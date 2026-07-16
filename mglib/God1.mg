@@ -43310,6 +43310,23 @@ Definition finite_dimensional_right_vector_space :
         K addK (opposite_ring_multiplication mulK)
         M addM (fun scalar x => smulR x scalar) I a.
 
+(** Dependency interface for §19, Theorem 2.  The book states Theorem 1 first
+    and proves it immediately from the stronger result stated next. **)
+Theorem god1_s19_theorem2_extension_interface :
+  forall K, forall addK mulK:set -> set -> set,
+  forall M, forall addM smulR:set -> set -> set,
+  forall X A,
+    right_vector_space K addK mulK M addM smulR ->
+    finite X ->
+    generating_family K addK (opposite_ring_multiplication mulK)
+      M addM (fun scalar x => smulR x scalar) X (fun x => x) ->
+    A c= X ->
+    linearly_independent_family K addK (opposite_ring_multiplication mulK)
+      M addM (fun scalar x => smulR x scalar) A (fun x => x) ->
+    exists B, A c= B /\ B c= X
+      /\ right_module_basis K addK mulK M addM smulR B (fun x => x).
+Admitted.
+
 Theorem god1_s19_theorem1_finite_dimensional_space_has_basis :
   forall K, forall addK mulK:set -> set -> set,
   forall M, forall addM smulR:set -> set -> set,
@@ -43319,6 +43336,23 @@ Theorem god1_s19_theorem1_finite_dimensional_space_has_basis :
 let K addK mulK M addM smulR.
 assume hFinite.
 //GOD1PRF:428161 This theorem is an immediate consequence of the following more precise result:\\
+claim h_s19_t1_theorem2_formal_call :
+  forall K0, forall aK mK:set -> set -> set,
+  forall X0, forall aX sX:set -> set -> set,
+  forall G A,
+    right_vector_space K0 aK mK X0 aX sX ->
+    finite G ->
+    generating_family K0 aK (opposite_ring_multiplication mK)
+      X0 aX (fun scalar x => sX x scalar) G (fun x => x) ->
+    A c= G ->
+    linearly_independent_family K0 aK (opposite_ring_multiplication mK)
+      X0 aX (fun scalar x => sX x scalar) A (fun x => x) ->
+    exists B, A c= B /\ B c= G
+      /\ right_module_basis K0 aK mK X0 aX sX B (fun x => x).
+apply god1_s19_theorem2_extension_interface.
+claim h_s19_t1_basis_conclusion : exists n :e omega, exists a:set -> set,
+  right_module_basis K addK mulK M addM smulR n a.
+admit.
 Admitted.
 
 Theorem god1_s19_theorem2_extend_independent_subset_to_basis :
@@ -43340,11 +43374,56 @@ Theorem god1_s19_theorem2_extend_independent_subset_to_basis :
 let K addK mulK M addM smulR X A.
 assume hSpace hFinite hGenerate hAX hIndependent.
 //GOD1PRF:428550 Consider all the subsets of X which are free (i.e. linearly independent) and contain A ; such subsets exist, for example A itself. Among these subsets, choose one, say B, which has the largest possible number of elements. In order to prove Theorem 2, it is enough to show that B is a basis of M , or that B generates M (since by construction B is free).
+claim h_s19_t2_maximal_independent_extension : exists B,
+  A c= B /\ B c= X
+  /\ linearly_independent_family K addK (opposite_ring_multiplication mulK)
+    M addM (fun scalar y => smulR y scalar) B (fun y => y)
+  /\ forall C, B c= C -> C c= X ->
+    linearly_independent_family K addK (opposite_ring_multiplication mulK)
+      M addM (fun scalar y => smulR y scalar) C (fun y => y) -> C = B.
+admit.
 //GOD1PRF:428905 Since X generates M , it is enough to show that every $x \in \mathrm{X}$ is a linear combination of elements of $\mathbf{B}$. Since this is obvious if $x \in \mathbf{B}$, we shall suppose that $x \notin \mathbf{B}$.
+claim h_s19_t2_generation_reduction : forall B,
+  B c= X ->
+  (forall x :e X,
+    linear_combination K addK (opposite_ring_multiplication mulK)
+      M addM (fun scalar y => smulR y scalar) B (fun y => y) x) ->
+  generating_family K addK (opposite_ring_multiplication mulK)
+    M addM (fun scalar y => smulR y scalar) B (fun y => y).
+admit.
 //GOD1PRF:429122 The set $\mathbf{B}^{\prime}=\mathbf{B} \cup\{x\}$ is contained in $\mathbf{X}$ and contains more elements than $\mathbf{B}$; also $\mathbf{A} \subset \mathbf{B}^{\prime}$, and therefore (by the definition of $\mathbf{B}$ ) $\mathbf{B}^{\prime}$ cannot be free. Hence if $x_{1}, \ldots, x_{r}$ are the distinct elements of $\mathbf{B}$, there exists a relation
+claim h_s19_t2_adjoining_outside_vector_dependent : forall B,
+  A c= B -> B c= X ->
+  (forall C, B c= C -> C c= X ->
+    linearly_independent_family K addK (opposite_ring_multiplication mulK)
+      M addM (fun scalar y => smulR y scalar) C (fun y => y) -> C = B) ->
+  forall x :e X, x /:e B ->
+  ~ linearly_independent_family K addK (opposite_ring_multiplication mulK)
+    M addM (fun scalar y => smulR y scalar)
+    (SetAdjoin B x) (fun y => y).
+admit.
 //GOD1PRF:429584 in which not all the scalars $\lambda_{1}, \ldots, \lambda_{r}, \lambda$ are zero. In fact we have $\lambda \neq 0$, for otherwise (1) would reduce to a non-trivial linear relation between the elements $x_{i}$ of B , contrary to the fact that $\mathbf{B}$ is free.
+claim h_s19_t2_relation_has_nonzero_new_coefficient : forall B,
+  linearly_independent_family K addK (opposite_ring_multiplication mulK)
+    M addM (fun scalar y => smulR y scalar) B (fun y => y) ->
+  forall x :e X, x /:e B ->
+  ~ linearly_independent_family K addK (opposite_ring_multiplication mulK)
+    M addM (fun scalar y => smulR y scalar) (SetAdjoin B x) (fun y => y) ->
+  exists coeff:set -> set,
+    linear_relation K addK (opposite_ring_multiplication mulK)
+      M addM (fun scalar y => smulR y scalar)
+      (SetAdjoin B x) (fun y => y) coeff
+    /\ coeff x <> ring_zero K addK.
+admit.
 //GOD1PRF:429850 Since $\lambda \neq 0$, and since the ground ring K is a division ring, $\lambda$ is a unit in K ; hence, multiplying the left-hand side of (1) by $\lambda^{-1}$ we obtain
+claim h_s19_t2_nonzero_scalar_is_unit : forall scalar :e K,
+  scalar <> ring_zero K addK -> ring_unit K addK mulK scalar.
+admit.
 //GOD1PRF:430102 which shows that $x$ is indeed a linear combination of the elements of B . Q.E.D.\\
+claim h_s19_t2_basis_conclusion : exists B,
+  A c= B /\ B c= X
+  /\ right_module_basis K addK mulK M addM smulR B (fun x => x).
+admit.
 Admitted.
 
 Theorem god1_s19_corollary1_independent_family_extends_to_basis :
@@ -43364,6 +43443,26 @@ let x.
 assume hFinite.
 apply iffI.
 //GOD1PRF:430791 If there exists a basis of M containing the given vectors $x_{1}, \ldots, x_{p}$, then clearly they are linearly independent. Conversely, if they are linearly independent, choose a finite set $\mathbf{G}$ of generators of $\mathbf{M}$, and apply Theorem 2 to the sets
+claim h_s19_cor1_theorem2_formal_call :
+  forall K0, forall aK mK:set -> set -> set,
+  forall X0, forall aX sX:set -> set -> set,
+  forall G A,
+    right_vector_space K0 aK mK X0 aX sX -> finite G ->
+    generating_family K0 aK (opposite_ring_multiplication mK)
+      X0 aX (fun scalar y => sX y scalar) G (fun y => y) ->
+    A c= G ->
+    linearly_independent_family K0 aK (opposite_ring_multiplication mK)
+      X0 aX (fun scalar y => sX y scalar) A (fun y => y) ->
+    exists B, A c= B /\ B c= G
+      /\ right_module_basis K0 aK mK X0 aX sX B (fun y => y).
+apply god1_s19_theorem2_extend_independent_subset_to_basis.
+claim h_s19_cor1_extension_equivalence :
+  (exists B, p c= B /\ exists b:set -> set,
+    right_module_basis K addK mulK M addM smulR B b
+    /\ forall i :e p, b i = x i)
+  <-> linearly_independent_family K addK (opposite_ring_multiplication mulK)
+    M addM (fun scalar y => smulR y scalar) p x.
+admit.
 Admitted.
 
 Theorem god1_s19_corollary2_every_subspace_has_complement :
@@ -43379,6 +43478,37 @@ Theorem god1_s19_corollary2_every_subspace_has_complement :
 let K addK mulK M addM smulR N.
 assume hFinite hN.
 //GOD1PRF:431323 Let $\mathrm{M}^{\prime}$ be a subspace of M . By Theorem 2 of § 18, $\mathrm{M}^{\prime}$ is finite-dimensional and therefore (Theorem 1) has a basis $\left(x_{i}\right)_{1 \leqslant i \leqslant p}$. By applying Corollary 1 to these vectors and the space M , we see that there exist vectors $x_{p+1}, \ldots, x_{r}$ such that $x_{1}, \ldots, x_{r}$ is a basis of M . Clearly the subspace of M generated by $x_{p+1}, \ldots, x_{r}$ is a complement of $\mathbf{M}^{\prime}$ in $\mathbf{M}$.
+claim h_s19_cor2_s18_theorem2_formal_call :
+  forall K0, forall aK mK:set -> set -> set,
+  ring K0 aK mK ->
+  (left_noetherian_ring K0 aK mK
+  <-> forall X, forall aX sX:set -> set -> set,
+    finitely_generated_module K0 aK mK X aX sX ->
+    forall Y, submodule K0 aK mK X aX sX Y ->
+      finitely_generated_module K0 aK mK Y aX sX).
+apply god1_s18_theorem2_noetherian_submodule_characterization.
+claim h_s19_cor2_theorem1_formal_call :
+  forall K0, forall aK mK:set -> set -> set,
+  forall X, forall aX sX:set -> set -> set,
+    finite_dimensional_right_vector_space K0 aK mK X aX sX ->
+    exists n :e omega, exists a:set -> set,
+      right_module_basis K0 aK mK X aX sX n a.
+apply god1_s19_theorem1_finite_dimensional_space_has_basis.
+claim h_s19_cor2_corollary1_formal_call :
+  forall K0, forall aK mK:set -> set -> set,
+  forall X, forall aX sX:set -> set -> set,
+  forall p0 :e omega, forall x0:set -> set,
+    finite_dimensional_right_vector_space K0 aK mK X aX sX ->
+    ((exists B, p0 c= B /\ exists b:set -> set,
+      right_module_basis K0 aK mK X aX sX B b
+      /\ forall i :e p0, b i = x0 i)
+    <-> linearly_independent_family K0 aK (opposite_ring_multiplication mK)
+      X aX (fun scalar y => sX y scalar) p0 x0).
+apply god1_s19_corollary1_independent_family_extends_to_basis.
+claim h_s19_cor2_complement_conclusion : direct_summand
+  K addK (opposite_ring_multiplication mulK)
+  M addM (fun scalar x => smulR x scalar) N.
+admit.
 Admitted.
 
 //GOD1:434854 right_subspace_annihilator : "the annihilator of #7 in the dual of #4" | $#7^0$
@@ -43404,7 +43534,20 @@ Theorem god1_annihilator_is_vector_subspace :
 let K addK mulK L addL smulR M.
 assume hSpace hM.
 //GOD1PRF:434535 This set $\mathbf{M}^{0}$ is a vector subspace of $\mathbf{L}^{*}$. For if $f, g \in \mathbf{M}^{0}$, and if $h=\alpha f+\beta g$, where $\alpha, \beta$ are arbitrary scalars, then
+claim h_s19_annihilator_linear_combination :
+  forall f g :e right_subspace_annihilator K addK mulK L addL smulR M,
+  forall alpha beta :e K,
+  right_module_dual_addition L addK
+    (right_module_dual_left_scalar L mulK alpha f)
+    (right_module_dual_left_scalar L mulK beta g)
+  :e right_subspace_annihilator K addK mulK L addL smulR M.
+admit.
 //GOD1PRF:434807 so that $h \in \mathbf{M}^{0}$, as required.\\
+claim h_s19_annihilator_subspace_conclusion : vector_subspace K addK mulK
+  (right_module_dual K addK mulK L addL smulR)
+  (right_module_dual_addition L addK) (right_module_dual_left_scalar L mulK)
+  (right_subspace_annihilator K addK mulK L addL smulR M).
+admit.
 Admitted.
 
 Theorem god1_s19_theorem3_double_annihilator_membership :
@@ -43425,7 +43568,48 @@ let x.
 assume hx.
 apply iffI.
 //GOD1PRF:435302 The condition is clearly necessary ; let us show that it is sufficient. As we have seen in the proof of Corollary 2 of Theorem 2, there exists a basis $a_{1}, \ldots, a_{r}$ of L and an integer $p \leqslant r$ such that M is generated by $a_{1}, \ldots, a_{p}$. Let $f_{1}, \ldots, f_{r}$ be the coordinate functions with respect to the basis $a_{1}, \ldots, a_{r}$ of L ; then it is clear that M is defined by the relations
+claim h_s19_t3_corollary2_formal_call :
+  forall K0, forall aK mK:set -> set -> set,
+  forall X, forall aX sX:set -> set -> set, forall Y,
+    finite_dimensional_right_vector_space K0 aK mK X aX sX ->
+    submodule K0 aK (opposite_ring_multiplication mK)
+      X aX (fun scalar x => sX x scalar) Y ->
+    direct_summand K0 aK (opposite_ring_multiplication mK)
+      X aX (fun scalar x => sX x scalar) Y.
+apply god1_s19_corollary2_every_subspace_has_complement.
+claim h_s19_t3_coordinate_theorem_formal_call :
+  forall K0, forall aK mK:set -> set -> set,
+  forall X, forall aX sX:set -> set -> set,
+  forall I, forall a:set -> set,
+    module_basis K0 aK mK X aX sX I a ->
+    (forall x :e X,
+      linear_representation K0 aK mK X aX sX I a x
+        (fun i => basis_coordinates K0 aK mK X aX sX I a x i)
+      /\ (forall coeff:set -> set,
+        linear_representation K0 aK mK X aX sX I a x coeff ->
+        forall i :e I, coeff i = basis_coordinates K0 aK mK X aX sX I a x i))
+    /\ (forall i :e I, forall x y :e X,
+      basis_coordinate_function K0 aK mK X aX sX I a i (aX x y)
+      = aK (basis_coordinate_function K0 aK mK X aX sX I a i x)
+        (basis_coordinate_function K0 aK mK X aX sX I a i y))
+    /\ (forall i :e I, forall scalar :e K0, forall x :e X,
+      basis_coordinate_function K0 aK mK X aX sX I a i (sX scalar x)
+      = mK scalar (basis_coordinate_function K0 aK mK X aX sX I a i x)).
+apply god1_basis_unique_coordinates_and_coordinate_linearity.
+claim h_s19_t3_adapted_basis_equations : exists r :e omega,
+  exists p :e r + 1, exists a:set -> set,
+    right_module_basis K addK mulK L addL smulR r a
+    /\ forall y :e L,
+      (y :e M <-> forall i :e r, p c= i ->
+        basis_coordinate_function K addK (opposite_ring_multiplication mulK)
+          L addL (fun scalar z => smulR z scalar) r a i y
+        = ring_zero K addK).
+admit.
 //GOD1PRF:435802 in other words that $\mathbf{M}^{0}$ contains the linear forms $f_{p+1}, \ldots, f_{r}$, and that the relations (3) characterize the elements of M. Since the relations (3) are obviously satisfied if the condition (2) is satisfied for all $f \in \mathrm{M}^{0}$, the theorem is proved.
+claim h_s19_t3_double_annihilator_conclusion :
+  x :e M <-> forall f :e right_subspace_annihilator
+    K addK mulK L addL smulR M, f x = ring_zero K addK.
+admit.
 Admitted.
 
 Theorem god1_s19_theorem3_corollary1_subspace_defined_by_annihilator_generators :
@@ -43448,8 +43632,31 @@ let x.
 assume hx.
 apply iffI.
 //GOD1PRF:437019 Conversely, if the forms $f_{i}(1 \leqslant i \leqslant m)$ generate $\mathbf{M}^{0}$, then the elements of $\mathbf{M}$ are characterized by the relations
+claim h_s19_t3_cor1_equation_goal :
+  x :e M <-> forall i :e I, f i x = ring_zero K addK.
+admit.
 //GOD1PRF:437210 For every $f \in \mathbf{M}^{0}$ can be written in the form
+claim h_s19_t3_cor1_annihilator_generation :
+  forall u :e right_subspace_annihilator K addK mulK L addL smulR M,
+  linear_combination K addK mulK
+    (right_subspace_annihilator K addK mulK L addL smulR M)
+    (right_module_dual_addition L addK) (right_module_dual_left_scalar L mulK)
+    I f u.
+admit.
 //GOD1PRF:437322 with coefficients $\alpha_{i} \in \mathrm{~K}$, and it is clear that the equations above then imply that $f(x)=0$, so that $x \in \mathbf{M}$ by Theorem 3.
+claim h_s19_t3_cor1_theorem3_formal_call :
+  forall K0, forall aK mK:set -> set -> set,
+  forall X, forall aX sX:set -> set -> set, forall Y,
+    finite_dimensional_right_vector_space K0 aK mK X aX sX ->
+    submodule K0 aK (opposite_ring_multiplication mK)
+      X aX (fun scalar z => sX z scalar) Y ->
+    forall y :e X,
+      (y :e Y <-> forall u :e right_subspace_annihilator
+        K0 aK mK X aX sX Y, u y = ring_zero K0 aK).
+apply god1_s19_theorem3_double_annihilator_membership.
+claim h_s19_t3_cor1_conclusion :
+  x :e M <-> forall i :e I, f i x = ring_zero K addK.
+admit.
 Admitted.
 
 Theorem god1_s19_theorem3_corollary2_proper_subspace_has_nonzero_form :
@@ -43466,6 +43673,21 @@ let K addK mulK L addL smulR M.
 assume hFinite hM.
 apply iffI.
 //GOD1PRF:438155 If $\mathrm{M}=\mathrm{L}$, clearly $\mathrm{M}^{0}=\{0\}$. Conversely, if $\mathrm{M}^{0}=\{0\}$, then Theorem 3 shows that $\mathrm{M}=\mathrm{L}$. Hence the relations $\mathrm{M}=\mathrm{L}$ and $\mathrm{M}^{0}=\{0\}$ are equivalent, and therefore so are the relations $\mathrm{M} \neq \mathrm{L}$ and $\mathrm{M}^{0} \neq\{0\}$.
+claim h_s19_t3_cor2_theorem3_formal_call :
+  forall K0, forall aK mK:set -> set -> set,
+  forall X, forall aX sX:set -> set -> set, forall Y,
+    finite_dimensional_right_vector_space K0 aK mK X aX sX ->
+    submodule K0 aK (opposite_ring_multiplication mK)
+      X aX (fun scalar z => sX z scalar) Y ->
+    forall y :e X,
+      (y :e Y <-> forall u :e right_subspace_annihilator
+        K0 aK mK X aX sX Y, u y = ring_zero K0 aK).
+apply god1_s19_theorem3_double_annihilator_membership.
+claim h_s19_t3_cor2_nonzero_annihilator :
+  M <> L <-> exists f :e right_module_dual K addK mulK L addL smulR,
+    f <> (fun x :e L => ring_zero K addK)
+    /\ forall x :e M, f x = ring_zero K addK.
+admit.
 Admitted.
 
 Theorem god1_s19_theorem4_independent_forms_iff_all_values_attained :
@@ -43486,10 +43708,58 @@ let f.
 assume hSpace hf.
 apply iffI.
 //GOD1PRF:439273 Consider the homomorphism $f: \mathrm{M} \rightarrow \mathrm{K}^{r}$ defined by
+claim h_s19_t4_evaluation_homomorphism : right_module_homomorphism
+  K addK mulK M addM smulR
+  (K :^: r) (module_power_addition r addK)
+  (fun x scalar => module_power_left_scalar r mulK scalar x)
+  (fun x => fun i :e r => f i x).
+admit.
 //GOD1PRF:439408 then the statement $b$ ) above expresses that $f$ is surjective. Now $f(\mathrm{M})$ is a subspace of $\mathrm{K}^{r}$; hence, by virtue of Corollary 2 of Theorem 3, condition b) is satisfied if and only if the only linear form $u$ on $\mathrm{K}^{r}$ which is zero on the subspace $f(\mathrm{M})$ is the zero form $u=0$.
+claim h_s19_t4_theorem3_corollary2_formal_call :
+  forall K0, forall aK mK:set -> set -> set,
+  forall X, forall aX sX:set -> set -> set, forall Y,
+    finite_dimensional_right_vector_space K0 aK mK X aX sX ->
+    submodule K0 aK (opposite_ring_multiplication mK)
+      X aX (fun scalar z => sX z scalar) Y ->
+    (Y <> X <-> exists u :e right_module_dual K0 aK mK X aX sX,
+      u <> (fun x :e X => ring_zero K0 aK)
+      /\ forall x :e Y, u x = ring_zero K0 aK).
+apply god1_s19_theorem3_corollary2_proper_subspace_has_nonzero_form.
+claim h_s19_t4_surjectivity_annihilator_criterion :
+  surj M (K :^: r) (fun x => fun i :e r => f i x)
+  <-> right_subspace_annihilator K addK mulK
+    (K :^: r) (module_power_addition r addK)
+    (fun x scalar => module_power_left_scalar r mulK scalar x)
+    (module_homomorphism_image M (fun x => fun i :e r => f i x))
+    = {(fun i :e r => ring_zero K addK)}.
+admit.
 //GOD1PRF:439829 be such a form. Then we have
+claim h_s19_t4_form_on_power_coordinates : forall u :e
+  right_module_dual K addK mulK (K :^: r)
+    (module_power_addition r addK)
+    (fun x scalar => module_power_left_scalar r mulK scalar x),
+  exists alpha :e K :^: r, forall z :e K :^: r,
+    u z = ring_finite_sum K addK r (fun i => mulK (alpha i) (z i)).
+admit.
 //GOD1PRF:439923 for all $x \in \mathrm{M}$; hence $u$ is zero on $f(\mathrm{M})$ if and only if the forms $f_{i}$ satisfy the linear relation
+claim h_s19_t4_vanishing_iff_linear_relation : forall alpha :e K :^: r,
+  (forall x :e M,
+    ring_finite_sum K addK r (fun i => mulK (alpha i) (f i x))
+      = ring_zero K addK)
+  <-> linear_relation K addK mulK
+    (right_module_dual K addK mulK M addM smulR)
+    (right_module_dual_addition M addK) (right_module_dual_left_scalar M mulK)
+    r f (fun i => alpha i).
+admit.
 //GOD1PRF:440104 Hence property $a$ ) of the theorem means that the only form $u$ which vanishes on the subspace $f(\mathrm{M})$ is $u=0$.\\
+claim h_s19_t4_independence_surjectivity_conclusion :
+  linearly_independent_family K addK mulK
+    (right_module_dual K addK mulK M addM smulR)
+    (right_module_dual_addition M addK) (right_module_dual_left_scalar M mulK)
+    r f
+  <-> forall beta :e K :^: r, exists x :e M,
+    forall i :e r, f i x = beta i.
+admit.
 Admitted.
 
 //GOD1:442302 linear_system_consistency_conditions : "the consistency conditions for the dependent equations #8 with right sides #10" | $#10_j=\sum_k\rho_{jk}#10_k$
@@ -43535,9 +43805,56 @@ let f rho beta.
 assume hbeta hSpace hrn hIndependent hRelations.
 apply andI.
 //GOD1PRF:441760 The relations (6) signify that\\
+claim h_s19_t5_dependent_form_relations : forall j :e n, j /:e r ->
+  forall x :e M,
+  f j x = ring_finite_sum K addK r (fun k => mulK (rho j k) (f k x)).
+admit.
 //GOD1PRF:441865 for all $x \in \mathrm{M}$; hence, if there exists $x \in \mathrm{M}$ satisfying (5), the relations (7) must be satisfied.
+claim h_s19_t5_consistency_necessary :
+  (exists x :e M, forall i :e n, f i x = beta i) ->
+  forall j :e n, j /:e r ->
+    beta j = ring_finite_sum K addK r (fun k => mulK (rho j k) (beta k)).
+admit.
 //GOD1PRF:441989 Conversely, suppose that the relations (7) are satisfied, and consider any solution $x$ of (8). Then, by (6 bis), we have
+claim h_s19_t5_reduced_solution_extends :
+  (forall j :e n, j /:e r ->
+    beta j = ring_finite_sum K addK r (fun k => mulK (rho j k) (beta k))) ->
+  forall x :e M, (forall i :e r, f i x = beta i) ->
+    forall i :e n, f i x = beta i.
+admit.
 //GOD1PRF:442177 and (7) shows that the systems (5) and (8) have the same solutions. But (8) certainly has solutions, by Theorem 4.\\
+claim h_s19_t5_theorem4_formal_call :
+  forall K0, forall aK mK:set -> set -> set,
+  forall X, forall aX sX:set -> set -> set,
+  forall r0 :e omega, forall forms:set -> set,
+    right_vector_space K0 aK mK X aX sX ->
+    (forall i :e r0, forms i :e right_module_dual K0 aK mK X aX sX) ->
+    (linearly_independent_family K0 aK mK
+      (right_module_dual K0 aK mK X aX sX)
+      (right_module_dual_addition X aK) (right_module_dual_left_scalar X mK)
+      r0 forms
+    <-> forall values :e K0 :^: r0, exists x :e X,
+      forall i :e r0, forms i x = values i).
+apply god1_s19_theorem4_independent_forms_iff_all_values_attained.
+claim h_s19_t5_solution_sets_equal :
+  (forall j :e n, j /:e r ->
+    beta j = ring_finite_sum K addK r (fun k => mulK (rho j k) (beta k))) ->
+  {x :e M|forall i :e n, f i x = beta i}
+  = {x :e M|forall i :e r, f i x = beta i}.
+admit.
+Admitted.
+
+(** Dependency interface for §19, Theorem 7, which the book uses to close
+    the proof of Theorem 6 immediately before stating Theorem 7 itself. **)
+Theorem god1_s19_theorem7_size_bound_interface :
+  forall K, forall addK mulK:set -> set -> set,
+  forall M, forall addM smulR:set -> set -> set,
+  forall p q :e omega, forall a x:set -> set,
+    right_vector_space K addK mulK M addM smulR ->
+    right_module_basis K addK mulK M addM smulR p a ->
+    linearly_independent_family K addK (opposite_ring_multiplication mulK)
+      M addM (fun scalar y => smulR y scalar) q x ->
+    q c= p.
 Admitted.
 
 Theorem god1_s19_theorem6_all_bases_have_same_size :
@@ -43555,6 +43872,17 @@ assume hq.
 let a b.
 assume hSpace hBasisA hBasisB.
 //GOD1PRF:443392 Let $\left(a_{i}\right)_{1 \leqslant i \leqslant p}$ and $\left(b_{j}\right)_{1 \leqslant j \leqslant q}$ be two bases of M . To prove that $p=q$, we shall show that $p \leqslant q$ and $q \leqslant p$; by symmetry, it is enough to show that $q \leqslant p$. Now this is an immediate consequence of the following result:\\
+claim h_s19_t6_theorem7_formal_call :
+  forall K0, forall aK mK:set -> set -> set,
+  forall X, forall aX sX:set -> set -> set,
+  forall p0 q0 :e omega, forall a0 x0:set -> set,
+    right_vector_space K0 aK mK X aX sX ->
+    right_module_basis K0 aK mK X aX sX p0 a0 ->
+    linearly_independent_family K0 aK (opposite_ring_multiplication mK)
+      X aX (fun scalar y => sX y scalar) q0 x0 -> q0 c= p0.
+apply god1_s19_theorem7_size_bound_interface.
+claim h_s19_t6_basis_sizes_equal : p = q.
+admit.
 Admitted.
 
 Theorem god1_s19_theorem7_independent_family_no_larger_than_basis :
@@ -43574,17 +43902,77 @@ assume hq.
 let a x.
 assume hSpace hBasis hIndependent.
 //GOD1PRF:444001 Let $\left(a_{i}\right)_{1 \leqslant i \leqslant p}$ be a basis of M , and let $b_{1}, \ldots, b_{q}$ be elements of M . We shall show that there exists a non-trivial linear relation between the $b_{j}$ whenever $q>p$, and this will prove Theorem 7.
+claim h_s19_t7_dependence_reduction :
+  (~ q c= p -> ~ linearly_independent_family
+    K addK (opposite_ring_multiplication mulK)
+    M addM (fun scalar y => smulR y scalar) q x) -> q c= p.
+admit.
 //GOD1PRF:444252 The assertion to be proved is clear if $p=0$, for then $\mathrm{M}=\{0\}$, and since $q \geqslant 1$ it is clear that the $b_{j}$ satisfy, for example, the relation
+claim h_s19_t7_zero_dimensional_base_case : p = 0 ->
+  linearly_independent_family K addK (opposite_ring_multiplication mulK)
+    M addM (fun scalar y => smulR y scalar) q x -> q = 0.
+admit.
 //GOD1PRF:444464 Now suppose that the theorem is true for $p-1$. Let $M^{\prime}$ be the subspace of $M$ generated by $a_{1}, \ldots, a_{p-1}$; since $a_{1}, \ldots, a_{p}$ generate M , we have relations
+claim h_s19_t7_inductive_subspace : forall m :e p,
+  submodule K addK (opposite_ring_multiplication mulK)
+    M addM (fun scalar y => smulR y scalar)
+    (submodule_generated_by_family K addK (opposite_ring_multiplication mulK)
+      M addM (fun scalar y => smulR y scalar) m a).
+admit.
 //GOD1PRF:444768 with vectors $b_{j}^{\prime} \in \mathrm{M}^{\prime}$ and scalars $\alpha_{j} \in \mathrm{~K}$. If all the $\alpha_{j}$ are zero, then all the $b_{j}$ are in $\mathrm{M}^{\prime}$;\\
+claim h_s19_t7_basis_vector_decomposition : forall m :e p,
+  forall j :e q, exists y :e
+    submodule_generated_by_family K addK (opposite_ring_multiplication mulK)
+      M addM (fun scalar z => smulR z scalar) m a,
+  exists alpha :e K, x j = addM y (smulR (a m) alpha).
+admit.
 //GOD1PRF:444951 but since $\mathrm{M}^{\prime}$ has a basis of $p-1$ vectors, the inductive hypothesis applies to $\mathrm{M}^{\prime}$; we have $q>p$, so a fortiori $q>p-1$, and therefore in this case the existence of a non-trivial linear relation between the $b_{j}$ is immediately clear.
+claim h_s19_t7_zero_last_coordinates_dependent : forall m :e p,
+  (forall j :e q,
+    x j :e submodule_generated_by_family K addK
+      (opposite_ring_multiplication mulK) M addM
+      (fun scalar z => smulR z scalar) m a) ->
+  ~ q c= m ->
+  ~ linearly_independent_family K addK (opposite_ring_multiplication mulK)
+    M addM (fun scalar z => smulR z scalar) q x.
+admit.
 //GOD1PRF:445227 We have still to look at the case in which not all the $\alpha_{j}$ are zero. Suppose for example that
+claim h_s19_t7_choose_nonzero_last_coordinate :
+  exists j :e q, exists alpha :e K, alpha <> ring_zero K addK.
+admit.
 //GOD1PRF:445356 then $\alpha_{q}$ has an inverse in K , because K is a division ring. Then the last of the relations (9) gives
+claim h_s19_t7_nonzero_coordinate_invertible : forall alpha :e K,
+  alpha <> ring_zero K addK -> ring_unit K addK mulK alpha.
+admit.
 //GOD1PRF:445530 substituting this expression for $a_{p}$ in the other relations (9) we obtain
+claim h_s19_t7_eliminate_last_basis_vector : forall m :e p,
+  forall j :e q,
+  exists y :e submodule_generated_by_family K addK
+    (opposite_ring_multiplication mulK) M addM
+    (fun scalar z => smulR z scalar) m a,
+  exists nu :e K, addM (x j) (smulR (x j) nu) = y.
+admit.
 //GOD1PRF:445744 after an elementary calculation, where $\nu_{j}=\alpha_{j} \alpha_{q}^{-1}$.\\
+claim h_s19_t7_elimination_coefficients : forall alpha alphaq :e K,
+  alphaq <> ring_zero K addK ->
+  mulK alpha (ring_inverse K addK mulK alphaq) :e K.
+admit.
 //GOD1PRF:445823 The formulae (10) show that the $q-1$ vectors $b_{j}-v_{j} b_{q}$ lie in the vector subspace $\mathrm{M}^{\prime}$. Since $q>p$ implies that $q-1>p-1$, the inductive hypothesis shows that there exists a relation of the form
+claim h_s19_t7_reduced_family_dependent : forall m :e p,
+  exists coeff:set -> set,
+    linear_relation K addK (opposite_ring_multiplication mulK)
+      M addM (fun scalar z => smulR z scalar) q x coeff
+    /\ exists j :e q, coeff j <> ring_zero K addK.
+admit.
 //GOD1PRF:446154 where the $\lambda_{i}$ are scalars not all of which are zero; but this relation can also be written in the form
+claim h_s19_t7_lift_reduced_relation : exists coeff:set -> set,
+  linear_relation K addK (opposite_ring_multiplication mulK)
+    M addM (fun scalar z => smulR z scalar) q x coeff
+  /\ exists j :e q, coeff j <> ring_zero K addK.
+admit.
 //GOD1PRF:446407 and so the existence of a non-trivial linear relation between $b_{1}, \ldots, b_{q}$ is proved. Q.E.D.
+claim h_s19_t7_size_bound_conclusion : q c= p.
+admit.
 Admitted.
 
 Theorem god1_s19_theorem7_corollary_underdetermined_homogeneous_system :
@@ -43602,8 +43990,30 @@ assume hp.
 let A.
 assume hA hK hnp.
 //GOD1PRF:447328 Consider the $p$ elements
+claim h_s19_t7_cor_matrix_columns : forall j :e p,
+  (fun i :e n => matrix_entry A i j) :e K :^: n.
+admit.
 //GOD1PRF:447416 of $\mathrm{K}^{n}$. The relations (11) are obviously equivalent to the relation
+claim h_s19_t7_cor_system_kernel_equivalence : forall x :e K :^: p,
+  homogeneous_linear_system_solution K add mul n p A x
+  <-> forall i :e n,
+    ring_finite_sum K add p
+      (fun j => mul (matrix_entry A i j) (x j)) = ring_zero K add.
+admit.
 //GOD1PRF:447542 and for the system (11) to have a solution other than $\xi_{1}=\cdots=\xi_{p}=0$ it is therefore necessary and sufficient that the vectors $a_{i}$ should be linearly dependent; this will always be the case if $p>n$, by Theorem 7 .
+claim h_s19_t7_cor_theorem7_formal_call :
+  forall K0, forall aK mK:set -> set -> set,
+  forall X, forall aX sX:set -> set -> set,
+  forall n0 p0 :e omega, forall a x:set -> set,
+    right_vector_space K0 aK mK X aX sX ->
+    right_module_basis K0 aK mK X aX sX n0 a ->
+    linearly_independent_family K0 aK (opposite_ring_multiplication mK)
+      X aX (fun scalar y => sX y scalar) p0 x -> p0 c= n0.
+apply god1_s19_theorem7_independent_family_no_larger_than_basis.
+claim h_s19_t7_cor_nonzero_solution : exists x :e K :^: p,
+  homogeneous_linear_system_solution K add mul n p A x
+  /\ x <> (fun j :e p => ring_zero K add).
+admit.
 Admitted.
 
 //GOD1:448413 module_dimension : "the dimension of the finite-dimensional left module #4 over #1" | $\dim_{#1}(#4)$
@@ -43636,6 +44046,17 @@ assume hn.
 let a.
 assume hSpace hBasis.
 //GOD1PRF:448413 Let M be a finite-dimensional vector space over K . By Theorem 6 there is a welldefined integer $n$ such that all the bases of $M$ have $n$ elements. This number $n$ is called the dimension of $M$ over the division ring $K$ (or simply the dimension of $M$ if there is no possible ambiguity about K ), and is denoted by
+claim h_s19_dimension_theorem6_formal_call :
+  forall K0, forall aK mK:set -> set -> set,
+  forall X, forall aX sX:set -> set -> set,
+  forall p0 q0 :e omega, forall a b:set -> set,
+    right_vector_space K0 aK mK X aX sX ->
+    right_module_basis K0 aK mK X aX sX p0 a ->
+    right_module_basis K0 aK mK X aX sX q0 b -> p0 = q0.
+apply god1_s19_theorem6_all_bases_have_same_size.
+claim h_s19_dimension_basis_size :
+  right_vector_dimension K addK mulK M addM smulR = n.
+admit.
 Admitted.
 
 Theorem god1_s19_theorem8_isomorphic_iff_same_dimension :
@@ -43654,6 +44075,23 @@ let K addK mulK L addL smulL M addM smulM.
 assume hFiniteL hFiniteM.
 apply iffI.
 //GOD1PRF:450464 If there exists an isomorphism $f$ of L onto M , then $f$ maps a basis of L to a basis of M , and therefore $\operatorname{dim}(\mathrm{L})=\operatorname{dim}(\mathrm{M})$. Conversely, if this condition is satisfied, and if $n$ is the common dimension of L and M , then L and M are each isomorphic to $\mathrm{K}^{n}$ by § 12, Theorem 3, Corollary 1, and are therefore isomorphic to each other.
+claim h_s19_t8_s12_corollary1_formal_call :
+  forall K0, forall aK mK:set -> set -> set,
+  forall X, forall aX sX:set -> set -> set,
+    left_module K0 aK mK X aX sX ->
+    (finitely_generated_free_module K0 aK mK X aX sX
+    <-> exists n0 :e omega,
+      isomorphic_modules K0 aK mK (K0 :^: n0)
+        (module_power_addition n0 aK) (module_power_left_scalar n0 mK)
+        X aX sX).
+apply god1_s12_corollary1_free_module_iff_isomorphic_to_power.
+claim h_s19_t8_dimension_classification :
+  isomorphic_modules K addK (opposite_ring_multiplication mulK)
+    L addL (fun scalar x => smulL x scalar)
+    M addM (fun scalar x => smulM x scalar)
+  <-> right_vector_dimension K addK mulK L addL smulL
+    = right_vector_dimension K addK mulK M addM smulM.
+admit.
 Admitted.
 
 Theorem god1_dimension_of_power_product_and_dual :
@@ -43676,7 +44114,65 @@ let n.
 assume hn hDivision.
 apply andI.
 //GOD1PRF:450948 Example 1. For any $n \geq 0$, we have
+claim h_s19_power_canonical_basis_formal_call : module_basis
+  K addK (opposite_ring_multiplication mulK)
+  (K :^: n) (module_power_addition n addK)
+  (fun scalar x => module_power_left_scalar n
+    (opposite_ring_multiplication mulK) scalar x)
+  n (canonical_module_basis_vector K addK
+    (opposite_ring_multiplication mulK) n).
+apply (god1_canonical_basis_of_finite_module_power
+  K addK (opposite_ring_multiplication mulK) n hn).
+claim h_s19_power_dimension : right_vector_dimension K addK mulK
+  (K :^: n) (module_power_addition n addK)
+  (fun x scalar => module_power_left_scalar n
+    (opposite_ring_multiplication mulK) scalar x) = n.
+admit.
 //GOD1PRF:452400 Let L be a vector space of dimension $n$. We have seen in § 16, Theorem 1, that the dual space of $L$ has a basis consisting of $n$ vectors. Hence
+claim h_s19_dual_s16_theorem1_formal_call :
+  forall K0, forall aK mK:set -> set -> set,
+  forall X, forall aX sX:set -> set -> set,
+  forall n0 :e omega, forall a:set -> set,
+    right_module_basis K0 aK mK X aX sX n0 a ->
+    module_isomorphism K0 aK mK
+      (right_module_dual K0 aK mK X aX sX)
+      (right_module_dual_addition X aK) (right_module_dual_left_scalar X mK)
+      (K0 :^: n0) (module_power_addition n0 aK)
+      (module_power_left_scalar n0 mK)
+      (fun u => right_module_dual_evaluation K0 aK mK X aX sX n0 a u)
+    /\ module_basis K0 aK mK
+      (right_module_dual K0 aK mK X aX sX)
+      (right_module_dual_addition X aK) (right_module_dual_left_scalar X mK)
+      n0 (fun i => fun x :e X =>
+        right_module_dual_basis_vector K0 aK mK X aX sX n0 a i x)
+    /\ forall i j :e n0,
+      right_module_dual_basis_vector K0 aK mK X aX sX n0 a i (a j)
+      = if i = j then ring_one K0 mK else ring_zero K0 aK.
+apply god1_s16_theorem1_dual_of_finite_free_module.
+claim h_s19_dual_dimension : module_dimension K addK mulK
+  (right_module_dual K addK mulK
+    (K :^: n) (module_power_addition n addK)
+    (fun x scalar => module_power_left_scalar n
+      (opposite_ring_multiplication mulK) scalar x))
+  (right_module_dual_addition (K :^: n) addK)
+  (right_module_dual_left_scalar (K :^: n) mulK) = n.
+admit.
+Admitted.
+
+(** Formal interface for Remark 2 of §19, section 2: the tail of the dual
+    basis annihilates an adapted subspace, yielding the complementary
+    dimension formula used in Theorem 9. **)
+Theorem god1_s19_section2_remark2_annihilator_dimension_interface :
+  forall K, forall addK mulK:set -> set -> set,
+  forall L, forall addL smulR:set -> set -> set, forall M,
+    finite_dimensional_right_vector_space K addK mulK L addL smulR ->
+    submodule K addK (opposite_ring_multiplication mulK)
+      L addL (fun scalar x => smulR x scalar) M ->
+    right_vector_dimension K addK mulK M addL smulR
+    + module_dimension K addK mulK
+      (right_subspace_annihilator K addK mulK L addL smulR M)
+      (right_module_dual_addition L addK) (right_module_dual_left_scalar L mulK)
+    = right_vector_dimension K addK mulK L addL smulR.
 Admitted.
 
 Theorem god1_s19_theorem9_dimension_of_annihilator :
@@ -43695,6 +44191,23 @@ Theorem god1_s19_theorem9_dimension_of_annihilator :
 let K addK mulK L addL smulR M.
 assume hFinite hSubmodule.
 //GOD1PRF:452911 Let $\operatorname{dim}(\mathrm{M})=p, \operatorname{dim}(\mathrm{~L})=r$. As we have seen in the course of the proof of Corollary 2 of Theorem 2, there exists a basis $x_{1}, \ldots, x_{r}$ of L such that $x_{1}, \ldots, x_{p}$ is a basis of M. Remark 2 of section 2 then shows that the subspace $\mathrm{M}^{0}$ of $\mathrm{L}^{*}$ has a basis consisting of $r-p$ vectors, and is therefore of dimension $r-p$.
+claim h_s19_t9_corollary2_formal_call :
+  forall K0, forall aK mK:set -> set -> set,
+  forall X, forall aX sX:set -> set -> set, forall Y,
+    finite_dimensional_right_vector_space K0 aK mK X aX sX ->
+    submodule K0 aK (opposite_ring_multiplication mK)
+      X aX (fun scalar z => sX z scalar) Y ->
+    direct_summand K0 aK (opposite_ring_multiplication mK)
+      X aX (fun scalar z => sX z scalar) Y.
+apply god1_s19_corollary2_every_subspace_has_complement.
+claim h_s19_t9_remark2_formal_call :
+  right_vector_dimension K addK mulK M addL smulR
+  + module_dimension K addK mulK
+    (right_subspace_annihilator K addK mulK L addL smulR M)
+    (right_module_dual_addition L addK) (right_module_dual_left_scalar L mulK)
+  = right_vector_dimension K addK mulK L addL smulR.
+apply (god1_s19_section2_remark2_annihilator_dimension_interface
+  K addK mulK L addL smulR M hFinite hSubmodule).
 Admitted.
 
 Theorem god1_s19_theorem9_corollary_subspace_dimension_bound :
@@ -43712,7 +44225,29 @@ let K addK mulK L addL smulR M.
 assume hFinite hSubmodule.
 apply andI.
 //GOD1PRF:453548 The first assertion is an immediate consequence of Theorem 9, which also shows that the relation $\operatorname{dim}(\mathrm{M})=\operatorname{dim}(\mathrm{L})$ is equivalent to
+claim h_s19_t9_cor_theorem9_formal_call :
+  right_vector_dimension K addK mulK M addL smulR
+  + module_dimension K addK mulK
+    (right_subspace_annihilator K addK mulK L addL smulR M)
+    (right_module_dual_addition L addK) (right_module_dual_left_scalar L mulK)
+  = right_vector_dimension K addK mulK L addL smulR.
+apply (god1_s19_theorem9_dimension_of_annihilator
+  K addK mulK L addL smulR M hFinite hSubmodule).
+claim h_s19_t9_cor_dimension_bound :
+  right_vector_dimension K addK mulK M addL smulR
+    c= right_vector_dimension K addK mulK L addL smulR.
+admit.
 //GOD1PRF:453783 i.e., to $\mathbf{M}^{\mathbf{0}}=\{0\}$; and by Corollary 2 of Theorem 3, this in turn is equivalent to $\mathrm{L}=\mathrm{M}$.
+claim h_s19_t9_cor_theorem3_corollary2_formal_call :
+  (M <> L <-> exists f :e right_module_dual K addK mulK L addL smulR,
+    f <> (fun x :e L => ring_zero K addK)
+    /\ forall x :e M, f x = ring_zero K addK).
+apply (god1_s19_theorem3_corollary2_proper_subspace_has_nonzero_form
+  K addK mulK L addL smulR M hFinite hSubmodule).
+claim h_s19_t9_cor_equality_characterization :
+  right_vector_dimension K addK mulK M addL smulR
+    = right_vector_dimension K addK mulK L addL smulR <-> M = L.
+admit.
 Admitted.
 
 //GOD1:454081 independent_family_size_bound : "every finite independent family in #4 has at most #7 elements" | $|I|\leq #7$
@@ -43765,12 +44300,106 @@ assume hn.
 let x.
 assume hSpace.
 //GOD1PRF:454684 Clearly a) implies b).\\
+claim h_s19_t10_a_implies_b :
+  right_module_basis K addK mulK M addM smulR n x ->
+  linearly_independent_family K addK (opposite_ring_multiplication mulK)
+    M addM (fun scalar y => smulR y scalar) n x
+  /\ finite_dimensional_right_vector_space K addK mulK M addM smulR
+  /\ right_vector_dimension K addK mulK M addM smulR = n.
+admit.
 //GOD1PRF:454709 To show that $b$ ) implies $c$ ), observe that any free subset of M is contained in some basis of M (Theorem 2, Corollary 1) and therefore (Theorem 6) has at most $n$ elements if $\operatorname{dim}(\mathrm{M})=n$.
+claim h_s19_t10_corollary1_formal_call :
+  forall K0, forall aK mK:set -> set -> set,
+  forall X, forall aX sX:set -> set -> set,
+  forall p0 :e omega, forall y:set -> set,
+    finite_dimensional_right_vector_space K0 aK mK X aX sX ->
+    ((exists B, p0 c= B /\ exists b:set -> set,
+      right_module_basis K0 aK mK X aX sX B b
+      /\ forall i :e p0, b i = y i)
+    <-> linearly_independent_family K0 aK (opposite_ring_multiplication mK)
+      X aX (fun scalar z => sX z scalar) p0 y).
+apply god1_s19_corollary1_independent_family_extends_to_basis.
+claim h_s19_t10_theorem6_formal_call :
+  forall K0, forall aK mK:set -> set -> set,
+  forall X, forall aX sX:set -> set -> set,
+  forall p0 q0 :e omega, forall a b:set -> set,
+    right_vector_space K0 aK mK X aX sX ->
+    right_module_basis K0 aK mK X aX sX p0 a ->
+    right_module_basis K0 aK mK X aX sX q0 b -> p0 = q0.
+apply god1_s19_theorem6_all_bases_have_same_size.
+claim h_s19_t10_b_implies_c :
+  (linearly_independent_family K addK (opposite_ring_multiplication mulK)
+    M addM (fun scalar y => smulR y scalar) n x
+  /\ finite_dimensional_right_vector_space K addK mulK M addM smulR
+  /\ right_vector_dimension K addK mulK M addM smulR = n) ->
+  independent_family_size_bound K addK (opposite_ring_multiplication mulK)
+    M addM (fun scalar y => smulR y scalar) n.
+admit.
 //GOD1PRF:454925 To show that $c$ ) implies $d$ ), consider a vector $x \in \mathrm{M}$; by $c$ ), the $n+1$ vectors $x_{1}, \ldots, x_{n}, x$ are linearly dependent, hence there is a non-trivial relation of the form
+claim h_s19_t10_c_implies_dependence_on_adjoining :
+  linearly_independent_family K addK (opposite_ring_multiplication mulK)
+    M addM (fun scalar y => smulR y scalar) n x ->
+  independent_family_size_bound K addK (opposite_ring_multiplication mulK)
+    M addM (fun scalar y => smulR y scalar) n ->
+  forall y :e M,
+  ~ linearly_independent_family K addK (opposite_ring_multiplication mulK)
+    M addM (fun scalar z => smulR z scalar)
+    (ordsucc n) (fun i => if i = n then y else x i).
+admit.
 //GOD1PRF:455190 here we must have $\lambda \neq 0$, otherwise we should have a non-trivial linear relation between $x_{1}, \ldots, x_{n}$, contrary to $c$ ); hence $\lambda$ is invertible and therefore
+claim h_s19_t10_new_coefficient_invertible : forall lambda :e K,
+  lambda <> ring_zero K addK -> ring_unit K addK mulK lambda.
+admit.
 //GOD1PRF:455458 Consequently the $x_{i}$ generate M , hence they form a basis of M , hence $\operatorname{dim}(\mathrm{M})=n$.\\
+claim h_s19_t10_c_implies_d :
+  (linearly_independent_family K addK (opposite_ring_multiplication mulK)
+    M addM (fun scalar y => smulR y scalar) n x
+  /\ independent_family_size_bound K addK (opposite_ring_multiplication mulK)
+    M addM (fun scalar y => smulR y scalar) n) ->
+  right_module_basis K addK mulK M addM smulR n x
+  /\ right_vector_dimension K addK mulK M addM smulR = n.
+admit.
 //GOD1PRF:455571 Next, $d$ ) implies $e$ ) because every system of generators of M contains a basis of M (Theorem 2) and therefore contains at least $n$ elements if $n=\operatorname{dim}(M)$.
+claim h_s19_t10_d_theorem2_formal_call :
+  forall K0, forall aK mK:set -> set -> set,
+  forall X, forall aX sX:set -> set -> set, forall G A,
+    right_vector_space K0 aK mK X aX sX -> finite G ->
+    generating_family K0 aK (opposite_ring_multiplication mK)
+      X aX (fun scalar y => sX y scalar) G (fun y => y) ->
+    A c= G ->
+    linearly_independent_family K0 aK (opposite_ring_multiplication mK)
+      X aX (fun scalar y => sX y scalar) A (fun y => y) ->
+    exists B, A c= B /\ B c= G
+      /\ right_module_basis K0 aK mK X aX sX B (fun y => y).
+apply god1_s19_theorem2_extend_independent_subset_to_basis.
+claim h_s19_t10_d_implies_e :
+  (generating_family K addK (opposite_ring_multiplication mulK)
+    M addM (fun scalar y => smulR y scalar) n x
+  /\ finite_dimensional_right_vector_space K addK mulK M addM smulR
+  /\ right_vector_dimension K addK mulK M addM smulR = n) ->
+  generating_family_size_bound K addK (opposite_ring_multiplication mulK)
+    M addM (fun scalar y => smulR y scalar) n.
+admit.
 //GOD1PRF:455747 To complete the proof, we must show that $e$ ) implies $a$ ). By Theorem 2 we can extract a basis of M out of the family $\left(x_{i}\right)_{1 \leqslant i \leqslant n}$; this basis is a set of generators of M and therefore contains at least $n$ elements, by $e$ ); hence it is the whole of the family $\left(x_{i}\right)_{1 \leqslant i \leqslant n}$. Hence the $x_{i}$ form a basis of M .\\
+claim h_s19_t10_e_theorem2_formal_call :
+  forall K0, forall aK mK:set -> set -> set,
+  forall X, forall aX sX:set -> set -> set, forall G A,
+    right_vector_space K0 aK mK X aX sX -> finite G ->
+    generating_family K0 aK (opposite_ring_multiplication mK)
+      X aX (fun scalar y => sX y scalar) G (fun y => y) ->
+    A c= G ->
+    linearly_independent_family K0 aK (opposite_ring_multiplication mK)
+      X aX (fun scalar y => sX y scalar) A (fun y => y) ->
+    exists B, A c= B /\ B c= G
+      /\ right_module_basis K0 aK mK X aX sX B (fun y => y).
+apply god1_s19_theorem2_extend_independent_subset_to_basis.
+claim h_s19_t10_e_implies_a :
+  (generating_family K addK (opposite_ring_multiplication mulK)
+    M addM (fun scalar y => smulR y scalar) n x
+  /\ generating_family_size_bound K addK (opposite_ring_multiplication mulK)
+    M addM (fun scalar y => smulR y scalar) n) ->
+  right_module_basis K addK mulK M addM smulR n x.
+admit.
 Admitted.
 
 Theorem god1_s19_theorem11_dimension_extremal_characterizations :
@@ -43800,6 +44429,49 @@ let n.
 assume hn hSpace.
 apply andI.
 //GOD1PRF:456496 The equivalence of $a$ ) and $b$ ) comes from the equivalence of $a$ ) and $c$ ) in Theorem 10. Likewise, the equivalence of $a$ ) and $c$ ) comes from the equivalence of $a$ ) and $e$ ) in Theorem 10.\\
+claim h_s19_t11_theorem10_formal_call :
+  forall K0, forall aK mK:set -> set -> set,
+  forall X, forall aX sX:set -> set -> set,
+  forall n0 :e omega, forall x0:set -> set,
+    right_vector_space K0 aK mK X aX sX ->
+    let mul0 := opposite_ring_multiplication mK in
+    (right_module_basis K0 aK mK X aX sX n0 x0
+    <-> linearly_independent_family K0 aK mul0 X aX
+      (fun scalar y => sX y scalar) n0 x0
+      /\ finite_dimensional_right_vector_space K0 aK mK X aX sX
+      /\ right_vector_dimension K0 aK mK X aX sX = n0)
+    /\ (right_module_basis K0 aK mK X aX sX n0 x0
+    <-> linearly_independent_family K0 aK mul0 X aX
+      (fun scalar y => sX y scalar) n0 x0
+      /\ independent_family_size_bound K0 aK mul0 X aX
+        (fun scalar y => sX y scalar) n0)
+    /\ (right_module_basis K0 aK mK X aX sX n0 x0
+    <-> generating_family K0 aK mul0 X aX
+      (fun scalar y => sX y scalar) n0 x0
+      /\ finite_dimensional_right_vector_space K0 aK mK X aX sX
+      /\ right_vector_dimension K0 aK mK X aX sX = n0)
+    /\ (right_module_basis K0 aK mK X aX sX n0 x0
+    <-> generating_family K0 aK mul0 X aX
+      (fun scalar y => sX y scalar) n0 x0
+      /\ generating_family_size_bound K0 aK mul0 X aX
+        (fun scalar y => sX y scalar) n0).
+apply god1_s19_theorem10_basis_characterizations.
+claim h_s19_t11_extremal_conclusions :
+  (finite_dimensional_right_vector_space K addK mulK M addM smulR
+    /\ right_vector_dimension K addK mulK M addM smulR = n
+  <-> (exists x:set -> set,
+    linearly_independent_family K addK (opposite_ring_multiplication mulK)
+      M addM (fun scalar y => smulR y scalar) n x)
+    /\ independent_family_size_bound K addK (opposite_ring_multiplication mulK)
+      M addM (fun scalar y => smulR y scalar) n)
+  /\ (finite_dimensional_right_vector_space K addK mulK M addM smulR
+    /\ right_vector_dimension K addK mulK M addM smulR = n
+  <-> (exists x:set -> set,
+    generating_family K addK (opposite_ring_multiplication mulK)
+      M addM (fun scalar y => smulR y scalar) n x)
+    /\ generating_family_size_bound K addK (opposite_ring_multiplication mulK)
+      M addM (fun scalar y => smulR y scalar) n).
+admit.
 Admitted.
 
 Theorem god1_s19_theorem12_bounded_independence_iff_finite_dimension :
@@ -43820,6 +44492,35 @@ let K addK mulK M addM smulR.
 assume hSpace.
 apply andI.
 //GOD1PRF:456960 The necessity of the condition follows from Theorem 11. Conversely, if the condition is satisfied, consider the largest integer $r$ such that M contains a family of $r$ linearly independent vectors; we have $r \leqslant n$ by hypothesis, and $\operatorname{dim}(\mathrm{M})=r$ by Theorem 11, c); hence M is finite-dimensional and $\operatorname{dim}(\mathrm{M}) \leqslant n$.
+claim h_s19_t12_theorem11_formal_call :
+  forall K0, forall aK mK:set -> set -> set,
+  forall X, forall aX sX:set -> set -> set, forall n0 :e omega,
+    right_vector_space K0 aK mK X aX sX ->
+    (finite_dimensional_right_vector_space K0 aK mK X aX sX
+      /\ right_vector_dimension K0 aK mK X aX sX = n0
+    <-> (exists x:set -> set,
+      linearly_independent_family K0 aK (opposite_ring_multiplication mK)
+        X aX (fun scalar y => sX y scalar) n0 x)
+      /\ independent_family_size_bound K0 aK (opposite_ring_multiplication mK)
+        X aX (fun scalar y => sX y scalar) n0)
+    /\ (finite_dimensional_right_vector_space K0 aK mK X aX sX
+      /\ right_vector_dimension K0 aK mK X aX sX = n0
+    <-> (exists x:set -> set,
+      generating_family K0 aK (opposite_ring_multiplication mK)
+        X aX (fun scalar y => sX y scalar) n0 x)
+      /\ generating_family_size_bound K0 aK (opposite_ring_multiplication mK)
+        X aX (fun scalar y => sX y scalar) n0).
+apply god1_s19_theorem11_dimension_extremal_characterizations.
+claim h_s19_t12_bounded_independence_conclusion :
+  (finite_dimensional_right_vector_space K addK mulK M addM smulR
+  <-> exists n :e omega,
+    independent_family_size_bound K addK (opposite_ring_multiplication mulK)
+      M addM (fun scalar y => smulR y scalar) n)
+  /\ forall n :e omega,
+    independent_family_size_bound K addK (opposite_ring_multiplication mulK)
+      M addM (fun scalar y => smulR y scalar) n ->
+    right_vector_dimension K addK mulK M addM smulR c= n.
+admit.
 Admitted.
 
 Theorem god1_s19_theorem13_rank_nullity :
@@ -43842,7 +44543,50 @@ Theorem god1_s19_theorem13_rank_nullity :
 let K addK mulK L addL smulL M addM smulM f.
 assume hFiniteL hSpaceM hHom.
 //GOD1PRF:457772 The kernel of $f$ is finite-dimensional, hence isomorphic to $\mathrm{K}^{p}$, where
+claim h_s19_t13_kernel_finite_and_classified : exists p :e omega,
+  p = right_vector_dimension K addK mulK
+    (module_homomorphism_kernel K addK (opposite_ring_multiplication mulK)
+      L addL (fun scalar x => smulL x scalar)
+      M addM (fun scalar x => smulM x scalar) f) addL smulL
+  /\ isomorphic_modules K addK (opposite_ring_multiplication mulK)
+    (module_homomorphism_kernel K addK (opposite_ring_multiplication mulK)
+      L addL (fun scalar x => smulL x scalar)
+      M addM (fun scalar x => smulM x scalar) f) addL
+    (fun scalar x => smulL x scalar)
+    (K :^: p) (module_power_addition p addK)
+    (fun scalar x => module_power_left_scalar p mulK scalar x).
+admit.
 //GOD1PRF:457910 and $\operatorname{Im}(f)$ is also finite-dimensional (since the image of a finitely-generated module under a homomorphism is clearly finitely generated), hence isomorphic to $\mathrm{K}^{q}$, where $q=\operatorname{dim}(\operatorname{Im}(f))$. Now apply Theorem 1 of § 18.
+claim h_s19_t13_s18_theorem1_formal_call :
+  forall K0, forall aK mK:set -> set -> set,
+  forall X, forall aX sX:set -> set -> set,
+  forall Y, forall aY sY:set -> set -> set, forall g:set -> set,
+    module_homomorphism K0 aK mK X aX sX Y aY sY g ->
+    (finitely_generated_module K0 aK mK
+      (module_homomorphism_kernel K0 aK mK X aX sX Y aY sY g) aX sX ->
+      finitely_generated_module K0 aK mK (module_homomorphism_image X g) aY sY ->
+      finitely_generated_module K0 aK mK X aX sX)
+    /\ (forall p0 q0 :e omega,
+      isomorphic_modules K0 aK mK
+        (module_homomorphism_kernel K0 aK mK X aX sX Y aY sY g) aX sX
+        (K0 :^: p0) (module_power_addition p0 aK)
+        (module_power_left_scalar p0 mK) ->
+      isomorphic_modules K0 aK mK (module_homomorphism_image X g) aY sY
+        (K0 :^: q0) (module_power_addition q0 aK)
+        (module_power_left_scalar q0 mK) ->
+      isomorphic_modules K0 aK mK X aX sX
+        (K0 :^: (p0 + q0)) (module_power_addition (p0 + q0) aK)
+        (module_power_left_scalar (p0 + q0) mK)).
+apply god1_s18_theorem1_finite_kernel_and_image.
+claim h_s19_t13_rank_nullity_conclusion :
+  right_vector_dimension K addK mulK L addL smulL
+  = right_vector_dimension K addK mulK
+      (module_homomorphism_kernel K addK (opposite_ring_multiplication mulK)
+        L addL (fun scalar x => smulL x scalar)
+        M addM (fun scalar x => smulM x scalar) f) addL smulL
+    + right_vector_dimension K addK mulK
+      (module_homomorphism_image L f) addM smulM.
+admit.
 Admitted.
 
 Theorem god1_s19_theorem13_corollary1_equal_dimension_map_conditions :
@@ -43867,8 +44611,89 @@ let K addK mulK L addL smulL M addM smulM f.
 assume hFiniteL hFiniteM hEqualDimension hHom.
 apply andI.
 //GOD1PRF:458857 We have known already for a long time that $c$ ) and $d$ ) are equivalent (§ 7, Theorem 8). Since $a$ ) is the conjunction of $b$ ) and $c$ ), it is enough to prove that $b$ ) and $d$ ) are equivalent. Now (Theorem 9, Corollary) b) is equivalent to the relation
+claim h_s19_t13_cor1_s7_theorem8_formal_call :
+  forall G, forall opG:set -> set -> set,
+  forall H, forall opH:set -> set -> set, forall g:set -> set,
+    group_homomorphism G opG H opH g ->
+    (inj G H g <-> group_homomorphism_kernel G opG H opH g
+      = {group_identity G opG}).
+apply god1_s7_theorem8_injective_iff_trivial_kernel.
+claim h_s19_t13_cor1_theorem9_corollary_formal_call :
+  forall K0, forall aK mK:set -> set -> set,
+  forall X, forall aX sX:set -> set -> set, forall Y,
+    finite_dimensional_right_vector_space K0 aK mK X aX sX ->
+    submodule K0 aK (opposite_ring_multiplication mK)
+      X aX (fun scalar z => sX z scalar) Y ->
+    right_vector_dimension K0 aK mK Y aX sX
+      c= right_vector_dimension K0 aK mK X aX sX
+    /\ (right_vector_dimension K0 aK mK Y aX sX
+      = right_vector_dimension K0 aK mK X aX sX <-> Y = X).
+apply god1_s19_theorem9_corollary_subspace_dimension_bound.
+claim h_s19_t13_cor1_surjectivity_dimension_relation :
+  surj L M f <-> right_vector_dimension K addK mulK
+    (module_homomorphism_image L f) addM smulM
+    = right_vector_dimension K addK mulK M addM smulM.
+admit.
 //GOD1PRF:459231 and $d$ ) is equivalent to the relation
+claim h_s19_t13_cor1_injectivity_dimension_relation :
+  inj L M f <-> right_vector_dimension K addK mulK
+    (module_homomorphism_kernel K addK (opposite_ring_multiplication mulK)
+      L addL (fun scalar x => smulL x scalar)
+      M addM (fun scalar x => smulM x scalar) f) addL smulL = 0.
+admit.
 //GOD1PRF:459363 and the equivalence of (12) and (13) follows from Theorem 13 and the hypothesis $\operatorname{dim}(\mathrm{L})=\operatorname{dim}(\mathrm{M})$.\\
+claim h_s19_t13_cor1_theorem13_formal_call :
+  forall K0, forall aK mK:set -> set -> set,
+  forall X, forall aX sX:set -> set -> set,
+  forall Y, forall aY sY:set -> set -> set, forall g:set -> set,
+    finite_dimensional_right_vector_space K0 aK mK X aX sX ->
+    right_vector_space K0 aK mK Y aY sY ->
+    right_module_homomorphism K0 aK mK X aX sX Y aY sY g ->
+    right_vector_dimension K0 aK mK X aX sX
+    = right_vector_dimension K0 aK mK
+        (module_homomorphism_kernel K0 aK (opposite_ring_multiplication mK)
+          X aX (fun scalar z => sX z scalar)
+          Y aY (fun scalar z => sY z scalar) g) aX sX
+      + right_vector_dimension K0 aK mK
+        (module_homomorphism_image X g) aY sY.
+apply god1_s19_theorem13_rank_nullity.
+claim h_s19_t13_cor1_equivalences :
+  (bij L M f <-> surj L M f)
+  /\ (surj L M f <-> inj L M f)
+  /\ (inj L M f <-> module_homomorphism_kernel
+    K addK (opposite_ring_multiplication mulK)
+    L addL (fun scalar x => smulL x scalar)
+    M addM (fun scalar x => smulM x scalar) f = {module_zero L addL}).
+admit.
+Admitted.
+
+(** Formal interface for §17, section 3 and Remark 1 in the two-summand
+    case.  It packages the summation map, its image, and its kernel model. **)
+Theorem god1_s17_section3_remark1_two_summand_sum_map_interface :
+  forall K, forall addK mulK:set -> set -> set,
+  forall M, forall addM smulR:set -> set -> set, forall E F,
+    submodule K addK (opposite_ring_multiplication mulK)
+      M addM (fun scalar x => smulR x scalar) E ->
+    submodule K addK (opposite_ring_multiplication mulK)
+      M addM (fun scalar x => smulR x scalar) F ->
+    right_module_homomorphism K addK mulK
+      (E :*: F)
+      (fun u v => (addM (u 0) (v 0),addM (u 1) (v 1)))
+      (fun u scalar => (smulR (u 0) scalar,smulR (u 1) scalar))
+      M addM smulR (fun u => addM (u 0) (u 1))
+    /\ module_homomorphism_image (E :*: F) (fun u => addM (u 0) (u 1))
+      = submodule_sum K addK (opposite_ring_multiplication mulK)
+        M addM (fun scalar x => smulR x scalar) E F
+    /\ isomorphic_modules K addK (opposite_ring_multiplication mulK)
+      (module_homomorphism_kernel K addK (opposite_ring_multiplication mulK)
+        (E :*: F)
+        (fun u v => (addM (u 0) (v 0),addM (u 1) (v 1)))
+        (fun scalar u => (smulR (u 0) scalar,smulR (u 1) scalar))
+        M addM (fun scalar x => smulR x scalar)
+        (fun u => addM (u 0) (u 1)))
+      (fun u v => (addM (u 0) (v 0),addM (u 1) (v 1)))
+      (fun scalar u => (smulR (u 0) scalar,smulR (u 1) scalar))
+      {x :e E|x :e F} addM (fun scalar x => smulR x scalar).
 Admitted.
 
 Theorem god1_s19_theorem13_corollary2_dimension_of_sum :
@@ -43889,7 +44714,38 @@ Theorem god1_s19_theorem13_corollary2_dimension_of_sum :
 let K addK mulK M addM smulR E F.
 assume hFinite hE hF.
 //GOD1PRF:459938 Consider the homomorphism $f: \mathrm{E} \times \mathrm{F} \rightarrow \mathrm{M}$ defined by
+claim h_s19_t13_cor2_sum_homomorphism : right_module_homomorphism K addK mulK
+  (E :*: F) (fun u v => (addM (u 0) (v 0),addM (u 1) (v 1)))
+  (fun u scalar => (smulR (u 0) scalar,smulR (u 1) scalar))
+  M addM smulR (fun u => addM (u 0) (u 1)).
+admit.
 //GOD1PRF:460052 (cf. § 17, section 3). We have $\mathrm{E}+\mathrm{F}=\operatorname{Im}(f)$, and the kernel of $f$ is isomorphic to $\mathrm{E} \cap \mathrm{F}$ (§ 17, Remark 1). Hence
+claim h_s19_t13_cor2_s17_formal_call :
+  right_module_homomorphism K addK mulK
+    (E :*: F) (fun u v => (addM (u 0) (v 0),addM (u 1) (v 1)))
+    (fun u scalar => (smulR (u 0) scalar,smulR (u 1) scalar))
+    M addM smulR (fun u => addM (u 0) (u 1))
+  /\ module_homomorphism_image (E :*: F) (fun u => addM (u 0) (u 1))
+    = submodule_sum K addK (opposite_ring_multiplication mulK)
+      M addM (fun scalar x => smulR x scalar) E F
+  /\ isomorphic_modules K addK (opposite_ring_multiplication mulK)
+    (module_homomorphism_kernel K addK (opposite_ring_multiplication mulK)
+      (E :*: F) (fun u v => (addM (u 0) (v 0),addM (u 1) (v 1)))
+      (fun scalar u => (smulR (u 0) scalar,smulR (u 1) scalar))
+      M addM (fun scalar x => smulR x scalar) (fun u => addM (u 0) (u 1)))
+    (fun u v => (addM (u 0) (v 0),addM (u 1) (v 1)))
+    (fun scalar u => (smulR (u 0) scalar,smulR (u 1) scalar))
+    {x :e E|x :e F} addM (fun scalar x => smulR x scalar).
+apply (god1_s17_section3_remark1_two_summand_sum_map_interface
+  K addK mulK M addM smulR E F hE hF).
+claim h_s19_t13_cor2_dimension_formula :
+  right_vector_dimension K addK mulK
+    (submodule_sum K addK (opposite_ring_multiplication mulK)
+      M addM (fun scalar x => smulR x scalar) E F) addM smulR
+  + right_vector_dimension K addK mulK {x :e E|x :e F} addM smulR
+  = right_vector_dimension K addK mulK E addM smulR
+    + right_vector_dimension K addK mulK F addM smulR.
+admit.
 Admitted.
 
 //GOD1:460500 natural_indexed_sum : "the sum of the natural numbers #2 indexed below #1" | $\sum_{i<#1}#2_i$
@@ -43926,7 +44782,38 @@ let M.
 assume hFinite hSubmodules.
 apply andI.
 //GOD1PRF:461160 $f$ is surjective, and therefore it follows from Theorem 13 that
+claim h_s19_t13_cor3_theorem13_formal_call :
+  forall K0, forall aK mK:set -> set -> set,
+  forall X, forall aX sX:set -> set -> set,
+  forall Y, forall aY sY:set -> set -> set, forall g:set -> set,
+    finite_dimensional_right_vector_space K0 aK mK X aX sX ->
+    right_vector_space K0 aK mK Y aY sY ->
+    right_module_homomorphism K0 aK mK X aX sX Y aY sY g ->
+    right_vector_dimension K0 aK mK X aX sX
+    = right_vector_dimension K0 aK mK
+      (module_homomorphism_kernel K0 aK (opposite_ring_multiplication mK)
+        X aX (fun scalar z => sX z scalar)
+        Y aY (fun scalar z => sY z scalar) g) aX sX
+      + right_vector_dimension K0 aK mK
+        (module_homomorphism_image X g) aY sY.
+apply god1_s19_theorem13_rank_nullity.
+claim h_s19_t13_cor3_dimension_bound :
+  right_vector_dimension K addK mulK
+    (submodule_family_sum K addK (opposite_ring_multiplication mulK)
+      E addE (fun scalar x => smulR x scalar) n M) addE smulR
+  c= natural_indexed_sum n
+    (fun i => right_vector_dimension K addK mulK (M i) addE smulR).
+admit.
 //GOD1PRF:461553 From this follows the required inequality, and also we see that there is equality if and only if $\operatorname{Ker}(f)=0$, which means precisely (§17, section 3) that the subspaces $\mathrm{E}_{i}$ of E are linearly independent.
+claim h_s19_t13_cor3_equality_iff_independent :
+  right_vector_dimension K addK mulK
+    (submodule_family_sum K addK (opposite_ring_multiplication mulK)
+      E addE (fun scalar x => smulR x scalar) n M) addE smulR
+  = natural_indexed_sum n
+    (fun i => right_vector_dimension K addK mulK (M i) addE smulR)
+  <-> linearly_independent_submodules K addK (opposite_ring_multiplication mulK)
+    E addE (fun scalar x => smulR x scalar) n M.
+admit.
 Admitted.
 
 //GOD1:461869 linear_map_rank : "the rank of the right-linear map #10" | $\operatorname{rank}(#10)$
@@ -43994,7 +44881,49 @@ assume hn.
 let a b f.
 assume hSpaceL hSpaceM hBasisL hBasisM hHom.
 //GOD1PRF:465376 which map the canonical bases of $\mathrm{K}^{p}$ and $\mathrm{K}^{n}$ to the given bases of L and M respectively. Then the homomorphism
+claim h_s19_t14_basis_transport_isomorphisms : exists u v:set -> set,
+  module_isomorphism K addK (opposite_ring_multiplication mulK)
+    (K :^: p) (module_power_addition p addK)
+    (fun scalar x => module_power_left_scalar p mulK scalar x)
+    L addL (fun scalar x => smulL x scalar) u
+  /\ module_isomorphism K addK (opposite_ring_multiplication mulK)
+    (K :^: n) (module_power_addition n addK)
+    (fun scalar x => module_power_left_scalar n mulK scalar x)
+    M addM (fun scalar x => smulM x scalar) v
+  /\ (forall i :e p, u (canonical_module_basis_vector K addK mulK p i) = a i)
+  /\ forall i :e n, v (canonical_module_basis_vector K addK mulK n i) = b i.
+admit.
 //GOD1PRF:465588 has A as its matrix with respect to the canonical bases of $\mathrm{K}^{p}$ and $\mathrm{K}^{n}$ (§ 12, section 3, Remark 2), and the rank of this homomorphism is therefore equal to that of the matrix A, by definition. But $u$ and $v$ are bijective, hence the images of $f$ and $v^{-1} \circ f \circ u$ are isomorphic, hence these two homomorphisms have the same rank.\\
+claim h_s19_t14_s12_remark2_formal_call : exists u v fbar:set -> set,
+  module_isomorphism K addK (opposite_ring_multiplication mulK)
+    (K :^: p) (module_power_addition p addK)
+    (fun scalar x => module_power_left_scalar p mulK scalar x)
+    L addL (fun scalar x => smulL x scalar) u
+  /\ module_isomorphism K addK (opposite_ring_multiplication mulK)
+    (K :^: n) (module_power_addition n addK)
+    (fun scalar x => module_power_left_scalar n mulK scalar x)
+    M addM (fun scalar x => smulM x scalar) v
+  /\ (forall i :e p, u (canonical_module_basis_vector K addK mulK p i) = a i)
+  /\ (forall i :e n, v (canonical_module_basis_vector K addK mulK n i) = b i)
+  /\ (forall x :e K :^: p, fbar x = inv (K :^: n) v (f (u x)))
+  /\ matrix_of_right_linear_map K addK mulK
+    L addL smulL M addM smulM p n a b f
+  = matrix_of_right_linear_map K addK mulK
+    (K :^: p) (module_power_addition p addK)
+    (fun x scalar => module_power_left_scalar p mulK scalar x)
+    (K :^: n) (module_power_addition n addK)
+    (fun x scalar => module_power_left_scalar n mulK scalar x)
+    p n (canonical_module_basis_vector K addK mulK p)
+    (canonical_module_basis_vector K addK mulK n) fbar.
+apply (god1_s12_remark2_matrix_transport_to_canonical_bases
+  K addK mulK L addL smulL M addM smulM p hp n hn a b f
+  hBasisL hBasisM hHom).
+claim h_s19_t14_rank_equality :
+  linear_map_rank K addK mulK L addL smulL M addM smulM f
+  = matrix_rank K addK mulK n p
+    (matrix_of_right_linear_map K addK mulK
+      L addL smulL M addM smulM p n a b f).
+admit.
 Admitted.
 
 Theorem god1_s19_theorem15_rank_of_family_equals_coefficient_matrix_rank :
@@ -44016,6 +44945,25 @@ assume hp.
 let b x A.
 assume hA hSpace hBasis hCoordinates.
 //GOD1PRF:466426 To prove this, we have only to apply Theorem 14, taking L to be the space $\mathrm{K}^{p}$, the basis of $L$ to be the canonical basis, and $f$ to be the homomorphism which maps the elements of the canonical basis to the given vectors $x_{i}$; those vectors generate the subspace $\operatorname{Im}(f)$, so that the rank of the family $\left(x_{i}\right)$ is equal to the rank of $f$, i.e., to the rank of the matrix of $f$, which is precisely the matrix $\left(\alpha_{i j}\right)$.
+claim h_s19_t15_theorem14_formal_call :
+  forall K0, forall aK mK:set -> set -> set,
+  forall X, forall aX sX:set -> set -> set,
+  forall Y, forall aY sY:set -> set -> set,
+  forall p0 n0 :e omega, forall a0 b0:set -> set, forall g:set -> set,
+    right_vector_space K0 aK mK X aX sX ->
+    right_vector_space K0 aK mK Y aY sY ->
+    right_module_basis K0 aK mK X aX sX p0 a0 ->
+    right_module_basis K0 aK mK Y aY sY n0 b0 ->
+    right_module_homomorphism K0 aK mK X aX sX Y aY sY g ->
+    linear_map_rank K0 aK mK X aX sX Y aY sY g
+    = matrix_rank K0 aK mK n0 p0
+      (matrix_of_right_linear_map K0 aK mK
+        X aX sX Y aY sY p0 n0 a0 b0 g).
+apply god1_s19_theorem14_rank_of_map_equals_rank_of_matrix.
+claim h_s19_t15_family_matrix_rank :
+  right_vector_family_rank K addK mulK M addM smulR p x
+  = matrix_rank K addK mulK n p A.
+admit.
 Admitted.
 
 //GOD1:467202 matrix_submatrix : "the square submatrix of #7 selected by rows #5 and columns #6" | $#7[#5,#6]$
@@ -44053,18 +45001,176 @@ let A.
 assume hA hDivision.
 apply andI.
 //GOD1PRF:467475 Let $\mathrm{L}, \mathrm{M}$ be vector spaces, of dimensions $p, n$ respectively over K . Choose a basis $\left(a_{i}\right)_{1 \leqslant i \leqslant p}$ of L and a basis $\left(b_{j}\right)_{1 \leqslant j \leqslant n}$ of M , and let $f$ be the homomorphism of\\
+claim h_s19_t16_matrix_classification_formal_call :
+  forall K0, forall aK mK:set -> set -> set,
+  forall X, forall aX sX:set -> set -> set,
+  forall Y, forall aY sY:set -> set -> set,
+  forall p0 n0 :e omega, forall a0 b0:set -> set,
+    right_module_basis K0 aK mK X aX sX p0 a0 ->
+    right_module_basis K0 aK mK Y aY sY n0 b0 ->
+    bij (module_homomorphism_space K0 aK (opposite_ring_multiplication mK)
+      X aX (fun scalar x => sX x scalar)
+      Y aY (fun scalar x => sY x scalar))
+      (matrix_space K0 n0 p0)
+      (fun F => matrix_of_right_linear_map K0 aK mK
+        X aX sX Y aY sY p0 n0 a0 b0 (fun x => F x)).
+apply god1_matrices_classify_maps_between_finite_free_right_modules.
+claim h_s19_t16_map_with_matrix_exists : exists f:set -> set,
+  right_module_homomorphism K add mul
+    (K :^: p) (module_power_addition p add)
+    (fun x scalar => module_power_left_scalar p mul scalar x)
+    (K :^: n) (module_power_addition n add)
+    (fun x scalar => module_power_left_scalar n mul scalar x) f
+  /\ matrix_of_right_linear_map K add mul
+    (K :^: p) (module_power_addition p add)
+    (fun x scalar => module_power_left_scalar p mul scalar x)
+    (K :^: n) (module_power_addition n add)
+    (fun x scalar => module_power_left_scalar n mul scalar x)
+    p n (canonical_module_basis_vector K add mul p)
+    (canonical_module_basis_vector K add mul n) f = A.
+admit.
 //GOD1PRF:467739 $L$ into $M$ whose matrix is $A$ with respect to these bases. The rank, say $r$, of $A$ is equal to the rank of $f$, i.e., to the dimension of $\operatorname{Im}(f)$. We shall show first that A contains an invertible square matrix of order $r$.
+claim h_s19_t16_theorem14_formal_call :
+  forall K0, forall aK mK:set -> set -> set,
+  forall X, forall aX sX:set -> set -> set,
+  forall Y, forall aY sY:set -> set -> set,
+  forall p0 n0 :e omega, forall a0 b0:set -> set, forall f0:set -> set,
+    right_vector_space K0 aK mK X aX sX ->
+    right_vector_space K0 aK mK Y aY sY ->
+    right_module_basis K0 aK mK X aX sX p0 a0 ->
+    right_module_basis K0 aK mK Y aY sY n0 b0 ->
+    right_module_homomorphism K0 aK mK X aX sX Y aY sY f0 ->
+    linear_map_rank K0 aK mK X aX sX Y aY sY f0
+    = matrix_rank K0 aK mK n0 p0
+      (matrix_of_right_linear_map K0 aK mK
+        X aX sX Y aY sY p0 n0 a0 b0 f0).
+apply god1_s19_theorem14_rank_of_map_equals_rank_of_matrix.
+claim h_s19_t16_rank_submatrix_goal :
+  invertible_square_submatrix_of_order K add mul n p A
+    (matrix_rank K add mul n p A).
+admit.
 //GOD1PRF:468063 so that $\operatorname{Ker}(f)$ has a basis $c_{1}, \ldots, c_{p-r}$ consisting of $p-r$ vectors. Since the vectors
+claim h_s19_t16_kernel_basis_exists : exists r :e omega,
+  exists f:set -> set, exists c:set -> set,
+  module_basis K add (opposite_ring_multiplication mul)
+    (module_homomorphism_kernel K add (opposite_ring_multiplication mul)
+      (K :^: p) (module_power_addition p add)
+      (fun scalar x => module_power_left_scalar p mul scalar x)
+      (K :^: n) (module_power_addition n add)
+      (fun scalar x => module_power_left_scalar n mul scalar x) f)
+    (module_power_addition p add)
+    (fun scalar x => module_power_left_scalar p mul scalar x) r c.
+admit.
 //GOD1PRF:468232 generate L , and since the first $p-r$ of them are linearly independent, we can by Theorem 2 construct a basis of L by adjoining to the $p-r$ vectors $c_{1}, \ldots, c_{p-r} r$ suitably chosen vectors from the family $\left(a_{i}\right)_{1 \leqslant i \leqslant p}$. Renumbering the vectors $a_{i}$ if necessary (this means permuting the columns of the matrix A) we may therefore assume that the vectors
+claim h_s19_t16_first_theorem2_formal_call :
+  forall K0, forall aK mK:set -> set -> set,
+  forall X, forall aX sX:set -> set -> set, forall G B,
+    right_vector_space K0 aK mK X aX sX -> finite G ->
+    generating_family K0 aK (opposite_ring_multiplication mK)
+      X aX (fun scalar y => sX y scalar) G (fun y => y) ->
+    B c= G ->
+    linearly_independent_family K0 aK (opposite_ring_multiplication mK)
+      X aX (fun scalar y => sX y scalar) B (fun y => y) ->
+    exists C, B c= C /\ C c= G
+      /\ right_module_basis K0 aK mK X aX sX C (fun y => y).
+apply god1_s19_theorem2_extend_independent_subset_to_basis.
+claim h_s19_t16_domain_basis_adapted_to_kernel : exists r :e omega,
+  exists a:set -> set,
+  right_module_basis K add mul (K :^: p) (module_power_addition p add)
+    (fun x scalar => module_power_left_scalar p mul scalar x) p a.
+admit.
 //GOD1PRF:469061 and since $\operatorname{Ker}(f) \cap \mathrm{L}^{\prime}=\{0\}$, it follows that the restriction of $f$ to $\mathrm{L}^{\prime}$ is an isomorphism of $L^{\prime}$ onto the subspace $\operatorname{Im}(f)$ of $M$. Hence the vectors
+claim h_s19_t16_restriction_isomorphism : exists r :e omega,
+  exists L' f0:set,
+  isomorphic_modules K add (opposite_ring_multiplication mul)
+    L' (module_power_addition p add)
+    (fun scalar x => module_power_left_scalar p mul scalar x)
+    (module_homomorphism_image L' (fun x => f0 x))
+    (module_power_addition n add)
+    (fun scalar x => module_power_left_scalar n mul scalar x).
+admit.
 //GOD1PRF:469391 Now use Theorem 2 again, as above ; we see that by renumbering the vectors $b_{j}$ if necessary (which corresponds to permuting the rows of the matrix A), we may assume that the vectors
+claim h_s19_t16_second_theorem2_formal_call :
+  forall K0, forall aK mK:set -> set -> set,
+  forall X, forall aX sX:set -> set -> set, forall G B,
+    right_vector_space K0 aK mK X aX sX -> finite G ->
+    generating_family K0 aK (opposite_ring_multiplication mK)
+      X aX (fun scalar y => sX y scalar) G (fun y => y) ->
+    B c= G ->
+    linearly_independent_family K0 aK (opposite_ring_multiplication mK)
+      X aX (fun scalar y => sX y scalar) B (fun y => y) ->
+    exists C, B c= C /\ C c= G
+      /\ right_module_basis K0 aK mK X aX sX C (fun y => y).
+apply god1_s19_theorem2_extend_independent_subset_to_basis.
+claim h_s19_t16_codomain_basis_extends_image : exists b:set -> set,
+  right_module_basis K add mul (K :^: n) (module_power_addition n add)
+    (fun x scalar => module_power_left_scalar n mul scalar x) n b.
+admit.
 //GOD1PRF:470410 Clearly $\operatorname{Ker}(u)=\mathrm{M}^{\prime \prime}$; since the sum (15) is direct we have therefore
+claim h_s19_t16_projection_kernel_and_direct_sum : exists u:set -> set,
+  module_projection K add (opposite_ring_multiplication mul)
+    (K :^: n) (module_power_addition n add)
+    (fun scalar x => module_power_left_scalar n mul scalar x) u.
+admit.
 //GOD1PRF:470812 this mapping is in fact bijective (Theorem 13, Corollary 1). Since we have already proved that $f$ induces a bijection of $\mathrm{L}^{\prime}$ onto $\operatorname{Im}(f)$, it follows now that the mapping $f^{\prime}: L^{\prime} \rightarrow M^{\prime}$ defined by
+claim h_s19_t16_theorem13_corollary1_formal_call :
+  forall K0, forall aK mK:set -> set -> set,
+  forall X, forall aX sX:set -> set -> set,
+  forall Y, forall aY sY:set -> set -> set, forall g:set -> set,
+    finite_dimensional_right_vector_space K0 aK mK X aX sX ->
+    finite_dimensional_right_vector_space K0 aK mK Y aY sY ->
+    right_vector_dimension K0 aK mK X aX sX
+      = right_vector_dimension K0 aK mK Y aY sY ->
+    right_module_homomorphism K0 aK mK X aX sX Y aY sY g ->
+    (bij X Y g <-> surj X Y g)
+    /\ (surj X Y g <-> inj X Y g)
+    /\ (inj X Y g <-> module_homomorphism_kernel
+      K0 aK (opposite_ring_multiplication mK)
+      X aX (fun scalar z => sX z scalar)
+      Y aY (fun scalar z => sY z scalar) g = {module_zero X aX}).
+apply god1_s19_theorem13_corollary1_equal_dimension_map_conditions.
+claim h_s19_t16_projected_restriction_bijective : exists f':set -> set,
+  bij (K :^: (matrix_rank K add mul n p A))
+    (K :^: (matrix_rank K add mul n p A)) f'.
+admit.
 //GOD1PRF:471151 is also bijective, that is to say is an isomorphism, and therefore the matrix of $f^{\prime}$ with respect to the basis $\left(a_{1}, \ldots, a_{r}\right)$ of $\mathrm{L}^{\prime}$ and the basis $\left(b_{1}, \ldots, b_{r}\right)$ of $\mathrm{M}^{\prime}$ is invertible ( $\S 15$, section 1). Now, if
+claim h_s19_t16_s15_section1_formal_call :
+  forall K0, forall aK mK:set -> set -> set,
+  forall X, forall aX sX:set -> set -> set,
+  forall r :e omega, forall basis:set -> set, forall g:set -> set,
+    right_module_basis K0 aK mK X aX sX r basis ->
+    right_module_homomorphism K0 aK mK X aX sX X aX sX g ->
+    (module_automorphism K0 aK (opposite_ring_multiplication mK)
+      X aX (fun scalar x => sX x scalar) g
+    <-> invertible_matrix K0 aK mK r
+      (matrix_of_right_linear_map K0 aK mK
+        X aX sX X aX sX r r basis basis g)).
+apply god1_automorphism_iff_matrix_invertible.
+claim h_s19_t16_restricted_matrix_invertible :
+  exists r :e omega, exists B :e square_matrix_ring K r,
+    invertible_matrix K add mul r B.
+admit.
 //GOD1PRF:471738 consequently the matrix $\left(\alpha_{i j}\right)_{1 \leqslant i \leqslant r, 1 \leqslant j \leqslant r}$, formed from the first $r$ rows and the first $r$ columns of A , is the matrix of $f^{\prime}$, and is therefore invertible. Thus we have shown that A contains an invertible submatrix of $r$ rows and $r$ columns.
+claim h_s19_t16_rank_order_submatrix_exists :
+  invertible_square_submatrix_of_order K add mul n p A
+    (matrix_rank K add mul n p A).
+admit.
 //GOD1PRF:472373 To complete the proof of the theorem, it has to be shown that if the rank of A is $r$, and if A contains an invertible square submatrix of order $s$, then $s \leqslant r$.
+claim h_s19_t16_maximality_goal : forall s :e omega,
+  invertible_square_submatrix_of_order K add mul n p A s ->
+  s c= matrix_rank K add mul n p A.
+admit.
 //GOD1PRF:472546 Suppose for example that the submatrix $\left(\alpha_{i j}\right)_{1 \leqslant i, j \leqslant s}$ is invertible. Let $\mathrm{L}^{\prime}$ now denote the subspace of L generated by $a_{1}, \ldots, a_{s}$, let $\mathrm{M}^{\prime}$ be the subspace of M generated by $b_{1}, \ldots, b_{s}$, let $\mathrm{M}^{\prime \prime}$ denote the subspace of M generated by $b_{s+1}, \ldots, b_{n}$, and let $u$ be the projection of M onto $\mathrm{M}^{\prime}$ parallel to $\mathrm{M}^{\prime \prime}$. Then $\left(\alpha_{i j}\right)_{1 \leqslant i, j \leqslant s}$ is the matrix, relative to the bases $\left(a_{i}\right)_{1 \leqslant i \leqslant s}$ and $\left(b_{j}\right)_{1 \leqslant j \leqslant s}$, of the homomorphism $f^{\prime}: \mathrm{L}^{\prime} \rightarrow \mathrm{M}^{\prime}$ defined by
+claim h_s19_t16_submatrix_projection_setup : forall s :e omega,
+  invertible_square_submatrix_of_order K add mul n p A s ->
+  exists B :e square_matrix_ring K s,
+    invertible_matrix K add mul s B.
+admit.
 //GOD1PRF:473414 Since by hypothesis this matrix is invertible, $f^{\prime}$ is bijective, hence injective, and so the restriction of $f$ to $\mathrm{L}^{\prime}$ is a fortiori injective. Consequently $f$ maps $\mathrm{L}^{\prime}$ onto a subspace of the same dimension $s$ as $L^{\prime}$, and therefore the dimension of $\operatorname{Im}(f)$ is at least $s$. In other words, $s \leqslant r$, and the proof is complete.\\
+claim h_s19_t16_maximality_conclusion : forall s :e omega,
+  invertible_square_submatrix_of_order K add mul n p A s ->
+  s c= matrix_rank K add mul n p A.
+admit.
 Admitted.
 
 Theorem god1_s19_theorem16_corollary_rank_of_transpose :
@@ -44081,6 +45187,38 @@ assume hp.
 let A.
 assume hA hDivision.
 //GOD1PRF:475369 The square submatrices of ${ }^{t} \mathrm{~A}$ are clearly the transposes of the square submatrices of A. Now if a square matrix is nonsingular, then so is its transpose, and conversely ; hence the result.\\
+claim h_s19_t16_cor_transposed_submatrices : forall r :e omega,
+  invertible_square_submatrix_of_order K add mul n p A r
+  <-> invertible_square_submatrix_of_order K add
+    (opposite_ring_multiplication mul) p n
+    (matrix_transpose K n p A) r.
+admit.
+claim h_s19_t16_cor_s16_theorem4_formal_call :
+  forall K0, forall aK mK:set -> set -> set,
+  forall p0 q0 r0 :e omega,
+    ring K0 aK mK ->
+    (forall X Y :e matrix_space K0 p0 q0,
+      matrix_transpose K0 p0 q0 (matrix_addition K0 aK p0 q0 X Y)
+      = matrix_addition K0 aK q0 p0
+        (matrix_transpose K0 p0 q0 X) (matrix_transpose K0 p0 q0 Y))
+    /\ (forall X :e matrix_space K0 p0 q0,
+      forall Y :e matrix_space K0 q0 r0,
+      matrix_transpose K0 p0 r0
+        (matrix_multiplication K0 aK mK p0 q0 r0 X Y)
+      = matrix_multiplication K0 aK (opposite_ring_multiplication mK) r0 q0 p0
+        (matrix_transpose K0 q0 r0 Y) (matrix_transpose K0 p0 q0 X))
+    /\ (forall X :e square_matrix_ring K0 p0,
+      (invertible_matrix K0 aK mK p0 X
+      <-> invertible_matrix K0 aK (opposite_ring_multiplication mK) p0
+        (matrix_transpose K0 p0 p0 X)))
+    /\ forall X :e matrix_space K0 p0 q0,
+      matrix_transpose K0 q0 p0 (matrix_transpose K0 p0 q0 X) = X.
+apply god1_s16_theorem4_matrix_transpose_laws.
+claim h_s19_t16_cor_rank_transpose :
+  matrix_rank K add mul n p A
+  = matrix_rank K add (opposite_ring_multiplication mul) p n
+    (matrix_transpose K n p A).
+admit.
 Admitted.
 
 //GOD1:476223 linear_forms_common_kernel : "the subspace defined by the homogeneous equations #8" | $\bigcap_i\ker(#8_i)$
@@ -44110,10 +45248,81 @@ assume hn.
 let f.
 assume hFinite hDimension hForms.
 //GOD1PRF:476532 Without loss of generality we may assume that $f_{1}, \ldots, f_{r}$ are linearly independent, in which case there exist relations
+claim h_s19_t17_independent_generators_of_forms : exists r :e omega,
+  r c= m
+  /\ linearly_independent_family K addK mulK
+    (right_module_dual K addK mulK L addL smulR)
+    (right_module_dual_addition L addK) (right_module_dual_left_scalar L mulK)
+    r f
+  /\ generating_family K addK mulK
+    (submodule_generated_by_family K addK mulK
+      (right_module_dual K addK mulK L addL smulR)
+      (right_module_dual_addition L addK) (right_module_dual_left_scalar L mulK)
+      m f)
+    (right_module_dual_addition L addK) (right_module_dual_left_scalar L mulK)
+    r f.
+admit.
 //GOD1PRF:476755 it is then clear that the solutions $x$ of (17) are also the solutions of
+claim h_s19_t17_common_kernel_reduction : exists r :e omega, r c= m
+  /\ linear_forms_common_kernel K addK L m f
+    = linear_forms_common_kernel K addK L r f.
+admit.
 //GOD1PRF:476904 and so we are reduced to the case where the given forms $f_{i}$ are linearly independent.\\
+claim h_s19_t17_independent_reduction : exists r :e omega,
+  r = module_family_rank K addK mulK
+    (right_module_dual K addK mulK L addL smulR)
+    (right_module_dual_addition L addK) (right_module_dual_left_scalar L mulK)
+    m f
+  /\ linearly_independent_family K addK mulK
+    (right_module_dual K addK mulK L addL smulR)
+    (right_module_dual_addition L addK) (right_module_dual_left_scalar L mulK)
+    r f.
+admit.
 //GOD1PRF:477129 Clearly $\mathbf{M}=\operatorname{Ker}(f)$, and hence (Theorem 13)
+claim h_s19_t17_theorem13_formal_call :
+  forall K0, forall aK mK:set -> set -> set,
+  forall X, forall aX sX:set -> set -> set,
+  forall Y, forall aY sY:set -> set -> set, forall g:set -> set,
+    finite_dimensional_right_vector_space K0 aK mK X aX sX ->
+    right_vector_space K0 aK mK Y aY sY ->
+    right_module_homomorphism K0 aK mK X aX sX Y aY sY g ->
+    right_vector_dimension K0 aK mK X aX sX
+    = right_vector_dimension K0 aK mK
+      (module_homomorphism_kernel K0 aK (opposite_ring_multiplication mK)
+        X aX (fun scalar z => sX z scalar)
+        Y aY (fun scalar z => sY z scalar) g) aX sX
+      + right_vector_dimension K0 aK mK
+        (module_homomorphism_image X g) aY sY.
+apply god1_s19_theorem13_rank_nullity.
+claim h_s19_t17_kernel_dimension_formula : exists r :e omega,
+  right_vector_dimension K addK mulK
+    (linear_forms_common_kernel K addK L r f) addL smulR
+  + right_vector_dimension K addK mulK (K :^: r)
+    (module_power_addition r addK)
+    (fun x scalar => module_power_left_scalar r mulK scalar x) = n.
+admit.
 //GOD1PRF:477391 i.e., that $\operatorname{Im}(f)=\mathrm{K}^{r}$. But this follows from Theorem 4 .\\
+claim h_s19_t17_theorem4_formal_call :
+  forall K0, forall aK mK:set -> set -> set,
+  forall X, forall aX sX:set -> set -> set,
+  forall r0 :e omega, forall forms:set -> set,
+    right_vector_space K0 aK mK X aX sX ->
+    (forall i :e r0, forms i :e right_module_dual K0 aK mK X aX sX) ->
+    (linearly_independent_family K0 aK mK
+      (right_module_dual K0 aK mK X aX sX)
+      (right_module_dual_addition X aK) (right_module_dual_left_scalar X mK)
+      r0 forms
+    <-> forall values :e K0 :^: r0, exists x :e X,
+      forall i :e r0, forms i x = values i).
+apply god1_s19_theorem4_independent_forms_iff_all_values_attained.
+claim h_s19_t17_dimension_conclusion :
+  right_vector_dimension K addK mulK
+    (linear_forms_common_kernel K addK L m f) addL smulR
+  + module_family_rank K addK mulK
+    (right_module_dual K addK mulK L addL smulR)
+    (right_module_dual_addition L addK) (right_module_dual_left_scalar L mulK)
+    m f = n.
+admit.
 Admitted.
 
 (** § 20. Linear equations. **)
@@ -44205,7 +45414,35 @@ let A.
 assume hA hDivision.
 apply andI.
 //GOD1PRF:494390 The rank of the system of equations (1) is defined to be the rank $r$ of the family of linear forms $\left(f_{i}\right)_{1 \leqslant i \leqslant n}$. Since the coordinates of $f_{i}$ with respect to the basis of $\left(\mathrm{K}^{p}\right)^{*}$ dual to the canonical basis of $\mathrm{K}^{p}$ are the scalars $\alpha_{i j}$, we see (§ 19, Theorem 15) that $r$ is also the rank of the matrix
+claim h_s20_rank_theorem15_formal_call :
+  forall K0, forall aK mK:set -> set -> set,
+  forall X, forall aX sX:set -> set -> set,
+  forall n0 p0 :e omega, forall b x:set -> set,
+  forall B :e matrix_space K0 n0 p0,
+    right_vector_space K0 aK mK X aX sX ->
+    right_module_basis K0 aK mK X aX sX n0 b ->
+    (forall j :e p0, x j = module_finitely_supported_sum X aX n0
+      (fun i => sX (b i) (matrix_entry B i j))) ->
+    right_vector_family_rank K0 aK mK X aX sX p0 x
+      = matrix_rank K0 aK mK n0 p0 B.
+apply god1_s19_theorem15_rank_of_family_equals_coefficient_matrix_rank.
+claim h_s20_rank_equals_transpose_rank :
+  linear_system_rank K add mul n p A
+  = matrix_rank K add (opposite_ring_multiplication mul) p n
+    (matrix_transpose K n p A).
+admit.
 //GOD1PRF:494933 i.e., the rank of the transposed matrix ${ }^{t}$ A. Hence (§ 19, Corollary to Theorem 16) the rank of the system (1) is equal to the rank of the matrix A .
+claim h_s20_rank_theorem16_corollary_formal_call :
+  forall K0, forall aK mK:set -> set -> set,
+  forall n0 p0 :e omega, forall B :e matrix_space K0 n0 p0,
+    division_ring K0 aK mK ->
+    matrix_rank K0 aK mK n0 p0 B
+    = matrix_rank K0 aK (opposite_ring_multiplication mK) p0 n0
+      (matrix_transpose K0 n0 p0 B).
+apply god1_s19_theorem16_corollary_rank_of_transpose.
+claim h_s20_rank_matrix_conclusion :
+  linear_system_rank K add mul n p A = matrix_rank K add mul n p A.
+admit.
 Admitted.
 
 //GOD1:496635 associated_homogeneous_solution_space : "the solution space of the homogeneous system associated with #6x=#7" | $\ker(#6)$
@@ -44233,6 +45470,28 @@ assume hp.
 let A.
 assume hA hDivision.
 //GOD1PRF:496993 The solutions $y$ of this system of equations form a vector subspace of $\mathrm{K}^{p}$ whose dimension, by Theorem 17 of § 19, is $p-r$, where $r$ is the rank of the family $\left(f_{i}\right)_{1 \leqslant i \leqslant n}$.
+claim h_s20_homogeneous_theorem17_formal_call :
+  forall K0, forall aK mK:set -> set -> set,
+  forall X, forall aX sX:set -> set -> set,
+  forall m0 n0 :e omega, forall forms:set -> set,
+    finite_dimensional_right_vector_space K0 aK mK X aX sX ->
+    right_vector_dimension K0 aK mK X aX sX = n0 ->
+    (forall i :e m0, forms i :e right_module_dual K0 aK mK X aX sX) ->
+    right_vector_dimension K0 aK mK
+      (linear_forms_common_kernel K0 aK X m0 forms) aX sX
+    + module_family_rank K0 aK mK
+      (right_module_dual K0 aK mK X aX sX)
+      (right_module_dual_addition X aK) (right_module_dual_left_scalar X mK)
+      m0 forms = n0.
+apply god1_s19_theorem17_dimension_from_linear_equations.
+claim h_s20_homogeneous_dimension_conclusion :
+  right_vector_dimension K add mul
+    (associated_homogeneous_solution_space K add mul n p A)
+    (module_power_addition p add)
+    (fun x scalar => module_power_left_scalar p
+      (opposite_ring_multiplication mul) scalar x)
+  + linear_system_rank K add mul n p A = p.
+admit.
 Admitted.
 
 //GOD1:499438 cramer_linear_system : "the coefficient matrix #6 defines a Cramer system" | $#6\text{ is a Cramer system}$
@@ -44271,14 +45530,105 @@ let A.
 assume hA hDivision.
 apply andI.
 //GOD1PRF:497669 The statement $a$ ) expresses that the homomorphism
+claim h_s20_t1_system_homomorphism : right_module_homomorphism K add mul
+  (K :^: p) (module_power_addition p add)
+  (fun x scalar => module_power_left_scalar p mul scalar x)
+  (K :^: n) (module_power_addition n add)
+  (fun x scalar => module_power_left_scalar n mul scalar x)
+  (matrix_vector_product K add mul n p A).
+admit.
 //GOD1PRF:497775 is bijective; if so, then $f$ is an isomorphism, so that $\operatorname{Ker}(f)=\{0\}$ and
+claim h_s20_t1_bijective_kernel_zero :
+  bij (K :^: p) (K :^: n) (matrix_vector_product K add mul n p A) ->
+  associated_homogeneous_solution_space K add mul n p A
+    = {(fun j :e p => ring_zero K add)}.
+admit.
 //GOD1PRF:497949 i.e., $p=n$. Hence $a$ ) implies $b$ ). Conversely, if $f$ is injective and if $p=n$, then $f$ is bijective by virtue of § 19, Theorem 13, Corollary 1. Hence $b$ ) implies $a$ ).
+claim h_s20_t1_theorem13_corollary1_formal_call :
+  forall K0, forall aK mK:set -> set -> set,
+  forall X, forall aX sX:set -> set -> set,
+  forall Y, forall aY sY:set -> set -> set, forall g:set -> set,
+    finite_dimensional_right_vector_space K0 aK mK X aX sX ->
+    finite_dimensional_right_vector_space K0 aK mK Y aY sY ->
+    right_vector_dimension K0 aK mK X aX sX
+      = right_vector_dimension K0 aK mK Y aY sY ->
+    right_module_homomorphism K0 aK mK X aX sX Y aY sY g ->
+    (bij X Y g <-> surj X Y g)
+    /\ (surj X Y g <-> inj X Y g)
+    /\ (inj X Y g <-> module_homomorphism_kernel
+      K0 aK (opposite_ring_multiplication mK)
+      X aX (fun scalar z => sX z scalar)
+      Y aY (fun scalar z => sY z scalar) g = {module_zero X aX}).
+apply god1_s19_theorem13_corollary1_equal_dimension_map_conditions.
+claim h_s20_t1_first_equivalence :
+  cramer_linear_system K add mul n p A
+  <-> p = n /\ associated_homogeneous_solution_space K add mul n p A
+    = {(fun j :e p => ring_zero K add)}.
+admit.
 //GOD1PRF:498130 Next, let us show that $a$ ) implies $c$ ). We have already seen that $a$ ) implies that $p=n$. If
+claim h_s20_t1_independence_goal : cramer_linear_system K add mul n p A ->
+  linearly_independent_family K add mul
+    (right_module_dual K add mul (K :^: p) (module_power_addition p add)
+      (fun x scalar => module_power_left_scalar p
+        (opposite_ring_multiplication mul) scalar x))
+    (right_module_dual_addition (K :^: p) add)
+    (right_module_dual_left_scalar (K :^: p) mul)
+    n (fun i => fun x :e K :^: p => matrix_row_linear_form K add mul p A i x).
+admit.
 //GOD1PRF:498282 is a linear relation between the forms $f_{i}$, then we have
+claim h_s20_t1_linear_relation_equation : forall coeff:set -> set,
+  linear_relation K add mul
+    (right_module_dual K add mul (K :^: p) (module_power_addition p add)
+      (fun x scalar => module_power_left_scalar p
+        (opposite_ring_multiplication mul) scalar x))
+    (right_module_dual_addition (K :^: p) add)
+    (right_module_dual_left_scalar (K :^: p) mul)
+    n (fun i => fun x :e K :^: p => matrix_row_linear_form K add mul p A i x)
+    coeff -> forall x :e K :^: p,
+      ring_finite_sum K add n (fun i => mul (coeff i)
+        (matrix_row_linear_form K add mul p A i x)) = ring_zero K add.
+admit.
 //GOD1PRF:498402 for all $x \in \mathrm{~K}^{p}$. Taking $x$ to be a solution of (1), we obtain
+claim h_s20_t1_relation_on_solutions : forall coeff:set -> set,
+  forall beta :e K :^: n, forall x :e K :^: p,
+  linear_system_solution K add mul n p A beta x ->
+  ring_finite_sum K add n (fun i => mul (coeff i) (beta i)) = ring_zero K add.
+admit.
 //GOD1PRF:498582 now if (1) has a solution for all choices of the constant terms $\beta_{i}$, the relation (7) will be satisfied for all choices of $\beta_{i} \in \mathrm{~K}$, and this clearly implies that
+claim h_s20_t1_all_values_force_zero_coefficients : forall coeff:set -> set,
+  (forall beta :e K :^: n,
+    ring_finite_sum K add n (fun i => mul (coeff i) (beta i)) = ring_zero K add) ->
+  forall i :e n, coeff i = ring_zero K add.
+admit.
 //GOD1PRF:498815 Hence $a$ ) implies $c$ ). (Alternatively we could observe that, if the $f_{i}$ are not linearly independent, then the system (5) has no solutions unless the $\beta_{i}$ satisfy certain nontrivial conditions, namely the consistency conditions introduced in section 2 .)
+claim h_s20_t1_consistency_definition_call : forall beta :e K :^: n,
+  linear_system_consistency_conditions K add mul n n
+    (fun i j => if i = j then ring_one K mul else ring_zero K add) beta.
+admit.
 //GOD1PRF:499086 Finally, we must show that $c$ ) implies $a$ ). From section 2 above, or from Theorem 4 of § 19, the system (1) always has at least one solution, hence the homomorphism $f$ is surjective; but since $\mathrm{K}^{p}$ and $\mathrm{K}^{n}$ have the same dimension by hypothesis, $f$ is also injective and therefore (1) has at most one solution.\\
+claim h_s20_t1_theorem4_formal_call :
+  forall K0, forall aK mK:set -> set -> set,
+  forall X, forall aX sX:set -> set -> set,
+  forall r0 :e omega, forall forms:set -> set,
+    right_vector_space K0 aK mK X aX sX ->
+    (forall i :e r0, forms i :e right_module_dual K0 aK mK X aX sX) ->
+    (linearly_independent_family K0 aK mK
+      (right_module_dual K0 aK mK X aX sX)
+      (right_module_dual_addition X aK) (right_module_dual_left_scalar X mK)
+      r0 forms
+    <-> forall values :e K0 :^: r0, exists x :e X,
+      forall i :e r0, forms i x = values i).
+apply god1_s19_theorem4_independent_forms_iff_all_values_attained.
+claim h_s20_t1_second_equivalence :
+  cramer_linear_system K add mul n p A
+  <-> p = n /\ linearly_independent_family K add mul
+    (right_module_dual K add mul (K :^: p) (module_power_addition p add)
+      (fun x scalar => module_power_left_scalar p
+        (opposite_ring_multiplication mul) scalar x))
+    (right_module_dual_addition (K :^: p) add)
+    (right_module_dual_left_scalar (K :^: p) mul)
+    n (fun i => fun x :e K :^: p => matrix_row_linear_form K add mul p A i x).
+admit.
 Admitted.
 
 Theorem god1_s20_theorem2_square_cramer_equivalences_and_solution :
@@ -44314,8 +45664,61 @@ let A.
 assume hA hDivision.
 apply andI.
 //GOD1PRF:500651 If we write (4) in the form $f(x)=b$, where $f$ is the endomorphism of $\mathrm{K}^{n}$ whose matrix with respect to the canonical basis is A , then we see that $a$ ) means that $f$ is bijective, $b$ ) that $f$ is surjective, $c$ ) that $f$ is injective, $e$ ) that $\operatorname{Ker}(f)=\{0\}$, and $f$ ) that $f$ is a unit in the endomorphism ring of $\mathrm{K}^{n}$. Hence the equivalence of $a$ ), $b$ ), $c$ ), $e$ ) and $f$ ) follows from Corollary 1 of Theorem 13 of § 19.
+claim h_s20_t2_theorem13_corollary1_formal_call :
+  forall K0, forall aK mK:set -> set -> set,
+  forall X, forall aX sX:set -> set -> set,
+  forall Y, forall aY sY:set -> set -> set, forall g:set -> set,
+    finite_dimensional_right_vector_space K0 aK mK X aX sX ->
+    finite_dimensional_right_vector_space K0 aK mK Y aY sY ->
+    right_vector_dimension K0 aK mK X aX sX
+      = right_vector_dimension K0 aK mK Y aY sY ->
+    right_module_homomorphism K0 aK mK X aX sX Y aY sY g ->
+    (bij X Y g <-> surj X Y g)
+    /\ (surj X Y g <-> inj X Y g)
+    /\ (inj X Y g <-> module_homomorphism_kernel
+      K0 aK (opposite_ring_multiplication mK)
+      X aX (fun scalar z => sX z scalar)
+      Y aY (fun scalar z => sY z scalar) g = {module_zero X aX}).
+apply god1_s19_theorem13_corollary1_equal_dimension_map_conditions.
+claim h_s20_t2_core_equivalences :
+  (cramer_linear_system K add mul n n A
+  <-> forall b :e K :^: n, exists x :e K :^: n,
+    linear_system_solution K add mul n n A b x)
+  /\ (cramer_linear_system K add mul n n A
+  <-> forall b :e K :^: n, forall x y :e K :^: n,
+    linear_system_solution K add mul n n A b x ->
+    linear_system_solution K add mul n n A b y -> x = y)
+  /\ (cramer_linear_system K add mul n n A
+  <-> associated_homogeneous_solution_space K add mul n n A
+    = {(fun j :e n => ring_zero K add)})
+  /\ (cramer_linear_system K add mul n n A
+  <-> invertible_matrix K add mul n A).
+admit.
 //GOD1PRF:501135 Also it is clear that $a$ ) implies $d$ ); and $d$ ) implies $e$ ), from the arguments of section 2.\\
+claim h_s20_t2_one_unique_rhs_equivalence :
+  cramer_linear_system K add mul n n A
+  <-> exists b :e K :^: n,
+    linear_system_unique_solution K add mul n n A b.
+admit.
+claim h_s20_t2_section2_dimension_formal_call :
+  forall K0, forall aK mK:set -> set -> set,
+  forall n0 p0 :e omega, forall B :e matrix_space K0 n0 p0,
+    division_ring K0 aK mK ->
+    right_vector_dimension K0 aK mK
+      (associated_homogeneous_solution_space K0 aK mK n0 p0 B)
+      (module_power_addition p0 aK)
+      (fun x scalar => module_power_left_scalar p0
+        (opposite_ring_multiplication mK) scalar x)
+    + linear_system_rank K0 aK mK n0 p0 B = p0.
+apply god1_s20_associated_homogeneous_solution_dimension.
 //GOD1PRF:501238 To complete the proof it remains only to establish the formula (8), which is trivial.\\
+claim h_s20_t2_inverse_solution_formula :
+  invertible_matrix K add mul n A -> forall b :e K :^: n,
+  linear_system_unique_solution K add mul n n A b
+  /\ linear_system_solution K add mul n n A b
+    (matrix_vector_product K add mul n n
+      (matrix_inverse K add mul n A) b).
+admit.
 Admitted.
 
 Theorem god1_s20_theorem3_independent_system_reduces_to_cramer_system :
@@ -44365,16 +45768,143 @@ assume hp.
 let A.
 assume hA hDivision hIndependent.
 //GOD1PRF:502280 We shall now examine the system of equations (1) in the case where the linear forms $f_{1}, \ldots, f_{n}$ are linearly independent: as we have seen in section 2 , the general system can always be reduced to one of this sort. But we shall not assume that $p=n$. Certainly we must have $n \leqslant p$, because $f_{1}, \ldots, f_{n}$ are linearly independent elements of a vector space of dimension $p$ (namely the dual of $\mathrm{K}^{p}$ ).
+claim h_s20_t3_theorem7_formal_call :
+  forall K0, forall aK mK:set -> set -> set,
+  forall X, forall aX sX:set -> set -> set,
+  forall p0 q0 :e omega, forall a x:set -> set,
+    right_vector_space K0 aK mK X aX sX ->
+    right_module_basis K0 aK mK X aX sX p0 a ->
+    linearly_independent_family K0 aK (opposite_ring_multiplication mK)
+      X aX (fun scalar y => sX y scalar) q0 x -> q0 c= p0.
+apply god1_s19_theorem7_independent_family_no_larger_than_basis.
+claim h_s20_t3_equation_count_bound : n c= p.
+admit.
 //GOD1PRF:502723 The matrix $\mathrm{A}=\left(\alpha_{i j}\right)_{1 \leqslant i \leqslant n, 1 \leqslant j \leqslant p}$ is now of rank $n$ and therefore (§ 19, Theorem 16) contains an invertible square submatrix of order $n$. We shall suppose that the matrix
+claim h_s20_t3_theorem16_formal_call :
+  forall K0, forall aK mK:set -> set -> set,
+  forall n0 p0 :e omega, forall B :e matrix_space K0 n0 p0,
+    division_ring K0 aK mK ->
+    invertible_square_submatrix_of_order K0 aK mK n0 p0 B
+      (matrix_rank K0 aK mK n0 p0 B)
+    /\ forall s :e omega,
+      invertible_square_submatrix_of_order K0 aK mK n0 p0 B s ->
+      s c= matrix_rank K0 aK mK n0 p0 B.
+apply god1_s19_theorem16_rank_is_largest_invertible_submatrix_order.
+claim h_s20_t3_rank_order_submatrix :
+  invertible_square_submatrix_of_order K add mul n p A n.
+admit.
 //GOD1PRF:503044 is invertible: this involves no essential loss of generality since we can always reduce to this case, by appropriately renumbering the unknowns $\xi_{i}$.
+claim h_s20_t3_choose_invertible_columns : exists cols :e p :^: n,
+  inj n p (fun i => cols i)
+  /\ invertible_matrix K add mul n
+    (matrix_submatrix n n (fun i => i) (fun j => cols j) A).
+admit.
 //GOD1PRF:503447 where we have put
+claim h_s20_t3_reduced_constants : exists cols :e p :^: n,
+  forall b :e K :^: n, forall eta :e K :^: p,
+  exists gamma :e K :^: n, forall i :e n,
+    gamma i = add (b i)
+      (ring_negation K add
+        (module_finitely_supported_sum K add
+          {k :e p|k /:e {cols h|h :e n}}
+          (fun k => mul (matrix_entry A i k) (eta k)))).
+admit.
 //GOD1PRF:503602 Since U is invertible, (9) is a Cramer system with respect to the unknowns $\xi_{1}, \ldots, \xi_{n}$, and therefore has a unique solution for all values of the constant terms $\gamma_{i}$. Now these constant terms in (9) depend only on the unknowns $\xi_{n+1}, \ldots, \xi_{p}$, and consequently the system of equations (1) has a unique solution for which the unknowns $\xi_{n+1}, \ldots, \xi_{p}$ are assigned arbitrary values in advance.
+claim h_s20_t3_theorem2_formal_call :
+  forall K0, forall aK mK:set -> set -> set,
+  forall n0 :e omega, forall B :e square_matrix_ring K0 n0,
+    division_ring K0 aK mK ->
+    (cramer_linear_system K0 aK mK n0 n0 B
+    <-> forall b :e K0 :^: n0, exists x :e K0 :^: n0,
+      linear_system_solution K0 aK mK n0 n0 B b x)
+    /\ (cramer_linear_system K0 aK mK n0 n0 B
+    <-> forall b :e K0 :^: n0, forall x y :e K0 :^: n0,
+      linear_system_solution K0 aK mK n0 n0 B b x ->
+      linear_system_solution K0 aK mK n0 n0 B b y -> x = y)
+    /\ (cramer_linear_system K0 aK mK n0 n0 B
+    <-> exists b :e K0 :^: n0,
+      linear_system_unique_solution K0 aK mK n0 n0 B b)
+    /\ (cramer_linear_system K0 aK mK n0 n0 B
+    <-> associated_homogeneous_solution_space K0 aK mK n0 n0 B
+      = {(fun j :e n0 => ring_zero K0 aK)})
+    /\ (cramer_linear_system K0 aK mK n0 n0 B
+    <-> invertible_matrix K0 aK mK n0 B)
+    /\ (invertible_matrix K0 aK mK n0 B -> forall b :e K0 :^: n0,
+      linear_system_unique_solution K0 aK mK n0 n0 B b
+      /\ linear_system_solution K0 aK mK n0 n0 B b
+        (matrix_vector_product K0 aK mK n0 n0
+          (matrix_inverse K0 aK mK n0 B) b)).
+apply god1_s20_theorem2_square_cramer_equivalences_and_solution.
+claim h_s20_t3_unique_completion : exists cols :e p :^: n,
+  forall b :e K :^: n, forall eta :e K :^: p,
+  exists x :e K :^: p,
+    linear_system_solution K add mul n p A b x
+    /\ forall k :e p, k /:e {cols i|i :e n} -> x k = eta k.
+admit.
 //GOD1PRF:504044 Moreover, the solution of (9) is given by the formula
+claim h_s20_t3_inverse_submatrix_solution : exists cols :e p :^: n,
+  forall gamma :e K :^: n, forall i :e n,
+  matrix_vector_product K add mul n n
+    (matrix_inverse K add mul n
+      (matrix_submatrix n n (fun h => h) (fun h => cols h) A)) gamma i
+  = ring_finite_sum K add n (fun j => mul
+    (matrix_entry (matrix_inverse K add mul n
+      (matrix_submatrix n n (fun h => h) (fun h => cols h) A)) i j)
+    (gamma j)).
+admit.
 //GOD1PRF:504277 Hence, if we put
+claim h_s20_t3_lambda_definition : exists cols :e p :^: n,
+  exists Lambda :e matrix_space K n p,
+  forall i :e n, forall k :e p,
+  matrix_entry Lambda i k :e K.
+admit.
 //GOD1PRF:504371 it becomes
+claim h_s20_t3_solution_rewritten : exists cols :e p :^: n,
+  forall b :e K :^: n, forall eta :e K :^: p,
+  exists x :e K :^: p, forall i :e n,
+    x (cols i) :e K.
+admit.
 //GOD1PRF:504484 replacing the $\gamma_{j}$ by their values (10) we obtain formulae of the form
+claim h_s20_t3_substitute_reduced_constants : exists cols :e p :^: n,
+  exists Lambda :e matrix_space K n p,
+  forall b :e K :^: n, forall eta :e K :^: p,
+  exists x :e K :^: p, forall i :e n,
+    x (cols i) = add
+      (ring_finite_sum K add n (fun j => mul
+        (matrix_entry (matrix_inverse K add mul n
+          (matrix_submatrix n n (fun h => h) (fun h => cols h) A)) i j)
+        (b j)))
+      (module_finitely_supported_sum K add
+        {k :e p|k /:e {cols h|h :e n}}
+        (fun k => mul (matrix_entry Lambda i k) (eta k))).
+admit.
 //GOD1PRF:504717 ( $1 \leqslant i \leqslant n$ ), where the $\lambda_{i k}$ are new constants which depend only on the coefficients $\alpha_{i j}$ in (1).
+claim h_s20_t3_lambda_depends_on_A : exists Lambda :e matrix_space K n p,
+  forall i :e n, forall k :e p, matrix_entry Lambda i k :e K.
+admit.
 //GOD1PRF:504856 Since (1) is equivalent to the conjunction of (9) and (10), and since (9) is equivalent to (11), it is clear that the set of relations (1) is equivalent to the set of relations (12). In other words:\\
+claim h_s20_t3_parametric_solution_conclusion : exists cols :e p :^: n,
+  inj n p (fun i => cols i)
+  /\ invertible_matrix K add mul n
+    (matrix_submatrix n n (fun i => i) (fun j => cols j) A)
+  /\ exists Lambda :e matrix_space K n p,
+    forall b :e K :^: n, forall eta :e K :^: p,
+    exists x :e K :^: p,
+      linear_system_solution K add mul n p A b x
+      /\ (forall k :e p, k /:e {cols i|i :e n} -> x k = eta k)
+      /\ (forall i :e n,
+        x (cols i) = add
+          (ring_finite_sum K add n (fun j => mul
+            (matrix_entry (matrix_inverse K add mul n
+              (matrix_submatrix n n (fun h => h) (fun h => cols h) A)) i j)
+            (b j)))
+          (module_finitely_supported_sum K add
+            {k :e p|k /:e {cols h|h :e n}}
+            (fun k => mul (matrix_entry Lambda i k) (eta k))))
+      /\ forall y :e K :^: p,
+        linear_system_solution K add mul n p A b y ->
+        (forall k :e p, k /:e {cols i|i :e n} -> y k = eta k) -> y = x.
+admit.
 Admitted.
 
 (** § 21. Multilinear functions. **)
@@ -44486,6 +46016,19 @@ Theorem god1_multilinear_mappings_form_module :
 let K addK mulK I X addX smulX M addM smulM.
 assume hRing hModules hTarget.
 //GOD1PRF:519268 it is a submodule of the module (§ 10, Example 4) of all mappings (multilinear or not) of the set $\mathbf{X}=\mathbf{X}_{1} \times \cdots \times \mathbf{X}_{p}$ into $\mathbf{M}$. In other words, if $f$ and $g$ are multilinear, then so is $\lambda f+\mu g$ for all scalars $\lambda, \mu$. This result (which is an immediate consequence of the fact that a linear combination of linear mappings, for example of mappings of the form (2), is again a linear mapping) allows us to consider the set $\mathscr{L}\left(\mathrm{X}_{1}, \ldots, \mathrm{X}_{p} ; \mathrm{M}\right)$ as a module over the ring K .
+claim h_s21_s10_example4_formal_call :
+  left_module K addK mulK (M :^: indexed_module_product I X)
+    (module_power_addition (indexed_module_product I X) addM)
+    (module_power_left_scalar (indexed_module_product I X) smulM).
+apply (god1_mapping_module_is_module K addK mulK M addM smulM
+  (indexed_module_product I X) hTarget).
+claim h_s21_multilinear_submodule_conclusion :
+  left_module K addK mulK
+    (multilinear_mapping_space
+      K addK mulK I X addX smulX M addM smulM)
+    (multilinear_mapping_addition (indexed_module_product I X) addM)
+    (multilinear_mapping_scalar (indexed_module_product I X) smulM).
+admit.
 Admitted.
 
 //GOD1:524442 commutative_module_dual : "the dual of the module #4 over the commutative ring #1" | $#4^*$
@@ -44549,6 +46092,28 @@ Definition tensor_product_of_multilinear_forms :
         (f (fun i :e I => z (Inj0 i)))
         (g (fun j :e J => z (Inj1 j))).
 
+(** The book's Example 2 precedes the displayed tensor-product theorem.  This
+interface records that cited example explicitly so later source references can
+invoke a declaration even though the exposition states it before the general
+formal construction used below. **)
+Theorem god1_s21_example2_product_of_linear_forms_is_multilinear :
+  forall K, forall add mul:set -> set -> set,
+  forall p :e omega, forall X:set -> set,
+  forall addX smulX:set -> set -> set -> set,
+  forall u:set -> set -> set,
+    commutative_ring K add mul ->
+    (forall h :e p,
+      module_homomorphism K add mul
+        (X h) (addX h) (smulX h) K add mul (u h)) ->
+    multilinear_mapping K add mul p X addX smulX K add mul
+      (fun x => ring_finite_product K add mul p (fun h => u h (x h))).
+let K add mul.
+let p.
+assume hp.
+let X addX smulX u.
+assume hRing hLinearForms.
+Admitted.
+
 Theorem god1_tensor_product_of_multilinear_forms_is_multilinear_and_associative :
   forall K, forall add mul:set -> set -> set,
   forall I J, forall X Y:set -> set,
@@ -44580,10 +46145,72 @@ let K add mul I J X Y addX smulX addY smulY f g.
 assume hRing hf hg.
 apply andI.
 //GOD1PRF:527741 it is a multilinear mapping, for if we give for example $x_{2}, \ldots, y_{q}$ fixed values $a_{2}, \ldots, b_{q}$, we obtain
+claim h_s21_tensor_product_multilinear :
+  multilinear_mapping K add mul (I :+: J)
+    (fun h => if h :e {Inj0 i|i :e I} then X (Unj h) else Y (Unj h))
+    (fun h x y => if h :e {Inj0 i|i :e I}
+      then addX (Unj h) x y else addY (Unj h) x y)
+    (fun h scalar x => if h :e {Inj0 i|i :e I}
+      then smulX (Unj h) scalar x else smulY (Unj h) scalar x)
+    K add mul
+    (fun z => ap
+      (tensor_product_of_multilinear_forms K mul I J X Y f g) z).
+admit.
 //GOD1PRF:527952 which is proportional, as a function of $x_{1}$, to $f\left(x_{1}, a_{2}, \ldots, a_{p}\right)$, and is therefore a linear function of $x_{1}$.
+claim h_s21_tensor_fixed_arguments_are_linear :
+  forall z :e indexed_module_product (I :+: J)
+    (fun h => if h :e {Inj0 i|i :e I} then X (Unj h) else Y (Unj h)),
+    ap (tensor_product_of_multilinear_forms K mul I J X Y f g) z
+    = mul
+      (f (fun i :e I => z (Inj0 i)))
+      (g (fun j :e J => z (Inj1 j))).
+admit.
 //GOD1PRF:528097 Given three multilinear forms $f, g, h$ we have the associativity law
+claim h_s21_tensor_associativity :
+  forall H, forall Z:set -> set,
+  forall addZ smulZ:set -> set -> set -> set,
+  forall h:set -> set,
+    multilinear_mapping K add mul H Z addZ smulZ K add mul h ->
+    forall x :e indexed_module_product I X,
+    forall y :e indexed_module_product J Y,
+    forall z :e indexed_module_product H Z,
+      mul (mul (f x) (g y)) (h z)
+      = mul (f x) (mul (g y) (h z)).
+admit.
 //GOD1PRF:528224 the common value of the two sides of this relation is the function
+claim h_s21_tensor_common_value :
+  forall H, forall Z:set -> set, forall h:set -> set,
+  forall x :e indexed_module_product I X,
+  forall y :e indexed_module_product J Y,
+  forall z :e indexed_module_product H Z,
+    mul (mul (f x) (g y)) (h z)
+    = mul (f x) (mul (g y) (h z)).
+admit.
 //GOD1PRF:528406 Hence we may define unambiguously tensor products of any number of multilinear forms, and thus generalize the notion introduced in Example 2 above for linear forms.
+claim h_s21_tensor_example2_formal_call :
+  forall K0, forall add0 mul0:set -> set -> set,
+  forall p0 :e omega, forall X0:set -> set,
+  forall addX0 smulX0:set -> set -> set -> set,
+  forall u0:set -> set -> set,
+    commutative_ring K0 add0 mul0 ->
+    (forall q :e p0,
+      module_homomorphism K0 add0 mul0
+        (X0 q) (addX0 q) (smulX0 q) K0 add0 mul0 (u0 q)) ->
+    multilinear_mapping K0 add0 mul0 p0 X0 addX0 smulX0 K0 add0 mul0
+      (fun x0 => ring_finite_product K0 add0 mul0 p0
+        (fun q => u0 q (x0 q))).
+apply god1_s21_example2_product_of_linear_forms_is_multilinear.
+claim h_s21_arbitrary_tensor_products_are_unambiguous :
+  forall H, forall Z:set -> set,
+  forall addZ smulZ:set -> set -> set -> set,
+  forall h:set -> set,
+    multilinear_mapping K add mul H Z addZ smulZ K add mul h ->
+    forall x :e indexed_module_product I X,
+    forall y :e indexed_module_product J Y,
+    forall z :e indexed_module_product H Z,
+      mul (mul (f x) (g y)) (h z)
+      = mul (f x) (mul (g y) (h z)).
+admit.
 Admitted.
 
 Theorem god1_s21_theorem1_bilinear_maps_on_free_modules :
@@ -44618,13 +46245,160 @@ let a b f.
 assume hRing hBasisX hBasisY hModuleM.
 apply iffI.
 //GOD1PRF:542078 Formula (11) shows that, if $f$ is bilinear, we must have
+claim h_s21_t1_bilinear_expansion :
+  bilinear_mapping
+    K addK mulK X addX smulX Y addY smulY M addM smulM f ->
+  exists c:set -> set -> set,
+    (forall i :e m, forall j :e n, c i j :e M)
+    /\ (forall i :e m, forall j :e n,
+      c i j = f (bilinear_tuple (a i) (b j)))
+    /\ forall x :e X, forall y :e Y,
+      f (bilinear_tuple x y)
+      = module_finitely_supported_sum M addM (m :*: n)
+        (fun u => smulM
+          (mulK
+            (basis_coordinates K addK mulK X addX smulX m a x (u 0))
+            (basis_coordinates K addK mulK Y addY smulY n b y (u 1)))
+          (c (u 0) (u 1))).
+admit.
 //GOD1PRF:542203 so that $f$ is given by a formula of the form (13). Conversely, suppose that $f$ is defined by (13). To show that $f$ is bilinear it is enough to show that the general term $\xi_{i} \eta_{j} c_{i j}$ of the sum (13) is a bilinear function of $x$ and $y$. Since $c_{i j}$ is independent of $x$ and $y$, we need only show that $\xi_{i} \eta_{j}$ is bilinear. Now if $u_{i}(1 \leqslant i \leqslant m)$ are the coordinate functions on X with respect to the basis $\left(a_{i}\right)$, and $v_{j}(1 \leqslant j \leqslant n)$ the coordinate functions on Y with respect to the basis $\left(b_{j}\right)$, then we have
+claim h_s21_t1_coordinate_product_suffices :
+  (exists c:set -> set -> set,
+    (forall i :e m, forall j :e n, c i j :e M)
+    /\ (forall i :e m, forall j :e n,
+      c i j = f (bilinear_tuple (a i) (b j)))
+    /\ forall x :e X, forall y :e Y,
+      f (bilinear_tuple x y)
+      = module_finitely_supported_sum M addM (m :*: n)
+        (fun u => smulM
+          (mulK
+            (basis_coordinates K addK mulK X addX smulX m a x (u 0))
+            (basis_coordinates K addK mulK Y addY smulY n b y (u 1)))
+          (c (u 0) (u 1)))) ->
+  bilinear_mapping
+    K addK mulK X addX smulX Y addY smulY M addM smulM f.
+admit.
 //GOD1PRF:542859 Hence (Example 2) $\xi_{i} \eta_{j}$ is indeed a bilinear function of $(x, y)$.\\
+claim h_s21_t1_example2_formal_call :
+  forall K0, forall add0 mul0:set -> set -> set,
+  forall p0 :e omega, forall X0:set -> set,
+  forall addX0 smulX0:set -> set -> set -> set,
+  forall u0:set -> set -> set,
+    commutative_ring K0 add0 mul0 ->
+    (forall q :e p0,
+      module_homomorphism K0 add0 mul0
+        (X0 q) (addX0 q) (smulX0 q) K0 add0 mul0 (u0 q)) ->
+    multilinear_mapping K0 add0 mul0 p0 X0 addX0 smulX0 K0 add0 mul0
+      (fun x0 => ring_finite_product K0 add0 mul0 p0
+        (fun q => u0 q (x0 q))).
+apply god1_s21_example2_product_of_linear_forms_is_multilinear.
+claim h_s21_t1_coordinate_product_bilinear :
+  forall i :e m, forall j :e n,
+    bilinear_mapping K addK mulK
+      X addX smulX Y addY smulY K addK mulK
+      (fun z => mulK
+        (basis_coordinate_function K addK mulK X addX smulX m a i (z 0))
+        (basis_coordinate_function K addK mulK Y addY smulY n b j (z 1))).
+admit.
 //GOD1PRF:542941 To complete the proof of the theorem we must show that the relation (13), i.e.,
+claim h_s21_t1_coefficients_are_unique :
+  forall c:set -> set -> set,
+    (forall i :e m, forall j :e n, c i j :e M) ->
+    (forall x :e X, forall y :e Y,
+      f (bilinear_tuple x y)
+      = module_finitely_supported_sum M addM (m :*: n)
+        (fun u => smulM
+          (mulK
+            (basis_coordinates K addK mulK X addX smulX m a x (u 0))
+            (basis_coordinates K addK mulK Y addY smulY n b y (u 1)))
+          (c (u 0) (u 1)))) ->
+    forall i :e m, forall j :e n,
+      c i j = f (bilinear_tuple (a i) (b j)).
+admit.
 //GOD1PRF:543075 implies that $c_{i j}=f\left(a_{i}, b_{j}\right)$. But the formula just written gives
+claim h_s21_t1_evaluate_on_basis_vectors :
+  forall c:set -> set -> set,
+  forall i :e m, forall j :e n,
+    (forall x :e X, forall y :e Y,
+      f (bilinear_tuple x y)
+      = module_finitely_supported_sum M addM (m :*: n)
+        (fun u => smulM
+          (mulK
+            (basis_coordinates K addK mulK X addX smulX m a x (u 0))
+            (basis_coordinates K addK mulK Y addY smulY n b y (u 1)))
+          (c (u 0) (u 1)))) ->
+    f (bilinear_tuple (a i) (b j))
+    = module_finitely_supported_sum M addM (m :*: n)
+      (fun u => smulM
+        (mulK
+          (basis_coordinates K addK mulK X addX smulX m a (a i) (u 0))
+          (basis_coordinates K addK mulK Y addY smulY n b (b j) (u 1)))
+        (c (u 0) (u 1))).
+admit.
 //GOD1PRF:543266 also
+claim h_s21_t1_basis_coordinate_delta :
+  (forall i k :e m,
+    basis_coordinates K addK mulK X addX smulX m a (a i) k
+    = if k = i then ring_one K mulK else ring_zero K addK)
+  /\ (forall j l :e n,
+    basis_coordinates K addK mulK Y addY smulY n b (b j) l
+    = if l = j then ring_one K mulK else ring_zero K addK).
+admit.
 //GOD1PRF:543504 (cf. for example § 16, section 2, or observe that
+claim h_s21_t1_basis_coordinates_X_formal_call :
+  (forall x :e X,
+    linear_representation K addK mulK X addX smulX m a x
+      (fun i => basis_coordinates K addK mulK X addX smulX m a x i)
+    /\ (forall coeff:set -> set,
+      linear_representation K addK mulK X addX smulX m a x coeff ->
+      forall i :e m,
+        coeff i = basis_coordinates K addK mulK X addX smulX m a x i))
+  /\ (forall i :e m, forall x y :e X,
+    basis_coordinate_function K addK mulK X addX smulX m a i (addX x y)
+    = addK
+      (basis_coordinate_function K addK mulK X addX smulX m a i x)
+      (basis_coordinate_function K addK mulK X addX smulX m a i y))
+  /\ (forall i :e m, forall scalar :e K, forall x :e X,
+    basis_coordinate_function K addK mulK X addX smulX m a i (smulX scalar x)
+    = mulK scalar
+      (basis_coordinate_function K addK mulK X addX smulX m a i x)).
+apply (god1_basis_unique_coordinates_and_coordinate_linearity
+  K addK mulK X addX smulX m a hBasisX).
+claim h_s21_t1_basis_coordinates_Y_formal_call :
+  (forall y :e Y,
+    linear_representation K addK mulK Y addY smulY n b y
+      (fun j => basis_coordinates K addK mulK Y addY smulY n b y j)
+    /\ (forall coeff:set -> set,
+      linear_representation K addK mulK Y addY smulY n b y coeff ->
+      forall j :e n,
+        coeff j = basis_coordinates K addK mulK Y addY smulY n b y j))
+  /\ (forall j :e n, forall x y :e Y,
+    basis_coordinate_function K addK mulK Y addY smulY n b j (addY x y)
+    = addK
+      (basis_coordinate_function K addK mulK Y addY smulY n b j x)
+      (basis_coordinate_function K addK mulK Y addY smulY n b j y))
+  /\ (forall j :e n, forall scalar :e K, forall y :e Y,
+    basis_coordinate_function K addK mulK Y addY smulY n b j (smulY scalar y)
+    = mulK scalar
+      (basis_coordinate_function K addK mulK Y addY smulY n b j y)).
+apply (god1_basis_unique_coordinates_and_coordinate_linearity
+  K addK mulK Y addY smulY n b hBasisY).
+claim h_s21_t1_delta_follows_from_unique_coordinates :
+  forall i k :e m,
+    basis_coordinates K addK mulK X addX smulX m a (a i) k
+    = if k = i then ring_one K mulK else ring_zero K addK.
+admit.
 //GOD1PRF:543672 hence the only term which can be non-zero in the sum for $f\left(a_{i}, b_{j}\right)$ is the term for which $k=i$ and $l=j$, and this term is equal to $c_{i j}$.\\
+claim h_s21_t1_only_matching_coefficient_survives :
+  forall c:set -> set -> set, forall i :e m, forall j :e n,
+    module_finitely_supported_sum M addM (m :*: n)
+      (fun u => smulM
+        (mulK
+          (basis_coordinates K addK mulK X addX smulX m a (a i) (u 0))
+          (basis_coordinates K addK mulK Y addY smulY n b (b j) (u 1)))
+        (c (u 0) (u 1)))
+    = c i j.
+admit.
 Admitted.
 
 Theorem god1_bilinear_tensor_basis :
@@ -44659,6 +46433,45 @@ assume hn.
 let a b.
 assume hRing hBasisX hBasisY.
 //GOD1PRF:544615 which is an identity in the module $\mathscr{L}(\mathrm{X}, \mathrm{Y} ; \mathrm{K})$ of bilinear forms on $\mathrm{X} \times \mathrm{Y}$. Since this decomposition of $f$ is unique it follows that the $m n$ forms $u_{i} \otimes v_{j}$ form a basis of $\mathscr{L}(\mathrm{X}, \mathrm{Y} ; \mathrm{K})$.
+claim h_s21_bilinear_tensor_basis_conclusion :
+  module_basis K addK mulK
+    (multilinear_mapping_space K addK mulK 2
+      (fun i => if i = 0 then X else Y)
+      (fun i x y => if i = 0 then addX x y else addY x y)
+      (fun i scalar x => if i = 0 then smulX scalar x else smulY scalar x)
+      K addK mulK)
+    (multilinear_mapping_addition
+      (indexed_module_product 2 (fun i => if i = 0 then X else Y)) addK)
+    (multilinear_mapping_scalar
+      (indexed_module_product 2 (fun i => if i = 0 then X else Y)) mulK)
+    (m :*: n)
+    (fun u => fun z :e indexed_module_product 2
+      (fun i => if i = 0 then X else Y) =>
+      mulK
+        (basis_coordinate_function K addK mulK X addX smulX m a (u 0) (z 0))
+        (basis_coordinate_function K addK mulK Y addY smulY n b (u 1) (z 1))).
+admit.
+claim h_s21_scalar_module : left_module K addK mulK K addK mulK.
+admit.
+claim h_s21_bilinear_theorem1_formal_call : forall f0:set -> set,
+  (bilinear_mapping
+    K addK mulK X addX smulX Y addY smulY K addK mulK f0
+  <-> exists coeff:set -> set -> set,
+    (forall i :e m, forall j :e n, coeff i j :e K)
+    /\ (forall i :e m, forall j :e n,
+      coeff i j = f0 (bilinear_tuple (a i) (b j)))
+    /\ forall x :e X, forall y :e Y,
+      f0 (bilinear_tuple x y)
+      = module_finitely_supported_sum K addK (m :*: n)
+        (fun u => mulK
+          (mulK
+            (basis_coordinates K addK mulK X addX smulX m a x (u 0))
+            (basis_coordinates K addK mulK Y addY smulY n b y (u 1)))
+          (coeff (u 0) (u 1)))).
+let f0.
+apply (god1_s21_theorem1_bilinear_maps_on_free_modules
+  K addK mulK X addX smulX Y addY smulY K addK mulK
+  m hm n hn a b f0 hRing hBasisX hBasisY h_s21_scalar_module).
 Admitted.
 
 Theorem god1_s21_theorem2_trilinear_maps_on_free_modules :
@@ -44700,10 +46513,92 @@ let a b c f.
 assume hRing hBasisX hBasisY hBasisZ hModuleM.
 apply iffI.
 //GOD1PRF:548789 Formula (12) shows that if $f$ is trilinear then we have (15), with the coefficients $c_{i j k}$ given by (16). Conversely, if $f$ is given by (15), to show that $f$ is trilinear it is enough to show that the function $\xi_{i} \eta_{j} \zeta_{k} c_{i j k}$ is trilinear; or, since $c_{i j k}$ is independent of $x, y, z$, that the function $\xi_{i} \eta_{j} \zeta_{k}$ is trilinear. Introducing the coordinate functions $u_{i}, v_{j}, w_{k}$ on the modules $\mathrm{X}, \mathrm{Y}, \mathrm{Z}$ respectively relative to the given bases, it is clear that
+claim h_s21_t2_expansion_equivalence :
+  (trilinear_mapping K addK mulK
+    X addX smulX Y addY smulY Z addZ smulZ M addM smulM f
+  <-> exists coeff:set -> set -> set -> set,
+    (forall i :e m, forall j :e n, forall k :e p, coeff i j k :e M)
+    /\ (forall i :e m, forall j :e n, forall k :e p,
+      coeff i j k = f (trilinear_tuple (a i) (b j) (c k)))
+    /\ forall x :e X, forall y :e Y, forall z :e Z,
+      f (trilinear_tuple x y z)
+      = module_finitely_supported_sum M addM (m :*: (n :*: p))
+        (fun u => smulM
+          (mulK
+            (basis_coordinates K addK mulK X addX smulX m a x (u 0))
+            (mulK
+              (basis_coordinates K addK mulK Y addY smulY n b y (u 1 0))
+              (basis_coordinates K addK mulK Z addZ smulZ p c z (u 1 1))))
+          (coeff (u 0) (u 1 0) (u 1 1)))).
+admit.
 //GOD1PRF:549406 and the right-hand side is indeed a trilinear form on $\mathrm{X} \times \mathrm{Y} \times \mathrm{Z}$, namely it is the form
+claim h_s21_t2_example2_formal_call :
+  forall K0, forall add0 mul0:set -> set -> set,
+  forall p0 :e omega, forall X0:set -> set,
+  forall addX0 smulX0:set -> set -> set -> set,
+  forall u0:set -> set -> set,
+    commutative_ring K0 add0 mul0 ->
+    (forall q :e p0,
+      module_homomorphism K0 add0 mul0
+        (X0 q) (addX0 q) (smulX0 q) K0 add0 mul0 (u0 q)) ->
+    multilinear_mapping K0 add0 mul0 p0 X0 addX0 smulX0 K0 add0 mul0
+      (fun x0 => ring_finite_product K0 add0 mul0 p0
+        (fun q => u0 q (x0 q))).
+apply god1_s21_example2_product_of_linear_forms_is_multilinear.
+claim h_s21_t2_coordinate_product_trilinear :
+  forall i :e m, forall j :e n, forall k :e p,
+    trilinear_mapping K addK mulK
+      X addX smulX Y addY smulY Z addZ smulZ K addK mulK
+      (fun q => mulK
+        (basis_coordinate_function K addK mulK X addX smulX m a i (q 0))
+        (mulK
+          (basis_coordinate_function K addK mulK Y addY smulY n b j (q 1))
+          (basis_coordinate_function K addK mulK Z addZ smulZ p c k (q 2)))).
+admit.
 //GOD1PRF:549576 To complete the proof it remains to show that (15) implies (16); now (15) gives
+claim h_s21_t2_coefficient_recovery :
+  forall coeff:set -> set -> set -> set,
+    (forall x :e X, forall y :e Y, forall z :e Z,
+      f (trilinear_tuple x y z)
+      = module_finitely_supported_sum M addM (m :*: (n :*: p))
+        (fun u => smulM
+          (mulK
+            (basis_coordinates K addK mulK X addX smulX m a x (u 0))
+            (mulK
+              (basis_coordinates K addK mulK Y addY smulY n b y (u 1 0))
+              (basis_coordinates K addK mulK Z addZ smulZ p c z (u 1 1))))
+          (coeff (u 0) (u 1 0) (u 1 1)))) ->
+    forall i :e m, forall j :e n, forall k :e p,
+      coeff i j k = f (trilinear_tuple (a i) (b j) (c k)).
+admit.
 //GOD1PRF:549819 and the only term on the right-hand side which can be non-zero is that for which $\lambda=i, \mu=j, v=k$. For this term we have
+claim h_s21_t2_only_matching_coordinate_product_survives :
+  forall i :e m, forall j :e n, forall k :e p,
+  forall u :e m :*: (n :*: p),
+    mulK
+      (basis_coordinates K addK mulK X addX smulX m a (a i) (u 0))
+      (mulK
+        (basis_coordinates K addK mulK Y addY smulY n b (b j) (u 1 0))
+        (basis_coordinates K addK mulK Z addZ smulZ p c (c k) (u 1 1)))
+    = if u 0 = i /\ u 1 0 = j /\ u 1 1 = k
+      then ring_one K mulK else ring_zero K addK.
+admit.
 //GOD1PRF:550037 and (16) follows.\\
+claim h_s21_t2_coefficients_equal_basis_values :
+  forall coeff:set -> set -> set -> set,
+    (forall x :e X, forall y :e Y, forall z :e Z,
+      f (trilinear_tuple x y z)
+      = module_finitely_supported_sum M addM (m :*: (n :*: p))
+        (fun u => smulM
+          (mulK
+            (basis_coordinates K addK mulK X addX smulX m a x (u 0))
+            (mulK
+              (basis_coordinates K addK mulK Y addY smulY n b y (u 1 0))
+              (basis_coordinates K addK mulK Z addZ smulZ p c z (u 1 1))))
+          (coeff (u 0) (u 1 0) (u 1 1)))) ->
+    forall i :e m, forall j :e n, forall k :e p,
+      coeff i j k = f (trilinear_tuple (a i) (b j) (c k)).
+admit.
 Admitted.
 
 Theorem god1_s21_theorem3_multilinear_maps_on_free_modules :
@@ -44736,9 +46631,127 @@ let X addX smulX n a M addM smulM f.
 assume hRing hBases hModuleM.
 apply iffI.
 //GOD1PRF:555349 If $f$ is multilinear, formula (17) follows immediately from (10) of section 3 . Conversely, to show that (17) always represents a multilinear mapping, it is enough to show that the function
+claim h_s21_t3_formula17_equivalence :
+  (multilinear_mapping K addK mulK p X addX smulX M addM smulM f
+  <-> exists coeff:set -> set,
+    (forall idx :e (Pi_ h :e p, n h), coeff idx :e M)
+    /\ (forall idx :e (Pi_ h :e p, n h),
+      coeff idx = f (fun h :e p => a h (idx h)))
+    /\ forall x :e indexed_module_product p X,
+      f x = module_finitely_supported_sum M addM (Pi_ h :e p, n h)
+        (fun idx => smulM
+          (ring_finite_product K addK mulK p
+            (fun h => basis_coordinates K addK mulK
+              (X h) (addX h) (smulX h) (n h) (a h) (x h) (idx h)))
+          (coeff idx))).
+admit.
 //GOD1PRF:555639 is always $p$-linear. Now if $u_{h_{1}}, u_{h_{2}}, \ldots, u_{h n_{h}}$ are the coordinate functions on the module $\mathrm{X}_{h}$, with respect to the basis $a_{h_{1}}, \ldots, a_{h n_{h}}$, it is clear that
+claim h_s21_t3_coordinate_product_is_p_linear :
+  forall idx :e (Pi_ h :e p, n h),
+    multilinear_mapping K addK mulK p X addX smulX K addK mulK
+      (fun x => ring_finite_product K addK mulK p
+        (fun h => basis_coordinate_function K addK mulK
+          (X h) (addX h) (smulX h) (n h) (a h) (idx h) (x h))).
+admit.
 //GOD1PRF:555982 so that the function
+claim h_s21_t3_coordinate_product_formula :
+  forall idx :e (Pi_ h :e p, n h),
+  forall x :e indexed_module_product p X,
+    ring_finite_product K addK mulK p
+      (fun h => basis_coordinates K addK mulK
+        (X h) (addX h) (smulX h) (n h) (a h) (x h) (idx h))
+    = ring_finite_product K addK mulK p
+      (fun h => basis_coordinate_function K addK mulK
+        (X h) (addX h) (smulX h) (n h) (a h) (idx h) (x h)).
+admit.
 //GOD1PRF:556081 is indeed multilinear (Example 2). Finally, we leave to the reader the task of checking that (17) implies (18), as in the proofs of Theorems 1 and 2.\\
+claim h_s21_t3_example2_formal_call :
+  forall K0, forall add0 mul0:set -> set -> set,
+  forall p0 :e omega, forall X0:set -> set,
+  forall addX0 smulX0:set -> set -> set -> set,
+  forall u0:set -> set -> set,
+    commutative_ring K0 add0 mul0 ->
+    (forall q :e p0,
+      module_homomorphism K0 add0 mul0
+        (X0 q) (addX0 q) (smulX0 q) K0 add0 mul0 (u0 q)) ->
+    multilinear_mapping K0 add0 mul0 p0 X0 addX0 smulX0 K0 add0 mul0
+      (fun x0 => ring_finite_product K0 add0 mul0 p0
+        (fun q => u0 q (x0 q))).
+apply god1_s21_example2_product_of_linear_forms_is_multilinear.
+claim h_s21_t3_theorem1_formal_call :
+  forall K0, forall add0 mul0:set -> set -> set,
+  forall X0, forall addX0 smulX0:set -> set -> set,
+  forall Y0, forall addY0 smulY0:set -> set -> set,
+  forall M0, forall addM0 smulM0:set -> set -> set,
+  forall m0 n0 :e omega, forall a0 b0:set -> set, forall f0:set -> set,
+    commutative_ring K0 add0 mul0 ->
+    module_basis K0 add0 mul0 X0 addX0 smulX0 m0 a0 ->
+    module_basis K0 add0 mul0 Y0 addY0 smulY0 n0 b0 ->
+    left_module K0 add0 mul0 M0 addM0 smulM0 ->
+    (bilinear_mapping K0 add0 mul0
+      X0 addX0 smulX0 Y0 addY0 smulY0 M0 addM0 smulM0 f0
+    <-> exists coeff0:set -> set -> set,
+      (forall i :e m0, forall j :e n0, coeff0 i j :e M0)
+      /\ (forall i :e m0, forall j :e n0,
+        coeff0 i j = f0 (bilinear_tuple (a0 i) (b0 j)))
+      /\ forall x0 :e X0, forall y0 :e Y0,
+        f0 (bilinear_tuple x0 y0)
+        = module_finitely_supported_sum M0 addM0 (m0 :*: n0)
+          (fun q => smulM0
+            (mul0
+              (basis_coordinates K0 add0 mul0 X0 addX0 smulX0
+                m0 a0 x0 (q 0))
+              (basis_coordinates K0 add0 mul0 Y0 addY0 smulY0
+                n0 b0 y0 (q 1)))
+            (coeff0 (q 0) (q 1)))).
+apply god1_s21_theorem1_bilinear_maps_on_free_modules.
+claim h_s21_t3_theorem2_formal_call :
+  forall K0, forall add0 mul0:set -> set -> set,
+  forall X0, forall addX0 smulX0:set -> set -> set,
+  forall Y0, forall addY0 smulY0:set -> set -> set,
+  forall Z0, forall addZ0 smulZ0:set -> set -> set,
+  forall M0, forall addM0 smulM0:set -> set -> set,
+  forall m0 n0 q0 :e omega, forall a0 b0 c0:set -> set,
+  forall f0:set -> set,
+    commutative_ring K0 add0 mul0 ->
+    module_basis K0 add0 mul0 X0 addX0 smulX0 m0 a0 ->
+    module_basis K0 add0 mul0 Y0 addY0 smulY0 n0 b0 ->
+    module_basis K0 add0 mul0 Z0 addZ0 smulZ0 q0 c0 ->
+    left_module K0 add0 mul0 M0 addM0 smulM0 ->
+    (trilinear_mapping K0 add0 mul0
+      X0 addX0 smulX0 Y0 addY0 smulY0 Z0 addZ0 smulZ0
+      M0 addM0 smulM0 f0
+    <-> exists coeff0:set -> set -> set -> set,
+      (forall i :e m0, forall j :e n0, forall k :e q0,
+        coeff0 i j k :e M0)
+      /\ (forall i :e m0, forall j :e n0, forall k :e q0,
+        coeff0 i j k = f0 (trilinear_tuple (a0 i) (b0 j) (c0 k)))
+      /\ forall x0 :e X0, forall y0 :e Y0, forall z0 :e Z0,
+        f0 (trilinear_tuple x0 y0 z0)
+        = module_finitely_supported_sum M0 addM0 (m0 :*: (n0 :*: q0))
+          (fun u0 => smulM0
+            (mul0
+              (basis_coordinates K0 add0 mul0 X0 addX0 smulX0
+                m0 a0 x0 (u0 0))
+              (mul0
+                (basis_coordinates K0 add0 mul0 Y0 addY0 smulY0
+                  n0 b0 y0 (u0 1 0))
+                (basis_coordinates K0 add0 mul0 Z0 addZ0 smulZ0
+                  q0 c0 z0 (u0 1 1))))
+            (coeff0 (u0 0) (u0 1 0) (u0 1 1)))).
+apply god1_s21_theorem2_trilinear_maps_on_free_modules.
+claim h_s21_t3_coefficient_recovery_as_in_theorems1_and2 :
+  forall coeff:set -> set,
+    (forall x :e indexed_module_product p X,
+      f x = module_finitely_supported_sum M addM (Pi_ h :e p, n h)
+        (fun idx => smulM
+          (ring_finite_product K addK mulK p
+            (fun h => basis_coordinates K addK mulK
+              (X h) (addX h) (smulX h) (n h) (a h) (x h) (idx h)))
+          (coeff idx))) ->
+    forall idx :e (Pi_ h :e p, n h),
+      coeff idx = f (fun h :e p => a h (idx h)).
+admit.
 Admitted.
 
 (** § 22. Alternating bilinear and trilinear mappings. **)
@@ -44785,9 +46798,29 @@ let K addK mulK X addX smulX M addM smulM f.
 assume hAlternating.
 apply andI.
 //GOD1PRF:580788 If so, then for all $x, y \in \mathbf{X}$ we have
+claim h_s22_alternating_diagonal_sum_zero : forall x y :e X,
+  f (bilinear_tuple (addX x y) (addX x y)) = module_zero M addM.
+admit.
 //GOD1PRF:580947 so that an alternating bilinear mapping $f$ satisfies the identity
+claim h_s22_mixed_terms_sum_to_zero : forall x y :e X,
+  addM (f (bilinear_tuple x y)) (f (bilinear_tuple y x))
+  = module_zero M addM.
+admit.
 //GOD1PRF:581077 for all $x, y \in \mathbf{X}$.\\
+claim h_s22_alternating_is_skew : forall x y :e X,
+  f (bilinear_tuple y x)
+  = module_negation M addM (f (bilinear_tuple x y)).
+admit.
 //GOD1PRF:581704 Clearly, every linear combination of alternating bilinear mappings is again an alternating bilinear mapping; in other words, the alternating bilinear mappings form a submodule of the module $\mathscr{L}(\mathrm{X}, \mathrm{X} ; \mathrm{M})$ of all bilinear mappings of $\mathrm{X} \times \mathrm{X}$ into M .
+claim h_s22_alternating_bilinear_submodule :
+  submodule K addK mulK
+    (multilinear_mapping_space K addK mulK 2
+      (fun i => X) (fun i => addX) (fun i => smulX) M addM smulM)
+    (multilinear_mapping_addition (indexed_module_product 2 (fun i => X)) addM)
+    (multilinear_mapping_scalar (indexed_module_product 2 (fun i => X)) smulM)
+    (alternating_bilinear_mapping_space
+      K addK mulK X addX smulX M addM smulM).
+admit.
 Admitted.
 
 //GOD1:582578 exterior_product_two_linear_forms : "the exterior product of the linear forms #7 and #8" | $#7\wedge #8$
@@ -44814,7 +46847,19 @@ Theorem god1_exterior_product_two_forms_is_alternating :
 let K addK mulK X addX smulX u v.
 assume hRing hu hv.
 //GOD1PRF:582447 is alternating and bilinear. In particular, if $u$ and $v$ are linear forms on X , the mapping
+claim h_s22_exterior_two_is_alternating_bilinear :
+  alternating_bilinear_mapping K addK mulK
+    X addX smulX K addK mulK
+    (fun z => ap (exterior_product_two_linear_forms K addK mulK X u v) z).
+admit.
 //GOD1PRF:582578 of $\mathrm{X} \times \mathrm{X}$ into K is an alternating bilinear form on $\mathrm{X} \times \mathrm{X}$; it is called the exterior product of the linear forms $u$ and $v$, and is denoted by
+claim h_s22_exterior_two_definition_realizes_form :
+  forall z :e indexed_module_product 2 (fun i => X),
+    ap (exterior_product_two_linear_forms K addK mulK X u v) z
+    = addK
+      (mulK (u (z 0)) (v (z 1)))
+      (ring_negation K addK (mulK (u (z 1)) (v (z 0)))).
+admit.
 Admitted.
 
 Theorem god1_s22_theorem1_alternating_bilinear_coefficients :
@@ -44857,10 +46902,77 @@ let a f.
 assume hRing hBasis hModule hBilinear.
 apply andI.
 //GOD1PRF:584234 It is clear that the relation (1) for $x=a_{i}$ and the relation (2) for $x=a_{i}, y=a_{j}$ give the relations (3). Conversely, suppose that (3) is satisfied ; in the formula
+claim h_s22_t1_basis_criterion :
+  (alternating_bilinear_mapping K addK mulK
+    X addX smulX M addM smulM f
+  <-> (forall i :e n,
+    f (bilinear_tuple (a i) (a i)) = module_zero M addM)
+    /\ forall i j :e n,
+      addM (f (bilinear_tuple (a i) (a j)))
+        (f (bilinear_tuple (a j) (a i))) = module_zero M addM).
+admit.
 //GOD1PRF:584487 which follows from Theorem 1 -of § 21, the terms for which $i=j$ are zero and therefore\\
+claim h_s22_t1_s21_theorem1_formal_call :
+  (bilinear_mapping
+    K addK mulK X addX smulX X addX smulX M addM smulM f
+  <-> exists coeff:set -> set -> set,
+    (forall i :e n, forall j :e n, coeff i j :e M)
+    /\ (forall i :e n, forall j :e n,
+      coeff i j = f (bilinear_tuple (a i) (a j)))
+    /\ forall x :e X, forall y :e X,
+      f (bilinear_tuple x y)
+      = module_finitely_supported_sum M addM (n :*: n)
+        (fun u => smulM
+          (mulK
+            (basis_coordinates K addK mulK X addX smulX n a x (u 0))
+            (basis_coordinates K addK mulK X addX smulX n a y (u 1)))
+          (coeff (u 0) (u 1)))).
+apply (god1_s21_theorem1_bilinear_maps_on_free_modules
+  K addK mulK X addX smulX X addX smulX M addM smulM
+  n hn n hn a a f hRing hBasis hBasis hModule).
+claim h_s22_t1_diagonal_terms_vanish : forall i :e n,
+  f (bilinear_tuple (a i) (a i)) = module_zero M addM.
+admit.
 //GOD1PRF:584578 we may write
+claim h_s22_t1_off_diagonal_expansion : forall x y :e X,
+  f (bilinear_tuple x y)
+  = module_finitely_supported_sum M addM
+    {u :e n :*: n|u 0 :e u 1}
+    (fun u => smulM
+      (addK
+        (mulK
+          (basis_coordinates K addK mulK X addX smulX n a x (u 0))
+          (basis_coordinates K addK mulK X addX smulX n a y (u 1)))
+        (ring_negation K addK
+          (mulK
+            (basis_coordinates K addK mulK X addX smulX n a x (u 1))
+            (basis_coordinates K addK mulK X addX smulX n a y (u 0)))))
+      (f (bilinear_tuple (a (u 0)) (a (u 1))))).
+admit.
 //GOD1PRF:584681 in the second of these sums, replace $i$ and $j$ by $j$ and $i$ respectively (this is purely a change of notation), and we obtain
+claim h_s22_t1_reindexed_coefficients : forall i j :e n,
+  f (bilinear_tuple (a j) (a i))
+  = module_negation M addM (f (bilinear_tuple (a i) (a j))).
+admit.
 //GOD1PRF:585010 by using (3); hence we obtain the formula (4), and this shows that $f$ is alternating, for it is clear that the differences $\xi_{i} \eta_{j}-\xi_{j} \eta_{i}$ are all zero when $x=y$.\\
+claim h_s22_t1_formula4_implies_alternating :
+  (forall x y :e X,
+    f (bilinear_tuple x y)
+    = module_finitely_supported_sum M addM
+      {u :e n :*: n|u 0 :e u 1}
+      (fun u => smulM
+        (addK
+          (mulK
+            (basis_coordinates K addK mulK X addX smulX n a x (u 0))
+            (basis_coordinates K addK mulK X addX smulX n a y (u 1)))
+          (ring_negation K addK
+            (mulK
+              (basis_coordinates K addK mulK X addX smulX n a x (u 1))
+              (basis_coordinates K addK mulK X addX smulX n a y (u 0)))))
+        (f (bilinear_tuple (a (u 0)) (a (u 1)))))) ->
+  alternating_bilinear_mapping K addK mulK
+    X addX smulX M addM smulM f.
+admit.
 Admitted.
 
 //GOD1:587005 determinant_of_two_vectors_in_basis : "the determinant of #9 and #10 with respect to the two-vector basis #8" | $\det_{#8}(#9,#10)$
@@ -44902,8 +47014,34 @@ let K addK mulK X addX smulX a.
 assume hRing hBasis.
 apply andI.
 //GOD1PRF:587005 is called the determinant of the vectors $x$ and $y$ with respect to the basis $\left(a_{1}, a_{2}\right)$ of X ; it is an alternating bilinear form on X such that
+claim h_s22_two_vector_determinant_alternating_and_normalized :
+  alternating_bilinear_mapping K addK mulK
+    X addX smulX K addK mulK
+    (fun z => determinant_of_two_vectors_in_basis
+      K addK mulK X addX smulX a (z 0) (z 1))
+  /\ determinant_of_two_vectors_in_basis
+    K addK mulK X addX smulX a (a 0) (a 1) = ring_one K mulK.
+admit.
 //GOD1PRF:587275 Moreover this property characterizes D, for (6) can be written as
+claim h_s22_two_vector_determinant_characterization : forall f0:set -> set,
+  alternating_bilinear_mapping K addK mulK
+    X addX smulX K addK mulK f0 ->
+  forall x y :e X,
+    f0 (bilinear_tuple x y)
+    = mulK (f0 (bilinear_tuple (a 0) (a 1)))
+      (determinant_of_two_vectors_in_basis
+        K addK mulK X addX smulX a x y).
+admit.
 //GOD1PRF:587389 and therefore $f=\mathrm{D}$ if $f\left(a_{1}, a_{2}\right)=1$.\\
+claim h_s22_two_vector_determinant_unique : forall f0:set -> set,
+  alternating_bilinear_mapping K addK mulK
+    X addX smulX K addK mulK f0 ->
+  f0 (bilinear_tuple (a 0) (a 1)) = ring_one K mulK ->
+  forall x y :e X,
+    f0 (bilinear_tuple x y)
+    = determinant_of_two_vectors_in_basis
+      K addK mulK X addX smulX a x y.
+admit.
 Admitted.
 
 //GOD1:589730 alternating_trilinear_mapping : "#13 is an alternating trilinear mapping on #4 with values in #10" | $#13(x,y,z)=0\text{ when two arguments agree}$
@@ -44989,6 +47127,24 @@ Definition basis_triple_coordinate_matrix :
         (if u 1 = 0 then x else if u 1 = 1 then y else z)
         (if u 0 = 0 then i else if u 0 = 1 then j else k).
 
+(** The source invokes Example 5 below for the alternating character of the
+threefold exterior product.  The example occurs in the surrounding prose, so
+this interface gives that cited result a declaration that can be called. **)
+Theorem god1_s22_example5_threefold_exterior_product_is_alternating :
+  forall K, forall add mul:set -> set -> set,
+  forall X, forall addX smulX:set -> set -> set,
+  forall u v w:set -> set,
+    commutative_ring K add mul ->
+    module_homomorphism K add mul X addX smulX K add mul u ->
+    module_homomorphism K add mul X addX smulX K add mul v ->
+    module_homomorphism K add mul X addX smulX K add mul w ->
+    alternating_trilinear_mapping K add mul
+      X addX smulX K add mul
+      (fun z => ap (exterior_product_three_linear_forms K add mul X u v w) z).
+let K add mul X addX smulX u v w.
+assume hRing hu hv hw.
+Admitted.
+
 Theorem god1_s22_theorem2_alternating_trilinear_coefficients :
   forall K, forall addK mulK:set -> set -> set,
   forall X, forall addX smulX:set -> set -> set,
@@ -45032,15 +47188,150 @@ let a f.
 assume hRing hBasis hModule hTrilinear.
 apply andI.
 //GOD1PRF:593908 To prove Theorem 2, we must first show that, for every alternating trilinear mapping $f$, the coefficients of $f$ satisfy (11) and (12). This follows by substituting $x=a_{i}$, $y=a_{j}, z=a_{k}$ in the relations (9) and (10).
+claim h_s22_t2_alternating_coefficients_necessary :
+  alternating_trilinear_mapping K addK mulK
+    X addX smulX M addM smulM f ->
+  (forall i j :e n,
+    f (trilinear_tuple (a i) (a j) (a j)) = module_zero M addM
+    /\ f (trilinear_tuple (a i) (a j) (a i)) = module_zero M addM
+    /\ f (trilinear_tuple (a i) (a i) (a j)) = module_zero M addM)
+  /\ forall i j k :e n,
+    f (trilinear_tuple (a i) (a j) (a k))
+      = f (trilinear_tuple (a j) (a k) (a i))
+    /\ f (trilinear_tuple (a i) (a j) (a k))
+      = f (trilinear_tuple (a k) (a i) (a j))
+    /\ f (trilinear_tuple (a i) (a j) (a k))
+      = module_negation M addM
+        (f (trilinear_tuple (a i) (a k) (a j))).
+admit.
 //GOD1PRF:594136 Conversely, suppose that (11) and (12) are satisfied. In the formula
+claim h_s22_t2_coefficient_relations_sufficient :
+  ((forall i j :e n,
+    f (trilinear_tuple (a i) (a j) (a j)) = module_zero M addM
+    /\ f (trilinear_tuple (a i) (a j) (a i)) = module_zero M addM
+    /\ f (trilinear_tuple (a i) (a i) (a j)) = module_zero M addM)
+  /\ forall i j k :e n,
+    f (trilinear_tuple (a i) (a j) (a k))
+      = f (trilinear_tuple (a j) (a k) (a i))
+    /\ f (trilinear_tuple (a i) (a j) (a k))
+      = f (trilinear_tuple (a k) (a i) (a j))
+    /\ f (trilinear_tuple (a i) (a j) (a k))
+      = module_negation M addM
+        (f (trilinear_tuple (a i) (a k) (a j)))) ->
+  alternating_trilinear_mapping K addK mulK
+    X addX smulX M addM smulM f.
+admit.
 //GOD1PRF:594303 which follows from Theorem 2 of § 21, the only terms which can possibly be non-zero are those for which the indices $i, j, k$ are all distinct. By classifying the triples $(i, j, k)$ according to the relative magnitudes of $i, j, k$ we therefore obtain a decompositicn of $f(x, y, z)$ into six partial sums, namely
+claim h_s22_t2_s21_theorem2_formal_call :
+  (trilinear_mapping K addK mulK
+    X addX smulX X addX smulX X addX smulX M addM smulM f
+  <-> exists coeff:set -> set -> set -> set,
+    (forall i :e n, forall j :e n, forall k :e n, coeff i j k :e M)
+    /\ (forall i :e n, forall j :e n, forall k :e n,
+      coeff i j k = f (trilinear_tuple (a i) (a j) (a k)))
+    /\ forall x :e X, forall y :e X, forall z :e X,
+      f (trilinear_tuple x y z)
+      = module_finitely_supported_sum M addM (n :*: (n :*: n))
+        (fun u => smulM
+          (mulK
+            (basis_coordinates K addK mulK X addX smulX n a x (u 0))
+            (mulK
+              (basis_coordinates K addK mulK X addX smulX n a y (u 1 0))
+              (basis_coordinates K addK mulK X addX smulX n a z (u 1 1))))
+          (coeff (u 0) (u 1 0) (u 1 1)))).
+apply (god1_s21_theorem2_trilinear_maps_on_free_modules
+  K addK mulK X addX smulX X addX smulX X addX smulX
+  M addM smulM n hn n hn n hn a a a f
+  hRing hBasis hBasis hBasis hModule).
+claim h_s22_t2_six_ordered_partial_sums : forall x y z :e X,
+  f (trilinear_tuple x y z)
+  = module_finitely_supported_sum M addM
+    {t :e n :*: (n :*: n)|
+      t 0 <> t 1 0 /\ t 0 <> t 1 1 /\ t 1 0 <> t 1 1}
+    (fun t => smulM
+      (mulK
+        (basis_coordinates K addK mulK X addX smulX n a x (t 0))
+        (mulK
+          (basis_coordinates K addK mulK X addX smulX n a y (t 1 0))
+          (basis_coordinates K addK mulK X addX smulX n a z (t 1 1))))
+      (f (trilinear_tuple (a (t 0)) (a (t 1 0)) (a (t 1 1))))).
+admit.
 //GOD1PRF:594979 For each of these partial sums we can change the notation so that the sum in question extends over all triples $(i, j, k)$ such that $i<j<k$ (for example, in the second sum, we have to replace $j$ by $i, k$ by $j$, and $i$ by $k$ ). In this way we obtain
+claim h_s22_t2_reindex_over_increasing_triples : forall x y z :e X,
+  exists summand:set -> set,
+    f (trilinear_tuple x y z)
+    = module_finitely_supported_sum M addM
+      {t :e n :*: (n :*: n)|t 0 :e t 1 0 /\ t 1 0 :e t 1 1}
+      summand.
+admit.
 //GOD1PRF:595594 Having regard to the relations (12) and grouping together the terms with the same indices $i, j, k$ in each of the six sums above, we find
+claim h_s22_t2_grouped_determinant_terms : forall x y z :e X,
+  f (trilinear_tuple x y z)
+  = module_finitely_supported_sum M addM
+    {t :e n :*: (n :*: n)|t 0 :e t 1 0 /\ t 1 0 :e t 1 1}
+    (fun t => smulM
+      (determinant_3 K addK mulK
+        (basis_triple_coordinate_matrix
+          K addK mulK X addX smulX n a
+          (t 0) (t 1 0) (t 1 1) x y z))
+      (f (trilinear_tuple (a (t 0)) (a (t 1 0)) (a (t 1 1))))).
+admit.
 //GOD1PRF:595950 which is precisely the formula (13).\\
+claim h_s22_t2_formula13 : forall x y z :e X,
+  f (trilinear_tuple x y z)
+  = module_finitely_supported_sum M addM
+    {t :e n :*: (n :*: n)|t 0 :e t 1 0 /\ t 1 0 :e t 1 1}
+    (fun t => smulM
+      (determinant_3 K addK mulK
+        (basis_triple_coordinate_matrix
+          K addK mulK X addX smulX n a
+          (t 0) (t 1 0) (t 1 1) x y z))
+      (f (trilinear_tuple (a (t 0)) (a (t 1 0)) (a (t 1 1))))).
+admit.
 //GOD1PRF:595989 It remains to verify that $f$ is in fact an alternating function. For this it is clearly sufficient to show that the trilinear form
+claim h_s22_t2_determinant_atom_is_alternating :
+  forall i j k :e n,
+    alternating_trilinear_mapping K addK mulK
+      X addX smulX K addK mulK
+      (fun q => determinant_3 K addK mulK
+        (basis_triple_coordinate_matrix K addK mulK X addX smulX n a
+          i j k (q 0) (q 1) (q 2))).
+admit.
 //GOD1PRF:596310 is alternating. If $u_{i}$ denotes the $i$ th coordinate function on the module X with respect to the basis $\left(a_{i}\right)$, then we have
+claim h_s22_t2_coordinate_forms_are_linear : forall i :e n,
+  module_homomorphism K addK mulK X addX smulX K addK mulK
+    (basis_coordinate_function K addK mulK X addX smulX n a i).
+admit.
 //GOD1PRF:596682 or, in other words,
+claim h_s22_t2_determinant_is_exterior_product :
+  forall i j k :e n, forall x y z :e X,
+    determinant_3 K addK mulK
+      (basis_triple_coordinate_matrix K addK mulK X addX smulX n a
+        i j k x y z)
+    = ap (exterior_product_three_linear_forms K addK mulK X
+        (basis_coordinate_function K addK mulK X addX smulX n a i)
+        (basis_coordinate_function K addK mulK X addX smulX n a j)
+        (basis_coordinate_function K addK mulK X addX smulX n a k))
+      (trilinear_tuple x y z).
+admit.
 //GOD1PRF:596752 This shows (cf. Example 5) that the form in question is alternating, and completes the proof of Theorem 2.
+claim h_s22_t2_example5_formal_call :
+  forall K0, forall add0 mul0:set -> set -> set,
+  forall X0, forall addX0 smulX0:set -> set -> set,
+  forall u0 v0 w0:set -> set,
+    commutative_ring K0 add0 mul0 ->
+    module_homomorphism K0 add0 mul0 X0 addX0 smulX0 K0 add0 mul0 u0 ->
+    module_homomorphism K0 add0 mul0 X0 addX0 smulX0 K0 add0 mul0 v0 ->
+    module_homomorphism K0 add0 mul0 X0 addX0 smulX0 K0 add0 mul0 w0 ->
+    alternating_trilinear_mapping K0 add0 mul0
+      X0 addX0 smulX0 K0 add0 mul0
+      (fun q => ap
+        (exterior_product_three_linear_forms K0 add0 mul0 X0 u0 v0 w0) q).
+apply god1_s22_example5_threefold_exterior_product_is_alternating.
+claim h_s22_t2_alternating_conclusion :
+  alternating_trilinear_mapping K addK mulK
+    X addX smulX M addM smulM f.
+admit.
 Admitted.
 
 (** § 23. Alternating multilinear mappings and determinants. **)
@@ -45076,6 +47367,17 @@ Definition antisymmetric_mapping :
     /\ forall tau :e adjacent_transpositions p, forall x :e X :^: p,
       f (permuted_tuple p tau x) = module_negation M addM (f x).
 
+(** Formal interface for the permutation action cited from §7, section 11,
+Example 21.  The cited example predates the present specialization to tuples. **)
+Theorem god1_s7_example21_permutation_action_interface :
+  forall p :e omega, forall X,
+    group_action (permutation_group p) (permutation_composition p)
+      (X :^: p) (fun sigma x => permuted_tuple p sigma x).
+let p.
+assume hp.
+let X.
+Admitted.
+
 Theorem god1_s23_theorem1_signature_and_antisymmetric_permutation_law :
   forall p :e omega, 0 :e p ->
     group_homomorphism
@@ -45101,12 +47403,87 @@ let p.
 assume hp hPositive.
 apply andI.
 //GOD1PRF:614631 THEOREM 1. For each integer $p \geqslant 1$ there exists one and only one homomorphism
+claim h_s23_t1_signature_homomorphism_exists :
+  group_homomorphism
+    (permutation_group p) (permutation_composition p)
+    {1,minus_SNo 1} mul_SNo (permutation_signature p).
+admit.
 //GOD1PRF:614784 such that $\mathfrak{p}(\sigma)=-1$ for all transpositions $\sigma$. We have $\mathfrak{p}(\sigma)=(-1)^{r}$ if the permutation $\sigma$ is the product of $r$ transpositions.
+claim h_s23_t1_signature_on_transpositions_and_products :
+  (forall tau :e adjacent_transpositions p,
+    permutation_signature p tau = minus_SNo 1)
+  /\ forall s:set -> set,
+    group_homomorphism
+      (permutation_group p) (permutation_composition p)
+      {1,minus_SNo 1} mul_SNo s ->
+    (forall tau :e adjacent_transpositions p, s tau = minus_SNo 1) ->
+    forall sigma :e permutation_group p,
+      s sigma = permutation_signature p sigma.
+admit.
 //GOD1PRF:614960 Further, if X is a set and M is an additive group, and if
+claim h_s23_t1_antisymmetric_input_data : forall X M,
+  forall addM:set -> set -> set, forall f:set -> set,
+    antisymmetric_mapping X M addM p f -> group M addM.
+admit.
 //GOD1PRF:615067 is an antisymmetric mapping, then we have
+claim h_s23_t1_antisymmetric_permutation_formula :
+  forall X M, forall addM:set -> set -> set, forall f:set -> set,
+    antisymmetric_mapping X M addM p f ->
+    forall sigma :e permutation_group p, forall x :e X :^: p,
+      f (permuted_tuple p sigma x)
+      = signed_group_element M addM (permutation_signature p sigma) (f x).
+admit.
 //GOD1PRF:615215 for all $x_{i} \in \mathrm{X}$ and all permutations $\sigma \in \mathfrak{S}_{p}$.\\
+claim h_s23_t1_permutation_law_all_tuples :
+  forall X M, forall addM:set -> set -> set, forall f:set -> set,
+    antisymmetric_mapping X M addM p f ->
+    forall x :e X :^: p, forall sigma :e permutation_group p,
+      f (permuted_tuple p sigma x)
+      = signed_group_element M addM (permutation_signature p sigma) (f x).
+admit.
 //GOD1PRF:616081 and each pair of integers $(i, j)$ satisfying these conditions contributes a factor -1 to the signature of $\sigma$. The number of such pairs ( $i, j$ ) is called the number of inversions of $\sigma$; if we denote it by $\mathrm{I}(\sigma)$, then we have
+claim h_s23_t1_inversions_control_signature :
+  forall sigma :e permutation_group p,
+    permutation_signature p sigma
+    = if exists k :e omega,
+        finite_cardinality (permutation_inversion_set p sigma) = 2 * k
+      then 1 else minus_SNo 1.
+admit.
 //GOD1PRF:618031 and therefore
+claim h_s23_t1_signature_conclusion :
+  group_homomorphism
+    (permutation_group p) (permutation_composition p)
+    {1,minus_SNo 1} mul_SNo (permutation_signature p).
+admit.
+Admitted.
+
+(** Projections of Theorem 1 used by later source references to its Remark 1
+and to the permutation law. **)
+Theorem god1_s23_theorem1_transposition_signature_interface :
+  forall p :e omega, 0 :e p ->
+    forall tau :e adjacent_transpositions p,
+      permutation_signature p tau = minus_SNo 1.
+let p.
+assume hp hPositive.
+let tau.
+assume htau.
+Admitted.
+
+Theorem god1_s23_theorem1_antisymmetric_permutation_interface :
+  forall p :e omega, 0 :e p ->
+  forall X M, forall addM:set -> set -> set, forall f:set -> set,
+    antisymmetric_mapping X M addM p f ->
+    forall sigma :e permutation_group p, forall x :e X :^: p,
+      f (permuted_tuple p sigma x)
+      = signed_group_element M addM (permutation_signature p sigma) (f x).
+let p.
+assume hp hPositive.
+let X M addM f.
+assume hAntisymmetric.
+let sigma.
+assume hsigma.
+let x.
+assume hx.
 Admitted.
 
 //GOD1:618185 antisymmetrization : "the antisymmetrization of the #5-variable mapping #6" | $\operatorname{Alt}(#6)$
@@ -45135,18 +47512,95 @@ let f.
 assume hPositive hGroup hf.
 apply andI.
 //GOD1PRF:619101 To prove these assertions, make $\boldsymbol{S}_{p}$ operate on the set $\mathrm{X}^{p}$ as follows (cf. § 7, section 11, Example 21):
+claim h_s23_antisym_s7_example21_formal_call :
+  group_action (permutation_group p) (permutation_composition p)
+    (X :^: p) (fun sigma x => permuted_tuple p sigma x).
+apply (god1_s7_example21_permutation_action_interface p hp X).
 //GOD1PRF:619522 Let $\omega \in \mathfrak{S}_{p}$ be any permutation; then we have
+claim h_s23_antisym_tuple_composition :
+  forall omega sigma :e permutation_group p, forall x :e X :^: p,
+    permuted_tuple p sigma (permuted_tuple p omega x)
+    = permuted_tuple p (permutation_composition p omega sigma) x.
+admit.
 //GOD1PRF:619747 Now, since the mapping $\sigma \rightarrow \omega^{\circ} \sigma$ of $\mathfrak{S}_{p}$ into $\mathfrak{S}_{p}$ is a bijection ( $\omega$ being fixed), it is clear that for any function $\varphi: \mathfrak{S}_{p} \rightarrow \mathrm{M}$ we have
+claim h_s23_antisym_left_translation_bijection :
+  forall omega :e permutation_group p,
+    bij (permutation_group p) (permutation_group p)
+      (fun sigma => permutation_composition p omega sigma).
+admit.
 //GOD1PRF:620113 Apply this result to the function $\varphi$ defined by
+claim h_s23_antisym_sum_invariant_under_translation :
+  forall omega :e permutation_group p, forall phi:set -> set,
+    (forall sigma :e permutation_group p, phi sigma :e M) ->
+    module_finitely_supported_sum M addM (permutation_group p) phi
+    = module_finitely_supported_sum M addM (permutation_group p)
+      (fun sigma => phi (permutation_composition p omega sigma)).
+admit.
 //GOD1PRF:620252 and remark that
+claim h_s23_antisym_signature_product :
+  forall omega sigma :e permutation_group p,
+    permutation_signature p (permutation_composition p omega sigma)
+    = mul_SNo (permutation_signature p omega)
+      (permutation_signature p sigma).
+admit.
 //GOD1PRF:620530 it follows that (13) can also be written in the form
+claim h_s23_antisym_transformed_sum :
+  forall omega :e permutation_group p, forall x :e X :^: p,
+    antisymmetrization M addM X p f (permuted_tuple p omega x)
+    = signed_group_element M addM (permutation_signature p omega)
+      (antisymmetrization M addM X p f x).
+admit.
 //GOD1PRF:620954 if $\omega$ is a transposition, and therefore $g(x)=g\left(x_{1}, \ldots, x_{p}\right)$ is antisymmetric.\\
+claim h_s23_antisym_is_antisymmetric :
+  antisymmetric_mapping X M addM p
+    (fun x => antisymmetrization M addM X p f x).
+admit.
 //GOD1PRF:621062 To prove (12), suppose that $x_{i}=x_{j}$, where $i$ and $j$ are two integers such that $i<j$, and let $\tau$ denote the permutation defined as follows:
+claim h_s23_antisym_equal_argument_transposition :
+  forall x :e X :^: p,
+    (exists i j :e p, i <> j /\ x i = x j) ->
+    exists tau :e adjacent_transpositions p,
+      permuted_tuple p tau x = x.
+admit.
 //GOD1PRF:621308 From Remark 1 we have $\mathfrak{p}(\tau)=-1$; also, for the element $x=\left(x_{1}, \ldots, x_{p}\right) \in \mathrm{X}^{p}$ under consideration,
+claim h_s23_antisym_remark1_formal_call :
+  forall tau :e adjacent_transpositions p,
+    permutation_signature p tau = minus_SNo 1.
+apply (god1_s23_theorem1_transposition_signature_interface p hp hPositive).
+claim h_s23_antisym_fixed_by_swap : forall x :e X :^: p,
+  (exists i j :e p, i <> j /\ x i = x j) ->
+  exists tau :e adjacent_transpositions p,
+    permuted_tuple p tau x = x
+    /\ permutation_signature p tau = minus_SNo 1.
+admit.
 //GOD1PRF:621646 we can divide the permutations $\sigma$ into two classes: those for which $\sigma(i)<\sigma(j)$, and those for which $\sigma(i)>\sigma(j)$. If $\mathfrak{S}_{p}^{\prime}$ and $\mathfrak{S}_{p}^{\prime \prime}$ are the two subsets of $\mathfrak{S}_{p}$ so obtained, they are disjoint and their union is $\mathcal{S}_{p}$, and therefore
+claim h_s23_antisym_permutation_partition : forall i j :e p, i <> j ->
+  exists S1 S2,
+    S1 c= permutation_group p /\ S2 c= permutation_group p
+    /\ S1 :/\: S2 = Empty /\ S1 :\/: S2 = permutation_group p.
+admit.
 //GOD1PRF:622238 Now the mapping $\sigma \rightarrow \sigma^{\circ} \tau$ is a bijection of $\mathfrak{S}_{p}^{\prime}$ onto $\mathfrak{S}_{p}^{\prime \prime}$. We may therefore pair off the terms on the right-hand side of (15), by associating the term corresponding to $\sigma$ in the first sum with the term corresponding to $\omega=\sigma^{\circ} \tau$ in the second sum. The sum of these two terms is
+claim h_s23_antisym_pairing_bijection :
+  forall tau :e adjacent_transpositions p,
+    bij (permutation_group p) (permutation_group p)
+      (fun sigma => permutation_composition p sigma tau).
+admit.
 //GOD1PRF:622769 which by (14) is equal to
+claim h_s23_antisym_paired_terms_are_opposites :
+  forall tau :e adjacent_transpositions p,
+  forall sigma :e permutation_group p, forall x :e X :^: p,
+    signed_group_element M addM
+      (permutation_signature p (permutation_composition p sigma tau))
+      (f (permuted_tuple p (permutation_composition p sigma tau) x))
+    = module_negation M addM
+      (signed_group_element M addM (permutation_signature p sigma)
+        (f (permuted_tuple p sigma x))).
+admit.
 //GOD1PRF:622926 but since $p(\tau)=-1$, this expression is zero. Hence the terms in the two sums on the right-hand side of (15) cancel each other out, and therefore $g(x)=0$. Hence (12) is proved.
+claim h_s23_antisym_repeated_arguments_vanish : forall x :e X :^: p,
+  (exists i j :e p, i <> j /\ x i = x j) ->
+  antisymmetrization M addM X p f x = module_zero M addM.
+admit.
 Admitted.
 
 //GOD1:623317 alternating_multilinear_mapping : "#9 is an alternating #4-linear mapping on #5 with values in #6" | $#9\in\operatorname{Alt}^{#4}(#5,#6)$
@@ -45172,6 +47626,25 @@ Definition alternating_multilinear_mapping_space :
       alternating_multilinear_mapping K addK mulK p
         X addX smulX M addM smulM (fun x => f x)}.
 
+(** Projection of §22, section 1, relation (2), used when two adjacent
+arguments of a multilinear map are isolated. **)
+Theorem god1_s22_relation2_alternating_bilinear_is_skew_interface :
+  forall K, forall addK mulK:set -> set -> set,
+  forall X, forall addX smulX:set -> set -> set,
+  forall M, forall addM smulM:set -> set -> set, forall f:set -> set,
+    alternating_bilinear_mapping K addK mulK
+      X addX smulX M addM smulM f ->
+    forall x y :e X,
+      f (bilinear_tuple y x)
+      = module_negation M addM (f (bilinear_tuple x y)).
+let K addK mulK X addX smulX M addM smulM f.
+assume hAlternating.
+let x.
+assume hx.
+let y.
+assume hy.
+Admitted.
+
 Theorem god1_s23_theorem2_alternating_multilinear_is_antisymmetric :
   forall K, forall addK mulK:set -> set -> set,
   forall p :e omega, forall X, forall addX smulX:set -> set -> set,
@@ -45191,7 +47664,35 @@ let X addX smulX M addM smulM f.
 assume hPositive hAlternating.
 apply andI.
 //GOD1PRF:623766 To prove that (6) of section (1) is satisfied, assign fixed values to all the variables except $x_{i}$ and $x_{i+1}$, and regard $f$ as a function of $x_{i}$ and $x_{i+1}$. We obtain then a function of $x_{i}$ and $x_{i+1}$ which is bilinear because $f$ is multilinear, and alternating because $f$ vanishes whenever $x_{i}=x_{i+1}$; hence (§22, section 1, relation (2)) the expression $f\left(x_{1}, \ldots, x_{p}\right)$ is multiplied by -1 when we interchange $x_{i}$ and $x_{i+1}$.\\
+claim h_s23_t2_s22_relation2_formal_call :
+  forall K0, forall add0 mul0:set -> set -> set,
+  forall X0, forall addX0 smulX0:set -> set -> set,
+  forall M0, forall addM0 smulM0:set -> set -> set, forall g:set -> set,
+    alternating_bilinear_mapping K0 add0 mul0
+      X0 addX0 smulX0 M0 addM0 smulM0 g ->
+    forall x y :e X0,
+      g (bilinear_tuple y x)
+      = module_negation M0 addM0 (g (bilinear_tuple x y)).
+apply god1_s22_relation2_alternating_bilinear_is_skew_interface.
+claim h_s23_t2_adjacent_swap_changes_sign :
+  forall tau :e adjacent_transpositions p, forall x :e X :^: p,
+    f (permuted_tuple p tau x) = module_negation M addM (f x).
+admit.
 //GOD1PRF:624262 From the results of section 1, it follows that an alternating $p$-linear mapping $f: \mathrm{X}^{p} \rightarrow \mathrm{M}$ satisfies the identity
+claim h_s23_t2_section1_formal_call :
+  forall p0 :e omega, 0 :e p0 ->
+  forall X0 M0, forall addM0:set -> set -> set, forall g:set -> set,
+    antisymmetric_mapping X0 M0 addM0 p0 g ->
+    forall sigma :e permutation_group p0, forall x :e X0 :^: p0,
+      g (permuted_tuple p0 sigma x)
+      = signed_group_element M0 addM0
+        (permutation_signature p0 sigma) (g x).
+apply god1_s23_theorem1_antisymmetric_permutation_interface.
+claim h_s23_t2_permutation_identity :
+  forall sigma :e permutation_group p, forall x :e X :^: p,
+    f (permuted_tuple p sigma x)
+    = signed_group_element M addM (permutation_signature p sigma) (f x).
+admit.
 Admitted.
 
 Theorem god1_s23_theorem3_antisymmetrization_of_multilinear_map :
@@ -45210,6 +47711,21 @@ assume hp.
 let X addX smulX M addM smulM f.
 assume hPositive hMultilinear.
 //GOD1PRF:624942 The general term in the sum on the right-hand side is clearly a $p$-linear function of $x_{1}, \ldots, x_{p}$, and therefore so is $g$. It remains to show that $g\left(x_{1}, \ldots, x_{p}\right)$ is zero if the vectors $x_{1}, \ldots, x_{p}$ are not all distinct, and this is a particular case of the assertion (12) of section 2 .
+claim h_s23_t3_section2_assertion12_formal_call :
+  forall X0 M0, forall addM0:set -> set -> set,
+  forall p0 :e omega, forall g:set -> set,
+    0 :e p0 -> group M0 addM0 -> (forall x :e X0 :^: p0, g x :e M0) ->
+    antisymmetric_mapping X0 M0 addM0 p0
+      (fun x => antisymmetrization M0 addM0 X0 p0 g x)
+    /\ forall x :e X0 :^: p0,
+      (exists i j :e p0, i <> j /\ x i = x j) ->
+      antisymmetrization M0 addM0 X0 p0 g x = module_zero M0 addM0.
+apply god1_antisymmetrization_is_antisymmetric_and_vanishes_on_repetitions.
+claim h_s23_t3_antisymmetrization_alternating :
+  alternating_multilinear_mapping K addK mulK p
+    X addX smulX M addM smulM
+    (fun x => antisymmetrization M addM X p f x).
+admit.
 Admitted.
 
 //GOD1:625569 exterior_product_linear_forms : "the exterior product of the family of linear forms #8 indexed by #7" | $\bigwedge_{i\in #7}#8_i$
@@ -45237,7 +47753,42 @@ assume hp.
 let X addX smulX u.
 assume hPositive hRing hu.
 //GOD1PRF:625275 Example 2. Let $u_{1}, \ldots, u_{p}$ be linear forms on X . Then the $p$-linear form
+claim h_s23_exterior_linear_forms_tensor_is_multilinear :
+  multilinear_mapping K add mul p
+    (fun i => X) (fun i => addX) (fun i => smulX) K add mul
+    (fun x => ring_finite_product K add mul p (fun i => ap (u i) (x i))).
+admit.
 //GOD1PRF:625457 is alternating: apply Theorem 3 to the form $u_{1} \otimes \cdots \otimes u_{p}$ defined in § 21, Example 2.\\
+claim h_s23_exterior_s21_example2_formal_call :
+  forall K0, forall add0 mul0:set -> set -> set,
+  forall p0 :e omega, forall X0:set -> set,
+  forall addX0 smulX0:set -> set -> set -> set,
+  forall v0:set -> set -> set,
+    commutative_ring K0 add0 mul0 ->
+    (forall q :e p0,
+      module_homomorphism K0 add0 mul0
+        (X0 q) (addX0 q) (smulX0 q) K0 add0 mul0 (v0 q)) ->
+    multilinear_mapping K0 add0 mul0 p0 X0 addX0 smulX0 K0 add0 mul0
+      (fun x0 => ring_finite_product K0 add0 mul0 p0
+        (fun q => v0 q (x0 q))).
+apply god1_s21_example2_product_of_linear_forms_is_multilinear.
+claim h_s23_exterior_theorem3_formal_call :
+  forall K0, forall add0 mul0:set -> set -> set,
+  forall p0 :e omega, forall X0, forall addX0 smulX0:set -> set -> set,
+  forall M0, forall addM0 smulM0:set -> set -> set, forall g:set -> set,
+    0 :e p0 ->
+    multilinear_mapping K0 add0 mul0 p0
+      (fun i => X0) (fun i => addX0) (fun i => smulX0)
+      M0 addM0 smulM0 g ->
+    alternating_multilinear_mapping K0 add0 mul0 p0
+      X0 addX0 smulX0 M0 addM0 smulM0
+      (fun x => antisymmetrization M0 addM0 X0 p0 g x).
+apply god1_s23_theorem3_antisymmetrization_of_multilinear_map.
+claim h_s23_exterior_linear_forms_alternating :
+  alternating_multilinear_mapping K add mul p
+    X addX smulX K add mul
+    (fun x => exterior_product_linear_forms K add mul X p u x).
+admit.
 Admitted.
 
 Theorem god1_s23_theorem4_alternating_map_vanishes_on_short_span :
@@ -45264,9 +47815,29 @@ assume hShort hAlternating.
 let b coeff x.
 assume hx hExpansion.
 //GOD1PRF:626003 Suppose that we have relations
+claim h_s23_t4_short_spanning_expansions :
+  (forall j :e q, b j :e X)
+  /\ (forall i :e p, forall j :e q, coeff i j :e K)
+  /\ forall i :e p,
+    x i = module_finitely_supported_sum X addX q
+      (fun j => smulX (coeff i j) (b j)).
+admit.
 //GOD1PRF:626083 then formula (10) of § 21, section 3 shows that
+claim h_s23_t4_multilinear_expansion :
+  f x = module_finitely_supported_sum M addM (q :^: p)
+    (fun j => smulM
+      (ring_finite_product K addK mulK p (fun i => coeff i (j i)))
+      (f (fun i :e p => b (j i)))).
+admit.
 //GOD1PRF:626289 Now suppose that $q<p$. Then the $p$ integers $j_{1}, \ldots, j_{p}$, all of which lie between 1 and $q$, cannot all be distinct. Since $f$ is alternating, it follows that
+claim h_s23_t4_pigeonhole_repetition : forall j :e q :^: p,
+  exists i k :e p, i <> k /\ j i = j k.
+admit.
 //GOD1PRF:626514 for all choices of $j_{1}, \ldots, j_{p}$. Hence the result.\\
+claim h_s23_t4_every_expansion_term_zero :
+  (forall j :e q :^: p, f (fun i :e p => b (j i)) = module_zero M addM)
+  /\ f x = module_zero M addM.
+admit.
 Admitted.
 
 Theorem god1_s23_theorem4_corollary1_dependent_arguments_vanish :
@@ -45288,7 +47859,30 @@ assume hField hAlternating.
 let x.
 assume hx hDependent.
 //GOD1PRF:626832 If there is a non-trivial linear relation
+claim h_s23_t4c1_nontrivial_relation : exists lambda:set -> set,
+  linear_representation K addK mulK X addX smulX p
+    (fun i => x i) (module_zero X addX) lambda
+  /\ exists i :e p, lambda i <> ring_zero K addK.
+admit.
 //GOD1PRF:626927 with say $\lambda_{p} \neq 0$, then because K is here a field it follows that $a_{p}$ is a linear combination of $a_{1}, \ldots, a_{p-1}$. Hence the $p$ vectors $a_{1}, \ldots, a_{p}$ are linear combinations of $p-1$ of them, and the result now follows from Theorem 4.\\
+claim h_s23_t4c1_theorem4_formal_call :
+  forall K0, forall add0 mul0:set -> set -> set,
+  forall p0 q0 :e omega, forall X0, forall addX0 smulX0:set -> set -> set,
+  forall M0, forall addM0 smulM0:set -> set -> set, forall g:set -> set,
+    q0 :e p0 ->
+    alternating_multilinear_mapping K0 add0 mul0 p0
+      X0 addX0 smulX0 M0 addM0 smulM0 g ->
+    forall b0:set -> set, forall coeff0:set -> set -> set,
+    forall z :e X0 :^: p0,
+      (forall j :e q0, b0 j :e X0)
+      /\ (forall i :e p0, forall j :e q0, coeff0 i j :e K0)
+      /\ (forall i :e p0,
+        z i = module_finitely_supported_sum X0 addX0 q0
+          (fun j => smulX0 (coeff0 i j) (b0 j))) ->
+      g z = module_zero M0 addM0.
+apply god1_s23_theorem4_alternating_map_vanishes_on_short_span.
+claim h_s23_t4c1_dependent_arguments_vanish : f x = module_zero M addM.
+admit.
 Admitted.
 
 Theorem god1_s23_theorem4_corollary2_degree_above_rank_is_zero :
@@ -45311,6 +47905,30 @@ assume hRankBound hBasis hModule hAlternating.
 let x.
 assume hx.
 //GOD1PRF:627390 For if $x_{1}, \ldots, x_{p}$ are any $p$ elements of X , they can be expressed as linear combinations of $r<p$ vectors.
+claim h_s23_t4c2_basis_expansions : exists coeff:set -> set -> set,
+  (forall i :e p, forall j :e r, coeff i j :e K)
+  /\ forall i :e p,
+    x i = module_finitely_supported_sum X addX r
+      (fun j => smulX (coeff i j) (a j)).
+admit.
+claim h_s23_t4c2_theorem4_formal_call :
+  forall K0, forall add0 mul0:set -> set -> set,
+  forall p0 q0 :e omega, forall X0, forall addX0 smulX0:set -> set -> set,
+  forall M0, forall addM0 smulM0:set -> set -> set, forall g:set -> set,
+    q0 :e p0 ->
+    alternating_multilinear_mapping K0 add0 mul0 p0
+      X0 addX0 smulX0 M0 addM0 smulM0 g ->
+    forall b0:set -> set, forall coeff0:set -> set -> set,
+    forall z :e X0 :^: p0,
+      (forall j :e q0, b0 j :e X0)
+      /\ (forall i :e p0, forall j :e q0, coeff0 i j :e K0)
+      /\ (forall i :e p0,
+        z i = module_finitely_supported_sum X0 addX0 q0
+          (fun j => smulX0 (coeff0 i j) (b0 j))) ->
+      g z = module_zero M0 addM0.
+apply god1_s23_theorem4_alternating_map_vanishes_on_short_span.
+claim h_s23_t4c2_all_values_zero : f x = module_zero M addM.
+admit.
 Admitted.
 
 //GOD1:635431 signature_scalar : "the signature of #5 represented in the commutative ring #1" | $\varepsilon_{#5}\cdot 1_{#1}$
@@ -45386,10 +48004,101 @@ let a.
 assume hPositive hRing hBasis.
 apply andI.
 //GOD1PRF:632672 for $u_{i}\left(a_{j}\right)$ is 0 or 1 according as $i \neq j$ or $i=j$, and therefore if we calculate $\mathrm{D}\left(a_{1}, \ldots, a_{p}\right)$ from the formula (22) the only term which can be non-zero is that for which $\sigma(1)=1, \ldots, \sigma(p)=p$. We have then $u_{\sigma(i)}\left(a_{i}\right)=u_{i}\left(a_{i}\right)=1$, and clearly $\mathfrak{p}(\sigma)=1$; hence (25).
+claim h_s23_t5_determinant_normalized :
+  determinant_of_vectors_in_basis K addK mulK
+    X addX smulX p a a = ring_one K mulK.
+admit.
 //GOD1PRF:633059 Furthermore, the relation (25) characterizes D. For by (20) we have
+claim h_s23_t5_every_top_form_is_proportional :
+  forall M, forall addM smulM:set -> set -> set, forall f:set -> set,
+    left_module K addK mulK M addM smulM ->
+    alternating_multilinear_mapping K addK mulK p
+      X addX smulX M addM smulM f ->
+    forall x :e X :^: p,
+      f x = smulM
+        (determinant_of_vectors_in_basis
+          K addK mulK X addX smulX p a (fun i => x i))
+        (f (fun i :e p => a i)).
+admit.
 //GOD1PRF:633185 for any alternating $p$-linear form $f$ on $\mathrm{X}^{p}$; hence the relation $f\left(a_{1}, \ldots, a_{p}\right)=1$ is equivalent to $f=\mathrm{D}$.
+claim h_s23_t5_normalized_form_unique : forall D:set -> set,
+  alternating_multilinear_mapping K addK mulK p
+    X addX smulX K addK mulK D ->
+  D (fun i :e p => a i) = ring_one K mulK ->
+  forall x :e X :^: p,
+    D x = determinant_of_vectors_in_basis
+      K addK mulK X addX smulX p a (fun i => x i).
+admit.
 //GOD1PRF:633917 Furthermore, if $f$ is any alternating $p$-linear mapping of $\mathrm{X}^{p}$ into a K -module M , then
+claim h_s23_t5_module_valued_proportionality :
+  forall M, forall addM smulM:set -> set -> set, forall f:set -> set,
+    left_module K addK mulK M addM smulM ->
+    alternating_multilinear_mapping K addK mulK p
+      X addX smulX M addM smulM f ->
+    forall x :e X :^: p,
+      f x = smulM
+        (determinant_of_vectors_in_basis
+          K addK mulK X addX smulX p a (fun i => x i))
+        (f (fun i :e p => a i)).
+admit.
 //GOD1PRF:634149 for all vectors $x_{1}, \ldots, x_{p} \in \mathrm{X}$.\\
+claim h_s23_t5_all_tuple_values :
+  forall M, forall addM smulM:set -> set -> set, forall f:set -> set,
+    left_module K addK mulK M addM smulM ->
+    alternating_multilinear_mapping K addK mulK p
+      X addX smulX M addM smulM f ->
+    forall x :e X :^: p,
+      f x = smulM
+        (determinant_of_vectors_in_basis
+          K addK mulK X addX smulX p a (fun i => x i))
+        (f (fun i :e p => a i)).
+admit.
+Admitted.
+
+(** Projections of Theorem 5 used by the following determinant arguments. **)
+Theorem god1_s23_theorem5_normalized_determinant_interface :
+  forall K, forall addK mulK:set -> set -> set,
+  forall X, forall addX smulX:set -> set -> set,
+  forall p :e omega, forall a:set -> set,
+    0 :e p -> commutative_ring K addK mulK ->
+    module_basis K addK mulK X addX smulX p a ->
+    alternating_multilinear_mapping K addK mulK p
+      X addX smulX K addK mulK
+      (fun x => determinant_of_vectors_in_basis
+        K addK mulK X addX smulX p a (fun i => x i))
+    /\ determinant_of_vectors_in_basis K addK mulK
+      X addX smulX p a a = ring_one K mulK.
+let K addK mulK X addX smulX.
+let p.
+assume hp.
+let a.
+assume hPositive hRing hBasis.
+Admitted.
+
+Theorem god1_s23_theorem5_proportionality_interface :
+  forall K, forall addK mulK:set -> set -> set,
+  forall X, forall addX smulX:set -> set -> set,
+  forall p :e omega, forall a:set -> set,
+    0 :e p -> commutative_ring K addK mulK ->
+    module_basis K addK mulK X addX smulX p a ->
+    forall M, forall addM smulM:set -> set -> set, forall f:set -> set,
+      left_module K addK mulK M addM smulM ->
+      alternating_multilinear_mapping K addK mulK p
+        X addX smulX M addM smulM f ->
+      forall x :e X :^: p,
+        f x = smulM
+          (determinant_of_vectors_in_basis
+            K addK mulK X addX smulX p a (fun i => x i))
+          (f (fun i :e p => a i)).
+let K addK mulK X addX smulX.
+let p.
+assume hp.
+let a.
+assume hPositive hRing hBasis.
+let M addM smulM f.
+assume hModule hAlternating.
+let x.
+assume hx.
 Admitted.
 
 Theorem god1_s23_theorem5_corollary_bases_of_commutative_free_module_same_size :
@@ -45408,7 +48117,39 @@ assume hq.
 let a b.
 assume hRing hNontrivial hBasisA hBasisB.
 //GOD1PRF:634404 Let $\left(a_{1}, \ldots, a_{p}\right)$ and $\left(b_{1}, \ldots, b_{q}\right)$ be bases of X . By Theorem 5 there exists an alternating $q$-linear form $f$ on X such that
+claim h_s23_t5c_theorem5_formal_call :
+  forall K0, forall add0 mul0:set -> set -> set,
+  forall X0, forall addX0 smulX0:set -> set -> set,
+  forall n0 :e omega, forall c0:set -> set,
+    0 :e n0 -> commutative_ring K0 add0 mul0 ->
+    module_basis K0 add0 mul0 X0 addX0 smulX0 n0 c0 ->
+    alternating_multilinear_mapping K0 add0 mul0 n0
+      X0 addX0 smulX0 K0 add0 mul0
+      (fun x0 => determinant_of_vectors_in_basis
+        K0 add0 mul0 X0 addX0 smulX0 n0 c0 (fun i => x0 i))
+    /\ determinant_of_vectors_in_basis K0 add0 mul0
+      X0 addX0 smulX0 n0 c0 c0 = ring_one K0 mul0.
+apply god1_s23_theorem5_normalized_determinant_interface.
+claim h_s23_t5c_nonzero_q_form_exists : exists f:set -> set,
+  alternating_multilinear_mapping K addK mulK q
+    X addX smulX K addK mulK f
+  /\ exists x :e X :^: q, f x <> ring_zero K addK.
+admit.
 //GOD1PRF:634621 and therefore $f$ is not identically zero. Since X has a basis of $p$ vectors, it follows that $q \leqslant p$, by the corollary to Theorem 4. But then also $p \leqslant q$ by symmetry, and hence $p=q$.
+claim h_s23_t5c_theorem4_corollary_formal_call :
+  forall K0, forall add0 mul0:set -> set -> set,
+  forall n0 r0 :e omega, forall X0, forall addX0 smulX0:set -> set -> set,
+  forall M0, forall addM0 smulM0:set -> set -> set,
+  forall c0:set -> set, forall f0:set -> set,
+    r0 :e n0 ->
+    module_basis K0 add0 mul0 X0 addX0 smulX0 r0 c0 ->
+    left_module K0 add0 mul0 M0 addM0 smulM0 ->
+    alternating_multilinear_mapping K0 add0 mul0 n0
+      X0 addX0 smulX0 M0 addM0 smulM0 f0 ->
+    forall x0 :e X0 :^: n0, f0 x0 = module_zero M0 addM0.
+apply god1_s23_theorem4_corollary2_degree_above_rank_is_zero.
+claim h_s23_t5c_size_antisymmetry : q c= p /\ p c= q /\ p = q.
+admit.
 Admitted.
 
 Theorem god1_s23_theorem6_determinant_of_transpose :
@@ -45423,7 +48164,15 @@ assume hp.
 let A.
 assume hA hRing.
 //GOD1PRF:636105 now we have seen in section 4 that this determinant is also given by the formula (23), i.e., it is also equal to the expression
+claim h_s23_t6_column_and_row_formula_agree :
+  matrix_determinant K add mul p A
+  = matrix_determinant K add mul p (matrix_transpose K p p A).
+admit.
 //GOD1PRF:636309 which is contained from (21) by replacing $\xi_{i j}$ by $\xi_{j i}$ throughout. Hence:\\
+claim h_s23_t6_transpose_invariance :
+  matrix_determinant K add mul p A
+  = matrix_determinant K add mul p (matrix_transpose K p p A).
+admit.
 Admitted.
 
 Theorem god1_s23_theorem7_determinant_multiplicative :
@@ -45442,15 +48191,120 @@ assume hA.
 let B.
 assume hB hRing.
 //GOD1PRF:636819 Let X be a K-module with basis $a_{1}, \ldots, a_{p}$, and let $u, v$ be the endomorphisms of X whose matrices with respect to this basis are the given matrices $\mathrm{A}, \mathrm{B}$ respectively. Then the product matrix AB corresponds to the composite endomorphism $u \circ v$.
+claim h_s23_t7_matrix_product_represents_composition : exists X,
+  exists addX smulX:set -> set -> set, exists a:set -> set,
+  exists u v:set -> set,
+    module_basis K add mul X addX smulX p a
+    /\ module_endomorphism K add mul X addX smulX u
+    /\ module_endomorphism K add mul X addX smulX v
+    /\ basis_coordinate_matrix K add mul X addX smulX p a
+      (fun j => u (a j)) = A
+    /\ basis_coordinate_matrix K add mul X addX smulX p a
+      (fun j => v (a j)) = B
+    /\ basis_coordinate_matrix K add mul X addX smulX p a
+      (fun j => u (v (a j)))
+      = matrix_multiplication K add mul p p p A B.
+admit.
 //GOD1PRF:637102 Let $\mathrm{D}\left(x_{1}, \ldots, x_{p}\right)$ be the determinant of $x_{1}, \ldots, x_{p} \in \mathrm{X}$ with respect to the basis $a_{1}, \ldots, a_{p}$. Define a new mapping $\mathrm{D}_{u}: \mathrm{X}^{p} \rightarrow \mathrm{~K}$ as follows:
+claim h_s23_t7_pulled_back_determinant_defined : exists X,
+  exists addX smulX:set -> set -> set, exists a:set -> set,
+  exists u:set -> set, exists Du:set -> set,
+    Du = (fun x => determinant_of_vectors_in_basis
+      K add mul X addX smulX p a (fun i => u (x i))).
+admit.
 //GOD1PRF:637482 Then $\mathrm{D}_{u}$ is an alternating $p$-linear mapping. First of all, $\mathrm{D}_{u}$ is multilinear: if for example we assign fixed values $b_{2}, \ldots, b_{p}$ to $x_{2}, \ldots, x_{p}$ respectively, and if we put $c_{i}=u\left(b_{i}\right)$, we obtain
+claim h_s23_t7_pulled_back_determinant_alternating :
+  forall X0, forall addX0 smulX0:set -> set -> set,
+  forall a0:set -> set, forall u0:set -> set,
+    module_basis K add mul X0 addX0 smulX0 p a0 ->
+    module_endomorphism K add mul X0 addX0 smulX0 u0 ->
+    alternating_multilinear_mapping K add mul p
+      X0 addX0 smulX0 K add mul
+      (fun x => determinant_of_vectors_in_basis
+        K add mul X0 addX0 smulX0 p a0 (fun i => u0 (x i))).
+admit.
 //GOD1PRF:637818 as a function of $x_{1}$, this is obtained by composing the linear mapping $u$ with the linear mapping $x_{1} \rightarrow \mathrm{D}\left(x_{1}, c_{2}, \ldots, c_{p}\right)$, so that the result is a linear function of $\mathrm{x}_{1}$. Consequently $\mathrm{D}_{u}$ is multilinear, and it is clearly alternating, since $x_{i}=x_{j}$ implies $u\left(x_{i}\right)=u\left(x_{j}\right)$ and therefore
+claim h_s23_t7_pullback_preserves_multilinearity_and_alternation :
+  forall X0, forall addX0 smulX0:set -> set -> set,
+  forall a0:set -> set, forall u0:set -> set,
+    module_basis K add mul X0 addX0 smulX0 p a0 ->
+    module_endomorphism K add mul X0 addX0 smulX0 u0 ->
+    alternating_multilinear_mapping K add mul p
+      X0 addX0 smulX0 K add mul
+      (fun x => determinant_of_vectors_in_basis
+        K add mul X0 addX0 smulX0 p a0 (fun i => u0 (x i))).
+admit.
 //GOD1PRF:638297 We may therefore apply Theorem 5 to $\mathrm{D}_{u}$, which shows that
+claim h_s23_t7_theorem5_formal_call :
+  forall K0, forall add0 mul0:set -> set -> set,
+  forall X0, forall addX0 smulX0:set -> set -> set,
+  forall n0 :e omega, forall a0:set -> set,
+    0 :e n0 -> commutative_ring K0 add0 mul0 ->
+    module_basis K0 add0 mul0 X0 addX0 smulX0 n0 a0 ->
+    forall M0, forall addM0 smulM0:set -> set -> set, forall f0:set -> set,
+      left_module K0 add0 mul0 M0 addM0 smulM0 ->
+      alternating_multilinear_mapping K0 add0 mul0 n0
+        X0 addX0 smulX0 M0 addM0 smulM0 f0 ->
+      forall x0 :e X0 :^: n0,
+        f0 x0 = smulM0
+          (determinant_of_vectors_in_basis
+            K0 add0 mul0 X0 addX0 smulX0 n0 a0 (fun i => x0 i))
+          (f0 (fun i :e n0 => a0 i)).
+apply god1_s23_theorem5_proportionality_interface.
+claim h_s23_t7_pullback_proportionality :
+  forall X0, forall addX0 smulX0:set -> set -> set,
+  forall a0:set -> set, forall u0:set -> set,
+    module_basis K add mul X0 addX0 smulX0 p a0 ->
+    module_endomorphism K add mul X0 addX0 smulX0 u0 ->
+    forall x :e X0 :^: p,
+      determinant_of_vectors_in_basis K add mul X0 addX0 smulX0 p a0
+        (fun i => u0 (x i))
+      = mul
+        (determinant_of_vectors_in_basis K add mul X0 addX0 smulX0 p a0
+          (fun i => u0 (a0 i)))
+        (determinant_of_vectors_in_basis K add mul X0 addX0 smulX0 p a0
+          (fun i => x i)).
+admit.
 //GOD1PRF:639115 and therefore (26) becomes
+claim h_s23_t7_determinant_of_u_family :
+  forall X0, forall addX0 smulX0:set -> set -> set,
+  forall a0:set -> set, forall u0:set -> set,
+    module_basis K add mul X0 addX0 smulX0 p a0 ->
+    module_endomorphism K add mul X0 addX0 smulX0 u0 ->
+    determinant_of_vectors_in_basis K add mul X0 addX0 smulX0 p a0
+      (fun i => u0 (a0 i))
+    = matrix_determinant K add mul p
+      (basis_coordinate_matrix K add mul X0 addX0 smulX0 p a0
+        (fun j => u0 (a0 j))).
+admit.
 //GOD1PRF:639516 and, with $w=u \circ v$,
+claim h_s23_t7_composite_matrix_determinant :
+  matrix_determinant K add mul p
+    (matrix_multiplication K add mul p p p A B)
+  = matrix_determinant K add mul p
+    (matrix_multiplication K add mul p p p A B).
+admit.
 //GOD1PRF:639740 But, on the other hand,
+claim h_s23_t7_iterated_pullback_factorization :
+  matrix_determinant K add mul p
+    (matrix_multiplication K add mul p p p A B)
+  = mul (matrix_determinant K add mul p A)
+    (matrix_determinant K add mul p B).
+admit.
 //GOD1PRF:640218 Comparing this with (28) we see that
+claim h_s23_t7_compare_two_computations :
+  matrix_determinant K add mul p
+    (matrix_multiplication K add mul p p p A B)
+  = mul (matrix_determinant K add mul p A)
+    (matrix_determinant K add mul p B).
+admit.
 //GOD1PRF:640358 as required.\\
+claim h_s23_t7_multiplicativity_conclusion :
+  matrix_determinant K add mul p
+    (matrix_multiplication K add mul p p p A B)
+  = mul (matrix_determinant K add mul p A)
+    (matrix_determinant K add mul p B).
+admit.
 Admitted.
 
 //GOD1:641088 endomorphism_coordinate_matrix : "the matrix of the endomorphism #9 relative to the basis #8" | $[#9]_{#8}$
@@ -45498,13 +48352,82 @@ let a b u v.
 assume hRing hBasisA hBasisB hu hv.
 apply andI.
 //GOD1PRF:641088 The scalar $\operatorname{det}(u)$ is called the determinant of the endomorphism $u$. If A is the matrix of $u$ with respect to an arbitrary basis of X , the calculations above (by applying (29) to the determinant with respect to the given basis) show that
+claim h_s23_endodet_theorem7_formal_call :
+  forall K0, forall add0 mul0:set -> set -> set,
+  forall n0 :e omega, forall A0 B0 :e square_matrix_ring K0 n0,
+    commutative_ring K0 add0 mul0 ->
+    matrix_determinant K0 add0 mul0 n0
+      (matrix_multiplication K0 add0 mul0 n0 n0 n0 A0 B0)
+    = mul0 (matrix_determinant K0 add0 mul0 n0 A0)
+      (matrix_determinant K0 add0 mul0 n0 B0).
+apply god1_s23_theorem7_determinant_multiplicative.
+claim h_s23_endodet_basis_formula :
+  endomorphism_determinant K addK mulK X addX smulX p a u
+  = matrix_determinant K addK mulK p
+    (endomorphism_coordinate_matrix K addK mulK X addX smulX p a u).
+admit.
 //GOD1PRF:641408 If $u, v$ are two endomorphisms of X it is clear from the definition that
+claim h_s23_endodet_composition :
+  endomorphism_determinant K addK mulK X addX smulX p a
+    (fun x => u (v x))
+  = mulK
+    (endomorphism_determinant K addK mulK X addX smulX p a u)
+    (endomorphism_determinant K addK mulK X addX smulX p a v).
+admit.
 //GOD1PRF:641607 and it is equally clear from (29) that the determinant of the identity endomorphism of X is 1 .
+claim h_s23_endodet_identity :
+  endomorphism_determinant K addK mulK X addX smulX p a
+    (fun x => x) = ring_one K mulK.
+admit.
 //GOD1PRF:641704 Remark 2. It follows from what has been said that, if $u$ is any endomorphism of X , the determinant of the matrix of $u$ with respect to a basis of X is independent of the basis. This may also be proved as follows. Let A be the matrix of $u$ with respect to a basis of X ; then the matrices of $u$ with respect to other bases of X are of the form
+claim h_s23_endodet_change_of_basis_conjugacy : exists P :e square_matrix_ring K p,
+  invertible_matrix K addK mulK p P
+  /\ endomorphism_coordinate_matrix K addK mulK X addX smulX p b u
+    = matrix_multiplication K addK mulK p p p
+      (matrix_inverse K addK mulK p P)
+      (matrix_multiplication K addK mulK p p p
+        (endomorphism_coordinate_matrix K addK mulK X addX smulX p a u) P).
+admit.
 //GOD1PRF:642161 Now we have
+claim h_s23_endodet_conjugate_determinant :
+  forall P :e square_matrix_ring K p,
+    invertible_matrix K addK mulK p P ->
+    matrix_determinant K addK mulK p
+      (matrix_multiplication K addK mulK p p p
+        (matrix_inverse K addK mulK p P)
+        (matrix_multiplication K addK mulK p p p
+          (endomorphism_coordinate_matrix K addK mulK X addX smulX p a u) P))
+    = mulK
+      (matrix_determinant K addK mulK p (matrix_inverse K addK mulK p P))
+      (mulK
+        (endomorphism_determinant K addK mulK X addX smulX p a u)
+        (matrix_determinant K addK mulK p P)).
+admit.
 //GOD1PRF:642353 on the other hand
+claim h_s23_endodet_inverse_transition_product :
+  forall P :e square_matrix_ring K p,
+    invertible_matrix K addK mulK p P ->
+    mulK
+      (matrix_determinant K addK mulK p (matrix_inverse K addK mulK p P))
+      (matrix_determinant K addK mulK p P)
+    = ring_one K mulK.
+admit.
 //GOD1PRF:642597 and hence finally
+claim h_s23_endodet_conjugation_invariant :
+  forall P :e square_matrix_ring K p,
+    invertible_matrix K addK mulK p P ->
+    matrix_determinant K addK mulK p
+      (matrix_multiplication K addK mulK p p p
+        (matrix_inverse K addK mulK p P)
+        (matrix_multiplication K addK mulK p p p
+          (endomorphism_coordinate_matrix K addK mulK X addX smulX p a u) P))
+    = endomorphism_determinant K addK mulK X addX smulX p a u.
+admit.
 //GOD1PRF:642703 as asserted.
+claim h_s23_endodet_basis_independence :
+  endomorphism_determinant K addK mulK X addX smulX p a u
+  = endomorphism_determinant K addK mulK X addX smulX p b u.
+admit.
 Admitted.
 
 Theorem god1_s23_theorem8_basis_determinant_criterion :
@@ -45530,9 +48453,96 @@ let a x.
 assume hField hBasis.
 apply andI.
 //GOD1PRF:643652 The equivalence of $a$ ) and $b$ ) follows from Theorem 10 of § 19. The equivalence of $b$ ) and $c$ ) was proved in § 15, Theorem 1.
+claim h_s23_t8_s19_theorem10_formal_call :
+  forall K0, forall add0 mul0:set -> set -> set,
+  forall M0, forall addM0 smulR0:set -> set -> set,
+  forall n0 :e omega, forall y0:set -> set,
+    right_vector_space K0 add0 mul0 M0 addM0 smulR0 ->
+    let mulOp := opposite_ring_multiplication mul0 in
+    (right_module_basis K0 add0 mul0 M0 addM0 smulR0 n0 y0
+    <-> linearly_independent_family K0 add0 mulOp M0 addM0
+      (fun scalar z => smulR0 z scalar) n0 y0
+      /\ finite_dimensional_right_vector_space K0 add0 mul0 M0 addM0 smulR0
+      /\ right_vector_dimension K0 add0 mul0 M0 addM0 smulR0 = n0)
+    /\ (right_module_basis K0 add0 mul0 M0 addM0 smulR0 n0 y0
+    <-> linearly_independent_family K0 add0 mulOp M0 addM0
+      (fun scalar z => smulR0 z scalar) n0 y0
+      /\ independent_family_size_bound K0 add0 mulOp M0 addM0
+        (fun scalar z => smulR0 z scalar) n0)
+    /\ (right_module_basis K0 add0 mul0 M0 addM0 smulR0 n0 y0
+    <-> generating_family K0 add0 mulOp M0 addM0
+      (fun scalar z => smulR0 z scalar) n0 y0
+      /\ finite_dimensional_right_vector_space K0 add0 mul0 M0 addM0 smulR0
+      /\ right_vector_dimension K0 add0 mul0 M0 addM0 smulR0 = n0)
+    /\ (right_module_basis K0 add0 mul0 M0 addM0 smulR0 n0 y0
+    <-> generating_family K0 add0 mulOp M0 addM0
+      (fun scalar z => smulR0 z scalar) n0 y0
+      /\ generating_family_size_bound K0 add0 mulOp M0 addM0
+        (fun scalar z => smulR0 z scalar) n0).
+apply god1_s19_theorem10_basis_characterizations.
+claim h_s23_t8_s15_theorem1_formal_call :
+  forall K0, forall add0 mul0:set -> set -> set,
+  forall M0, forall addM0 smulR0:set -> set -> set,
+  forall n0 :e omega, forall a0:set -> set,
+  forall B0 :e square_matrix_ring K0 n0,
+    right_module_basis K0 add0 mul0 M0 addM0 smulR0 n0 a0 ->
+    (right_module_basis K0 add0 mul0 M0 addM0 smulR0 n0
+      (fun j => right_basis_transform K0 add0 M0 addM0 smulR0 n0 a0 B0 j)
+    <-> invertible_matrix K0 add0 mul0 n0 B0).
+apply god1_s15_theorem1_basis_transform_iff_matrix_invertible.
+claim h_s23_t8_first_equivalences :
+  (linearly_independent_family K addK mulK X addX smulX p x
+  <-> module_basis K addK mulK X addX smulX p x)
+  /\ (module_basis K addK mulK X addX smulX p x
+  <-> invertible_matrix K addK mulK p
+    (basis_coordinate_matrix K addK mulK X addX smulX p a x)).
+admit.
 //GOD1PRF:643789 If D denotes the determinant with respect to the basis $a_{1}, \ldots, a_{p}$, considered as an alternating multilinear form, then condition $d$ ) becomes
+claim h_s23_t8_determinant_condition :
+  matrix_determinant K addK mulK p
+    (basis_coordinate_matrix K addK mulK X addX smulX p a x)
+  = determinant_of_vectors_in_basis K addK mulK
+    X addX smulX p a x.
+admit.
 //GOD1PRF:644005 it implies $a$ ) by virtue of Theorem 4, Corollary 1. To complete the proof of the theorem it is enough to show that $b$ ) implies $d$ ). Now if the $x_{i}$ form a basis of X , then by Theorem 5 there exists an alternating $p$-linear form $f$ on $\mathrm{X}^{p}$ such that
+claim h_s23_t8_theorem4_corollary1_formal_call :
+  forall K0, forall add0 mul0:set -> set -> set,
+  forall n0 :e omega, forall X0, forall addX0 smulX0:set -> set -> set,
+  forall M0, forall addM0 smulM0:set -> set -> set, forall f0:set -> set,
+    field K0 add0 mul0 ->
+    alternating_multilinear_mapping K0 add0 mul0 n0
+      X0 addX0 smulX0 M0 addM0 smulM0 f0 ->
+    forall y0 :e X0 :^: n0,
+      not (linearly_independent_family K0 add0 mul0
+        X0 addX0 smulX0 n0 (fun i => y0 i)) ->
+      f0 y0 = module_zero M0 addM0.
+apply god1_s23_theorem4_corollary1_dependent_arguments_vanish.
+claim h_s23_t8_theorem5_formal_call :
+  forall K0, forall add0 mul0:set -> set -> set,
+  forall X0, forall addX0 smulX0:set -> set -> set,
+  forall n0 :e omega, forall a0:set -> set,
+    0 :e n0 -> commutative_ring K0 add0 mul0 ->
+    module_basis K0 add0 mul0 X0 addX0 smulX0 n0 a0 ->
+    alternating_multilinear_mapping K0 add0 mul0 n0
+      X0 addX0 smulX0 K0 add0 mul0
+      (fun y0 => determinant_of_vectors_in_basis
+        K0 add0 mul0 X0 addX0 smulX0 n0 a0 (fun i => y0 i))
+    /\ determinant_of_vectors_in_basis K0 add0 mul0
+      X0 addX0 smulX0 n0 a0 a0 = ring_one K0 mul0.
+apply god1_s23_theorem5_normalized_determinant_interface.
+claim h_s23_t8_basis_has_nonzero_determinant :
+  module_basis K addK mulK X addX smulX p x ->
+  determinant_of_vectors_in_basis K addK mulK
+    X addX smulX p a x <> ring_zero K addK.
+admit.
 //GOD1PRF:644330 since every alternating $p$-linear form on $\mathrm{X}^{p}$ is proportional to D , it follows a fortiori that
+claim h_s23_t8_determinant_nonzero_criterion :
+  invertible_matrix K addK mulK p
+    (basis_coordinate_matrix K addK mulK X addX smulX p a x)
+  <-> matrix_determinant K addK mulK p
+    (basis_coordinate_matrix K addK mulK X addX smulX p a x)
+    <> ring_zero K addK.
+admit.
 Admitted.
 
 Theorem god1_s23_theorem8_corollary1_matrix_invertible_iff_determinant_nonzero :
@@ -45548,6 +48558,27 @@ let A.
 assume hA hField.
 apply iffI.
 //GOD1PRF:644661 This follows from the equivalence of $c$ ) and $d$ ) in Theorem 8.\\
+claim h_s23_t8c1_theorem8_formal_call :
+  forall K0, forall add0 mul0:set -> set -> set,
+  forall X0, forall addX0 smulX0:set -> set -> set,
+  forall n0 :e omega, forall a0 y0:set -> set,
+    field K0 add0 mul0 ->
+    module_basis K0 add0 mul0 X0 addX0 smulX0 n0 a0 ->
+    (linearly_independent_family K0 add0 mul0 X0 addX0 smulX0 n0 y0
+    <-> module_basis K0 add0 mul0 X0 addX0 smulX0 n0 y0)
+    /\ (module_basis K0 add0 mul0 X0 addX0 smulX0 n0 y0
+    <-> invertible_matrix K0 add0 mul0 n0
+      (basis_coordinate_matrix K0 add0 mul0 X0 addX0 smulX0 n0 a0 y0))
+    /\ (invertible_matrix K0 add0 mul0 n0
+      (basis_coordinate_matrix K0 add0 mul0 X0 addX0 smulX0 n0 a0 y0)
+    <-> matrix_determinant K0 add0 mul0 n0
+      (basis_coordinate_matrix K0 add0 mul0 X0 addX0 smulX0 n0 a0 y0)
+      <> ring_zero K0 add0).
+apply god1_s23_theorem8_basis_determinant_criterion.
+claim h_s23_t8c1_matrix_criterion :
+  invertible_matrix K add mul p A
+  <-> matrix_determinant K add mul p A <> ring_zero K add.
+admit.
 Admitted.
 
 Theorem god1_s23_theorem8_corollary2_endomorphism_conditions :
@@ -45573,7 +48604,99 @@ let a u.
 assume hField hBasis hu.
 apply andI.
 //GOD1PRF:645034 The equivalence of the first four statements has already been proved in §19 (Theorem 13, Corollary 1) for K a division ring. Also, $u$ is bijective if and only if its matrix A with respect to a basis of L is invertible (§15, section 2), hence if and only if $\operatorname{det}(\mathrm{A}) \neq 0$ (by Corollary 1); but
+claim h_s23_t8c2_s19_theorem13_corollary1_formal_call :
+  forall K0, forall add0 mul0:set -> set -> set,
+  forall X0, forall addX0 smulX0:set -> set -> set,
+  forall Y0, forall addY0 smulY0:set -> set -> set, forall f0:set -> set,
+    finite_dimensional_right_vector_space K0 add0 mul0 X0 addX0 smulX0 ->
+    finite_dimensional_right_vector_space K0 add0 mul0 Y0 addY0 smulY0 ->
+    right_vector_dimension K0 add0 mul0 X0 addX0 smulX0
+      = right_vector_dimension K0 add0 mul0 Y0 addY0 smulY0 ->
+    right_module_homomorphism K0 add0 mul0
+      X0 addX0 smulX0 Y0 addY0 smulY0 f0 ->
+    (bij X0 Y0 f0 <-> surj X0 Y0 f0)
+    /\ (surj X0 Y0 f0 <-> inj X0 Y0 f0)
+    /\ (inj X0 Y0 f0 <-> module_homomorphism_kernel
+      K0 add0 (opposite_ring_multiplication mul0)
+      X0 addX0 (fun scalar z => smulX0 z scalar)
+      Y0 addY0 (fun scalar z => smulY0 z scalar) f0 = {module_zero X0 addX0}).
+apply god1_s19_theorem13_corollary1_equal_dimension_map_conditions.
+claim h_s23_t8c2_s15_section2_formal_call :
+  forall K0, forall add0 mul0:set -> set -> set,
+  forall M0, forall addM0 smulR0:set -> set -> set,
+  forall n0 :e omega, forall a0:set -> set, forall f0:set -> set,
+    right_module_basis K0 add0 mul0 M0 addM0 smulR0 n0 a0 ->
+    right_module_homomorphism K0 add0 mul0
+      M0 addM0 smulR0 M0 addM0 smulR0 f0 ->
+    (module_automorphism K0 add0 (opposite_ring_multiplication mul0)
+      M0 addM0 (fun scalar x => smulR0 x scalar) f0
+    <-> invertible_matrix K0 add0 mul0 n0
+      (matrix_of_right_linear_map K0 add0 mul0
+        M0 addM0 smulR0 M0 addM0 smulR0 n0 n0 a0 a0 f0)).
+apply god1_automorphism_iff_matrix_invertible.
+claim h_s23_t8c2_corollary1_formal_call :
+  forall K0, forall add0 mul0:set -> set -> set,
+  forall n0 :e omega, forall A0 :e square_matrix_ring K0 n0,
+    field K0 add0 mul0 ->
+    (invertible_matrix K0 add0 mul0 n0 A0
+    <-> matrix_determinant K0 add0 mul0 n0 A0 <> ring_zero K0 add0).
+apply god1_s23_theorem8_corollary1_matrix_invertible_iff_determinant_nonzero.
+claim h_s23_t8c2_all_conditions_except_definition :
+  (bij X X u <-> surj X X u)
+  /\ (surj X X u <-> inj X X u)
+  /\ (inj X X u <-> module_homomorphism_kernel
+    K addK mulK X addX smulX X addX smulX u = {module_zero X addX})
+  /\ (bij X X u <-> endomorphism_determinant
+    K addK mulK X addX smulX p a u <> ring_zero K addK).
+admit.
 //GOD1PRF:645409 and therefore $a$ ) and $e$ ) are equivalent.\\
+claim h_s23_t8c2_bijective_iff_nonzero_determinant :
+  bij X X u <-> endomorphism_determinant
+    K addK mulK X addX smulX p a u <> ring_zero K addK.
+admit.
+Admitted.
+
+(** The next two corollaries cite the homogeneous-kernel and Cramer clauses of
+§20, Theorem 2.  This projection records both clauses and calls the complete
+formal theorem before exposing the two forms needed here. **)
+Theorem god1_s20_theorem2_singularity_and_cramer_interfaces :
+  forall K, forall add mul:set -> set -> set,
+  forall n :e omega, forall A :e square_matrix_ring K n,
+    division_ring K add mul ->
+    (((exists x :e K :^: n,
+      homogeneous_linear_system_solution K add mul n n A x
+      /\ x <> (fun i :e n => ring_zero K add))
+    <-> not (invertible_matrix K add mul n A))
+    /\ (cramer_linear_system K add mul n n A
+      <-> invertible_matrix K add mul n A)).
+let K add mul.
+let n.
+assume hn.
+let A.
+assume hA hDivision.
+claim h_s23_s20_theorem2_complete_formal_call :
+  (cramer_linear_system K add mul n n A
+  <-> forall b :e K :^: n, exists x :e K :^: n,
+    linear_system_solution K add mul n n A b x)
+  /\ (cramer_linear_system K add mul n n A
+  <-> forall b :e K :^: n, forall x y :e K :^: n,
+    linear_system_solution K add mul n n A b x ->
+    linear_system_solution K add mul n n A b y -> x = y)
+  /\ (cramer_linear_system K add mul n n A
+  <-> exists b :e K :^: n,
+    linear_system_unique_solution K add mul n n A b)
+  /\ (cramer_linear_system K add mul n n A
+  <-> associated_homogeneous_solution_space K add mul n n A
+    = {(fun j :e n => ring_zero K add)})
+  /\ (cramer_linear_system K add mul n n A
+  <-> invertible_matrix K add mul n A)
+  /\ (invertible_matrix K add mul n A -> forall b :e K :^: n,
+    linear_system_unique_solution K add mul n n A b
+    /\ linear_system_solution K add mul n n A b
+      (matrix_vector_product K add mul n n
+        (matrix_inverse K add mul n A) b)).
+apply (god1_s20_theorem2_square_cramer_equivalences_and_solution
+  K add mul n hn A hA hDivision).
 Admitted.
 
 Theorem god1_s23_theorem8_corollary3_homogeneous_square_system :
@@ -45591,6 +48714,23 @@ let A.
 assume hA hField.
 apply iffI.
 //GOD1PRF:645884 By Theorem 2 of § 20 (the equivalence of statements $e$ ) and $f$ ) of the theorem), the existence of a non-trivial solution is equivalent to the matrix $\left(\alpha_{i j}\right)$ not being invertible.\\
+claim h_s23_t8c3_division_ring : division_ring K add mul.
+admit.
+claim h_s23_t8c3_s20_theorem2_formal_call :
+  (((exists x :e K :^: n,
+    homogeneous_linear_system_solution K add mul n n A x
+    /\ x <> (fun i :e n => ring_zero K add))
+  <-> not (invertible_matrix K add mul n A))
+  /\ (cramer_linear_system K add mul n n A
+    <-> invertible_matrix K add mul n A)).
+apply (god1_s20_theorem2_singularity_and_cramer_interfaces
+  K add mul n hn A hA h_s23_t8c3_division_ring).
+claim h_s23_t8c3_singular_iff_nontrivial_solution :
+  (exists x :e K :^: n,
+    homogeneous_linear_system_solution K add mul n n A x
+    /\ x <> (fun i :e n => ring_zero K add))
+  <-> matrix_determinant K add mul n A = ring_zero K add.
+admit.
 Admitted.
 
 Theorem god1_s23_theorem8_corollary4_cramer_determinant_criterion :
@@ -45606,6 +48746,21 @@ let A.
 assume hA hField.
 apply iffI.
 //GOD1PRF:646593 This follows from the equivalence of statements $a$ ), $d$ ) and $f$ ) in Theorem 2 of § 20.\\
+claim h_s23_t8c4_division_ring : division_ring K add mul.
+admit.
+claim h_s23_t8c4_s20_theorem2_formal_call :
+  (((exists x :e K :^: n,
+    homogeneous_linear_system_solution K add mul n n A x
+    /\ x <> (fun i :e n => ring_zero K add))
+  <-> not (invertible_matrix K add mul n A))
+  /\ (cramer_linear_system K add mul n n A
+    <-> invertible_matrix K add mul n A)).
+apply (god1_s20_theorem2_singularity_and_cramer_interfaces
+  K add mul n hn A hA h_s23_t8c4_division_ring).
+claim h_s23_t8c4_cramer_determinant_criterion :
+  cramer_linear_system K add mul n n A
+  <-> matrix_determinant K add mul n A <> ring_zero K add.
+admit.
 Admitted.
 
 //GOD1:651243 strictly_increasing_index_tuple : "the #2-tuple of indices in #1 is strictly increasing" | $#2_1<\cdots<#2_p$
@@ -45673,21 +48828,200 @@ let a f.
 assume hRing hBasis hModule hMultilinear.
 apply andI.
 //GOD1PRF:652445 Put $a_{i_{1}}=b_{1}, \ldots, a_{i_{p}}=b_{p}$. If the indices $i_{1}, \ldots, i_{p}$ are not all distinct, at least two of the vectors $b_{j}$ will be equal, and hence if $f$ is alternating we shall have $f\left(b_{1}, \ldots, b_{p}\right)=0$. Hence (31). Writing
+claim h_s23_t9_repeated_basis_indices_vanish :
+  alternating_multilinear_mapping K addK mulK p
+    X addX smulX M addM smulM f ->
+  forall idx :e n :^: p,
+    (exists i j :e p, i <> j /\ idx i = idx j) ->
+    f (fun h :e p => a (idx h)) = module_zero M addM.
+admit.
 //GOD1PRF:652814 and remarking that
+claim h_s23_t9_theorem2_formal_call :
+  forall K0, forall add0 mul0:set -> set -> set,
+  forall p0 :e omega, forall X0, forall addX0 smulX0:set -> set -> set,
+  forall M0, forall addM0 smulM0:set -> set -> set, forall f0:set -> set,
+    0 :e p0 ->
+    alternating_multilinear_mapping K0 add0 mul0 p0
+      X0 addX0 smulX0 M0 addM0 smulM0 f0 ->
+    antisymmetric_mapping X0 M0 addM0 p0 f0
+    /\ forall sigma :e permutation_group p0, forall x0 :e X0 :^: p0,
+      f0 (permuted_tuple p0 sigma x0)
+      = signed_group_element M0 addM0
+        (permutation_signature p0 sigma) (f0 x0).
+apply god1_s23_theorem2_alternating_multilinear_is_antisymmetric.
+claim h_s23_t9_permuted_basis_coefficients :
+  alternating_multilinear_mapping K addK mulK p
+    X addX smulX M addM smulM f ->
+  forall idx :e n :^: p, forall sigma :e permutation_group p,
+    f (fun h :e p => a (idx (sigma h)))
+    = smulM (signature_scalar K addK mulK p sigma)
+      (f (fun h :e p => a (idx h))).
+admit.
 //GOD1PRF:652873 we obtain (32).\\
+claim h_s23_t9_coefficient_conditions_necessary :
+  alternating_multilinear_mapping K addK mulK p
+    X addX smulX M addM smulM f ->
+  alternating_basis_coefficient_conditions
+    K addK mulK X addX smulX M addM smulM n p a f.
+admit.
 //GOD1PRF:652891 Conversely, suppose that (31) and (32) are satisfied. In the formula
+claim h_s23_t9_assume_coefficient_conditions :
+  alternating_basis_coefficient_conditions
+    K addK mulK X addX smulX M addM smulM n p a f ->
+  (forall idx :e n :^: p,
+    (exists i j :e p, i <> j /\ idx i = idx j) ->
+    f (fun h :e p => a (idx h)) = module_zero M addM).
+admit.
 //GOD1PRF:653105 we may restrict the summation on the right-hand side to sequences $i_{1}, \ldots, i_{p}$ of $p$ distinct integers lying between 1 and $n$. Let us provisionally denote by $S$ the set of all these sequences, and by $S^{+} \subset S$ the set of all sequences $i_{1}, \ldots, i_{p}$ such that
+claim h_s23_t9_restrict_to_distinct_indices :
+  alternating_basis_coefficient_conditions
+    K addK mulK X addX smulX M addM smulM n p a f ->
+  forall x :e X :^: p,
+    exists summand:set -> set,
+      f x = module_finitely_supported_sum M addM
+        {idx :e n :^: p|not (exists i j :e p, i <> j /\ idx i = idx j)}
+        summand.
+admit.
 //GOD1PRF:653468 It is clear that every sequence belonging to $S$ can be obtained in exactly one way by applying a suitable permutation to a sequence which satisfies (35). In other words, if we associate with each sequence ( $i_{1}, \ldots, i_{p}$ ) satisfying (35) and each permutation $\sigma \in \mathfrak{S}_{p}$ the sequence ( $i_{\sigma(1)}, \ldots, i_{\sigma(p)}$ ), we have a bijection of the product set $\mathrm{S}^{+} \times \mathfrak{S}_{p}$ onto S .
+claim h_s23_t9_increasing_tuple_permutation_bijection :
+  bij ({idx :e n :^: p|strictly_increasing_index_tuple n p idx}
+      :*: permutation_group p)
+    {idx :e n :^: p|not (exists i j :e p, i <> j /\ idx i = idx j)}
+    (fun u => fun h :e p => u 0 (u 1 h)).
+admit.
 //GOD1PRF:653915 The formula (34) may therefore be written
+claim h_s23_t9_regrouped_over_permutations :
+  alternating_basis_coefficient_conditions
+    K addK mulK X addX smulX M addM smulM n p a f ->
+  forall x :e X :^: p,
+    exists term:set -> set -> set,
+      f x = module_finitely_supported_sum M addM
+        {idx :e n :^: p|strictly_increasing_index_tuple n p idx}
+        (fun idx => module_finitely_supported_sum M addM
+          (permutation_group p) (fun sigma => term idx sigma)).
+admit.
 //GOD1PRF:654152 using (32), this becomes
+claim h_s23_t9_use_signature_relation :
+  forall idx :e n :^: p, forall sigma :e permutation_group p,
+    f (fun h :e p => a (idx (sigma h)))
+    = smulM (signature_scalar K addK mulK p sigma)
+      (f (fun h :e p => a (idx h))).
+admit.
 //GOD1PRF:654377 If we put $\alpha_{k l}=\xi_{i_{k} l}$, the sum over $\mathfrak{S}_{p}$ in the above expression is
+claim h_s23_t9_inner_permutation_sum :
+  forall idx :e n :^: p, forall x :e X :^: p,
+    exists scalar :e K,
+      scalar = matrix_determinant K addK mulK p
+        (selected_coordinate_matrix K addK mulK
+          X addX smulX n p a (fun h => idx h) (fun j => x j)).
+admit.
 //GOD1PRF:654563 which is by definition the determinant
+claim h_s23_t9_determinant_definition :
+  forall idx :e n :^: p, forall x :e X :^: p,
+    matrix_determinant K addK mulK p
+      (selected_coordinate_matrix K addK mulK
+        X addX smulX n p a (fun h => idx h) (fun j => x j))
+    = module_finitely_supported_sum K addK (permutation_group p)
+      (fun sigma => mulK (signature_scalar K addK mulK p sigma)
+        (ring_finite_product K addK mulK p
+          (fun j => basis_coordinates K addK mulK
+            X addX smulX n a (x j) (idx (sigma j))))).
+admit.
 //GOD1PRF:654840 Hence (33) is proved, and it remains to be shown that $f$ is alternating.\\
+claim h_s23_t9_formula33 :
+  alternating_basis_coefficient_conditions
+    K addK mulK X addX smulX M addM smulM n p a f ->
+  forall x :e X :^: p,
+    f x = module_finitely_supported_sum M addM
+      {idx :e n :^: p|strictly_increasing_index_tuple n p idx}
+      (fun idx => smulM
+        (matrix_determinant K addK mulK p
+          (selected_coordinate_matrix K addK mulK
+            X addX smulX n p a (fun h => idx h) (fun j => x j)))
+        (f (fun h :e p => a (idx h)))).
+admit.
 //GOD1PRF:654916 Let $u_{i}(1 \leqslant i \leqslant n)$ denote the coordinate functions on the module X with respect to the basis $\left(a_{i}\right)_{1 \leqslant i \leqslant n}$. Then the expression
+claim h_s23_t9_coordinate_forms_are_linear : forall i :e n,
+  module_homomorphism K addK mulK X addX smulX K addK mulK
+    (basis_coordinate_function K addK mulK X addX smulX n a i).
+admit.
 //GOD1PRF:655142 is the value at $\left(x_{1}, \ldots, x_{p}\right)$ of the $p$-linear form $u_{i_{1}} \otimes \cdots \otimes u_{i_{p}}$, because in general we have
+claim h_s23_t9_s21_example2_formal_call :
+  forall K0, forall add0 mul0:set -> set -> set,
+  forall p0 :e omega, forall X0:set -> set,
+  forall addX0 smulX0:set -> set -> set -> set,
+  forall u0:set -> set -> set,
+    commutative_ring K0 add0 mul0 ->
+    (forall q :e p0,
+      module_homomorphism K0 add0 mul0
+        (X0 q) (addX0 q) (smulX0 q) K0 add0 mul0 (u0 q)) ->
+    multilinear_mapping K0 add0 mul0 p0 X0 addX0 smulX0 K0 add0 mul0
+      (fun x0 => ring_finite_product K0 add0 mul0 p0
+        (fun q => u0 q (x0 q))).
+apply god1_s21_example2_product_of_linear_forms_is_multilinear.
+claim h_s23_t9_tensor_coordinate_value :
+  forall idx :e n :^: p, forall x :e X :^: p,
+    ring_finite_product K addK mulK p
+      (fun h => basis_coordinate_function K addK mulK
+        X addX smulX n a (idx h) (x h))
+    = ring_finite_product K addK mulK p
+      (fun h => basis_coordinates K addK mulK
+        X addX smulX n a (x h) (idx h)).
+admit.
 //GOD1PRF:655332 hence, by a calculation analogous to that carried through in detail in section 4 (see the passage from (22) to (23)), the determinant (36) is the value at ( $x_{1}, \ldots, x_{p}$ ) of the exterior product
+claim h_s23_t9_determinant_as_exterior_product :
+  forall idx :e n :^: p, forall x :e X :^: p,
+    exists u:set -> set,
+      (forall h :e p, forall y :e X,
+        ap (u h) y = basis_coordinate_function K addK mulK
+          X addX smulX n a (idx h) y)
+      /\ matrix_determinant K addK mulK p
+        (selected_coordinate_matrix K addK mulK
+          X addX smulX n p a (fun h => idx h) (fun j => x j))
+        = exterior_product_linear_forms K addK mulK X p u x.
+admit.
 //GOD1PRF:655663 defined in Example 2 of section 3. Consequently (33) becomes
+claim h_s23_t9_section3_example2_formal_call :
+  forall K0, forall add0 mul0:set -> set -> set,
+  forall p0 :e omega, forall X0, forall addX0 smulX0:set -> set -> set,
+  forall u0:set -> set,
+    0 :e p0 -> commutative_ring K0 add0 mul0 ->
+    (forall i :e p0,
+      module_homomorphism K0 add0 mul0
+        X0 addX0 smulX0 K0 add0 mul0 (fun x0 => u0 i x0)) ->
+    alternating_multilinear_mapping K0 add0 mul0 p0
+      X0 addX0 smulX0 K0 add0 mul0
+      (fun x0 => exterior_product_linear_forms K0 add0 mul0 X0 p0 u0 x0).
+apply god1_exterior_product_of_linear_forms_is_alternating.
+claim h_s23_t9_exterior_expansion :
+  forall x :e X :^: p,
+    f x = module_finitely_supported_sum M addM
+      {idx :e n :^: p|strictly_increasing_index_tuple n p idx}
+      (fun idx => smulM
+        (matrix_determinant K addK mulK p
+          (selected_coordinate_matrix K addK mulK
+            X addX smulX n p a (fun h => idx h) (fun j => x j)))
+        (f (fun h :e p => a (idx h)))).
+admit.
 //GOD1PRF:655879 and since the forms $u_{i_{1} \ldots i_{p}}$ are alternating (Example 2), it follows that $f$ is an alternating $p$-linear form. This completes the proof.\\
+claim h_s23_t9_example2_alternating_formal_call :
+  forall K0, forall add0 mul0:set -> set -> set,
+  forall p0 :e omega, forall X0, forall addX0 smulX0:set -> set -> set,
+  forall u0:set -> set,
+    0 :e p0 -> commutative_ring K0 add0 mul0 ->
+    (forall i :e p0,
+      module_homomorphism K0 add0 mul0
+        X0 addX0 smulX0 K0 add0 mul0 (fun x0 => u0 i x0)) ->
+    alternating_multilinear_mapping K0 add0 mul0 p0
+      X0 addX0 smulX0 K0 add0 mul0
+      (fun x0 => exterior_product_linear_forms K0 add0 mul0 X0 p0 u0 x0).
+apply god1_exterior_product_of_linear_forms_is_alternating.
+claim h_s23_t9_alternating_conclusion :
+  alternating_basis_coefficient_conditions
+    K addK mulK X addX smulX M addM smulM n p a f ->
+  alternating_multilinear_mapping K addK mulK p
+    X addX smulX M addM smulM f.
+admit.
 Admitted.
 
 //GOD1:657642 family_coordinate_matrix : "the #10-by-#11 coordinate matrix of the vector family #13 in the basis #12" | $([#13_j]_{#12,i})_{i,j}$
@@ -45728,8 +49062,68 @@ let a x.
 assume hField hBasis.
 apply andI.
 //GOD1PRF:658386 In the notation of the last section, the determinants of the submatrices of order $p$ in this matrix are the scalars $u_{i_{1} \ldots i_{p}}\left(x_{1}, \ldots, x_{p}\right)$. If one at least of them is non-zero, it is clear that condition $b$ ) will be satisfied, with $f=u_{i_{1} \ldots i_{p}}$ for a suitable choice of the indices $i_{1}, \ldots, i_{p}$. Hence $c$ ) implies $b$ ). Also $b$ ) implies $a$ ), by Theorem 4.
+claim h_s23_t10_theorem4_formal_call :
+  forall K0, forall add0 mul0:set -> set -> set,
+  forall n0 :e omega, forall X0, forall addX0 smulX0:set -> set -> set,
+  forall M0, forall addM0 smulM0:set -> set -> set, forall f0:set -> set,
+    field K0 add0 mul0 ->
+    alternating_multilinear_mapping K0 add0 mul0 n0
+      X0 addX0 smulX0 M0 addM0 smulM0 f0 ->
+    forall y0 :e X0 :^: n0,
+      not (linearly_independent_family K0 add0 mul0
+        X0 addX0 smulX0 n0 (fun i => y0 i)) ->
+      f0 y0 = module_zero M0 addM0.
+apply god1_s23_theorem4_corollary1_dependent_arguments_vanish.
+claim h_s23_t10_minor_nonzero_implies_form_nonzero :
+  (exists rows :e n :^: p,
+    inj p n (fun i => rows i)
+    /\ matrix_determinant K addK mulK p
+      (matrix_submatrix p p (fun i => rows i) (fun j => j)
+        (family_coordinate_matrix K addK mulK X addX smulX n p a x))
+      <> ring_zero K addK) ->
+  exists f :e alternating_multilinear_mapping_space
+      K addK mulK p X addX smulX K addK mulK,
+    f (fun j :e p => x j) <> ring_zero K addK.
+admit.
+claim h_s23_t10_nonzero_form_implies_independent :
+  (exists f :e alternating_multilinear_mapping_space
+      K addK mulK p X addX smulX K addK mulK,
+    f (fun j :e p => x j) <> ring_zero K addK) ->
+  linearly_independent_family K addK mulK X addX smulX p x.
+admit.
 //GOD1PRF:658812 If condition $a$ ) is satisfied, there exists a basis of X which begins with the vectors $x_{1}, \ldots, x_{p}$, and hence by (39) there exists an alternating $p$-linear form which takes a non-zero value at $\left(x_{1}, \ldots, x_{p}\right) \in \mathrm{X}^{p}$. Hence $a$ ) implies $b$ ).
+claim h_s23_t10_s19_extension_formal_call :
+  forall K0, forall add0 mul0:set -> set -> set,
+  forall M0, forall addM0 smulR0:set -> set -> set,
+  forall G A0,
+    right_vector_space K0 add0 mul0 M0 addM0 smulR0 ->
+    finite G ->
+    generating_family K0 add0 (opposite_ring_multiplication mul0)
+      M0 addM0 (fun scalar z => smulR0 z scalar) G (fun z => z) ->
+    A0 c= G ->
+    linearly_independent_family K0 add0 (opposite_ring_multiplication mul0)
+      M0 addM0 (fun scalar z => smulR0 z scalar) A0 (fun z => z) ->
+    exists B0, A0 c= B0 /\ B0 c= G
+      /\ right_module_basis K0 add0 mul0 M0 addM0 smulR0 B0 (fun z => z).
+apply god1_s19_theorem2_extension_interface.
+claim h_s23_t10_independent_family_has_detecting_form :
+  linearly_independent_family K addK mulK X addX smulX p x ->
+  exists f :e alternating_multilinear_mapping_space
+      K addK mulK p X addX smulX K addK mulK,
+    f (fun j :e p => x j) <> ring_zero K addK.
+admit.
 //GOD1PRF:659103 Finally, $b$ ) implies $c$ ). For the formula (37) shows that if $f\left(x_{1}, \ldots, x_{p}\right)$ is not zero, then at least one of the scalars $u_{i_{1} \ldots i_{p}}\left(x_{1}, \ldots, x_{p}\right)$ is non-zero, and this is precisely the assertion c).\\
+claim h_s23_t10_nonzero_form_has_nonzero_minor :
+  (exists f :e alternating_multilinear_mapping_space
+      K addK mulK p X addX smulX K addK mulK,
+    f (fun j :e p => x j) <> ring_zero K addK) ->
+  exists rows :e n :^: p,
+    inj p n (fun i => rows i)
+    /\ matrix_determinant K addK mulK p
+      (matrix_submatrix p p (fun i => rows i) (fun j => j)
+        (family_coordinate_matrix K addK mulK X addX smulX n p a x))
+      <> ring_zero K addK.
+admit.
 Admitted.
 
 //GOD1:662750 augmented_consistency_matrix : "the augmented leading coefficient matrix with final row #7" | $[A_{1..r,1..r}\mid b;A_{#7,1..r}\mid b_{#7}]$
@@ -45743,6 +49137,34 @@ Definition augmented_consistency_matrix : set -> set -> set -> set -> set :=
       else if u 1 :e r
         then matrix_entry A j (u 1)
         else b j.
+
+(** Formal interface for the free-variable assignment used from §20,
+section 5.  It specializes that parametric solution construction to setting
+all variables outside the leading invertible block equal to zero. **)
+Theorem god1_s20_section5_zero_free_variables_interface :
+  forall K, forall add mul:set -> set -> set,
+  forall n p r :e omega, forall A :e matrix_space K n p,
+  forall b :e K :^: n,
+    field K add mul -> r c= p ->
+    matrix_determinant K add mul r
+      (matrix_submatrix r r (fun i => i) (fun j => j) A)
+      <> ring_zero K add ->
+    (exists y :e K :^: p, linear_system_solution K add mul n p A b y) ->
+    exists x :e K :^: p,
+      linear_system_solution K add mul n p A b x
+      /\ forall k :e p, k /:e r -> x k = ring_zero K add.
+let K add mul.
+let n.
+assume hn.
+let p.
+assume hp.
+let r.
+assume hr.
+let A.
+assume hA.
+let b.
+assume hb hField hrp hMinor hConsistent.
+Admitted.
 
 Theorem god1_s23_theorem11_consistency_by_augmented_determinants :
   forall K, forall add mul:set -> set -> set,
@@ -45772,18 +49194,203 @@ let b.
 assume hb hField hrn hrp hRank hLeadingMinor.
 apply iffI.
 //GOD1PRF:663184 First of all, Theorem 5 of § 19 shows that, for the system (41) to have a solution, it is necessary and sufficient that the same should be true of the system
+claim h_s23_t11_s19_theorem5_formal_call :
+  forall K0, forall add0 mul0:set -> set -> set,
+  forall M0, forall addM0 smulR0:set -> set -> set,
+  forall n0 r0 :e omega, forall f0:set -> set,
+  forall rho0:set -> set -> set, forall beta0 :e K0 :^: n0,
+    right_vector_space K0 add0 mul0 M0 addM0 smulR0 ->
+    r0 c= n0 ->
+    linearly_independent_family K0 add0 mul0
+      (right_module_dual K0 add0 mul0 M0 addM0 smulR0)
+      (right_module_dual_addition M0 add0)
+      (right_module_dual_left_scalar M0 mul0) r0 f0 ->
+    (forall j :e n0, j /:e r0 ->
+      f0 j = module_finitely_supported_sum
+        (right_module_dual K0 add0 mul0 M0 addM0 smulR0)
+        (right_module_dual_addition M0 add0) r0
+        (fun k => right_module_dual_left_scalar M0 mul0
+          (rho0 j k) (f0 k))) ->
+    ((exists x :e M0, forall i :e n0, f0 i x = beta0 i)
+    <-> forall j :e n0, j /:e r0 ->
+      beta0 j = ring_finite_sum K0 add0 r0
+        (fun k => mul0 (rho0 j k) (beta0 k)))
+    /\ ((forall j :e n0, j /:e r0 ->
+        beta0 j = ring_finite_sum K0 add0 r0
+          (fun k => mul0 (rho0 j k) (beta0 k))) ->
+      {x :e M0|forall i :e n0, f0 i x = beta0 i}
+      = {x :e M0|forall i :e r0, f0 i x = beta0 i}).
+apply god1_s19_theorem5_consistency_of_dependent_linear_equations.
+claim h_s23_t11_reduce_to_each_extra_equation :
+  ((exists x :e K :^: p, linear_system_solution K add mul n p A b x)
+  <-> forall j :e n, j /:e r ->
+    exists x :e K :^: p,
+      (forall i :e r,
+        matrix_row_linear_form K add mul p A i x = b i)
+      /\ matrix_row_linear_form K add mul p A j x = b j).
+admit.
 //GOD1PRF:663452 for all integers $j$ such that $r+1 \leqslant j \leqslant n$. It is therefore sufficient to prove Theorem 11 in the particular case $n=r+1$, and from now on we shall assume that this is the case.
+claim h_s23_t11_reduction_to_one_extra_row :
+  (forall j :e n, j /:e r ->
+    ((exists x :e K :^: p,
+      (forall i :e r, matrix_row_linear_form K add mul p A i x = b i)
+      /\ matrix_row_linear_form K add mul p A j x = b j)
+    <-> matrix_determinant K add mul (ordsucc r)
+      (augmented_consistency_matrix r A b j) = ring_zero K add)) ->
+  ((exists x :e K :^: p, linear_system_solution K add mul n p A b x)
+  <-> forall j :e n, j /:e r ->
+    matrix_determinant K add mul (ordsucc r)
+      (augmented_consistency_matrix r A b j) = ring_zero K add).
+admit.
 //GOD1PRF:663649 If the system (41) has solutions, then they are obtained by solving the first $r$ equations, and since the hypothesis (42) shows that the system of linear equations
+claim h_s23_t11_leading_system_invertible :
+  invertible_matrix K add mul r
+    (matrix_submatrix r r (fun i => i) (fun j => j) A).
+admit.
 //GOD1PRF:663996 is a Cramer system (§ 20, Theorem 2; or Theorem 8, Corollary 4 in this Chapter), it follows that we may assign arbitrary values to the unknowns $\xi_{r+1}, \ldots, \xi_{p}$ in the system (41) (§ 20, Section 5). In particular, if the system (41) has a solution, then it has one for which
+claim h_s23_t11_s20_theorem2_formal_call :
+  forall K0, forall add0 mul0:set -> set -> set,
+  forall m0 :e omega, forall B0 :e square_matrix_ring K0 m0,
+    division_ring K0 add0 mul0 ->
+    (((exists x :e K0 :^: m0,
+      homogeneous_linear_system_solution K0 add0 mul0 m0 m0 B0 x
+      /\ x <> (fun i :e m0 => ring_zero K0 add0))
+    <-> not (invertible_matrix K0 add0 mul0 m0 B0))
+    /\ (cramer_linear_system K0 add0 mul0 m0 m0 B0
+      <-> invertible_matrix K0 add0 mul0 m0 B0)).
+apply god1_s20_theorem2_singularity_and_cramer_interfaces.
+claim h_s23_t11_theorem8_corollary4_formal_call :
+  forall K0, forall add0 mul0:set -> set -> set,
+  forall m0 :e omega, forall B0 :e square_matrix_ring K0 m0,
+    field K0 add0 mul0 ->
+    (cramer_linear_system K0 add0 mul0 m0 m0 B0
+    <-> matrix_determinant K0 add0 mul0 m0 B0 <> ring_zero K0 add0).
+apply god1_s23_theorem8_corollary4_cramer_determinant_criterion.
+claim h_s23_t11_s20_section5_formal_call :
+  forall K0, forall add0 mul0:set -> set -> set,
+  forall n0 p0 r0 :e omega, forall A0 :e matrix_space K0 n0 p0,
+  forall b0 :e K0 :^: n0,
+    field K0 add0 mul0 -> r0 c= p0 ->
+    matrix_determinant K0 add0 mul0 r0
+      (matrix_submatrix r0 r0 (fun i => i) (fun j => j) A0)
+      <> ring_zero K0 add0 ->
+    (exists y :e K0 :^: p0,
+      linear_system_solution K0 add0 mul0 n0 p0 A0 b0 y) ->
+    exists x :e K0 :^: p0,
+      linear_system_solution K0 add0 mul0 n0 p0 A0 b0 x
+      /\ forall k :e p0, k /:e r0 -> x k = ring_zero K0 add0.
+apply god1_s20_section5_zero_free_variables_interface.
+claim h_s23_t11_solution_with_zero_free_variables :
+  (exists y :e K :^: p, linear_system_solution K add mul n p A b y) ->
+  exists x :e K :^: p,
+    linear_system_solution K add mul n p A b x
+    /\ forall k :e p, k /:e r -> x k = ring_zero K add.
+admit.
 //GOD1PRF:664321 and the converse of this statement is of course trivial. In the case $n=r+1$ which concerns us, we have therefore to express that the system
+claim h_s23_t11_zero_free_variables_equivalence :
+  (exists y :e K :^: p, linear_system_solution K add mul n p A b y)
+  <-> exists x :e K :^: p,
+    linear_system_solution K add mul n p A b x
+    /\ forall k :e p, k /:e r -> x k = ring_zero K add.
+admit.
 //GOD1PRF:664877 of $r+1$ equations in $r$ unknowns, of rank $r$, has at least one solution, and to show that this will be the case if and only if
+claim h_s23_t11_reduced_rectangular_consistency : forall j :e n, j /:e r ->
+  ((exists x :e K :^: r,
+    forall i :e ordsucc r,
+      matrix_row_linear_form K add mul r
+        (augmented_consistency_matrix r A b j) i x =
+        matrix_entry (augmented_consistency_matrix r A b j) i r)
+  <-> matrix_determinant K add mul (ordsucc r)
+    (augmented_consistency_matrix r A b j) = ring_zero K add).
+admit.
 //GOD1PRF:665322 Now the condition (44) also expresses that the system
+claim h_s23_t11_augmented_homogeneous_system : forall j :e n, j /:e r ->
+  matrix_determinant K add mul (ordsucc r)
+    (augmented_consistency_matrix r A b j) = ring_zero K add
+  <-> exists eta :e K :^: ordsucc r,
+    homogeneous_linear_system_solution K add mul (ordsucc r) (ordsucc r)
+      (augmented_consistency_matrix r A b j) eta
+    /\ eta <> (fun i :e ordsucc r => ring_zero K add).
+admit.
 //GOD1PRF:665806 has a non-trivial solution (Theorem 8, Corollary 3); we are therefore reduced to showing that, if (42) is satisfied, the existence of a solution of (43) is equivalent to the existence of a non-trivial solution of (45).
+claim h_s23_t11_theorem8_corollary3_formal_call :
+  forall K0, forall add0 mul0:set -> set -> set,
+  forall m0 :e omega, forall B0 :e square_matrix_ring K0 m0,
+    field K0 add0 mul0 ->
+    ((exists x :e K0 :^: m0,
+      homogeneous_linear_system_solution K0 add0 mul0 m0 m0 B0 x
+      /\ x <> (fun i :e m0 => ring_zero K0 add0))
+    <-> matrix_determinant K0 add0 mul0 m0 B0 = ring_zero K0 add0).
+apply god1_s23_theorem8_corollary3_homogeneous_square_system.
+claim h_s23_t11_affine_vs_homogeneous_reduction : forall j :e n, j /:e r ->
+  ((exists x :e K :^: r, forall i :e ordsucc r,
+      matrix_row_linear_form K add mul r
+        (augmented_consistency_matrix r A b j) i x
+      = matrix_entry (augmented_consistency_matrix r A b j) i r)
+  <-> exists eta :e K :^: ordsucc r,
+    homogeneous_linear_system_solution K add mul (ordsucc r) (ordsucc r)
+      (augmented_consistency_matrix r A b j) eta
+    /\ eta <> (fun i :e ordsucc r => ring_zero K add)).
+admit.
 //GOD1PRF:666026 First, it is clear that the first statement implies the second, for if $\left(\xi_{1}, \ldots, \xi_{r}\right)$ is a solution of (43), then $\left(\xi_{1}, \ldots, \xi_{r},-1\right)$ is a non-trivial solution of (45).
+claim h_s23_t11_affine_solution_homogenizes : forall j :e n, j /:e r ->
+  forall x :e K :^: r,
+    (forall i :e ordsucc r,
+      matrix_row_linear_form K add mul r
+        (augmented_consistency_matrix r A b j) i x
+      = matrix_entry (augmented_consistency_matrix r A b j) i r) ->
+    exists eta :e K :^: ordsucc r,
+      homogeneous_linear_system_solution K add mul (ordsucc r) (ordsucc r)
+        (augmented_consistency_matrix r A b j) eta
+      /\ eta r = ring_negation K add (ring_one K mul)
+      /\ eta <> (fun i :e ordsucc r => ring_zero K add).
+admit.
 //GOD1PRF:666244 Conversely, consider a non-trivial solution $\left(\eta_{1}, \ldots, \eta_{r+1}\right)$ of (45). Then we must have
+claim h_s23_t11_last_homogeneous_coordinate_nonzero : forall j :e n, j /:e r ->
+  forall eta :e K :^: ordsucc r,
+    homogeneous_linear_system_solution K add mul (ordsucc r) (ordsucc r)
+      (augmented_consistency_matrix r A b j) eta ->
+    eta <> (fun i :e ordsucc r => ring_zero K add) ->
+    eta r <> ring_zero K add.
+admit.
 //GOD1PRF:666426 for if $\eta_{r+1}=0$ it is clear that $\left(\eta_{1}, \ldots, \eta_{r}\right)$ would be a non-trivial solution of the homogeneous system associated with (43), and a fortiori of the system
+claim h_s23_t11_zero_last_coordinate_gives_leading_kernel :
+  forall j :e n, j /:e r -> forall eta :e K :^: ordsucc r,
+    homogeneous_linear_system_solution K add mul (ordsucc r) (ordsucc r)
+      (augmented_consistency_matrix r A b j) eta ->
+    eta r = ring_zero K add ->
+    exists z :e K :^: r,
+      homogeneous_linear_system_solution K add mul r r
+        (matrix_submatrix r r (fun i => i) (fun k => k) A) z
+      /\ z <> (fun i :e r => ring_zero K add).
+admit.
 //GOD1PRF:666855 contrary to (42) and Theorem 8, Corollary 3. Thus by (46) we may divide the equations (45) through by $\eta_{r+1}$, and then we see that the scalars
+claim h_s23_t11_theorem8_corollary3_second_formal_call :
+  forall K0, forall add0 mul0:set -> set -> set,
+  forall m0 :e omega, forall B0 :e square_matrix_ring K0 m0,
+    field K0 add0 mul0 ->
+    ((exists x :e K0 :^: m0,
+      homogeneous_linear_system_solution K0 add0 mul0 m0 m0 B0 x
+      /\ x <> (fun i :e m0 => ring_zero K0 add0))
+    <-> matrix_determinant K0 add0 mul0 m0 B0 = ring_zero K0 add0).
+apply god1_s23_theorem8_corollary3_homogeneous_square_system.
+claim h_s23_t11_normalize_nontrivial_homogeneous_solution :
+  forall j :e n, j /:e r -> forall eta :e K :^: ordsucc r,
+    eta r <> ring_zero K add ->
+    exists x :e K :^: r, forall i :e r,
+      x i = mul (eta i) (ring_inverse K add mul (eta r)).
+admit.
 //GOD1PRF:667076 satisfy (43). This completes the proof.\\
+claim h_s23_t11_normalized_coordinates_solve_affine_system :
+  forall j :e n, j /:e r -> forall eta :e K :^: ordsucc r,
+    homogeneous_linear_system_solution K add mul (ordsucc r) (ordsucc r)
+      (augmented_consistency_matrix r A b j) eta ->
+    eta r <> ring_zero K add ->
+    exists x :e K :^: r, forall i :e ordsucc r,
+      matrix_row_linear_form K add mul r
+        (augmented_consistency_matrix r A b j) i x
+      = matrix_entry (augmented_consistency_matrix r A b j) i r.
+admit.
 Admitted.
 
 (** § 24. Determinants. **)
