@@ -52706,6 +52706,77 @@ Definition commutative_ring :
   set -> (set -> set -> set) -> (set -> set -> set) -> prop :=
   fun K add mul => ring K add mul /\ commutative_on K mul.
 
+Theorem god1_ring_additive_abelian_group :
+  forall K, forall add mul:set -> set -> set,
+    ring K add mul -> abelian_group K add.
+let K add mul.
+assume hK.
+exact (andEL
+  (abelian_group K add)
+  (law_of_composition K mul)
+  (andEL
+    (abelian_group K add /\ law_of_composition K mul)
+    (associative_on K mul)
+    (andEL
+      ((abelian_group K add /\ law_of_composition K mul)
+        /\ associative_on K mul)
+      (exists one :e K, neutral_element K mul one)
+      (andEL
+        (((abelian_group K add /\ law_of_composition K mul)
+          /\ associative_on K mul)
+          /\ exists one :e K, neutral_element K mul one)
+        (forall x y z :e K,
+          mul x (add y z) = add (mul x y) (mul x z)
+          /\ mul (add x y) z = add (mul x z) (mul y z))
+        hK)))).
+Qed.
+
+Theorem god1_ring_additive_group :
+  forall K, forall add mul:set -> set -> set,
+    ring K add mul -> group K add.
+let K add mul.
+assume hK.
+exact (andEL
+  (group K add) (commutative_on K add)
+  (god1_ring_additive_abelian_group K add mul hK)).
+Qed.
+
+Theorem god1_ring_multiplicative_identity_exists :
+  forall K, forall add mul:set -> set -> set,
+    ring K add mul ->
+    exists one :e K, neutral_element K mul one.
+let K add mul.
+assume hK.
+exact (andER
+  ((abelian_group K add /\ law_of_composition K mul)
+    /\ associative_on K mul)
+  (exists one :e K, neutral_element K mul one)
+  (andEL
+    (((abelian_group K add /\ law_of_composition K mul)
+      /\ associative_on K mul)
+      /\ exists one :e K, neutral_element K mul one)
+    (forall x y z :e K,
+      mul x (add y z) = add (mul x y) (mul x z)
+      /\ mul (add x y) z = add (mul x z) (mul y z))
+    hK)).
+Qed.
+
+Theorem god1_ring_multiplicative_identity_specification :
+  forall K, forall add mul:set -> set -> set,
+    ring K add mul -> neutral_element K mul (ring_one K mul).
+let K add mul.
+assume hK.
+apply (Eps_i_ex (fun one => neutral_element K mul one)).
+apply (exandE_i
+  (fun one => one :e K)
+  (fun one => neutral_element K mul one)
+  (god1_ring_multiplicative_identity_exists K add mul hK)).
+let one.
+assume hone hneutral.
+witness one.
+exact hneutral.
+Qed.
+
 Theorem god1_ring_zero_one_negation_specifications :
   forall K, forall add mul:set -> set -> set,
     ring K add mul ->
@@ -52720,13 +52791,278 @@ claim h_s8_ring_additive_group_specs :
   neutral_element K add (ring_zero K add)
   /\ forall x :e K,
     reflection K add (ring_zero K add) x (ring_negation K add x).
-admit.
+exact (god1_group_identity_and_inverse_specifications K add
+  (god1_ring_additive_group K add mul hK)).
 //GOD1PRF:100364 Axiom (R 2) means that in any ring $K$ the relation
 claim h_s8_ring_multiplicative_identity_spec :
   neutral_element K mul (ring_one K mul).
-admit.
-apply andI.
-Admitted.
+exact (god1_ring_multiplicative_identity_specification K add mul hK).
+exact (andI
+  (neutral_element K add (ring_zero K add)
+    /\ neutral_element K mul (ring_one K mul))
+  (forall x :e K,
+    reflection K add (ring_zero K add) x (ring_negation K add x))
+  (andI
+    (neutral_element K add (ring_zero K add))
+    (neutral_element K mul (ring_one K mul))
+    (andEL
+      (neutral_element K add (ring_zero K add))
+      (forall x :e K,
+        reflection K add (ring_zero K add) x (ring_negation K add x))
+      h_s8_ring_additive_group_specs)
+    h_s8_ring_multiplicative_identity_spec)
+  (andER
+    (neutral_element K add (ring_zero K add))
+    (forall x :e K,
+      reflection K add (ring_zero K add) x (ring_negation K add x))
+    h_s8_ring_additive_group_specs)).
+Qed.
+
+Theorem god1_ring_multiplicative_law :
+  forall K, forall add mul:set -> set -> set,
+    ring K add mul -> law_of_composition K mul.
+let K add mul.
+assume hK.
+exact (andER
+  (abelian_group K add)
+  (law_of_composition K mul)
+  (andEL
+    (abelian_group K add /\ law_of_composition K mul)
+    (associative_on K mul)
+    (andEL
+      ((abelian_group K add /\ law_of_composition K mul)
+        /\ associative_on K mul)
+      (exists one :e K, neutral_element K mul one)
+      (andEL
+        (((abelian_group K add /\ law_of_composition K mul)
+          /\ associative_on K mul)
+          /\ exists one :e K, neutral_element K mul one)
+        (forall x y z :e K,
+          mul x (add y z) = add (mul x y) (mul x z)
+          /\ mul (add x y) z = add (mul x z) (mul y z))
+        hK)))).
+Qed.
+
+Theorem god1_ring_distributive_laws :
+  forall K, forall add mul:set -> set -> set,
+    ring K add mul -> forall x y z :e K,
+      mul x (add y z) = add (mul x y) (mul x z)
+      /\ mul (add x y) z = add (mul x z) (mul y z).
+let K add mul.
+assume hK.
+exact (andER
+  (((abelian_group K add /\ law_of_composition K mul)
+    /\ associative_on K mul)
+    /\ exists one :e K, neutral_element K mul one)
+  (forall x y z :e K,
+    mul x (add y z) = add (mul x y) (mul x z)
+    /\ mul (add x y) z = add (mul x z) (mul y z))
+  hK).
+Qed.
+
+Theorem god1_ring_zero_multiplication_left :
+  forall K, forall add mul:set -> set -> set,
+    ring K add mul -> forall x :e K,
+      mul (ring_zero K add) x = ring_zero K add.
+let K add mul.
+assume hK.
+let x.
+assume hx.
+claim hA : group K add.
+exact (god1_ring_additive_group K add mul hK).
+claim hM : law_of_composition K mul.
+exact (god1_ring_multiplicative_law K add mul hK).
+claim hzero : ring_zero K add :e K.
+exact (god1_group_identity_in K add hA).
+claim hz : mul (ring_zero K add) x :e K.
+exact (hM (ring_zero K add) hzero x hx).
+claim hzerozero :
+  add (ring_zero K add) (ring_zero K add) = ring_zero K add.
+exact (andEL
+  (add (ring_zero K add) (ring_zero K add) = ring_zero K add)
+  (add (ring_zero K add) (ring_zero K add) = ring_zero K add)
+  ((andER
+    (ring_zero K add :e K)
+    (forall u :e K,
+      add u (ring_zero K add) = u
+      /\ add (ring_zero K add) u = u)
+    (god1_group_identity_specification K add hA))
+    (ring_zero K add) hzero)).
+claim hzz :
+  mul (ring_zero K add) x
+    = add (mul (ring_zero K add) x) (mul (ring_zero K add) x).
+exact (eq_i_tra
+  (mul (ring_zero K add) x)
+  (mul (add (ring_zero K add) (ring_zero K add)) x)
+  (add (mul (ring_zero K add) x) (mul (ring_zero K add) x))
+  (eq_sym
+    (mul (add (ring_zero K add) (ring_zero K add)) x)
+    (mul (ring_zero K add) x)
+    (f_eq_i (fun u => mul u x)
+      (add (ring_zero K add) (ring_zero K add))
+      (ring_zero K add) hzerozero))
+  (andER
+    (mul (ring_zero K add)
+      (add (ring_zero K add) x)
+      = add (mul (ring_zero K add) (ring_zero K add))
+        (mul (ring_zero K add) x))
+    (mul (add (ring_zero K add) (ring_zero K add)) x
+      = add (mul (ring_zero K add) x) (mul (ring_zero K add) x))
+    (god1_ring_distributive_laws K add mul hK
+      (ring_zero K add) hzero (ring_zero K add) hzero x hx))).
+apply eq_sym.
+exact (god1_group_left_cancel K add hA
+  (mul (ring_zero K add) x) hz
+  (ring_zero K add) hzero
+  (mul (ring_zero K add) x) hz
+  (eq_i_tra
+    (add (mul (ring_zero K add) x) (ring_zero K add))
+    (mul (ring_zero K add) x)
+    (add (mul (ring_zero K add) x) (mul (ring_zero K add) x))
+    (andEL
+      (add (mul (ring_zero K add) x) (ring_zero K add)
+        = mul (ring_zero K add) x)
+      (add (ring_zero K add) (mul (ring_zero K add) x)
+        = mul (ring_zero K add) x)
+      ((andER
+        (ring_zero K add :e K)
+        (forall u :e K,
+          add u (ring_zero K add) = u
+          /\ add (ring_zero K add) u = u)
+        (god1_group_identity_specification K add hA))
+        (mul (ring_zero K add) x) hz))
+    hzz)).
+Qed.
+
+Theorem god1_ring_minus_one_multiplication_left :
+  forall K, forall add mul:set -> set -> set,
+    ring K add mul -> forall x :e K,
+      mul (ring_negation K add (ring_one K mul)) x
+        = ring_negation K add x.
+let K add mul.
+assume hK.
+let x.
+assume hx.
+claim hA : group K add.
+exact (god1_ring_additive_group K add mul hK).
+claim hM : law_of_composition K mul.
+exact (god1_ring_multiplicative_law K add mul hK).
+claim hzero : ring_zero K add :e K.
+exact (god1_group_identity_in K add hA).
+claim honeutral : neutral_element K mul (ring_one K mul).
+exact (god1_ring_multiplicative_identity_specification K add mul hK).
+claim hone : ring_one K mul :e K.
+exact (andEL
+  (ring_one K mul :e K)
+  (forall u :e K,
+    mul u (ring_one K mul) = u /\ mul (ring_one K mul) u = u)
+  honeutral).
+claim hminusone :
+  reflection K add (ring_zero K add) (ring_one K mul)
+    (ring_negation K add (ring_one K mul)).
+exact (god1_group_inverse_specification K add hA
+  (ring_one K mul) hone).
+claim hminusonein : ring_negation K add (ring_one K mul) :e K.
+exact (andEL
+  (ring_negation K add (ring_one K mul) :e K)
+  (add (ring_negation K add (ring_one K mul)) (ring_one K mul)
+    = ring_zero K add)
+  (andEL
+    (ring_negation K add (ring_one K mul) :e K
+      /\ add (ring_negation K add (ring_one K mul)) (ring_one K mul)
+        = ring_zero K add)
+    (add (ring_one K mul) (ring_negation K add (ring_one K mul))
+      = ring_zero K add)
+    hminusone)).
+claim hy : mul (ring_negation K add (ring_one K mul)) x :e K.
+exact (hM (ring_negation K add (ring_one K mul)) hminusonein x hx).
+claim hnegx :
+  reflection K add (ring_zero K add) x (ring_negation K add x).
+exact (god1_group_inverse_specification K add hA x hx).
+apply (god1_group_right_cancel K add hA
+  (mul (ring_negation K add (ring_one K mul)) x) hy
+  (ring_negation K add x)
+  (god1_group_inverse_in K add hA x hx) x hx).
+apply (eq_i_tra
+  (add (mul (ring_negation K add (ring_one K mul)) x) x)
+  (ring_zero K add)
+  (add (ring_negation K add x) x)).
+- apply (eq_i_tra
+    (add (mul (ring_negation K add (ring_one K mul)) x) x)
+    (add (mul (ring_negation K add (ring_one K mul)) x)
+      (mul (ring_one K mul) x))
+    (ring_zero K add)).
+  - exact (f_eq_i
+      (fun u => add (mul
+        (ring_negation K add (ring_one K mul)) x) u)
+      x (mul (ring_one K mul) x)
+      (eq_sym (mul (ring_one K mul) x) x
+        (andER
+          (mul x (ring_one K mul) = x)
+          (mul (ring_one K mul) x = x)
+          ((andER
+            (ring_one K mul :e K)
+            (forall u :e K,
+              mul u (ring_one K mul) = u
+              /\ mul (ring_one K mul) u = u)
+            honeutral) x hx)))).
+  - apply (eq_i_tra
+      (add (mul (ring_negation K add (ring_one K mul)) x)
+        (mul (ring_one K mul) x))
+      (mul (add (ring_negation K add (ring_one K mul))
+        (ring_one K mul)) x)
+      (ring_zero K add)).
+    - exact (eq_sym
+        (mul (add (ring_negation K add (ring_one K mul))
+          (ring_one K mul)) x)
+        (add (mul (ring_negation K add (ring_one K mul)) x)
+          (mul (ring_one K mul) x))
+        (andER
+          (mul (ring_negation K add (ring_one K mul))
+            (add (ring_one K mul) x)
+            = add
+              (mul (ring_negation K add (ring_one K mul))
+                (ring_one K mul))
+              (mul (ring_negation K add (ring_one K mul)) x))
+          (mul (add (ring_negation K add (ring_one K mul))
+            (ring_one K mul)) x
+            = add (mul (ring_negation K add (ring_one K mul)) x)
+              (mul (ring_one K mul) x))
+          (god1_ring_distributive_laws K add mul hK
+            (ring_negation K add (ring_one K mul)) hminusonein
+            (ring_one K mul) hone x hx))).
+    - apply (eq_i_tra
+        (mul (add (ring_negation K add (ring_one K mul))
+          (ring_one K mul)) x)
+        (mul (ring_zero K add) x) (ring_zero K add)).
+      - exact (f_eq_i (fun u => mul u x)
+          (add (ring_negation K add (ring_one K mul))
+            (ring_one K mul))
+          (ring_zero K add)
+          (andER
+            (ring_negation K add (ring_one K mul) :e K)
+            (add (ring_negation K add (ring_one K mul))
+              (ring_one K mul) = ring_zero K add)
+            (andEL
+              (ring_negation K add (ring_one K mul) :e K
+                /\ add (ring_negation K add (ring_one K mul))
+                  (ring_one K mul) = ring_zero K add)
+              (add (ring_one K mul)
+                (ring_negation K add (ring_one K mul))
+                = ring_zero K add)
+              hminusone))).
+      - exact (god1_ring_zero_multiplication_left K add mul hK x hx).
+- exact (eq_sym
+    (add (ring_negation K add x) x) (ring_zero K add)
+    (andER
+      (ring_negation K add x :e K)
+      (add (ring_negation K add x) x = ring_zero K add)
+      (andEL
+        (ring_negation K add x :e K
+          /\ add (ring_negation K add x) x = ring_zero K add)
+        (add x (ring_negation K add x) = ring_zero K add)
+        hnegx))).
+Qed.
 
 Theorem god1_ring_minus_one_and_zero_multiplication :
   forall K, forall add mul:set -> set -> set,
@@ -52739,13 +53075,17 @@ let K add mul.
 assume hK.
 let x.
 assume hx.
-apply andI.
 //GOD1PRF:100925 In any ring we have the relations
 claim h_s8_minus_one_zero_relations :
   mul (ring_negation K add (ring_one K mul)) x
     = ring_negation K add x
   /\ mul (ring_zero K add) x = ring_zero K add.
-admit.
+exact (andI
+  (mul (ring_negation K add (ring_one K mul)) x
+    = ring_negation K add x)
+  (mul (ring_zero K add) x = ring_zero K add)
+  (god1_ring_minus_one_multiplication_left K add mul hK x hx)
+  (god1_ring_zero_multiplication_left K add mul hK x hx)).
 //GOD1PRF:101003 To prove the first of these, it is enough to show that $(-1) x+x=0$; but since
 claim h_s8_minus_one_reduction :
   add
@@ -52753,24 +53093,39 @@ claim h_s8_minus_one_reduction :
     (ring_zero K add) = ring_zero K add ->
   mul (ring_negation K add (ring_one K mul)) x
     = ring_negation K add x.
-admit.
+assume hsum.
+exact (god1_ring_minus_one_multiplication_left K add mul hK x hx).
 //GOD1PRF:101123 we are reduced to proving the second relation $0 x=0$.
 claim h_s8_reduce_to_zero_multiplication :
   mul (ring_zero K add) x = ring_zero K add ->
   mul (ring_negation K add (ring_one K mul)) x
     = ring_negation K add x.
-admit.
+assume hzero_product.
+exact (god1_ring_minus_one_multiplication_left K add mul hK x hx).
 //GOD1PRF:101178 For this, we calculate
 claim h_s8_zero_distributive_calculation :
   mul (add (ring_zero K add) (ring_zero K add)) x
     = add (mul (ring_zero K add) x)
       (mul (ring_zero K add) x).
-admit.
+claim hA : group K add.
+exact (god1_ring_additive_group K add mul hK).
+claim hzero : ring_zero K add :e K.
+exact (god1_group_identity_in K add hA).
+exact (andER
+  (mul (ring_zero K add) (add (ring_zero K add) x)
+    = add (mul (ring_zero K add) (ring_zero K add))
+      (mul (ring_zero K add) x))
+  (mul (add (ring_zero K add) (ring_zero K add)) x
+    = add (mul (ring_zero K add) x)
+      (mul (ring_zero K add) x))
+  (god1_ring_distributive_laws K add mul hK
+    (ring_zero K add) hzero (ring_zero K add) hzero x hx)).
 //GOD1PRF:101237 so that $0 x=x-x=0$ as in any additive group.
 claim h_s8_zero_multiplication_conclusion :
   mul (ring_zero K add) x = ring_zero K add.
-admit.
-Admitted.
+exact (god1_ring_zero_multiplication_left K add mul hK x hx).
+exact h_s8_minus_one_zero_relations.
+Qed.
 
 //GOD1:103366 mapping_ring_addition : "pointwise addition of mappings from #1 into #2" | $(f+g)(x)=f(x)+g(x)$
 Definition mapping_ring_addition :
