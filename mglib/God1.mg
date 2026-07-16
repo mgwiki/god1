@@ -76491,17 +76491,426 @@ exact (iffI
 exact h_s9_t2_book_conclusion.
 Qed.
 
+Theorem god1_field_from_explicit_arithmetic :
+  forall K, forall add mul:set -> set -> set,
+  forall zero one, forall neg inv:set -> set,
+    law_of_composition K add ->
+    associative_on K add ->
+    commutative_on K add ->
+    neutral_element K add zero ->
+    (forall x :e K,
+      neg x :e K
+      /\ add (neg x) x = zero
+      /\ add x (neg x) = zero) ->
+    law_of_composition K mul ->
+    associative_on K mul ->
+    commutative_on K mul ->
+    neutral_element K mul one ->
+    (forall x y z :e K,
+      mul x (add y z) = add (mul x y) (mul x z)
+      /\ mul (add x y) z = add (mul x z) (mul y z)) ->
+    one <> zero ->
+    (forall x :e K, x <> zero ->
+      inv x :e K
+      /\ mul (inv x) x = one
+      /\ mul x (inv x) = one) ->
+    field K add mul.
+let K add mul zero one neg inv.
+assume haddlaw haddassoc haddcomm hzero haddinverse.
+assume hmullaw hmulassoc hmulcomm hone hdistrib honezero hmulinverse.
+claim hgroupIdentityData :
+  exists e :e K,
+    neutral_element K add e
+    /\ forall x :e K, exists y :e K,
+      reflection K add e x y.
+exact (ex_intro
+  (fun e => e :e K /\
+    (neutral_element K add e
+    /\ forall x :e K, exists y :e K,
+      reflection K add e x y))
+  zero
+  (andI
+    (zero :e K)
+    (neutral_element K add zero
+      /\ forall x :e K, exists y :e K,
+        reflection K add zero x y)
+    (andEL
+      (zero :e K)
+      (forall x :e K,
+        add x zero = x /\ add zero x = x)
+      hzero)
+    (andI
+      (neutral_element K add zero)
+      (forall x :e K, exists y :e K,
+        reflection K add zero x y)
+      hzero
+      (fun x hx =>
+        ex_intro
+          (fun y => y :e K /\ reflection K add zero x y)
+          (neg x)
+          (andI
+            (neg x :e K)
+            (reflection K add zero x (neg x))
+            (andEL
+              (neg x :e K)
+              (add (neg x) x = zero)
+              (andEL
+                (neg x :e K /\ add (neg x) x = zero)
+                (add x (neg x) = zero)
+                (haddinverse x hx)))
+            (haddinverse x hx)))))).
+claim hgroupAdd : group K add.
+exact (andI
+  (law_of_composition K add /\ associative_on K add)
+  (exists e :e K,
+    neutral_element K add e
+    /\ forall x :e K, exists y :e K,
+      reflection K add e x y)
+  (andI
+    (law_of_composition K add)
+    (associative_on K add)
+    haddlaw haddassoc)
+  hgroupIdentityData).
+claim habelianAdd : abelian_group K add.
+exact (andI
+  (group K add) (commutative_on K add)
+  hgroupAdd haddcomm).
+claim hmulIdentityData :
+  exists e :e K, neutral_element K mul e.
+exact (ex_intro
+  (fun e => e :e K /\ neutral_element K mul e)
+  one
+  (andI
+    (one :e K) (neutral_element K mul one)
+    (andEL
+      (one :e K)
+      (forall x :e K,
+        mul x one = x /\ mul one x = x)
+      hone)
+    hone)).
+claim hringCoreOne :
+  abelian_group K add /\ law_of_composition K mul.
+exact (andI
+  (abelian_group K add) (law_of_composition K mul)
+  habelianAdd hmullaw).
+claim hringCoreTwo :
+  (abelian_group K add /\ law_of_composition K mul)
+  /\ associative_on K mul.
+exact (andI
+  (abelian_group K add /\ law_of_composition K mul)
+  (associative_on K mul)
+  hringCoreOne hmulassoc).
+claim hringCoreThree :
+  ((abelian_group K add /\ law_of_composition K mul)
+    /\ associative_on K mul)
+  /\ exists e :e K, neutral_element K mul e.
+exact (andI
+  ((abelian_group K add /\ law_of_composition K mul)
+    /\ associative_on K mul)
+  (exists e :e K, neutral_element K mul e)
+  hringCoreTwo hmulIdentityData).
+claim hring : ring K add mul.
+exact (andI
+  (((abelian_group K add /\ law_of_composition K mul)
+    /\ associative_on K mul)
+    /\ exists e :e K, neutral_element K mul e)
+  (forall x y z :e K,
+    mul x (add y z) = add (mul x y) (mul x z)
+    /\ mul (add x y) z = add (mul x z) (mul y z))
+  hringCoreThree hdistrib).
+claim hzeroeq : ring_zero K add = zero.
+exact (god1_s6_theorem1_neutral_element_unique K add haddlaw
+  (ring_zero K add) zero
+  (god1_group_identity_specification K add hgroupAdd) hzero).
+claim honeeq : ring_one K mul = one.
+exact (god1_s6_theorem1_neutral_element_unique K mul hmullaw
+  (ring_one K mul) one
+  (god1_ring_multiplicative_identity_specification K add mul hring) hone).
+claim hringOneZero : ring_one K mul <> ring_zero K add.
+assume hcollapse.
+exact (honezero
+  (eq_i_tra one (ring_one K mul) zero
+    (eq_sym (ring_one K mul) one honeeq)
+    (eq_i_tra (ring_one K mul) (ring_zero K add) zero
+      hcollapse hzeroeq))).
+claim hunits : forall x :e K,
+  x <> ring_zero K add -> ring_unit K add mul x.
+let x.
+assume hx hxnonzeroRing.
+claim hxnonzero : x <> zero.
+assume hxzero.
+exact (hxnonzeroRing
+  (eq_i_tra x zero (ring_zero K add)
+    hxzero (eq_sym (ring_zero K add) zero hzeroeq))).
+claim hinvdata :
+  inv x :e K
+  /\ mul (inv x) x = one
+  /\ mul x (inv x) = one.
+exact (hmulinverse x hx hxnonzero).
+claim hinvK : inv x :e K.
+exact (andEL
+  (inv x :e K)
+  (mul (inv x) x = one)
+  (andEL
+    (inv x :e K /\ mul (inv x) x = one)
+    (mul x (inv x) = one)
+    hinvdata)).
+claim hinvLeft : mul (inv x) x = one.
+exact (andER
+  (inv x :e K)
+  (mul (inv x) x = one)
+  (andEL
+    (inv x :e K /\ mul (inv x) x = one)
+    (mul x (inv x) = one)
+    hinvdata)).
+claim hinvRight : mul x (inv x) = one.
+exact (andER
+  (inv x :e K /\ mul (inv x) x = one)
+  (mul x (inv x) = one)
+  hinvdata).
+exact (andI
+  (x :e K)
+  (exists y :e K,
+    mul y x = ring_one K mul
+    /\ mul x y = ring_one K mul)
+  hx
+  (ex_intro
+    (fun y => y :e K /\
+      (mul y x = ring_one K mul
+      /\ mul x y = ring_one K mul))
+    (inv x)
+    (andI
+      (inv x :e K)
+      (mul (inv x) x = ring_one K mul
+        /\ mul x (inv x) = ring_one K mul)
+      hinvK
+      (andI
+        (mul (inv x) x = ring_one K mul)
+        (mul x (inv x) = ring_one K mul)
+        (eq_i_tra (mul (inv x) x) one (ring_one K mul)
+          hinvLeft
+          (eq_sym (ring_one K mul) one honeeq))
+        (eq_i_tra (mul x (inv x)) one (ring_one K mul)
+          hinvRight
+          (eq_sym (ring_one K mul) one honeeq)))))).
+claim hdivision : division_ring K add mul.
+exact (andI
+  (ring K add mul /\ ring_one K mul <> ring_zero K add)
+  (forall x :e K,
+    x <> ring_zero K add -> ring_unit K add mul x)
+  (andI
+    (ring K add mul)
+    (ring_one K mul <> ring_zero K add)
+    hring hringOneZero)
+  hunits).
+exact (andI
+  (division_ring K add mul) (commutative_on K mul)
+  hdivision hmulcomm).
+Qed.
+
+Theorem god1_real_numbers_are_field :
+  field real add_SNo mul_SNo.
+exact (god1_field_from_explicit_arithmetic
+  real add_SNo mul_SNo 0 1 minus_SNo recip_SNo
+  (fun x hx y hy => real_add_SNo x hx y hy)
+  (fun x hx y hy z hz =>
+    add_SNo_assoc x y z
+      (real_SNo x hx) (real_SNo y hy) (real_SNo z hz))
+  (fun x hx y hy =>
+    add_SNo_com x y (real_SNo x hx) (real_SNo y hy))
+  (andI
+    (0 :e real)
+    (forall x :e real,
+      add_SNo x 0 = x /\ add_SNo 0 x = x)
+    real_0
+    (fun x hx => andI
+      (add_SNo x 0 = x) (add_SNo 0 x = x)
+      (add_SNo_0R x (real_SNo x hx))
+      (add_SNo_0L x (real_SNo x hx))))
+  (fun x hx =>
+    andI
+      (minus_SNo x :e real
+        /\ add_SNo (minus_SNo x) x = 0)
+      (add_SNo x (minus_SNo x) = 0)
+      (andI
+        (minus_SNo x :e real)
+        (add_SNo (minus_SNo x) x = 0)
+        (real_minus_SNo x hx)
+        (add_SNo_minus_SNo_linv x (real_SNo x hx)))
+      (add_SNo_minus_SNo_rinv x (real_SNo x hx)))
+  (fun x hx y hy => real_mul_SNo x hx y hy)
+  (fun x hx y hy z hz =>
+    mul_SNo_assoc x y z
+      (real_SNo x hx) (real_SNo y hy) (real_SNo z hz))
+  (fun x hx y hy =>
+    mul_SNo_com x y (real_SNo x hx) (real_SNo y hy))
+  (andI
+    (1 :e real)
+    (forall x :e real,
+      mul_SNo x 1 = x /\ mul_SNo 1 x = x)
+    real_1
+    (fun x hx => andI
+      (mul_SNo x 1 = x) (mul_SNo 1 x = x)
+      (mul_SNo_oneR x (real_SNo x hx))
+      (mul_SNo_oneL x (real_SNo x hx))))
+  (fun x hx y hy z hz =>
+    andI
+      (mul_SNo x (add_SNo y z)
+        = add_SNo (mul_SNo x y) (mul_SNo x z))
+      (mul_SNo (add_SNo x y) z
+        = add_SNo (mul_SNo x z) (mul_SNo y z))
+      (mul_SNo_distrL x y z
+        (real_SNo x hx) (real_SNo y hy) (real_SNo z hz))
+      (mul_SNo_distrR x y z
+        (real_SNo x hx) (real_SNo y hy) (real_SNo z hz)))
+  neq_1_0
+  (fun x hx hxzero =>
+    andI
+      (recip_SNo x :e real
+        /\ mul_SNo (recip_SNo x) x = 1)
+      (mul_SNo x (recip_SNo x) = 1)
+      (andI
+        (recip_SNo x :e real)
+        (mul_SNo (recip_SNo x) x = 1)
+        (real_recip_SNo x hx)
+        (recip_SNo_invL x (real_SNo x hx) hxzero))
+      (recip_SNo_invR x (real_SNo x hx) hxzero))).
+Qed.
+
+Theorem god1_real_minus_one_is_nonsquare :
+  ~square_in_ring real add_SNo mul_SNo (minus_SNo 1).
+assume hsquare.
+claim hexists : exists x :e real,
+  mul_SNo x x = minus_SNo 1.
+exact (andER
+  (minus_SNo 1 :e real)
+  (exists x :e real, mul_SNo x x = minus_SNo 1)
+  hsquare).
+apply (exandE_i
+  (fun x => x :e real)
+  (fun x => mul_SNo x x = minus_SNo 1)
+  hexists).
+let x.
+assume hx hsquareeq.
+claim hxSNo : SNo x.
+exact (real_SNo x hx).
+claim hminusOneSNo : SNo (minus_SNo 1).
+exact (SNo_minus_SNo 1 SNo_1).
+claim hnonnegative : SNoLe 0 (mul_SNo x x).
+exact (SNo_sqr_nonneg x hxSNo).
+claim hminusOneNonnegative : SNoLe 0 (minus_SNo 1).
+exact (SNoLe_eq_substR
+  (mul_SNo x x) (minus_SNo 1) 0
+  (SNo_mul_SNo x x hxSNo hxSNo)
+  hminusOneSNo SNo_0 hsquareeq hnonnegative).
+claim hminusOneNegative : SNoLt (minus_SNo 1) 0.
+exact (SNoLt_eq_substR
+  (minus_SNo 1) (minus_SNo 0) 0
+  minus_SNo_0
+  (minus_SNo_Lt_contra 0 1 SNo_0 SNo_1 SNoLt_0_1)).
+claim hcases :
+  SNoLt 0 (minus_SNo 1) \/ 0 = minus_SNo 1.
+exact (SNoLeE 0 (minus_SNo 1)
+  SNo_0 hminusOneSNo hminusOneNonnegative).
+apply (orE
+  (SNoLt 0 (minus_SNo 1))
+  (0 = minus_SNo 1) hcases).
+- assume hzeroLtMinusOne.
+  exact (SNoLt_irref 0
+    (SNoLt_tra 0 (minus_SNo 1) 0
+      SNo_0 hminusOneSNo SNo_0
+      hzeroLtMinusOne hminusOneNegative)).
+- assume hzeroEqMinusOne.
+  exact (SNoLt_irref 0
+    (SNoLt_eq_substL
+      (minus_SNo 1) 0 0
+      (eq_sym 0 (minus_SNo 1) hzeroEqMinusOne)
+      hminusOneNegative)).
+Qed.
+
+Theorem god1_complex_numbers_are_field_direct :
+  field complex add_CSNo mul_CSNo.
+exact (god1_field_from_explicit_arithmetic
+  complex add_CSNo mul_CSNo 0 1 minus_CSNo recip_CSNo
+  (fun z hz w hw => complex_add_CSNo z hz w hw)
+  (fun z hz w hw v hv =>
+    eq_sym
+      (add_CSNo (add_CSNo z w) v)
+      (add_CSNo z (add_CSNo w v))
+      (add_CSNo_assoc z w v
+        (complex_CSNo z hz) (complex_CSNo w hw) (complex_CSNo v hv)))
+  (fun z hz w hw =>
+    add_CSNo_com z w (complex_CSNo z hz) (complex_CSNo w hw))
+  (andI
+    (0 :e complex)
+    (forall z :e complex,
+      add_CSNo z 0 = z /\ add_CSNo 0 z = z)
+    complex_0
+    (fun z hz => andI
+      (add_CSNo z 0 = z) (add_CSNo 0 z = z)
+      (add_CSNo_0R z (complex_CSNo z hz))
+      (add_CSNo_0L z (complex_CSNo z hz))))
+  (fun z hz =>
+    andI
+      (minus_CSNo z :e complex
+        /\ add_CSNo (minus_CSNo z) z = 0)
+      (add_CSNo z (minus_CSNo z) = 0)
+      (andI
+        (minus_CSNo z :e complex)
+        (add_CSNo (minus_CSNo z) z = 0)
+        (complex_minus_CSNo z hz)
+        (add_CSNo_minus_CSNo_linv z (complex_CSNo z hz)))
+      (add_CSNo_minus_CSNo_rinv z (complex_CSNo z hz)))
+  (fun z hz w hw => complex_mul_CSNo z hz w hw)
+  (fun z hz w hw v hv =>
+    mul_CSNo_assoc z w v
+      (complex_CSNo z hz) (complex_CSNo w hw) (complex_CSNo v hv))
+  (fun z hz w hw =>
+    mul_CSNo_com z w (complex_CSNo z hz) (complex_CSNo w hw))
+  (andI
+    (1 :e complex)
+    (forall z :e complex,
+      mul_CSNo z 1 = z /\ mul_CSNo 1 z = z)
+    complex_1
+    (fun z hz => andI
+      (mul_CSNo z 1 = z) (mul_CSNo 1 z = z)
+      (mul_CSNo_1R z (complex_CSNo z hz))
+      (mul_CSNo_1L z (complex_CSNo z hz))))
+  (fun z hz w hw v hv =>
+    andI
+      (mul_CSNo z (add_CSNo w v)
+        = add_CSNo (mul_CSNo z w) (mul_CSNo z v))
+      (mul_CSNo (add_CSNo z w) v
+        = add_CSNo (mul_CSNo z v) (mul_CSNo w v))
+      (mul_CSNo_distrL z w v
+        (complex_CSNo z hz) (complex_CSNo w hw) (complex_CSNo v hv))
+      (mul_CSNo_distrR z w v
+        (complex_CSNo z hz) (complex_CSNo w hw) (complex_CSNo v hv)))
+  neq_1_0
+  (fun z hz hzzero =>
+    andI
+      (recip_CSNo z :e complex
+        /\ mul_CSNo (recip_CSNo z) z = 1)
+      (mul_CSNo z (recip_CSNo z) = 1)
+      (andI
+        (recip_CSNo z :e complex)
+        (mul_CSNo (recip_CSNo z) z = 1)
+        (complex_recip_CSNo z hz)
+        (recip_CSNo_invL z (complex_CSNo z hz) hzzero))
+      (recip_CSNo_invR z (complex_CSNo z hz) hzzero))).
+Qed.
+
 Theorem god1_complex_numbers_form_field :
   field complex add_CSNo mul_CSNo.
 prove (field complex add_CSNo mul_CSNo).
 //GOD1PRF:169221 Taking $\mathrm{K}=\mathbf{R}$ and $d=-1$, we see that the ring $\mathbf{C}$ of complex numbers is in fact a field; for this reason, $\mathbf{C}$ is called the field of complex numbers.
 claim h_s9_complex_real_field : field real add_SNo mul_SNo.
-admit.
+exact god1_real_numbers_are_field.
 claim h_s9_complex_minus_one_member : minus_SNo 1 :e real.
-admit.
+exact (real_minus_SNo 1 real_1).
 claim h_s9_complex_minus_one_nonsquare :
   ~square_in_ring real add_SNo mul_SNo (minus_SNo 1).
-admit.
+exact god1_real_minus_one_is_nonsquare.
 claim h_s9_complex_theorem2_call :
   field
     (quadratic_extension real)
@@ -76512,8 +76921,239 @@ apply (god1_s9_theorem2_quadratic_extension_field_iff_nonsquare
   real add_SNo mul_SNo h_s9_complex_real_field
   (minus_SNo 1) h_s9_complex_minus_one_member).
 claim h_s9_complex_field_conclusion : field complex add_CSNo mul_CSNo.
-admit.
-Admitted.
+exact god1_complex_numbers_are_field_direct.
+exact h_s9_complex_field_conclusion.
+Qed.
+
+Theorem god1_real_is_subfield_of_complex :
+  subfield complex add_CSNo mul_CSNo real.
+claim hfieldC : field complex add_CSNo mul_CSNo.
+exact god1_complex_numbers_are_field_direct.
+claim hdivisionC : division_ring complex add_CSNo mul_CSNo.
+exact (god1_field_division_ring complex add_CSNo mul_CSNo hfieldC).
+claim hringC : ring complex add_CSNo mul_CSNo.
+exact (god1_division_ring_ring complex add_CSNo mul_CSNo hdivisionC).
+claim hgroupAddC : group complex add_CSNo.
+exact (god1_ring_additive_group complex add_CSNo mul_CSNo hringC).
+claim haddLawC : law_of_composition complex add_CSNo.
+exact (god1_group_law_of_composition complex add_CSNo hgroupAddC).
+claim hmulLawC : law_of_composition complex mul_CSNo.
+exact (god1_ring_multiplicative_law complex add_CSNo mul_CSNo hringC).
+claim hzeroeq : ring_zero complex add_CSNo = 0.
+exact (god1_s6_theorem1_neutral_element_unique
+  complex add_CSNo haddLawC
+  (ring_zero complex add_CSNo) 0
+  (god1_group_identity_specification complex add_CSNo hgroupAddC)
+  (andI
+    (0 :e complex)
+    (forall z :e complex,
+      add_CSNo z 0 = z /\ add_CSNo 0 z = z)
+    complex_0
+    (fun z hz => andI
+      (add_CSNo z 0 = z) (add_CSNo 0 z = z)
+      (add_CSNo_0R z (complex_CSNo z hz))
+      (add_CSNo_0L z (complex_CSNo z hz))))).
+claim honeeq : ring_one complex mul_CSNo = 1.
+exact (god1_s6_theorem1_neutral_element_unique
+  complex mul_CSNo hmulLawC
+  (ring_one complex mul_CSNo) 1
+  (god1_ring_multiplicative_identity_specification
+    complex add_CSNo mul_CSNo hringC)
+  (andI
+    (1 :e complex)
+    (forall z :e complex,
+      mul_CSNo z 1 = z /\ mul_CSNo 1 z = z)
+    complex_1
+    (fun z hz => andI
+      (mul_CSNo z 1 = z) (mul_CSNo 1 z = z)
+      (mul_CSNo_1R z (complex_CSNo z hz))
+      (mul_CSNo_1L z (complex_CSNo z hz))))).
+claim hclosed : forall x y :e real,
+  add_CSNo x y :e real /\ mul_CSNo x y :e real.
+let x.
+assume hx.
+let y.
+assume hy.
+claim hxSNo : SNo x.
+exact (real_SNo x hx).
+claim hySNo : SNo y.
+exact (real_SNo y hy).
+exact (andI
+  (add_CSNo x y :e real)
+  (mul_CSNo x y :e real)
+  (mem_eq_substL real
+    (add_SNo x y) (add_CSNo x y)
+    (add_CSNo_add_SNo x y hxSNo hySNo)
+    (real_add_SNo x hx y hy))
+  (mem_eq_substL real
+    (mul_SNo x y) (mul_CSNo x y)
+    (mul_CSNo_mul_SNo x y hxSNo hySNo)
+    (real_mul_SNo x hx y hy))).
+claim hminusComplexOneReal : minus_CSNo 1 :e real.
+exact (mem_eq_substL real
+  (minus_SNo 1) (minus_CSNo 1)
+  (minus_CSNo_minus_SNo 1 SNo_1)
+  (real_minus_SNo 1 real_1)).
+claim honeC : ring_one complex mul_CSNo :e complex.
+exact (andEL
+  (ring_one complex mul_CSNo :e complex)
+  (forall z :e complex,
+    mul_CSNo z (ring_one complex mul_CSNo) = z
+    /\ mul_CSNo (ring_one complex mul_CSNo) z = z)
+  (god1_ring_multiplicative_identity_specification
+    complex add_CSNo mul_CSNo hringC)).
+claim habstractNegReflection : reflection
+  complex add_CSNo (ring_zero complex add_CSNo)
+  (ring_one complex mul_CSNo)
+  (ring_negation complex add_CSNo (ring_one complex mul_CSNo)).
+exact (god1_group_inverse_specification
+  complex add_CSNo hgroupAddC
+  (ring_one complex mul_CSNo) honeC).
+claim habstractNegLeft : left_reflection
+  complex add_CSNo (ring_zero complex add_CSNo)
+  (ring_one complex mul_CSNo)
+  (ring_negation complex add_CSNo (ring_one complex mul_CSNo)).
+exact (andEL
+  (ring_negation complex add_CSNo (ring_one complex mul_CSNo) :e complex
+    /\ add_CSNo
+      (ring_negation complex add_CSNo (ring_one complex mul_CSNo))
+      (ring_one complex mul_CSNo)
+      = ring_zero complex add_CSNo)
+  (add_CSNo
+    (ring_one complex mul_CSNo)
+    (ring_negation complex add_CSNo (ring_one complex mul_CSNo))
+    = ring_zero complex add_CSNo)
+  habstractNegReflection).
+claim hminusComplexOneC : minus_CSNo 1 :e complex.
+exact (real_complex (minus_CSNo 1) hminusComplexOneReal).
+claim hcandidateNegRight : right_reflection
+  complex add_CSNo (ring_zero complex add_CSNo)
+  (ring_one complex mul_CSNo) (minus_CSNo 1).
+exact (andI
+  (minus_CSNo 1 :e complex)
+  (add_CSNo (ring_one complex mul_CSNo) (minus_CSNo 1)
+    = ring_zero complex add_CSNo)
+  hminusComplexOneC
+  (eq_i_tra
+    (add_CSNo (ring_one complex mul_CSNo) (minus_CSNo 1))
+    (add_CSNo 1 (minus_CSNo 1))
+    (ring_zero complex add_CSNo)
+    (f_eq_i (fun u => add_CSNo u (minus_CSNo 1))
+      (ring_one complex mul_CSNo) 1 honeeq)
+    (eq_i_tra
+      (add_CSNo 1 (minus_CSNo 1)) 0
+      (ring_zero complex add_CSNo)
+      (add_CSNo_minus_CSNo_rinv 1 CSNo_1)
+      (eq_sym (ring_zero complex add_CSNo) 0 hzeroeq)))).
+claim habstractNegEq :
+  ring_negation complex add_CSNo (ring_one complex mul_CSNo)
+  = minus_CSNo 1.
+exact (god1_s6_left_and_right_reflections_equal
+  complex add_CSNo (ring_zero complex add_CSNo)
+  (ring_one complex mul_CSNo)
+  (ring_negation complex add_CSNo (ring_one complex mul_CSNo))
+  (minus_CSNo 1)
+  (god1_group_associative complex add_CSNo hgroupAddC)
+  (god1_group_identity_specification complex add_CSNo hgroupAddC)
+  honeC habstractNegLeft hcandidateNegRight).
+claim habstractNegReal :
+  ring_negation complex add_CSNo (ring_one complex mul_CSNo) :e real.
+exact (mem_eq_substL real
+  (minus_CSNo 1)
+  (ring_negation complex add_CSNo (ring_one complex mul_CSNo))
+  habstractNegEq hminusComplexOneReal).
+claim hsubring : subring complex add_CSNo mul_CSNo real.
+exact (god1_subring_test_reverse
+  complex add_CSNo mul_CSNo real
+  hringC real_complex
+  (andI
+    (forall x y :e real,
+      add_CSNo x y :e real /\ mul_CSNo x y :e real)
+    (ring_negation complex add_CSNo
+      (ring_one complex mul_CSNo) :e real)
+    hclosed habstractNegReal)).
+claim hinverseClosed : forall x :e real,
+  x <> ring_zero complex add_CSNo ->
+  ring_inverse complex add_CSNo mul_CSNo x :e real.
+let x.
+assume hx hxnonzeroRing.
+claim hxC : x :e complex.
+exact (real_complex x hx).
+claim hxSNo : SNo x.
+exact (real_SNo x hx).
+claim hxnonzero : x <> 0.
+assume hxzero.
+exact (hxnonzeroRing
+  (eq_i_tra x 0 (ring_zero complex add_CSNo)
+    hxzero (eq_sym (ring_zero complex add_CSNo) 0 hzeroeq))).
+claim hrecipReal : recip_SNo x :e real.
+exact (real_recip_SNo x hx).
+claim hrecipC : recip_SNo x :e complex.
+exact (real_complex (recip_SNo x) hrecipReal).
+claim hcandidateProduct :
+  mul_CSNo x (recip_SNo x) = ring_one complex mul_CSNo.
+exact (eq_i_tra
+  (mul_CSNo x (recip_SNo x))
+  (mul_SNo x (recip_SNo x))
+  (ring_one complex mul_CSNo)
+  (mul_CSNo_mul_SNo x (recip_SNo x)
+    hxSNo (real_SNo (recip_SNo x) hrecipReal))
+  (eq_i_tra
+    (mul_SNo x (recip_SNo x)) 1
+    (ring_one complex mul_CSNo)
+    (recip_SNo_invR x hxSNo hxnonzero)
+    (eq_sym (ring_one complex mul_CSNo) 1 honeeq))).
+claim hcandidateRight : right_reflection
+  complex mul_CSNo (ring_one complex mul_CSNo)
+  x (recip_SNo x).
+exact (andI
+  (recip_SNo x :e complex)
+  (mul_CSNo x (recip_SNo x) = ring_one complex mul_CSNo)
+  hrecipC hcandidateProduct).
+claim hunit : ring_unit complex add_CSNo mul_CSNo x.
+exact (god1_division_ring_nonzero_is_unit
+  complex add_CSNo mul_CSNo hdivisionC x hxC hxnonzeroRing).
+claim habstractReflection : reflection
+  complex mul_CSNo (ring_one complex mul_CSNo)
+  x (ring_inverse complex add_CSNo mul_CSNo x).
+exact (god1_ring_inverse_specification
+  complex add_CSNo mul_CSNo x hunit).
+claim habstractLeft : left_reflection
+  complex mul_CSNo (ring_one complex mul_CSNo)
+  x (ring_inverse complex add_CSNo mul_CSNo x).
+exact (andEL
+  (ring_inverse complex add_CSNo mul_CSNo x :e complex
+    /\ mul_CSNo (ring_inverse complex add_CSNo mul_CSNo x) x
+      = ring_one complex mul_CSNo)
+  (mul_CSNo x (ring_inverse complex add_CSNo mul_CSNo x)
+    = ring_one complex mul_CSNo)
+  habstractReflection).
+claim hinverseeq :
+  ring_inverse complex add_CSNo mul_CSNo x = recip_SNo x.
+exact (god1_s6_left_and_right_reflections_equal
+  complex mul_CSNo (ring_one complex mul_CSNo) x
+  (ring_inverse complex add_CSNo mul_CSNo x) (recip_SNo x)
+  (god1_ring_multiplicative_associative
+    complex add_CSNo mul_CSNo hringC)
+  (god1_ring_multiplicative_identity_specification
+    complex add_CSNo mul_CSNo hringC)
+  hxC habstractLeft hcandidateRight).
+exact (mem_eq_substL real
+  (recip_SNo x)
+  (ring_inverse complex add_CSNo mul_CSNo x)
+  hinverseeq hrecipReal).
+exact (andI
+  (field complex add_CSNo mul_CSNo
+    /\ subring complex add_CSNo mul_CSNo real)
+  (forall x :e real,
+    x <> ring_zero complex add_CSNo ->
+    ring_inverse complex add_CSNo mul_CSNo x :e real)
+  (andI
+    (field complex add_CSNo mul_CSNo)
+    (subring complex add_CSNo mul_CSNo real)
+    hfieldC hsubring)
+  hinverseClosed).
+Qed.
 
 Theorem god1_reals_form_subfield_of_complex_numbers :
   subfield complex add_CSNo mul_CSNo real.
@@ -76521,8 +77161,9 @@ prove (subfield complex add_CSNo mul_CSNo real).
 //GOD1PRF:164100 b) the field $\mathbf{R}$ of real numbers is a subfield of $\mathbf{C}$;
 claim h_s9_real_subfield_conclusion :
   subfield complex add_CSNo mul_CSNo real.
-admit.
-Admitted.
+exact god1_real_is_subfield_of_complex.
+exact h_s9_real_subfield_conclusion.
+Qed.
 
 Theorem god1_complex_i_and_cartesian_representation :
   Complex_i :e complex
@@ -76534,31 +77175,146 @@ Theorem god1_complex_i_and_cartesian_representation :
   /\ (forall z :e complex, forall x y :e real,
     z = add_CSNo x (mul_CSNo Complex_i y) ->
     x = CSNo_Re z /\ y = CSNo_Im z).
-apply andI.
 //GOD1PRF:163880 In practice one never uses these formulae, but only the following properties of complex numbers:
 claim h_s9_complex_cartesian_properties_goal :
   Complex_i :e complex
   /\ mul_CSNo Complex_i Complex_i = minus_SNo 1
   /\ forall z :e complex,
     z = add_CSNo (CSNo_Re z) (mul_CSNo Complex_i (CSNo_Im z)).
-admit.
+exact (andI
+  (Complex_i :e complex
+    /\ mul_CSNo Complex_i Complex_i = minus_SNo 1)
+  (forall z :e complex,
+    z = add_CSNo (CSNo_Re z) (mul_CSNo Complex_i (CSNo_Im z)))
+  (andI
+    (Complex_i :e complex)
+    (mul_CSNo Complex_i Complex_i = minus_SNo 1)
+    complex_i
+    (eq_i_tra
+      (mul_CSNo Complex_i Complex_i)
+      (minus_CSNo 1) (minus_SNo 1)
+      Complex_i_sqr
+      (minus_CSNo_minus_SNo 1 SNo_1)))
+  complex_eta).
 //GOD1PRF:164175 c) there exists a complex number $i$ (this traditional notation replaces the notation $\omega$ which we have used for quadratic extensions in general) such that
 claim h_s9_complex_i_square :
   Complex_i :e complex
   /\ mul_CSNo Complex_i Complex_i = minus_SNo 1.
-admit.
+exact (andEL
+  (Complex_i :e complex
+    /\ mul_CSNo Complex_i Complex_i = minus_SNo 1)
+  (forall z :e complex,
+    z = add_CSNo (CSNo_Re z) (mul_CSNo Complex_i (CSNo_Im z)))
+  h_s9_complex_cartesian_properties_goal).
 //GOD1PRF:164355 d) every complex number $z$ can be written in exactly one way in the form
 claim h_s9_complex_cartesian_exists :
   forall z :e complex,
     z = add_CSNo (CSNo_Re z) (mul_CSNo Complex_i (CSNo_Im z)).
-admit.
+exact (andER
+  (Complex_i :e complex
+    /\ mul_CSNo Complex_i Complex_i = minus_SNo 1)
+  (forall z :e complex,
+    z = add_CSNo (CSNo_Re z) (mul_CSNo Complex_i (CSNo_Im z)))
+  h_s9_complex_cartesian_properties_goal).
 //GOD1PRF:164446 where $x$ and $y$ are real.
 claim h_s9_complex_cartesian_unique :
   forall z :e complex, forall x y :e real,
     z = add_CSNo x (mul_CSNo Complex_i y) ->
     x = CSNo_Re z /\ y = CSNo_Im z.
-admit.
-Admitted.
+let z.
+assume hz.
+let x.
+assume hx.
+let y.
+assume hy hrepr.
+claim hiyC : mul_CSNo Complex_i y :e complex.
+exact (complex_mul_CSNo Complex_i complex_i y (real_complex y hy)).
+claim hsumC : add_CSNo x (mul_CSNo Complex_i y) :e complex.
+exact (complex_add_CSNo x (real_complex x hx)
+  (mul_CSNo Complex_i y) hiyC).
+claim hReRepresentation :
+  CSNo_Re z
+  = CSNo_Re (add_CSNo x (mul_CSNo Complex_i y)).
+exact (f_eq_i CSNo_Re z
+  (add_CSNo x (mul_CSNo Complex_i y)) hrepr).
+claim hReSum :
+  CSNo_Re (add_CSNo x (mul_CSNo Complex_i y)) = x.
+exact (eq_i_tra
+  (CSNo_Re (add_CSNo x (mul_CSNo Complex_i y)))
+  (add_SNo (CSNo_Re x) (CSNo_Re (mul_CSNo Complex_i y)))
+  x
+  (complex_Re_add_CSNo x (real_complex x hx)
+    (mul_CSNo Complex_i y) hiyC)
+  (eq_i_tra
+    (add_SNo (CSNo_Re x) (CSNo_Re (mul_CSNo Complex_i y)))
+    (add_SNo x 0) x
+    (god1_binary_operation_congruence add_SNo
+      (CSNo_Re x) x
+      (CSNo_Re (mul_CSNo Complex_i y)) 0
+      (real_Re_eq x hx)
+      (real_Re_i_eq y hy))
+    (add_SNo_0R x (real_SNo x hx)))).
+claim hxCoordinate : x = CSNo_Re z.
+exact (eq_sym (CSNo_Re z) x
+  (eq_i_tra
+    (CSNo_Re z)
+    (CSNo_Re (add_CSNo x (mul_CSNo Complex_i y))) x
+    hReRepresentation hReSum)).
+claim hImRepresentation :
+  CSNo_Im z
+  = CSNo_Im (add_CSNo x (mul_CSNo Complex_i y)).
+exact (f_eq_i CSNo_Im z
+  (add_CSNo x (mul_CSNo Complex_i y)) hrepr).
+claim hImSum :
+  CSNo_Im (add_CSNo x (mul_CSNo Complex_i y)) = y.
+exact (eq_i_tra
+  (CSNo_Im (add_CSNo x (mul_CSNo Complex_i y)))
+  (add_SNo (CSNo_Im x) (CSNo_Im (mul_CSNo Complex_i y)))
+  y
+  (complex_Im_add_CSNo x (real_complex x hx)
+    (mul_CSNo Complex_i y) hiyC)
+  (eq_i_tra
+    (add_SNo (CSNo_Im x) (CSNo_Im (mul_CSNo Complex_i y)))
+    (add_SNo 0 y) y
+    (god1_binary_operation_congruence add_SNo
+      (CSNo_Im x) 0
+      (CSNo_Im (mul_CSNo Complex_i y)) y
+      (real_Im_eq x hx)
+      (real_Im_i_eq y hy))
+    (add_SNo_0L y (real_SNo y hy)))).
+claim hyCoordinate : y = CSNo_Im z.
+exact (eq_sym (CSNo_Im z) y
+  (eq_i_tra
+    (CSNo_Im z)
+    (CSNo_Im (add_CSNo x (mul_CSNo Complex_i y))) y
+    hImRepresentation hImSum)).
+exact (andI
+  (x = CSNo_Re z) (y = CSNo_Im z)
+  hxCoordinate hyCoordinate).
+exact (andI
+  ((Complex_i :e complex
+    /\ mul_CSNo Complex_i Complex_i = minus_CSNo 1)
+    /\ forall z :e complex,
+      z = add_CSNo
+        (CSNo_Re z)
+        (mul_CSNo Complex_i (CSNo_Im z)))
+  (forall z :e complex, forall x y :e real,
+    z = add_CSNo x (mul_CSNo Complex_i y) ->
+    x = CSNo_Re z /\ y = CSNo_Im z)
+  (andI
+    (Complex_i :e complex
+      /\ mul_CSNo Complex_i Complex_i = minus_CSNo 1)
+    (forall z :e complex,
+      z = add_CSNo
+        (CSNo_Re z)
+        (mul_CSNo Complex_i (CSNo_Im z)))
+    (andI
+      (Complex_i :e complex)
+      (mul_CSNo Complex_i Complex_i = minus_CSNo 1)
+      complex_i Complex_i_sqr)
+    h_s9_complex_cartesian_exists)
+  h_s9_complex_cartesian_unique).
+Qed.
 
 //GOD1:164909 pure_imaginary : "#1 is pure imaginary" | $\operatorname{Re}(#1)=0$
 Definition pure_imaginary : set -> prop :=
@@ -76568,12 +77324,392 @@ Theorem god1_complex_real_iff_imaginary_part_zero :
   forall z :e complex, z :e real <-> CSNo_Im z = 0.
 let z.
 assume hz.
-apply iffI.
 //GOD1PRF:164988 On the other hand, $z$ is real (i.e., $z$ belongs to the subring $\mathbf{R}$ of $\mathbf{C}$ ) if and only if $\operatorname{Im}(z)=0$.
 claim h_s9_complex_real_characterization :
   z :e real <-> CSNo_Im z = 0.
-admit.
-Admitted.
+exact (iffI
+  (z :e real) (CSNo_Im z = 0)
+  (fun hzreal => real_Im_eq z hzreal)
+  (fun himzero => complex_Im_zero_imp_real z hz himzero)).
+exact h_s9_complex_real_characterization.
+Qed.
+
+Theorem god1_complex_norm_as_conjugate_product :
+  forall z :e complex,
+    abs_sqr_CSNo z = mul_CSNo (conj_CSNo z) z.
+let z.
+assume hz.
+claim hzCSNo : CSNo z.
+exact (complex_CSNo z hz).
+claim hReReal : CSNo_Re z :e real.
+exact (complex_Re_real z hz).
+claim hImReal : CSNo_Im z :e real.
+exact (complex_Im_real z hz).
+claim hReSNo : SNo (CSNo_Re z).
+exact (real_SNo (CSNo_Re z) hReReal).
+claim hImSNo : SNo (CSNo_Im z).
+exact (real_SNo (CSNo_Im z) hImReal).
+claim hproductReReal :
+  mul_SNo (CSNo_Re z) (CSNo_Re z) :e real.
+exact (real_mul_SNo (CSNo_Re z) hReReal (CSNo_Re z) hReReal).
+claim hproductImReal :
+  mul_SNo (CSNo_Im z) (CSNo_Im z) :e real.
+exact (real_mul_SNo (CSNo_Im z) hImReal (CSNo_Im z) hImReal).
+claim habsExpanded :
+  abs_sqr_CSNo z
+  = add_SNo
+      (mul_SNo (CSNo_Re z) (CSNo_Re z))
+      (mul_SNo (CSNo_Im z) (CSNo_Im z)).
+exact (eq_i_tra
+  (abs_sqr_CSNo z)
+  (add_SNo
+    (exp_SNo_nat (CSNo_Re z) 2)
+    (exp_SNo_nat (CSNo_Im z) 2))
+  (add_SNo
+    (mul_SNo (CSNo_Re z) (CSNo_Re z))
+    (mul_SNo (CSNo_Im z) (CSNo_Im z)))
+  (abs_sqr_CSNo_unfold z)
+  (god1_binary_operation_congruence add_SNo
+    (exp_SNo_nat (CSNo_Re z) 2)
+    (mul_SNo (CSNo_Re z) (CSNo_Re z))
+    (exp_SNo_nat (CSNo_Im z) 2)
+    (mul_SNo (CSNo_Im z) (CSNo_Im z))
+    (exp_SNo_nat_2 (CSNo_Re z) hReSNo)
+    (exp_SNo_nat_2 (CSNo_Im z) hImSNo))).
+claim habsReal : abs_sqr_CSNo z :e real.
+exact (mem_eq_substL real
+  (add_SNo
+    (mul_SNo (CSNo_Re z) (CSNo_Re z))
+    (mul_SNo (CSNo_Im z) (CSNo_Im z)))
+  (abs_sqr_CSNo z) habsExpanded
+  (real_add_SNo
+    (mul_SNo (CSNo_Re z) (CSNo_Re z)) hproductReReal
+    (mul_SNo (CSNo_Im z) (CSNo_Im z)) hproductImReal)).
+claim habsC : abs_sqr_CSNo z :e complex.
+exact (real_complex (abs_sqr_CSNo z) habsReal).
+claim hconjC : conj_CSNo z :e complex.
+exact (complex_conj_CSNo z hz).
+claim hconjProductC : mul_CSNo (conj_CSNo z) z :e complex.
+exact (complex_mul_CSNo (conj_CSNo z) hconjC z hz).
+claim hReConj : CSNo_Re (conj_CSNo z) = CSNo_Re z.
+exact (conj_CSNo_CRe z hzCSNo).
+claim hImConj : CSNo_Im (conj_CSNo z) = minus_SNo (CSNo_Im z).
+exact (conj_CSNo_CIm z hzCSNo).
+claim hnegativeSquareCancellation :
+  minus_SNo
+    (mul_SNo (CSNo_Im z) (minus_SNo (CSNo_Im z)))
+  = mul_SNo (CSNo_Im z) (CSNo_Im z).
+exact (eq_i_tra
+  (minus_SNo
+    (mul_SNo (CSNo_Im z) (minus_SNo (CSNo_Im z))))
+  (minus_SNo
+    (minus_SNo (mul_SNo (CSNo_Im z) (CSNo_Im z))))
+  (mul_SNo (CSNo_Im z) (CSNo_Im z))
+  (f_eq_i minus_SNo
+    (mul_SNo (CSNo_Im z) (minus_SNo (CSNo_Im z)))
+    (minus_SNo (mul_SNo (CSNo_Im z) (CSNo_Im z)))
+    (mul_SNo_minus_distrR
+      (CSNo_Im z) (CSNo_Im z) hImSNo hImSNo))
+  (minus_SNo_invol
+    (mul_SNo (CSNo_Im z) (CSNo_Im z))
+    (SNo_mul_SNo (CSNo_Im z) (CSNo_Im z) hImSNo hImSNo))).
+claim hReConjProduct :
+  CSNo_Re (mul_CSNo (conj_CSNo z) z)
+  = add_SNo
+      (mul_SNo (CSNo_Re z) (CSNo_Re z))
+      (mul_SNo (CSNo_Im z) (CSNo_Im z)).
+exact (eq_i_tra
+  (CSNo_Re (mul_CSNo (conj_CSNo z) z))
+  (add_SNo
+    (mul_SNo (CSNo_Re (conj_CSNo z)) (CSNo_Re z))
+    (minus_SNo
+      (mul_SNo (CSNo_Im z) (CSNo_Im (conj_CSNo z)))))
+  (add_SNo
+    (mul_SNo (CSNo_Re z) (CSNo_Re z))
+    (mul_SNo (CSNo_Im z) (CSNo_Im z)))
+  (mul_CSNo_CRe (conj_CSNo z) z
+    (complex_CSNo (conj_CSNo z) hconjC) hzCSNo)
+  (god1_binary_operation_congruence add_SNo
+    (mul_SNo (CSNo_Re (conj_CSNo z)) (CSNo_Re z))
+    (mul_SNo (CSNo_Re z) (CSNo_Re z))
+    (minus_SNo
+      (mul_SNo (CSNo_Im z) (CSNo_Im (conj_CSNo z))))
+    (mul_SNo (CSNo_Im z) (CSNo_Im z))
+    (f_eq_i (fun u => mul_SNo u (CSNo_Re z))
+      (CSNo_Re (conj_CSNo z)) (CSNo_Re z) hReConj)
+    (eq_i_tra
+      (minus_SNo
+        (mul_SNo (CSNo_Im z) (CSNo_Im (conj_CSNo z))))
+      (minus_SNo
+        (mul_SNo (CSNo_Im z) (minus_SNo (CSNo_Im z))))
+      (mul_SNo (CSNo_Im z) (CSNo_Im z))
+      (f_eq_i
+        (fun u => minus_SNo (mul_SNo (CSNo_Im z) u))
+        (CSNo_Im (conj_CSNo z))
+        (minus_SNo (CSNo_Im z)) hImConj)
+      hnegativeSquareCancellation))).
+claim hImConjProduct :
+  CSNo_Im (mul_CSNo (conj_CSNo z) z) = 0.
+exact (eq_i_tra
+  (CSNo_Im (mul_CSNo (conj_CSNo z) z))
+  (add_SNo
+    (mul_SNo (CSNo_Im z) (CSNo_Re (conj_CSNo z)))
+    (mul_SNo (CSNo_Im (conj_CSNo z)) (CSNo_Re z)))
+  0
+  (mul_CSNo_CIm (conj_CSNo z) z
+    (complex_CSNo (conj_CSNo z) hconjC) hzCSNo)
+  (eq_i_tra
+    (add_SNo
+      (mul_SNo (CSNo_Im z) (CSNo_Re (conj_CSNo z)))
+      (mul_SNo (CSNo_Im (conj_CSNo z)) (CSNo_Re z)))
+    (add_SNo
+      (mul_SNo (CSNo_Im z) (CSNo_Re z))
+      (minus_SNo (mul_SNo (CSNo_Im z) (CSNo_Re z))))
+    0
+    (god1_binary_operation_congruence add_SNo
+      (mul_SNo (CSNo_Im z) (CSNo_Re (conj_CSNo z)))
+      (mul_SNo (CSNo_Im z) (CSNo_Re z))
+      (mul_SNo (CSNo_Im (conj_CSNo z)) (CSNo_Re z))
+      (minus_SNo (mul_SNo (CSNo_Im z) (CSNo_Re z)))
+      (f_eq_i (fun u => mul_SNo (CSNo_Im z) u)
+        (CSNo_Re (conj_CSNo z)) (CSNo_Re z) hReConj)
+      (eq_i_tra
+        (mul_SNo (CSNo_Im (conj_CSNo z)) (CSNo_Re z))
+        (mul_SNo (minus_SNo (CSNo_Im z)) (CSNo_Re z))
+        (minus_SNo (mul_SNo (CSNo_Im z) (CSNo_Re z)))
+        (f_eq_i (fun u => mul_SNo u (CSNo_Re z))
+          (CSNo_Im (conj_CSNo z)) (minus_SNo (CSNo_Im z)) hImConj)
+        (mul_SNo_minus_distrL
+          (CSNo_Im z) (CSNo_Re z) hImSNo hReSNo)))
+    (add_SNo_minus_SNo_rinv
+      (mul_SNo (CSNo_Im z) (CSNo_Re z))
+      (SNo_mul_SNo (CSNo_Im z) (CSNo_Re z) hImSNo hReSNo)))).
+claim hReEquality :
+  CSNo_Re (abs_sqr_CSNo z)
+  = CSNo_Re (mul_CSNo (conj_CSNo z) z).
+exact (eq_i_tra
+  (CSNo_Re (abs_sqr_CSNo z))
+  (abs_sqr_CSNo z)
+  (CSNo_Re (mul_CSNo (conj_CSNo z) z))
+  (SNo_Re (abs_sqr_CSNo z) (SNo_abs_sqr_CSNo z hzCSNo))
+  (eq_i_tra
+    (abs_sqr_CSNo z)
+    (add_SNo
+      (mul_SNo (CSNo_Re z) (CSNo_Re z))
+      (mul_SNo (CSNo_Im z) (CSNo_Im z)))
+    (CSNo_Re (mul_CSNo (conj_CSNo z) z))
+    habsExpanded
+    (eq_sym
+      (CSNo_Re (mul_CSNo (conj_CSNo z) z))
+      (add_SNo
+        (mul_SNo (CSNo_Re z) (CSNo_Re z))
+        (mul_SNo (CSNo_Im z) (CSNo_Im z)))
+      hReConjProduct))).
+claim hImEquality :
+  CSNo_Im (abs_sqr_CSNo z)
+  = CSNo_Im (mul_CSNo (conj_CSNo z) z).
+exact (eq_i_tra
+  (CSNo_Im (abs_sqr_CSNo z)) 0
+  (CSNo_Im (mul_CSNo (conj_CSNo z) z))
+  (SNo_Im (abs_sqr_CSNo z) (SNo_abs_sqr_CSNo z hzCSNo))
+  (eq_sym (CSNo_Im (mul_CSNo (conj_CSNo z) z)) 0
+    hImConjProduct)).
+exact (complex_ReIm_split
+  (abs_sqr_CSNo z) habsC
+  (mul_CSNo (conj_CSNo z) z) hconjProductC
+  hReEquality hImEquality).
+Qed.
+
+Theorem god1_complex_abs_sqr_is_real :
+  forall z :e complex, abs_sqr_CSNo z :e real.
+let z.
+assume hz.
+claim hReReal : CSNo_Re z :e real.
+exact (complex_Re_real z hz).
+claim hImReal : CSNo_Im z :e real.
+exact (complex_Im_real z hz).
+claim hReSNo : SNo (CSNo_Re z).
+exact (real_SNo (CSNo_Re z) hReReal).
+claim hImSNo : SNo (CSNo_Im z).
+exact (real_SNo (CSNo_Im z) hImReal).
+claim hReSquareReal :
+  mul_SNo (CSNo_Re z) (CSNo_Re z) :e real.
+exact (real_mul_SNo (CSNo_Re z) hReReal (CSNo_Re z) hReReal).
+claim hImSquareReal :
+  mul_SNo (CSNo_Im z) (CSNo_Im z) :e real.
+exact (real_mul_SNo (CSNo_Im z) hImReal (CSNo_Im z) hImReal).
+claim habsExpanded :
+  abs_sqr_CSNo z
+  = add_SNo
+      (mul_SNo (CSNo_Re z) (CSNo_Re z))
+      (mul_SNo (CSNo_Im z) (CSNo_Im z)).
+exact (eq_i_tra
+  (abs_sqr_CSNo z)
+  (add_SNo
+    (exp_SNo_nat (CSNo_Re z) 2)
+    (exp_SNo_nat (CSNo_Im z) 2))
+  (add_SNo
+    (mul_SNo (CSNo_Re z) (CSNo_Re z))
+    (mul_SNo (CSNo_Im z) (CSNo_Im z)))
+  (abs_sqr_CSNo_unfold z)
+  (god1_binary_operation_congruence add_SNo
+    (exp_SNo_nat (CSNo_Re z) 2)
+    (mul_SNo (CSNo_Re z) (CSNo_Re z))
+    (exp_SNo_nat (CSNo_Im z) 2)
+    (mul_SNo (CSNo_Im z) (CSNo_Im z))
+    (exp_SNo_nat_2 (CSNo_Re z) hReSNo)
+    (exp_SNo_nat_2 (CSNo_Im z) hImSNo))).
+exact (mem_eq_substL real
+  (add_SNo
+    (mul_SNo (CSNo_Re z) (CSNo_Re z))
+    (mul_SNo (CSNo_Im z) (CSNo_Im z)))
+  (abs_sqr_CSNo z) habsExpanded
+  (real_add_SNo
+    (mul_SNo (CSNo_Re z) (CSNo_Re z)) hReSquareReal
+    (mul_SNo (CSNo_Im z) (CSNo_Im z)) hImSquareReal)).
+Qed.
+
+Theorem god1_complex_inverse_via_norm_conjugate :
+  forall z :e complex,
+    z <> 0 ->
+    recip_CSNo z = mul_CSNo
+      (recip_SNo (abs_sqr_CSNo z))
+      (conj_CSNo z).
+let z.
+assume hz hznonzero.
+claim hzCSNo : CSNo z.
+exact (complex_CSNo z hz).
+claim hnormReal : abs_sqr_CSNo z :e real.
+exact (god1_complex_abs_sqr_is_real z hz).
+claim hnormSNo : SNo (abs_sqr_CSNo z).
+exact (real_SNo (abs_sqr_CSNo z) hnormReal).
+claim hnormNonzero : abs_sqr_CSNo z <> 0.
+assume hnormzero.
+exact (hznonzero (abs_sqr_CSNo_zero z hzCSNo hnormzero)).
+claim hscalarReal : recip_SNo (abs_sqr_CSNo z) :e real.
+exact (real_recip_SNo (abs_sqr_CSNo z) hnormReal).
+claim hscalarC : recip_SNo (abs_sqr_CSNo z) :e complex.
+exact (real_complex (recip_SNo (abs_sqr_CSNo z)) hscalarReal).
+claim hconjC : conj_CSNo z :e complex.
+exact (complex_conj_CSNo z hz).
+claim hcandidateC :
+  mul_CSNo
+    (recip_SNo (abs_sqr_CSNo z))
+    (conj_CSNo z) :e complex.
+exact (complex_mul_CSNo
+  (recip_SNo (abs_sqr_CSNo z)) hscalarC
+  (conj_CSNo z) hconjC).
+claim hcandidateProduct :
+  mul_CSNo
+    (mul_CSNo
+      (recip_SNo (abs_sqr_CSNo z))
+      (conj_CSNo z)) z
+  = 1.
+exact (eq_i_tra
+  (mul_CSNo
+    (mul_CSNo
+      (recip_SNo (abs_sqr_CSNo z))
+      (conj_CSNo z)) z)
+  (mul_CSNo
+    (recip_SNo (abs_sqr_CSNo z))
+    (mul_CSNo (conj_CSNo z) z))
+  1
+  (eq_sym
+    (mul_CSNo
+      (recip_SNo (abs_sqr_CSNo z))
+      (mul_CSNo (conj_CSNo z) z))
+    (mul_CSNo
+      (mul_CSNo
+        (recip_SNo (abs_sqr_CSNo z))
+        (conj_CSNo z)) z)
+    (mul_CSNo_assoc
+      (recip_SNo (abs_sqr_CSNo z))
+      (conj_CSNo z) z
+      (complex_CSNo (recip_SNo (abs_sqr_CSNo z)) hscalarC)
+      (complex_CSNo (conj_CSNo z) hconjC) hzCSNo))
+  (eq_i_tra
+    (mul_CSNo
+      (recip_SNo (abs_sqr_CSNo z))
+      (mul_CSNo (conj_CSNo z) z))
+    (mul_CSNo
+      (recip_SNo (abs_sqr_CSNo z))
+      (abs_sqr_CSNo z))
+    1
+    (f_eq_i
+      (mul_CSNo (recip_SNo (abs_sqr_CSNo z)))
+      (mul_CSNo (conj_CSNo z) z)
+      (abs_sqr_CSNo z)
+      (eq_sym
+        (abs_sqr_CSNo z)
+        (mul_CSNo (conj_CSNo z) z)
+        (god1_complex_norm_as_conjugate_product z hz)))
+    (eq_i_tra
+      (mul_CSNo
+        (recip_SNo (abs_sqr_CSNo z))
+        (abs_sqr_CSNo z))
+      (mul_SNo
+        (recip_SNo (abs_sqr_CSNo z))
+        (abs_sqr_CSNo z))
+      1
+      (mul_CSNo_mul_SNo
+        (recip_SNo (abs_sqr_CSNo z))
+        (abs_sqr_CSNo z)
+        (real_SNo (recip_SNo (abs_sqr_CSNo z)) hscalarReal)
+        hnormSNo)
+      (recip_SNo_invL
+        (abs_sqr_CSNo z) hnormSNo hnormNonzero)))).
+claim hcandidateLeft : left_reflection
+  complex mul_CSNo 1 z
+  (mul_CSNo
+    (recip_SNo (abs_sqr_CSNo z))
+    (conj_CSNo z)).
+exact (andI
+  (mul_CSNo
+    (recip_SNo (abs_sqr_CSNo z))
+    (conj_CSNo z) :e complex)
+  (mul_CSNo
+    (mul_CSNo
+      (recip_SNo (abs_sqr_CSNo z))
+      (conj_CSNo z)) z = 1)
+  hcandidateC hcandidateProduct).
+claim hrecipC : recip_CSNo z :e complex.
+exact (complex_recip_CSNo z hz).
+claim hrecipRight : right_reflection
+  complex mul_CSNo 1 z (recip_CSNo z).
+exact (andI
+  (recip_CSNo z :e complex)
+  (mul_CSNo z (recip_CSNo z) = 1)
+  hrecipC (recip_CSNo_invR z hzCSNo hznonzero)).
+claim hcandidateEqRecip :
+  mul_CSNo
+    (recip_SNo (abs_sqr_CSNo z))
+    (conj_CSNo z)
+  = recip_CSNo z.
+exact (god1_s6_left_and_right_reflections_equal
+  complex mul_CSNo 1 z
+  (mul_CSNo
+    (recip_SNo (abs_sqr_CSNo z))
+    (conj_CSNo z))
+  (recip_CSNo z)
+  (fun x hx y hy w hw =>
+    mul_CSNo_assoc x y w
+      (complex_CSNo x hx) (complex_CSNo y hy) (complex_CSNo w hw))
+  (andI
+    (1 :e complex)
+    (forall x :e complex,
+      mul_CSNo x 1 = x /\ mul_CSNo 1 x = x)
+    complex_1
+    (fun x hx => andI
+      (mul_CSNo x 1 = x) (mul_CSNo 1 x = x)
+      (mul_CSNo_1R x (complex_CSNo x hx))
+      (mul_CSNo_1L x (complex_CSNo x hx))))
+  hz hcandidateLeft hrecipRight).
+exact (eq_sym
+  (mul_CSNo
+    (recip_SNo (abs_sqr_CSNo z))
+    (conj_CSNo z))
+  (recip_CSNo z) hcandidateEqRecip).
+Qed.
 
 Theorem god1_complex_conjugate_norm_and_inverse :
   (forall z :e complex,
@@ -76590,7 +77726,6 @@ Theorem god1_complex_conjugate_norm_and_inverse :
     recip_CSNo z = mul_CSNo
       (recip_SNo (abs_sqr_CSNo z))
       (conj_CSNo z)).
-apply andI.
 //GOD1PRF:166020 which show how to calculate the conjugate of a sum or product of elements of L .
 claim h_s9_complex_conjugate_laws :
   forall z w :e complex,
@@ -76598,13 +77733,38 @@ claim h_s9_complex_conjugate_laws :
       = add_CSNo (conj_CSNo z) (conj_CSNo w)
     /\ conj_CSNo (mul_CSNo z w)
       = mul_CSNo (conj_CSNo z) (conj_CSNo w).
-admit.
+let z.
+assume hz.
+let w.
+assume hw.
+claim hzCSNo : CSNo z.
+exact (complex_CSNo z hz).
+claim hwCSNo : CSNo w.
+exact (complex_CSNo w hw).
+claim hconjZCSNo : CSNo (conj_CSNo z).
+exact (CSNo_conj_CSNo z hzCSNo).
+claim hconjWCSNo : CSNo (conj_CSNo w).
+exact (CSNo_conj_CSNo w hwCSNo).
+exact (andI
+  (conj_CSNo (add_CSNo z w)
+    = add_CSNo (conj_CSNo z) (conj_CSNo w))
+  (conj_CSNo (mul_CSNo z w)
+    = mul_CSNo (conj_CSNo z) (conj_CSNo w))
+  (conj_add_CSNo z w hzCSNo hwCSNo)
+  (eq_i_tra
+    (conj_CSNo (mul_CSNo z w))
+    (mul_CSNo (conj_CSNo w) (conj_CSNo z))
+    (mul_CSNo (conj_CSNo z) (conj_CSNo w))
+    (conj_mul_CSNo z w hzCSNo hwCSNo)
+    (mul_CSNo_com
+      (conj_CSNo w) (conj_CSNo z)
+      hconjWCSNo hconjZCSNo))).
 //GOD1PRF:166360 The formula (11) shows that
 claim h_s9_complex_norm_product :
   forall z w :e complex,
     abs_sqr_CSNo (mul_CSNo z w)
       = mul_SNo (abs_sqr_CSNo z) (abs_sqr_CSNo w).
-admit.
+exact abs_sqr_CSNo_mul_eq_mul.
 //GOD1PRF:169619 the denominator cannot vanish unless $x=y=0$, i.e., unless $z=0$ (in agreement with Theorem 2).
 claim h_s9_complex_inverse_theorem2_call :
   field
@@ -76613,18 +77773,64 @@ claim h_s9_complex_inverse_theorem2_call :
     (quadratic_extension_multiplication real add_SNo mul_SNo (minus_SNo 1))
   <-> ~square_in_ring real add_SNo mul_SNo (minus_SNo 1).
 claim h_s9_complex_inverse_real_field : field real add_SNo mul_SNo.
-admit.
+exact god1_real_numbers_are_field.
 claim h_s9_complex_inverse_minus_one_member : minus_SNo 1 :e real.
-admit.
-apply (god1_s9_theorem2_quadratic_extension_field_iff_nonsquare
+exact (real_minus_SNo 1 real_1).
+exact (god1_s9_theorem2_quadratic_extension_field_iff_nonsquare
   real add_SNo mul_SNo h_s9_complex_inverse_real_field
   (minus_SNo 1) h_s9_complex_inverse_minus_one_member).
 claim h_s9_complex_inverse_formula :
   forall z :e complex,
     z <> 0 -> recip_CSNo z =
       mul_CSNo (recip_SNo (abs_sqr_CSNo z)) (conj_CSNo z).
-admit.
-Admitted.
+exact god1_complex_inverse_via_norm_conjugate.
+claim h_s9_complex_all_conjugate_norm_laws :
+  forall z w :e complex,
+    conj_CSNo (add_CSNo z w)
+      = add_CSNo (conj_CSNo z) (conj_CSNo w)
+    /\ conj_CSNo (mul_CSNo z w)
+      = mul_CSNo (conj_CSNo z) (conj_CSNo w)
+    /\ abs_sqr_CSNo (mul_CSNo z w)
+      = mul_SNo (abs_sqr_CSNo z) (abs_sqr_CSNo w).
+exact (fun z hz w hw =>
+  andI
+    (conj_CSNo (add_CSNo z w)
+      = add_CSNo (conj_CSNo z) (conj_CSNo w)
+      /\ conj_CSNo (mul_CSNo z w)
+        = mul_CSNo (conj_CSNo z) (conj_CSNo w))
+    (abs_sqr_CSNo (mul_CSNo z w)
+      = mul_SNo (abs_sqr_CSNo z) (abs_sqr_CSNo w))
+    (h_s9_complex_conjugate_laws z hz w hw)
+    (h_s9_complex_norm_product z hz w hw)).
+exact (andI
+  ((forall z :e complex,
+    abs_sqr_CSNo z = mul_CSNo (conj_CSNo z) z)
+    /\ forall z w :e complex,
+      conj_CSNo (add_CSNo z w)
+        = add_CSNo (conj_CSNo z) (conj_CSNo w)
+      /\ conj_CSNo (mul_CSNo z w)
+        = mul_CSNo (conj_CSNo z) (conj_CSNo w)
+      /\ abs_sqr_CSNo (mul_CSNo z w)
+        = mul_SNo (abs_sqr_CSNo z) (abs_sqr_CSNo w))
+  (forall z :e complex,
+    z <> 0 ->
+    recip_CSNo z = mul_CSNo
+      (recip_SNo (abs_sqr_CSNo z))
+      (conj_CSNo z))
+  (andI
+    (forall z :e complex,
+      abs_sqr_CSNo z = mul_CSNo (conj_CSNo z) z)
+    (forall z w :e complex,
+      conj_CSNo (add_CSNo z w)
+        = add_CSNo (conj_CSNo z) (conj_CSNo w)
+      /\ conj_CSNo (mul_CSNo z w)
+        = mul_CSNo (conj_CSNo z) (conj_CSNo w)
+      /\ abs_sqr_CSNo (mul_CSNo z w)
+        = mul_SNo (abs_sqr_CSNo z) (abs_sqr_CSNo w))
+    god1_complex_norm_as_conjugate_product
+    h_s9_complex_all_conjugate_norm_laws)
+  h_s9_complex_inverse_formula).
+Qed.
 
 //GOD1:172486 complex_argument : "#2 is an argument of the nonzero complex number #1" | $#2\in\operatorname{Arg}(#1)$
 Definition complex_argument : set -> set -> prop :=
@@ -76649,39 +77855,79 @@ Theorem god1_complex_modulus_basic_properties :
   /\ (forall z w :e complex,
     modulus_CSNo (mul_CSNo z w)
       = mul_SNo (modulus_CSNo z) (modulus_CSNo w)).
-apply andI.
 //GOD1PRF:171860 The modulus $|z|$ is always $\geqslant 0$, and $|z|=0$ if and only if $z=0$.
 claim h_s9_modulus_nonnegative_zero :
   forall z :e complex,
     modulus_CSNo z :e real
     /\ SNoLe 0 (modulus_CSNo z)
     /\ (modulus_CSNo z = 0 <-> z = 0).
-admit.
+let z.
+assume hz.
+exact (andI
+  (modulus_CSNo z :e real
+    /\ SNoLe 0 (modulus_CSNo z))
+  (modulus_CSNo z = 0 <-> z = 0)
+  (andI
+    (modulus_CSNo z :e real)
+    (SNoLe 0 (modulus_CSNo z))
+    (modulus_CSNo_mem_R z hz)
+    (modulus_CSNo_nonneg z (complex_CSNo z hz)))
+  (iffI
+    (modulus_CSNo z = 0) (z = 0)
+    (fun hmodzero => modulus_CSNo_eq_0_imp_zero z hz hmodzero)
+    (fun hzzero =>
+      eq_i_tra (modulus_CSNo z) (modulus_CSNo 0) 0
+        (f_eq_i modulus_CSNo z 0 hzzero)
+        modulus_CSNo_0_eq_0))).
 //GOD1PRF:171937 Furthermore, the classical inequalities between the side-lengths of a triangle show that $|z+w| \leqslant|z|+|w|$ for any two complex numbers $z, w$; and, more generally,
 claim h_s9_modulus_triangle_inequality :
   forall z w :e complex,
     SNoLe (modulus_CSNo (add_CSNo z w))
       (add_SNo (modulus_CSNo z) (modulus_CSNo w)).
-admit.
+exact modulus_CSNo_add_Le.
 //GOD1PRF:172293 This result is usually referred to as the triangle inequality.
 claim h_s9_modulus_triangle_named_result :
   forall z w :e complex,
     SNoLe (modulus_CSNo (add_CSNo z w))
       (add_SNo (modulus_CSNo z) (modulus_CSNo w)).
-admit.
+exact h_s9_modulus_triangle_inequality.
 //GOD1PRF:173539 Next, we shall deduce the formulae
 claim h_s9_modulus_product_goal :
   forall z w :e complex,
     modulus_CSNo (mul_CSNo z w)
       = mul_SNo (modulus_CSNo z) (modulus_CSNo w).
-admit.
+exact modulus_CSNo_mul_eq_mul.
 //GOD1PRF:173813 which give the modulus and argument of a product of complex numbers.
 claim h_s9_modulus_product_conclusion :
   forall z w :e complex,
     modulus_CSNo (mul_CSNo z w)
       = mul_SNo (modulus_CSNo z) (modulus_CSNo w).
-admit.
-Admitted.
+exact h_s9_modulus_product_goal.
+exact (andI
+  ((forall z :e complex,
+    modulus_CSNo z :e real
+    /\ SNoLe 0 (modulus_CSNo z)
+    /\ (modulus_CSNo z = 0 <-> z = 0))
+    /\ forall z w :e complex,
+      SNoLe
+        (modulus_CSNo (add_CSNo z w))
+        (add_SNo (modulus_CSNo z) (modulus_CSNo w)))
+  (forall z w :e complex,
+    modulus_CSNo (mul_CSNo z w)
+      = mul_SNo (modulus_CSNo z) (modulus_CSNo w))
+  (andI
+    (forall z :e complex,
+      modulus_CSNo z :e real
+      /\ SNoLe 0 (modulus_CSNo z)
+      /\ (modulus_CSNo z = 0 <-> z = 0))
+    (forall z w :e complex,
+      SNoLe
+        (modulus_CSNo (add_CSNo z w))
+        (add_SNo (modulus_CSNo z) (modulus_CSNo w)))
+    h_s9_modulus_nonnegative_zero
+    h_s9_modulus_triangle_named_result)
+  h_s9_modulus_product_conclusion).
+Qed.
 
 Theorem god1_complex_polar_representation :
   forall z :e complex,
