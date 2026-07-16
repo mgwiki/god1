@@ -72302,6 +72302,739 @@ exact (andI
 exact h_s9_extension_commutative_ring_conclusion.
 Qed.
 
+Theorem god1_quadratic_extension_embedding_member :
+  forall K, forall add mul:set -> set -> set,
+    ring K add mul -> forall x :e K,
+      quadratic_extension_embedding K add x :e quadratic_extension K.
+let K add mul.
+assume hK.
+let x.
+assume hx.
+exact (tuple_2_setprod K K x hx (ring_zero K add)
+  (god1_group_identity_in K add
+    (god1_ring_additive_group K add mul hK))).
+Qed.
+
+Theorem god1_quadratic_extension_embedding_injective :
+  forall K, forall add mul:set -> set -> set,
+    ring K add mul ->
+    inj K (quadratic_extension K) (quadratic_extension_embedding K add).
+let K add mul.
+assume hK.
+apply (injI K (quadratic_extension K)
+  (quadratic_extension_embedding K add)).
+- exact (god1_quadratic_extension_embedding_member K add mul hK).
+- let x.
+  assume hx.
+  let y.
+  assume hy.
+  assume heq.
+  exact (eq_i_tra x
+    ((quadratic_extension_embedding K add x) 0) y
+    (eq_sym
+      ((quadratic_extension_embedding K add x) 0) x
+      (tuple_2_0_eq x (ring_zero K add)))
+    (eq_i_tra
+      ((quadratic_extension_embedding K add x) 0)
+      ((quadratic_extension_embedding K add y) 0) y
+      (f_eq_i (fun q => q 0)
+        (quadratic_extension_embedding K add x)
+        (quadratic_extension_embedding K add y) heq)
+      (tuple_2_0_eq y (ring_zero K add)))).
+Qed.
+
+Theorem god1_quadratic_extension_embedding_preserves_addition :
+  forall K, forall add mul:set -> set -> set,
+    ring K add mul -> forall x y :e K,
+      quadratic_extension_embedding K add (add x y)
+      = quadratic_extension_addition K add
+        (quadratic_extension_embedding K add x)
+        (quadratic_extension_embedding K add y).
+let K add mul.
+assume hK.
+let x.
+assume hx.
+let y.
+assume hy.
+claim hG : group K add.
+exact (god1_ring_additive_group K add mul hK).
+claim hzero : ring_zero K add :e K.
+exact (god1_group_identity_in K add hG).
+claim hzerozero :
+  add (ring_zero K add) (ring_zero K add) = ring_zero K add.
+exact (andEL
+  (add (ring_zero K add) (ring_zero K add) = ring_zero K add)
+  (add (ring_zero K add) (ring_zero K add) = ring_zero K add)
+  ((andER
+    (ring_zero K add :e K)
+    (forall q :e K,
+      add q (ring_zero K add) = q
+      /\ add (ring_zero K add) q = q)
+    (god1_group_identity_specification K add hG))
+    (ring_zero K add) hzero)).
+claim hpair :
+  (add x y, ring_zero K add)
+  = (add x y, add (ring_zero K add) (ring_zero K add)).
+exact (god1_binary_operation_congruence (fun a b => (a,b))
+  (add x y) (add x y)
+  (ring_zero K add) (add (ring_zero K add) (ring_zero K add))
+  (eq_ref (add x y))
+  (eq_sym
+    (add (ring_zero K add) (ring_zero K add))
+    (ring_zero K add) hzerozero)).
+claim hright :
+  quadratic_extension_addition K add
+    (quadratic_extension_embedding K add x)
+    (quadratic_extension_embedding K add y)
+  = (add x y, add (ring_zero K add) (ring_zero K add)).
+exact (god1_binary_operation_congruence (fun a b => (a,b))
+  (add
+    ((quadratic_extension_embedding K add x) 0)
+    ((quadratic_extension_embedding K add y) 0))
+  (add x y)
+  (add
+    ((quadratic_extension_embedding K add x) 1)
+    ((quadratic_extension_embedding K add y) 1))
+  (add (ring_zero K add) (ring_zero K add))
+  (god1_binary_operation_congruence add
+    ((quadratic_extension_embedding K add x) 0) x
+    ((quadratic_extension_embedding K add y) 0) y
+    (tuple_2_0_eq x (ring_zero K add))
+    (tuple_2_0_eq y (ring_zero K add)))
+  (god1_binary_operation_congruence add
+    ((quadratic_extension_embedding K add x) 1) (ring_zero K add)
+    ((quadratic_extension_embedding K add y) 1) (ring_zero K add)
+    (tuple_2_1_eq x (ring_zero K add))
+    (tuple_2_1_eq y (ring_zero K add)))).
+exact (eq_i_tra
+  (quadratic_extension_embedding K add (add x y))
+  (add x y, ring_zero K add)
+  (quadratic_extension_addition K add
+    (quadratic_extension_embedding K add x)
+    (quadratic_extension_embedding K add y))
+  (eq_ref (add x y, ring_zero K add))
+  (eq_i_tra
+    (add x y, ring_zero K add)
+    (add x y, add (ring_zero K add) (ring_zero K add))
+    (quadratic_extension_addition K add
+      (quadratic_extension_embedding K add x)
+      (quadratic_extension_embedding K add y))
+    hpair
+    (eq_sym
+      (quadratic_extension_addition K add
+        (quadratic_extension_embedding K add x)
+        (quadratic_extension_embedding K add y))
+      (add x y, add (ring_zero K add) (ring_zero K add))
+      hright))).
+Qed.
+
+Theorem god1_quadratic_extension_embedding_preserves_multiplication :
+  forall K, forall add mul:set -> set -> set, forall d :e K,
+    ring K add mul -> forall x y :e K,
+      quadratic_extension_embedding K add (mul x y)
+      = quadratic_extension_multiplication K add mul d
+        (quadratic_extension_embedding K add x)
+        (quadratic_extension_embedding K add y).
+let K add mul d.
+assume hd hK.
+let x.
+assume hx.
+let y.
+assume hy.
+claim hG : group K add.
+exact (god1_ring_additive_group K add mul hK).
+claim hzero : ring_zero K add :e K.
+exact (god1_group_identity_in K add hG).
+claim hxy : mul x y :e K.
+exact (god1_ring_multiplicative_law K add mul hK x hx y hy).
+claim hzz : mul (ring_zero K add) (ring_zero K add) = ring_zero K add.
+exact (god1_ring_zero_multiplication_left K add mul hK
+  (ring_zero K add) hzero).
+claim hdzz :
+  mul d (mul (ring_zero K add) (ring_zero K add)) = ring_zero K add.
+exact (eq_i_tra
+  (mul d (mul (ring_zero K add) (ring_zero K add)))
+  (mul d (ring_zero K add)) (ring_zero K add)
+  (f_eq_i (fun q => mul d q)
+    (mul (ring_zero K add) (ring_zero K add))
+    (ring_zero K add) hzz)
+  (god1_ring_zero_multiplication_right K add mul hK d hd)).
+claim hxz : mul x (ring_zero K add) = ring_zero K add.
+exact (god1_ring_zero_multiplication_right K add mul hK x hx).
+claim hyz : mul y (ring_zero K add) = ring_zero K add.
+exact (god1_ring_zero_multiplication_right K add mul hK y hy).
+claim hfirstTarget :
+  add (mul x y)
+    (mul d (mul (ring_zero K add) (ring_zero K add))) = mul x y.
+exact (eq_i_tra
+  (add (mul x y)
+    (mul d (mul (ring_zero K add) (ring_zero K add))))
+  (add (mul x y) (ring_zero K add)) (mul x y)
+  (f_eq_i (fun q => add (mul x y) q)
+    (mul d (mul (ring_zero K add) (ring_zero K add)))
+    (ring_zero K add) hdzz)
+  (andEL
+    (add (mul x y) (ring_zero K add) = mul x y)
+    (add (ring_zero K add) (mul x y) = mul x y)
+    ((andER
+      (ring_zero K add :e K)
+      (forall q :e K,
+        add q (ring_zero K add) = q
+        /\ add (ring_zero K add) q = q)
+      (god1_group_identity_specification K add hG))
+      (mul x y) hxy))).
+claim hsecondTarget :
+  add (mul x (ring_zero K add)) (mul y (ring_zero K add))
+  = ring_zero K add.
+exact (eq_i_tra
+  (add (mul x (ring_zero K add)) (mul y (ring_zero K add)))
+  (add (ring_zero K add) (ring_zero K add)) (ring_zero K add)
+  (god1_binary_operation_congruence add
+    (mul x (ring_zero K add)) (ring_zero K add)
+    (mul y (ring_zero K add)) (ring_zero K add) hxz hyz)
+  (andEL
+    (add (ring_zero K add) (ring_zero K add) = ring_zero K add)
+    (add (ring_zero K add) (ring_zero K add) = ring_zero K add)
+    ((andER
+      (ring_zero K add :e K)
+      (forall q :e K,
+        add q (ring_zero K add) = q
+        /\ add (ring_zero K add) q = q)
+      (god1_group_identity_specification K add hG))
+      (ring_zero K add) hzero))).
+claim hpair :
+  (mul x y, ring_zero K add)
+  = (add (mul x y)
+      (mul d (mul (ring_zero K add) (ring_zero K add))),
+     add (mul x (ring_zero K add)) (mul y (ring_zero K add))).
+exact (god1_binary_operation_congruence (fun a b => (a,b))
+  (mul x y)
+  (add (mul x y)
+    (mul d (mul (ring_zero K add) (ring_zero K add))))
+  (ring_zero K add)
+  (add (mul x (ring_zero K add)) (mul y (ring_zero K add)))
+  (eq_sym
+    (add (mul x y)
+      (mul d (mul (ring_zero K add) (ring_zero K add))))
+    (mul x y) hfirstTarget)
+  (eq_sym
+    (add (mul x (ring_zero K add)) (mul y (ring_zero K add)))
+    (ring_zero K add) hsecondTarget)).
+claim hright :
+  quadratic_extension_multiplication K add mul d
+    (quadratic_extension_embedding K add x)
+    (quadratic_extension_embedding K add y)
+  = (add (mul x y)
+      (mul d (mul (ring_zero K add) (ring_zero K add))),
+     add (mul x (ring_zero K add)) (mul y (ring_zero K add))).
+exact (god1_binary_operation_congruence (fun a b => (a,b))
+  (add
+    (mul ((quadratic_extension_embedding K add x) 0)
+      ((quadratic_extension_embedding K add y) 0))
+    (mul d
+      (mul ((quadratic_extension_embedding K add x) 1)
+        ((quadratic_extension_embedding K add y) 1))))
+  (add (mul x y)
+    (mul d (mul (ring_zero K add) (ring_zero K add))))
+  (add
+    (mul ((quadratic_extension_embedding K add x) 0)
+      ((quadratic_extension_embedding K add y) 1))
+    (mul ((quadratic_extension_embedding K add y) 0)
+      ((quadratic_extension_embedding K add x) 1)))
+  (add (mul x (ring_zero K add)) (mul y (ring_zero K add)))
+  (god1_binary_operation_congruence add
+    (mul ((quadratic_extension_embedding K add x) 0)
+      ((quadratic_extension_embedding K add y) 0))
+    (mul x y)
+    (mul d
+      (mul ((quadratic_extension_embedding K add x) 1)
+        ((quadratic_extension_embedding K add y) 1)))
+    (mul d (mul (ring_zero K add) (ring_zero K add)))
+    (god1_binary_operation_congruence mul
+      ((quadratic_extension_embedding K add x) 0) x
+      ((quadratic_extension_embedding K add y) 0) y
+      (tuple_2_0_eq x (ring_zero K add))
+      (tuple_2_0_eq y (ring_zero K add)))
+    (f_eq_i (fun q => mul d q)
+      (mul ((quadratic_extension_embedding K add x) 1)
+        ((quadratic_extension_embedding K add y) 1))
+      (mul (ring_zero K add) (ring_zero K add))
+      (god1_binary_operation_congruence mul
+        ((quadratic_extension_embedding K add x) 1) (ring_zero K add)
+        ((quadratic_extension_embedding K add y) 1) (ring_zero K add)
+        (tuple_2_1_eq x (ring_zero K add))
+        (tuple_2_1_eq y (ring_zero K add)))))
+  (god1_binary_operation_congruence add
+    (mul ((quadratic_extension_embedding K add x) 0)
+      ((quadratic_extension_embedding K add y) 1))
+    (mul x (ring_zero K add))
+    (mul ((quadratic_extension_embedding K add y) 0)
+      ((quadratic_extension_embedding K add x) 1))
+    (mul y (ring_zero K add))
+    (god1_binary_operation_congruence mul
+      ((quadratic_extension_embedding K add x) 0) x
+      ((quadratic_extension_embedding K add y) 1) (ring_zero K add)
+      (tuple_2_0_eq x (ring_zero K add))
+      (tuple_2_1_eq y (ring_zero K add)))
+    (god1_binary_operation_congruence mul
+      ((quadratic_extension_embedding K add y) 0) y
+      ((quadratic_extension_embedding K add x) 1) (ring_zero K add)
+      (tuple_2_0_eq y (ring_zero K add))
+      (tuple_2_1_eq x (ring_zero K add))))).
+exact (eq_i_tra
+  (quadratic_extension_embedding K add (mul x y))
+  (mul x y, ring_zero K add)
+  (quadratic_extension_multiplication K add mul d
+    (quadratic_extension_embedding K add x)
+    (quadratic_extension_embedding K add y))
+  (eq_ref (mul x y, ring_zero K add))
+  (eq_i_tra
+    (mul x y, ring_zero K add)
+    (add (mul x y)
+        (mul d (mul (ring_zero K add) (ring_zero K add))),
+     add (mul x (ring_zero K add)) (mul y (ring_zero K add)))
+    (quadratic_extension_multiplication K add mul d
+      (quadratic_extension_embedding K add x)
+      (quadratic_extension_embedding K add y))
+    hpair
+    (eq_sym
+      (quadratic_extension_multiplication K add mul d
+        (quadratic_extension_embedding K add x)
+        (quadratic_extension_embedding K add y))
+      (add (mul x y)
+          (mul d (mul (ring_zero K add) (ring_zero K add))),
+       add (mul x (ring_zero K add)) (mul y (ring_zero K add)))
+      hright))).
+Qed.
+
+Theorem god1_quadratic_extension_ring_one :
+  forall K, forall add mul:set -> set -> set, forall d :e K,
+    commutative_ring K add mul ->
+    (ring_one K mul, ring_zero K add)
+    = ring_one (quadratic_extension K)
+      (quadratic_extension_multiplication K add mul d).
+let K add mul d.
+assume hd hK.
+claim hE : ring (quadratic_extension K)
+  (quadratic_extension_addition K add)
+  (quadratic_extension_multiplication K add mul d).
+exact (andEL
+  (ring (quadratic_extension K)
+    (quadratic_extension_addition K add)
+    (quadratic_extension_multiplication K add mul d))
+  (commutative_on (quadratic_extension K)
+    (quadratic_extension_multiplication K add mul d))
+  (god1_quadratic_extension_is_commutative_ring K add mul d hd hK)).
+exact (god1_s6_theorem1_neutral_element_unique
+  (quadratic_extension K)
+  (quadratic_extension_multiplication K add mul d)
+  (god1_ring_multiplicative_law
+    (quadratic_extension K)
+    (quadratic_extension_addition K add)
+    (quadratic_extension_multiplication K add mul d) hE)
+  (ring_one K mul, ring_zero K add)
+  (ring_one (quadratic_extension K)
+    (quadratic_extension_multiplication K add mul d))
+  (god1_quadratic_extension_multiplication_one_neutral
+    K add mul d hd hK)
+  (god1_ring_multiplicative_identity_specification
+    (quadratic_extension K)
+    (quadratic_extension_addition K add)
+    (quadratic_extension_multiplication K add mul d) hE)).
+Qed.
+
+Theorem god1_quadratic_extension_embedding_is_ring_homomorphism :
+  forall K, forall add mul:set -> set -> set, forall d :e K,
+    commutative_ring K add mul ->
+    ring_homomorphism K add mul
+      (quadratic_extension K)
+      (quadratic_extension_addition K add)
+      (quadratic_extension_multiplication K add mul d)
+      (quadratic_extension_embedding K add).
+let K add mul d.
+assume hd hK.
+claim hring : ring K add mul.
+exact (andEL (ring K add mul) (commutative_on K mul) hK).
+claim hE : ring (quadratic_extension K)
+  (quadratic_extension_addition K add)
+  (quadratic_extension_multiplication K add mul d).
+exact (andEL
+  (ring (quadratic_extension K)
+    (quadratic_extension_addition K add)
+    (quadratic_extension_multiplication K add mul d))
+  (commutative_on (quadratic_extension K)
+    (quadratic_extension_multiplication K add mul d))
+  (god1_quadratic_extension_is_commutative_ring K add mul d hd hK)).
+exact (andI
+  (((ring K add mul /\ ring (quadratic_extension K)
+      (quadratic_extension_addition K add)
+      (quadratic_extension_multiplication K add mul d))
+    /\ forall x :e K,
+      quadratic_extension_embedding K add x :e quadratic_extension K)
+    /\ forall x y :e K,
+      quadratic_extension_embedding K add (add x y)
+      = quadratic_extension_addition K add
+        (quadratic_extension_embedding K add x)
+        (quadratic_extension_embedding K add y)
+      /\ quadratic_extension_embedding K add (mul x y)
+      = quadratic_extension_multiplication K add mul d
+        (quadratic_extension_embedding K add x)
+        (quadratic_extension_embedding K add y))
+  (quadratic_extension_embedding K add (ring_one K mul)
+    = ring_one (quadratic_extension K)
+      (quadratic_extension_multiplication K add mul d))
+  (andI
+    ((ring K add mul /\ ring (quadratic_extension K)
+        (quadratic_extension_addition K add)
+        (quadratic_extension_multiplication K add mul d))
+      /\ forall x :e K,
+        quadratic_extension_embedding K add x :e quadratic_extension K)
+    (forall x y :e K,
+      quadratic_extension_embedding K add (add x y)
+      = quadratic_extension_addition K add
+        (quadratic_extension_embedding K add x)
+        (quadratic_extension_embedding K add y)
+      /\ quadratic_extension_embedding K add (mul x y)
+      = quadratic_extension_multiplication K add mul d
+        (quadratic_extension_embedding K add x)
+        (quadratic_extension_embedding K add y))
+    (andI
+      (ring K add mul /\ ring (quadratic_extension K)
+        (quadratic_extension_addition K add)
+        (quadratic_extension_multiplication K add mul d))
+      (forall x :e K,
+        quadratic_extension_embedding K add x :e quadratic_extension K)
+      (andI
+        (ring K add mul)
+        (ring (quadratic_extension K)
+          (quadratic_extension_addition K add)
+          (quadratic_extension_multiplication K add mul d))
+        hring hE)
+      (god1_quadratic_extension_embedding_member K add mul hring))
+    (fun x hx y hy => andI
+      (quadratic_extension_embedding K add (add x y)
+        = quadratic_extension_addition K add
+          (quadratic_extension_embedding K add x)
+          (quadratic_extension_embedding K add y))
+      (quadratic_extension_embedding K add (mul x y)
+        = quadratic_extension_multiplication K add mul d
+          (quadratic_extension_embedding K add x)
+          (quadratic_extension_embedding K add y))
+      (god1_quadratic_extension_embedding_preserves_addition
+        K add mul hring x hx y hy)
+      (god1_quadratic_extension_embedding_preserves_multiplication
+        K add mul d hd hring x hx y hy)))
+  (god1_quadratic_extension_ring_one K add mul d hd hK)).
+Qed.
+
+Theorem god1_quadratic_extension_root_member :
+  forall K, forall add mul:set -> set -> set,
+    ring K add mul ->
+    quadratic_extension_root K add mul :e quadratic_extension K.
+let K add mul.
+assume hK.
+exact (tuple_2_setprod K K
+  (ring_zero K add)
+  (god1_group_identity_in K add
+    (god1_ring_additive_group K add mul hK))
+  (ring_one K mul)
+  (andEL
+    (ring_one K mul :e K)
+    (forall q :e K,
+      mul q (ring_one K mul) = q
+      /\ mul (ring_one K mul) q = q)
+    (god1_ring_multiplicative_identity_specification K add mul hK))).
+Qed.
+
+Theorem god1_quadratic_extension_root_square :
+  forall K, forall add mul:set -> set -> set, forall d :e K,
+    commutative_ring K add mul ->
+    quadratic_extension_multiplication K add mul d
+      (quadratic_extension_root K add mul)
+      (quadratic_extension_root K add mul)
+    = quadratic_extension_embedding K add d.
+let K add mul d.
+assume hd hK.
+claim hring : ring K add mul.
+exact (andEL (ring K add mul) (commutative_on K mul) hK).
+claim hG : group K add.
+exact (god1_ring_additive_group K add mul hring).
+claim hzero : ring_zero K add :e K.
+exact (god1_group_identity_in K add hG).
+claim hone : ring_one K mul :e K.
+exact (andEL
+  (ring_one K mul :e K)
+  (forall q :e K,
+    mul q (ring_one K mul) = q
+    /\ mul (ring_one K mul) q = q)
+  (god1_ring_multiplicative_identity_specification K add mul hring)).
+claim h00 :
+  mul (ring_zero K add) (ring_zero K add) = ring_zero K add.
+exact (god1_ring_zero_multiplication_left K add mul hring
+  (ring_zero K add) hzero).
+claim h11 : mul (ring_one K mul) (ring_one K mul) = ring_one K mul.
+exact (andEL
+  (mul (ring_one K mul) (ring_one K mul) = ring_one K mul)
+  (mul (ring_one K mul) (ring_one K mul) = ring_one K mul)
+  ((andER
+    (ring_one K mul :e K)
+    (forall q :e K,
+      mul q (ring_one K mul) = q
+      /\ mul (ring_one K mul) q = q)
+    (god1_ring_multiplicative_identity_specification K add mul hring))
+    (ring_one K mul) hone)).
+claim hd1 : mul d (ring_one K mul) = d.
+exact (andEL
+  (mul d (ring_one K mul) = d)
+  (mul (ring_one K mul) d = d)
+  ((andER
+    (ring_one K mul :e K)
+    (forall q :e K,
+      mul q (ring_one K mul) = q
+      /\ mul (ring_one K mul) q = q)
+    (god1_ring_multiplicative_identity_specification K add mul hring))
+    d hd)).
+claim h01 : mul (ring_zero K add) (ring_one K mul) = ring_zero K add.
+exact (god1_ring_zero_multiplication_left K add mul hring
+  (ring_one K mul) hone).
+claim hfirst :
+  add
+    (mul (ring_zero K add) (ring_zero K add))
+    (mul d (mul (ring_one K mul) (ring_one K mul))) = d.
+exact (eq_i_tra
+  (add
+    (mul (ring_zero K add) (ring_zero K add))
+    (mul d (mul (ring_one K mul) (ring_one K mul))))
+  (add (ring_zero K add) (mul d (ring_one K mul))) d
+  (god1_binary_operation_congruence add
+    (mul (ring_zero K add) (ring_zero K add)) (ring_zero K add)
+    (mul d (mul (ring_one K mul) (ring_one K mul)))
+    (mul d (ring_one K mul)) h00
+    (f_eq_i (fun q => mul d q)
+      (mul (ring_one K mul) (ring_one K mul))
+      (ring_one K mul) h11))
+  (eq_i_tra
+    (add (ring_zero K add) (mul d (ring_one K mul)))
+    (add (ring_zero K add) d) d
+    (f_eq_i (fun q => add (ring_zero K add) q)
+      (mul d (ring_one K mul)) d hd1)
+    (andER
+      (add d (ring_zero K add) = d)
+      (add (ring_zero K add) d = d)
+      ((andER
+        (ring_zero K add :e K)
+        (forall q :e K,
+          add q (ring_zero K add) = q
+          /\ add (ring_zero K add) q = q)
+        (god1_group_identity_specification K add hG)) d hd)))).
+claim hsecond :
+  add
+    (mul (ring_zero K add) (ring_one K mul))
+    (mul (ring_zero K add) (ring_one K mul)) = ring_zero K add.
+exact (eq_i_tra
+  (add
+    (mul (ring_zero K add) (ring_one K mul))
+    (mul (ring_zero K add) (ring_one K mul)))
+  (add (ring_zero K add) (ring_zero K add)) (ring_zero K add)
+  (god1_binary_operation_congruence add
+    (mul (ring_zero K add) (ring_one K mul)) (ring_zero K add)
+    (mul (ring_zero K add) (ring_one K mul)) (ring_zero K add)
+    h01 h01)
+  (andEL
+    (add (ring_zero K add) (ring_zero K add) = ring_zero K add)
+    (add (ring_zero K add) (ring_zero K add) = ring_zero K add)
+    ((andER
+      (ring_zero K add :e K)
+      (forall q :e K,
+        add q (ring_zero K add) = q
+        /\ add (ring_zero K add) q = q)
+      (god1_group_identity_specification K add hG))
+      (ring_zero K add) hzero))).
+claim hroot :
+  quadratic_extension_root K add mul :e quadratic_extension K.
+exact (god1_quadratic_extension_root_member K add mul hring).
+claim hproduct :
+  quadratic_extension_multiplication K add mul d
+    (quadratic_extension_root K add mul)
+    (quadratic_extension_root K add mul) :e quadratic_extension K.
+exact (god1_quadratic_extension_multiplication_law K add mul d hd hring
+  (quadratic_extension_root K add mul) hroot
+  (quadratic_extension_root K add mul) hroot).
+claim hcomponentZero :
+  quadratic_extension_multiplication K add mul d
+    (quadratic_extension_root K add mul)
+    (quadratic_extension_root K add mul) 0 = d.
+exact (eq_i_tra
+  (quadratic_extension_multiplication K add mul d
+    (quadratic_extension_root K add mul)
+    (quadratic_extension_root K add mul) 0)
+  (add
+    (mul (ring_zero K add) (ring_zero K add))
+    (mul d (mul (ring_one K mul) (ring_one K mul)))) d
+  (eq_i_tra
+    (quadratic_extension_multiplication K add mul d
+      (quadratic_extension_root K add mul)
+      (quadratic_extension_root K add mul) 0)
+    (add
+      (mul ((quadratic_extension_root K add mul) 0)
+        ((quadratic_extension_root K add mul) 0))
+      (mul d (mul ((quadratic_extension_root K add mul) 1)
+        ((quadratic_extension_root K add mul) 1))))
+    (add
+      (mul (ring_zero K add) (ring_zero K add))
+      (mul d (mul (ring_one K mul) (ring_one K mul))))
+    (god1_quadratic_extension_multiplication_component_zero
+      K add mul d
+      (quadratic_extension_root K add mul)
+      (quadratic_extension_root K add mul))
+    (god1_binary_operation_congruence add
+      (mul ((quadratic_extension_root K add mul) 0)
+        ((quadratic_extension_root K add mul) 0))
+      (mul (ring_zero K add) (ring_zero K add))
+      (mul d (mul ((quadratic_extension_root K add mul) 1)
+        ((quadratic_extension_root K add mul) 1)))
+      (mul d (mul (ring_one K mul) (ring_one K mul)))
+      (god1_binary_operation_congruence mul
+        ((quadratic_extension_root K add mul) 0) (ring_zero K add)
+        ((quadratic_extension_root K add mul) 0) (ring_zero K add)
+        (tuple_2_0_eq (ring_zero K add) (ring_one K mul))
+        (tuple_2_0_eq (ring_zero K add) (ring_one K mul)))
+      (f_eq_i (fun q => mul d q)
+        (mul ((quadratic_extension_root K add mul) 1)
+          ((quadratic_extension_root K add mul) 1))
+        (mul (ring_one K mul) (ring_one K mul))
+        (god1_binary_operation_congruence mul
+          ((quadratic_extension_root K add mul) 1) (ring_one K mul)
+          ((quadratic_extension_root K add mul) 1) (ring_one K mul)
+          (tuple_2_1_eq (ring_zero K add) (ring_one K mul))
+          (tuple_2_1_eq (ring_zero K add) (ring_one K mul))))))
+  hfirst).
+claim hcomponentOne :
+  quadratic_extension_multiplication K add mul d
+    (quadratic_extension_root K add mul)
+    (quadratic_extension_root K add mul) 1 = ring_zero K add.
+exact (eq_i_tra
+  (quadratic_extension_multiplication K add mul d
+    (quadratic_extension_root K add mul)
+    (quadratic_extension_root K add mul) 1)
+  (add
+    (mul (ring_zero K add) (ring_one K mul))
+    (mul (ring_zero K add) (ring_one K mul)))
+  (ring_zero K add)
+  (eq_i_tra
+    (quadratic_extension_multiplication K add mul d
+      (quadratic_extension_root K add mul)
+      (quadratic_extension_root K add mul) 1)
+    (add
+      (mul ((quadratic_extension_root K add mul) 0)
+        ((quadratic_extension_root K add mul) 1))
+      (mul ((quadratic_extension_root K add mul) 0)
+        ((quadratic_extension_root K add mul) 1)))
+    (add
+      (mul (ring_zero K add) (ring_one K mul))
+      (mul (ring_zero K add) (ring_one K mul)))
+    (god1_quadratic_extension_multiplication_component_one
+      K add mul d
+      (quadratic_extension_root K add mul)
+      (quadratic_extension_root K add mul))
+    (god1_binary_operation_congruence add
+      (mul ((quadratic_extension_root K add mul) 0)
+        ((quadratic_extension_root K add mul) 1))
+      (mul (ring_zero K add) (ring_one K mul))
+      (mul ((quadratic_extension_root K add mul) 0)
+        ((quadratic_extension_root K add mul) 1))
+      (mul (ring_zero K add) (ring_one K mul))
+      (god1_binary_operation_congruence mul
+        ((quadratic_extension_root K add mul) 0) (ring_zero K add)
+        ((quadratic_extension_root K add mul) 1) (ring_one K mul)
+        (tuple_2_0_eq (ring_zero K add) (ring_one K mul))
+        (tuple_2_1_eq (ring_zero K add) (ring_one K mul)))
+      (god1_binary_operation_congruence mul
+        ((quadratic_extension_root K add mul) 0) (ring_zero K add)
+        ((quadratic_extension_root K add mul) 1) (ring_one K mul)
+        (tuple_2_0_eq (ring_zero K add) (ring_one K mul))
+        (tuple_2_1_eq (ring_zero K add) (ring_one K mul)))))
+  hsecond).
+claim heta :
+  (quadratic_extension_multiplication K add mul d
+      (quadratic_extension_root K add mul)
+      (quadratic_extension_root K add mul) 0,
+   quadratic_extension_multiplication K add mul d
+      (quadratic_extension_root K add mul)
+      (quadratic_extension_root K add mul) 1)
+  = quadratic_extension_multiplication K add mul d
+      (quadratic_extension_root K add mul)
+      (quadratic_extension_root K add mul).
+exact (god1_quadratic_extension_eta K
+  (quadratic_extension_multiplication K add mul d
+    (quadratic_extension_root K add mul)
+    (quadratic_extension_root K add mul)) hproduct).
+exact (eq_i_tra
+  (quadratic_extension_multiplication K add mul d
+    (quadratic_extension_root K add mul)
+    (quadratic_extension_root K add mul))
+  (d, ring_zero K add)
+  (quadratic_extension_embedding K add d)
+  (eq_i_tra
+    (quadratic_extension_multiplication K add mul d
+      (quadratic_extension_root K add mul)
+      (quadratic_extension_root K add mul))
+    (quadratic_extension_multiplication K add mul d
+        (quadratic_extension_root K add mul)
+        (quadratic_extension_root K add mul) 0,
+     quadratic_extension_multiplication K add mul d
+        (quadratic_extension_root K add mul)
+        (quadratic_extension_root K add mul) 1)
+    (d, ring_zero K add)
+    (eq_sym
+      (quadratic_extension_multiplication K add mul d
+          (quadratic_extension_root K add mul)
+          (quadratic_extension_root K add mul) 0,
+       quadratic_extension_multiplication K add mul d
+          (quadratic_extension_root K add mul)
+          (quadratic_extension_root K add mul) 1)
+      (quadratic_extension_multiplication K add mul d
+        (quadratic_extension_root K add mul)
+        (quadratic_extension_root K add mul)) heta)
+    (god1_binary_operation_congruence (fun a b => (a,b))
+      (quadratic_extension_multiplication K add mul d
+        (quadratic_extension_root K add mul)
+        (quadratic_extension_root K add mul) 0) d
+      (quadratic_extension_multiplication K add mul d
+        (quadratic_extension_root K add mul)
+        (quadratic_extension_root K add mul) 1) (ring_zero K add)
+      hcomponentZero hcomponentOne))
+  (eq_ref (d, ring_zero K add))).
+Qed.
+
+Theorem god1_quadratic_extension_root_is_square_root :
+  forall K, forall add mul:set -> set -> set, forall d :e K,
+    commutative_ring K add mul ->
+    square_root_in_ring
+      (quadratic_extension K)
+      (quadratic_extension_addition K add)
+      (quadratic_extension_multiplication K add mul d)
+      (quadratic_extension_embedding K add d)
+      (quadratic_extension_root K add mul).
+let K add mul d.
+assume hd hK.
+claim hring : ring K add mul.
+exact (andEL (ring K add mul) (commutative_on K mul) hK).
+exact (andI
+  (quadratic_extension_root K add mul :e quadratic_extension K
+    /\ quadratic_extension_embedding K add d :e quadratic_extension K)
+  (quadratic_extension_multiplication K add mul d
+    (quadratic_extension_root K add mul)
+    (quadratic_extension_root K add mul)
+    = quadratic_extension_embedding K add d)
+  (andI
+    (quadratic_extension_root K add mul :e quadratic_extension K)
+    (quadratic_extension_embedding K add d :e quadratic_extension K)
+    (god1_quadratic_extension_root_member K add mul hring)
+    (god1_quadratic_extension_embedding_member K add mul hring d hd))
+  (god1_quadratic_extension_root_square K add mul d hd hK)).
+Qed.
+
 Theorem god1_quadratic_extension_canonical_embedding :
   forall K, forall add mul:set -> set -> set, forall d :e K,
     commutative_ring K add mul ->
@@ -72321,7 +73054,6 @@ Theorem god1_quadratic_extension_canonical_embedding :
       (quadratic_extension_root K add mul).
 let K add mul d.
 assume hd hK.
-apply andI.
 //GOD1PRF:159539 Let us now show that L contains a subring isomorphic to K .
 claim h_s9_embedding_goal :
   ring_homomorphism K add mul
@@ -72329,7 +73061,8 @@ claim h_s9_embedding_goal :
     (quadratic_extension_addition K add)
     (quadratic_extension_multiplication K add mul d)
     (quadratic_extension_embedding K add).
-admit.
+exact (god1_quadratic_extension_embedding_is_ring_homomorphism
+  K add mul d hd hK).
 //GOD1PRF:159599 For this we consider the mapping $j: \mathrm{K} \rightarrow \mathrm{L}$ defined by
 claim h_s9_embedding_definition_call :
   forall x :e K,
@@ -72340,7 +73073,8 @@ apply (eq_ref (x, ring_zero K add)).
 //GOD1PRF:159704 Clearly $j$ is injective.
 claim h_s9_embedding_injective :
   inj K (quadratic_extension K) (quadratic_extension_embedding K add).
-admit.
+exact (god1_quadratic_extension_embedding_injective K add mul
+  (andEL (ring K add mul) (commutative_on K mul) hK)).
 //GOD1PRF:159730 Moreover, an easy calculation shows that
 claim h_s9_embedding_operation_calculations :
   forall x y :e K,
@@ -72352,7 +73086,23 @@ claim h_s9_embedding_operation_calculations :
       = quadratic_extension_multiplication K add mul d
         (quadratic_extension_embedding K add x)
         (quadratic_extension_embedding K add y).
-admit.
+exact (fun x hx y hy => andI
+  (quadratic_extension_embedding K add (add x y)
+    = quadratic_extension_addition K add
+      (quadratic_extension_embedding K add x)
+      (quadratic_extension_embedding K add y))
+  (quadratic_extension_embedding K add (mul x y)
+    = quadratic_extension_multiplication K add mul d
+      (quadratic_extension_embedding K add x)
+      (quadratic_extension_embedding K add y))
+  (god1_quadratic_extension_embedding_preserves_addition
+    K add mul
+    (andEL (ring K add mul) (commutative_on K mul) hK)
+    x hx y hy)
+  (god1_quadratic_extension_embedding_preserves_multiplication
+    K add mul d hd
+    (andEL (ring K add mul) (commutative_on K mul) hK)
+    x hx y hy)).
 //GOD1PRF:160138 These formulae show that $j$ is an isomorphism of K onto a subring of L .
 claim h_s9_embedding_ring_homomorphism :
   ring_homomorphism K add mul
@@ -72360,7 +73110,8 @@ claim h_s9_embedding_ring_homomorphism :
     (quadratic_extension_addition K add)
     (quadratic_extension_multiplication K add mul d)
     (quadratic_extension_embedding K add).
-admit.
+exact (god1_quadratic_extension_embedding_is_ring_homomorphism
+  K add mul d hd hK).
 //GOD1PRF:160447 To show that this constitutes a solution of the problem posed in section 1, it remains to be proved that the element $d$ of K is a square in L .
 claim h_s9_embedding_square_root_goal :
   square_root_in_ring
@@ -72369,18 +73120,20 @@ claim h_s9_embedding_square_root_goal :
     (quadratic_extension_multiplication K add mul d)
     (quadratic_extension_embedding K add d)
     (quadratic_extension_root K add mul).
-admit.
+exact (god1_quadratic_extension_root_is_square_root
+  K add mul d hd hK).
 //GOD1PRF:160592 Consider then the element
 claim h_s9_embedding_root_member :
   quadratic_extension_root K add mul :e quadratic_extension K.
-admit.
+exact (god1_quadratic_extension_root_member K add mul
+  (andEL (ring K add mul) (commutative_on K mul) hK)).
 //GOD1PRF:160677 of $L$; a trivial calculation shows that
 claim h_s9_embedding_root_square :
   quadratic_extension_multiplication K add mul d
     (quadratic_extension_root K add mul)
     (quadratic_extension_root K add mul)
   = quadratic_extension_embedding K add d.
-admit.
+exact (god1_quadratic_extension_root_square K add mul d hd hK).
 //GOD1PRF:160790 and since we have agreed to identify each element $x \in \mathrm{~K}$ with the element $j(x)$ of L , the proof is complete.
 claim h_s9_embedding_book_conclusion :
   square_root_in_ring
@@ -72389,8 +73142,33 @@ claim h_s9_embedding_book_conclusion :
     (quadratic_extension_multiplication K add mul d)
     (quadratic_extension_embedding K add d)
     (quadratic_extension_root K add mul).
-admit.
-Admitted.
+exact (god1_quadratic_extension_root_is_square_root
+  K add mul d hd hK).
+exact (andI
+  (ring_homomorphism K add mul
+      (quadratic_extension K)
+      (quadratic_extension_addition K add)
+      (quadratic_extension_multiplication K add mul d)
+      (quadratic_extension_embedding K add)
+    /\ inj K (quadratic_extension K)
+      (quadratic_extension_embedding K add))
+  (square_root_in_ring
+    (quadratic_extension K)
+    (quadratic_extension_addition K add)
+    (quadratic_extension_multiplication K add mul d)
+    (quadratic_extension_embedding K add d)
+    (quadratic_extension_root K add mul))
+  (andI
+    (ring_homomorphism K add mul
+      (quadratic_extension K)
+      (quadratic_extension_addition K add)
+      (quadratic_extension_multiplication K add mul d)
+      (quadratic_extension_embedding K add))
+    (inj K (quadratic_extension K)
+      (quadratic_extension_embedding K add))
+    h_s9_embedding_ring_homomorphism h_s9_embedding_injective)
+  h_s9_embedding_book_conclusion).
+Qed.
 
 //GOD1:165500 quadratic_conjugate : "the conjugate of #5 in the quadratic extension #1" | $\overline{#5}$
 Definition quadratic_conjugate :
