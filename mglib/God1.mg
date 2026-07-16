@@ -54410,6 +54410,483 @@ Definition ring_units :
   set -> (set -> set -> set) -> (set -> set -> set) -> set :=
   fun K add mul => {x :e K|ring_unit K add mul x}.
 
+Theorem god1_ring_unit_to_reflexible :
+  forall K, forall add mul:set -> set -> set, forall x,
+    ring_unit K add mul x ->
+    reflexible K mul (ring_one K mul) x.
+let K add mul x.
+assume hx.
+apply (andI
+  (x :e K)
+  (exists y :e K, reflection K mul (ring_one K mul) x y)).
+- exact (andEL
+    (x :e K)
+    (exists y :e K,
+      mul y x = ring_one K mul /\ mul x y = ring_one K mul)
+    hx).
+- apply (exandE_i
+    (fun y => y :e K)
+    (fun y => mul y x = ring_one K mul /\ mul x y = ring_one K mul)
+    (andER
+      (x :e K)
+      (exists y :e K,
+        mul y x = ring_one K mul /\ mul x y = ring_one K mul)
+      hx)).
+  let y.
+  assume hy heqs.
+  witness y.
+  exact (andI
+    (y :e K)
+    (reflection K mul (ring_one K mul) x y)
+    hy
+    (andI
+      (y :e K /\ mul y x = ring_one K mul)
+      (mul x y = ring_one K mul)
+      (andI
+        (y :e K) (mul y x = ring_one K mul) hy
+        (andEL
+          (mul y x = ring_one K mul)
+          (mul x y = ring_one K mul) heqs))
+      (andER
+        (mul y x = ring_one K mul)
+        (mul x y = ring_one K mul) heqs))).
+Qed.
+
+Theorem god1_reflexible_to_ring_unit :
+  forall K, forall add mul:set -> set -> set, forall x,
+    reflexible K mul (ring_one K mul) x ->
+    ring_unit K add mul x.
+let K add mul x.
+assume hx.
+apply (andI
+  (x :e K)
+  (exists y :e K,
+    mul y x = ring_one K mul /\ mul x y = ring_one K mul)).
+- exact (andEL
+    (x :e K)
+    (exists y :e K, reflection K mul (ring_one K mul) x y) hx).
+- apply (exandE_i
+    (fun y => y :e K)
+    (fun y => reflection K mul (ring_one K mul) x y)
+    (andER
+      (x :e K)
+      (exists y :e K, reflection K mul (ring_one K mul) x y) hx)).
+  let y.
+  assume hy hreflection.
+  witness y.
+  exact (andI
+    (y :e K)
+    (mul y x = ring_one K mul /\ mul x y = ring_one K mul)
+    hy
+    (andI
+      (mul y x = ring_one K mul)
+      (mul x y = ring_one K mul)
+      (andER
+        (y :e K) (mul y x = ring_one K mul)
+        (andEL
+          (y :e K /\ mul y x = ring_one K mul)
+          (mul x y = ring_one K mul) hreflection))
+      (andER
+        (y :e K /\ mul y x = ring_one K mul)
+        (mul x y = ring_one K mul) hreflection))).
+Qed.
+
+Theorem god1_ring_inverse_specification :
+  forall K, forall add mul:set -> set -> set, forall x,
+    ring_unit K add mul x ->
+    reflection K mul (ring_one K mul) x (ring_inverse K add mul x).
+let K add mul x.
+assume hx.
+claim hreflexible : reflexible K mul (ring_one K mul) x.
+exact (god1_ring_unit_to_reflexible K add mul x hx).
+apply (Eps_i_ex
+  (fun y => reflection K mul (ring_one K mul) x y)).
+apply (exandE_i
+  (fun y => y :e K)
+  (fun y => reflection K mul (ring_one K mul) x y)
+  (andER
+    (x :e K)
+    (exists y :e K, reflection K mul (ring_one K mul) x y)
+    hreflexible)).
+let y.
+assume hy hreflection.
+witness y.
+exact hreflection.
+Qed.
+
+Theorem god1_ring_one_is_unit :
+  forall K, forall add mul:set -> set -> set,
+    ring K add mul -> ring_unit K add mul (ring_one K mul).
+let K add mul.
+assume hK.
+claim honeutral : neutral_element K mul (ring_one K mul).
+exact (god1_ring_multiplicative_identity_specification K add mul hK).
+claim hone : ring_one K mul :e K.
+exact (andEL
+  (ring_one K mul :e K)
+  (forall x :e K,
+    mul x (ring_one K mul) = x /\ mul (ring_one K mul) x = x)
+  honeutral).
+apply (god1_reflexible_to_ring_unit K add mul (ring_one K mul)).
+apply (andI
+  (ring_one K mul :e K)
+  (exists r :e K,
+    reflection K mul (ring_one K mul) (ring_one K mul) r)).
+- exact hone.
+- witness (ring_one K mul).
+  exact (andI
+    (ring_one K mul :e K)
+    (reflection K mul (ring_one K mul)
+      (ring_one K mul) (ring_one K mul))
+    hone
+    (andI
+      (ring_one K mul :e K
+        /\ mul (ring_one K mul) (ring_one K mul) = ring_one K mul)
+      (mul (ring_one K mul) (ring_one K mul) = ring_one K mul)
+      (andI
+        (ring_one K mul :e K)
+        (mul (ring_one K mul) (ring_one K mul) = ring_one K mul)
+        hone
+        (andEL
+          (mul (ring_one K mul) (ring_one K mul) = ring_one K mul)
+          (mul (ring_one K mul) (ring_one K mul) = ring_one K mul)
+          ((andER
+            (ring_one K mul :e K)
+            (forall x :e K,
+              mul x (ring_one K mul) = x
+              /\ mul (ring_one K mul) x = x)
+            honeutral) (ring_one K mul) hone)))
+      (andER
+        (mul (ring_one K mul) (ring_one K mul) = ring_one K mul)
+        (mul (ring_one K mul) (ring_one K mul) = ring_one K mul)
+        ((andER
+          (ring_one K mul :e K)
+          (forall x :e K,
+            mul x (ring_one K mul) = x
+            /\ mul (ring_one K mul) x = x)
+          honeutral) (ring_one K mul) hone)))).
+Qed.
+
+Theorem god1_ring_unit_product :
+  forall K, forall add mul:set -> set -> set,
+    ring K add mul -> forall x y,
+      ring_unit K add mul x -> ring_unit K add mul y ->
+      ring_unit K add mul (mul x y).
+let K add mul.
+assume hK.
+let x y.
+assume hx hy.
+claim hrefx :
+  reflection K mul (ring_one K mul) x (ring_inverse K add mul x).
+exact (god1_ring_inverse_specification K add mul x hx).
+claim hrefy :
+  reflection K mul (ring_one K mul) y (ring_inverse K add mul y).
+exact (god1_ring_inverse_specification K add mul y hy).
+claim hxK : x :e K.
+exact (andEL (x :e K)
+  (exists r :e K, mul r x = ring_one K mul /\ mul x r = ring_one K mul)
+  hx).
+claim hyK : y :e K.
+exact (andEL (y :e K)
+  (exists r :e K, mul r y = ring_one K mul /\ mul y r = ring_one K mul)
+  hy).
+claim hrxK : ring_inverse K add mul x :e K.
+exact (andEL
+  (ring_inverse K add mul x :e K)
+  (mul (ring_inverse K add mul x) x = ring_one K mul)
+  (andEL
+    (ring_inverse K add mul x :e K
+      /\ mul (ring_inverse K add mul x) x = ring_one K mul)
+    (mul x (ring_inverse K add mul x) = ring_one K mul) hrefx)).
+claim hryK : ring_inverse K add mul y :e K.
+exact (andEL
+  (ring_inverse K add mul y :e K)
+  (mul (ring_inverse K add mul y) y = ring_one K mul)
+  (andEL
+    (ring_inverse K add mul y :e K
+      /\ mul (ring_inverse K add mul y) y = ring_one K mul)
+    (mul y (ring_inverse K add mul y) = ring_one K mul) hrefy)).
+claim hproduct :
+  reflexible K mul (ring_one K mul) (mul x y)
+  /\ reflection K mul (ring_one K mul) (mul x y)
+    (mul (ring_inverse K add mul y) (ring_inverse K add mul x)).
+exact ((andER
+  (forall a r :e K,
+    reflection K mul (ring_one K mul) a r ->
+    reflection K mul (ring_one K mul) r a)
+  (forall a b ra rb :e K,
+    reflection K mul (ring_one K mul) a ra ->
+    reflection K mul (ring_one K mul) b rb ->
+    reflexible K mul (ring_one K mul) (mul a b)
+    /\ reflection K mul (ring_one K mul) (mul a b) (mul rb ra))
+  (god1_s6_theorem3_reflections_and_products K mul (ring_one K mul)
+    (god1_ring_multiplicative_law K add mul hK)
+    (god1_ring_multiplicative_associative K add mul hK)
+    (god1_ring_multiplicative_identity_specification K add mul hK)))
+  x hxK y hyK
+  (ring_inverse K add mul x) hrxK
+  (ring_inverse K add mul y) hryK hrefx hrefy).
+exact (god1_reflexible_to_ring_unit K add mul (mul x y)
+  (andEL
+    (reflexible K mul (ring_one K mul) (mul x y))
+    (reflection K mul (ring_one K mul) (mul x y)
+      (mul (ring_inverse K add mul y) (ring_inverse K add mul x)))
+    hproduct)).
+Qed.
+
+Theorem god1_ring_inverse_is_unit :
+  forall K, forall add mul:set -> set -> set,
+    ring K add mul -> forall x,
+      ring_unit K add mul x ->
+      ring_unit K add mul (ring_inverse K add mul x).
+let K add mul.
+assume hK.
+let x.
+assume hx.
+claim hxK : x :e K.
+exact (andEL (x :e K)
+  (exists r :e K, mul r x = ring_one K mul /\ mul x r = ring_one K mul)
+  hx).
+claim hreflection :
+  reflection K mul (ring_one K mul) x (ring_inverse K add mul x).
+exact (god1_ring_inverse_specification K add mul x hx).
+claim hrK : ring_inverse K add mul x :e K.
+exact (andEL
+  (ring_inverse K add mul x :e K)
+  (mul (ring_inverse K add mul x) x = ring_one K mul)
+  (andEL
+    (ring_inverse K add mul x :e K
+      /\ mul (ring_inverse K add mul x) x = ring_one K mul)
+    (mul x (ring_inverse K add mul x) = ring_one K mul) hreflection)).
+apply (god1_reflexible_to_ring_unit K add mul (ring_inverse K add mul x)).
+apply (andI
+  (ring_inverse K add mul x :e K)
+  (exists r :e K,
+    reflection K mul (ring_one K mul) (ring_inverse K add mul x) r)).
+- exact hrK.
+- witness x.
+  exact (andI
+    (x :e K)
+    (reflection K mul (ring_one K mul) (ring_inverse K add mul x) x)
+    hxK
+    (god1_s6_reflection_reverses K mul (ring_one K mul)
+      x (ring_inverse K add mul x) hxK hreflection)).
+Qed.
+
+Theorem god1_ring_units_product_closed :
+  forall K, forall add mul:set -> set -> set,
+    ring K add mul -> forall x y :e ring_units K add mul,
+      mul x y :e ring_units K add mul.
+let K add mul.
+assume hK.
+let x.
+assume hx.
+let y.
+assume hy.
+exact (SepI K (fun z => ring_unit K add mul z) (mul x y)
+  (god1_ring_multiplicative_law K add mul hK
+    x (SepE1 K (fun z => ring_unit K add mul z) x hx)
+    y (SepE1 K (fun z => ring_unit K add mul z) y hy))
+  (god1_ring_unit_product K add mul hK x y
+    (SepE2 K (fun z => ring_unit K add mul z) x hx)
+    (SepE2 K (fun z => ring_unit K add mul z) y hy))).
+Qed.
+
+Theorem god1_ring_units_inverse_closed :
+  forall K, forall add mul:set -> set -> set,
+    ring K add mul -> forall x :e ring_units K add mul,
+      ring_inverse K add mul x :e ring_units K add mul.
+let K add mul.
+assume hK.
+let x.
+assume hx.
+claim hunit : ring_unit K add mul x.
+exact (SepE2 K (fun z => ring_unit K add mul z) x hx).
+claim hreflection :
+  reflection K mul (ring_one K mul) x (ring_inverse K add mul x).
+exact (god1_ring_inverse_specification K add mul x hunit).
+exact (SepI K (fun z => ring_unit K add mul z)
+  (ring_inverse K add mul x)
+  (andEL
+    (ring_inverse K add mul x :e K)
+    (mul (ring_inverse K add mul x) x = ring_one K mul)
+    (andEL
+      (ring_inverse K add mul x :e K
+        /\ mul (ring_inverse K add mul x) x = ring_one K mul)
+      (mul x (ring_inverse K add mul x) = ring_one K mul)
+      hreflection))
+  (god1_ring_inverse_is_unit K add mul hK x hunit)).
+Qed.
+
+Theorem god1_ring_units_group_core :
+  forall K, forall add mul:set -> set -> set,
+    ring K add mul -> group (ring_units K add mul) mul.
+let K add mul.
+assume hK.
+claim honeunit : ring_unit K add mul (ring_one K mul).
+exact (god1_ring_one_is_unit K add mul hK).
+claim honeunits : ring_one K mul :e ring_units K add mul.
+exact (SepI K (fun z => ring_unit K add mul z) (ring_one K mul)
+  (andEL
+    (ring_one K mul :e K)
+    (forall x :e K,
+      mul x (ring_one K mul) = x /\ mul (ring_one K mul) x = x)
+    (god1_ring_multiplicative_identity_specification K add mul hK))
+  honeunit).
+apply (andI
+  (law_of_composition (ring_units K add mul) mul
+    /\ associative_on (ring_units K add mul) mul)
+  (exists one :e ring_units K add mul,
+    neutral_element (ring_units K add mul) mul one
+    /\ forall x :e ring_units K add mul,
+      exists y :e ring_units K add mul,
+        reflection (ring_units K add mul) mul one x y)).
+- apply andI.
+  - exact (god1_ring_units_product_closed K add mul hK).
+  - let x.
+    assume hx.
+    let y.
+    assume hy.
+    let z.
+    assume hz.
+    exact (god1_ring_multiplicative_associative K add mul hK
+      x (SepE1 K (fun u => ring_unit K add mul u) x hx)
+      y (SepE1 K (fun u => ring_unit K add mul u) y hy)
+      z (SepE1 K (fun u => ring_unit K add mul u) z hz)).
+- witness (ring_one K mul).
+  apply andI.
+  - exact honeunits.
+  - apply andI.
+    - apply (andI
+        (ring_one K mul :e ring_units K add mul)
+        (forall x :e ring_units K add mul,
+          mul x (ring_one K mul) = x
+          /\ mul (ring_one K mul) x = x)).
+      - exact honeunits.
+      - let x.
+        assume hx.
+        exact ((andER
+          (ring_one K mul :e K)
+          (forall u :e K,
+            mul u (ring_one K mul) = u
+            /\ mul (ring_one K mul) u = u)
+          (god1_ring_multiplicative_identity_specification K add mul hK))
+          x (SepE1 K (fun u => ring_unit K add mul u) x hx)).
+    - let x.
+      assume hx.
+      witness (ring_inverse K add mul x).
+      claim hinverseunits :
+        ring_inverse K add mul x :e ring_units K add mul.
+      exact (god1_ring_units_inverse_closed K add mul hK x hx).
+      claim hreflection :
+        reflection K mul (ring_one K mul) x (ring_inverse K add mul x).
+      exact (god1_ring_inverse_specification K add mul x
+        (SepE2 K (fun u => ring_unit K add mul u) x hx)).
+      exact (andI
+        (ring_inverse K add mul x :e ring_units K add mul)
+        (reflection (ring_units K add mul) mul (ring_one K mul) x
+          (ring_inverse K add mul x))
+        hinverseunits
+        (andI
+          (ring_inverse K add mul x :e ring_units K add mul
+            /\ mul (ring_inverse K add mul x) x = ring_one K mul)
+          (mul x (ring_inverse K add mul x) = ring_one K mul)
+          (andI
+            (ring_inverse K add mul x :e ring_units K add mul)
+            (mul (ring_inverse K add mul x) x = ring_one K mul)
+            hinverseunits
+            (andER
+              (ring_inverse K add mul x :e K)
+              (mul (ring_inverse K add mul x) x = ring_one K mul)
+              (andEL
+                (ring_inverse K add mul x :e K
+                  /\ mul (ring_inverse K add mul x) x = ring_one K mul)
+                (mul x (ring_inverse K add mul x) = ring_one K mul)
+                hreflection)))
+          (andER
+            (ring_inverse K add mul x :e K
+              /\ mul (ring_inverse K add mul x) x = ring_one K mul)
+            (mul x (ring_inverse K add mul x) = ring_one K mul)
+            hreflection))).
+Qed.
+
+Theorem god1_ring_units_one_neutral :
+  forall K, forall add mul:set -> set -> set,
+    ring K add mul ->
+    neutral_element (ring_units K add mul) mul (ring_one K mul).
+let K add mul.
+assume hK.
+claim honeutral : neutral_element K mul (ring_one K mul).
+exact (god1_ring_multiplicative_identity_specification K add mul hK).
+claim honeunits : ring_one K mul :e ring_units K add mul.
+exact (SepI K (fun z => ring_unit K add mul z) (ring_one K mul)
+  (andEL
+    (ring_one K mul :e K)
+    (forall x :e K,
+      mul x (ring_one K mul) = x /\ mul (ring_one K mul) x = x)
+    honeutral)
+  (god1_ring_one_is_unit K add mul hK)).
+apply (andI
+  (ring_one K mul :e ring_units K add mul)
+  (forall x :e ring_units K add mul,
+    mul x (ring_one K mul) = x /\ mul (ring_one K mul) x = x)).
+- exact honeunits.
+- let x.
+  assume hx.
+  exact ((andER
+    (ring_one K mul :e K)
+    (forall u :e K,
+      mul u (ring_one K mul) = u /\ mul (ring_one K mul) u = u)
+    honeutral)
+    x (SepE1 K (fun u => ring_unit K add mul u) x hx)).
+Qed.
+
+Theorem god1_ring_units_inverse_exists :
+  forall K, forall add mul:set -> set -> set,
+    ring K add mul -> forall x :e ring_units K add mul,
+      exists y :e ring_units K add mul,
+        reflection (ring_units K add mul) mul (ring_one K mul) x y.
+let K add mul.
+assume hK.
+let x.
+assume hx.
+claim hunit : ring_unit K add mul x.
+exact (SepE2 K (fun u => ring_unit K add mul u) x hx).
+claim hinverseunits :
+  ring_inverse K add mul x :e ring_units K add mul.
+exact (god1_ring_units_inverse_closed K add mul hK x hx).
+claim hreflection :
+  reflection K mul (ring_one K mul) x (ring_inverse K add mul x).
+exact (god1_ring_inverse_specification K add mul x hunit).
+witness (ring_inverse K add mul x).
+exact (andI
+  (ring_inverse K add mul x :e ring_units K add mul)
+  (reflection (ring_units K add mul) mul (ring_one K mul) x
+    (ring_inverse K add mul x))
+  hinverseunits
+  (andI
+    (ring_inverse K add mul x :e ring_units K add mul
+      /\ mul (ring_inverse K add mul x) x = ring_one K mul)
+    (mul x (ring_inverse K add mul x) = ring_one K mul)
+    (andI
+      (ring_inverse K add mul x :e ring_units K add mul)
+      (mul (ring_inverse K add mul x) x = ring_one K mul)
+      hinverseunits
+      (andER
+        (ring_inverse K add mul x :e K)
+        (mul (ring_inverse K add mul x) x = ring_one K mul)
+        (andEL
+          (ring_inverse K add mul x :e K
+            /\ mul (ring_inverse K add mul x) x = ring_one K mul)
+          (mul x (ring_inverse K add mul x) = ring_one K mul)
+          hreflection)))
+    (andER
+      (ring_inverse K add mul x :e K
+        /\ mul (ring_inverse K add mul x) x = ring_one K mul)
+      (mul x (ring_inverse K add mul x) = ring_one K mul)
+      hreflection))).
+Qed.
+
 Theorem god1_ring_units_form_group :
   forall K, forall add mul:set -> set -> set,
     ring K add mul -> group (ring_units K add mul) mul.
@@ -54417,12 +54894,12 @@ let K add mul.
 assume hK.
 //GOD1PRF:110103 By Theorem 3 of § 6, if $\mathrm{K}^{*}$ contains $x$ and $y$ it also contains their product $x y$, and $\mathrm{K}^{*}$ may therefore be given the law of composition $(x, y) \rightarrow x y$.
 claim h_s8_units_s6_t3_law : law_of_composition K mul.
-admit.
+exact (god1_ring_multiplicative_law K add mul hK).
 claim h_s8_units_s6_t3_associative : associative_on K mul.
-admit.
+exact (god1_ring_multiplicative_associative K add mul hK).
 claim h_s8_units_s6_t3_identity :
   neutral_element K mul (ring_one K mul).
-admit.
+exact (god1_ring_multiplicative_identity_specification K add mul hK).
 claim h_s8_units_s6_theorem3_first_call :
   (forall x rx :e K,
     reflection K mul (ring_one K mul) x rx ->
@@ -54438,10 +54915,10 @@ apply (god1_s6_theorem3_reflections_and_products
   h_s8_units_s6_t3_identity).
 claim h_s8_units_product_closed :
   forall x y :e ring_units K add mul, mul x y :e ring_units K add mul.
-admit.
+exact (god1_ring_units_product_closed K add mul hK).
 //GOD1PRF:110297 The set $\mathrm{K}^{*}$, together with this law of composition, is a group.
 claim h_s8_units_group_goal : group (ring_units K add mul) mul.
-admit.
+exact (god1_ring_units_group_core K add mul hK).
 //GOD1PRF:110374 For it is clear that the multiplication in $\mathrm{K}^{*}$ is associative (because it is associative in K ); also $1 \in \mathrm{~K}^{*}$, so that we have a neutral element for the law of composition on $\mathrm{K}^{*}$; finally, if $x \in \mathrm{~K}^{*}$ then also $x^{-1} \in \mathrm{~K}^{*}$ (by Theorem 3 of § 6), and since
 claim h_s8_units_s6_theorem3_second_call :
   (forall x rx :e K,
@@ -54462,13 +54939,141 @@ claim h_s8_units_group_components :
   /\ forall x :e ring_units K add mul,
     exists y :e ring_units K add mul,
       reflection (ring_units K add mul) mul (ring_one K mul) x y.
-admit.
+exact (andI
+  (associative_on (ring_units K add mul) mul
+    /\ neutral_element (ring_units K add mul) mul (ring_one K mul))
+  (forall x :e ring_units K add mul,
+    exists y :e ring_units K add mul,
+      reflection (ring_units K add mul) mul (ring_one K mul) x y)
+  (andI
+    (associative_on (ring_units K add mul) mul)
+    (neutral_element (ring_units K add mul) mul (ring_one K mul))
+    (god1_group_associative (ring_units K add mul) mul
+      h_s8_units_group_goal)
+    (god1_ring_units_one_neutral K add mul hK))
+  (god1_ring_units_inverse_exists K add mul hK)).
 //GOD1PRF:110733 it follows that every element of $\mathrm{K}^{*}$ is invertible (in $\mathrm{K}^{*}$, not just in K ) with respect to the given law of composition on $\mathrm{K}^{*}$.
 claim h_s8_units_inverse_closed :
   forall x :e ring_units K add mul,
     ring_inverse K add mul x :e ring_units K add mul.
-admit.
-Admitted.
+exact (god1_ring_units_inverse_closed K add mul hK).
+exact h_s8_units_group_goal.
+Qed.
+
+Theorem god1_division_ring_ring :
+  forall K, forall add mul:set -> set -> set,
+    division_ring K add mul -> ring K add mul.
+let K add mul.
+assume hK.
+exact (andEL
+  (ring K add mul)
+  (ring_one K mul <> ring_zero K add)
+  (andEL
+    (ring K add mul /\ ring_one K mul <> ring_zero K add)
+    (forall x :e K,
+      x <> ring_zero K add -> ring_unit K add mul x)
+    hK)).
+Qed.
+
+Theorem god1_division_ring_one_ne_zero :
+  forall K, forall add mul:set -> set -> set,
+    division_ring K add mul -> ring_one K mul <> ring_zero K add.
+let K add mul.
+assume hK.
+exact (andER
+  (ring K add mul)
+  (ring_one K mul <> ring_zero K add)
+  (andEL
+    (ring K add mul /\ ring_one K mul <> ring_zero K add)
+    (forall x :e K,
+      x <> ring_zero K add -> ring_unit K add mul x)
+    hK)).
+Qed.
+
+Theorem god1_division_ring_nonzero_is_unit :
+  forall K, forall add mul:set -> set -> set,
+    division_ring K add mul -> forall x :e K,
+      x <> ring_zero K add -> ring_unit K add mul x.
+let K add mul.
+assume hK.
+exact (andER
+  (ring K add mul /\ ring_one K mul <> ring_zero K add)
+  (forall x :e K,
+    x <> ring_zero K add -> ring_unit K add mul x)
+  hK).
+Qed.
+
+Theorem god1_ring_unit_nonzero :
+  forall K, forall add mul:set -> set -> set,
+    ring K add mul -> ring_one K mul <> ring_zero K add ->
+    forall x, ring_unit K add mul x -> x <> ring_zero K add.
+let K add mul.
+assume hK honezero.
+let x.
+assume hunit hxzero.
+claim hreflection :
+  reflection K mul (ring_one K mul) x (ring_inverse K add mul x).
+exact (god1_ring_inverse_specification K add mul x hunit).
+claim hinverseK : ring_inverse K add mul x :e K.
+exact (andEL
+  (ring_inverse K add mul x :e K)
+  (mul (ring_inverse K add mul x) x = ring_one K mul)
+  (andEL
+    (ring_inverse K add mul x :e K
+      /\ mul (ring_inverse K add mul x) x = ring_one K mul)
+    (mul x (ring_inverse K add mul x) = ring_one K mul)
+    hreflection)).
+apply honezero.
+apply (eq_i_tra
+  (ring_one K mul)
+  (mul x (ring_inverse K add mul x))
+  (ring_zero K add)).
+- exact (eq_sym
+    (mul x (ring_inverse K add mul x)) (ring_one K mul)
+    (andER
+      (ring_inverse K add mul x :e K
+        /\ mul (ring_inverse K add mul x) x = ring_one K mul)
+      (mul x (ring_inverse K add mul x) = ring_one K mul)
+      hreflection)).
+- apply (eq_i_tra
+    (mul x (ring_inverse K add mul x))
+    (mul (ring_zero K add) (ring_inverse K add mul x))
+    (ring_zero K add)).
+  - exact (f_eq_i (fun u => mul u (ring_inverse K add mul x))
+      x (ring_zero K add) hxzero).
+  - exact (god1_ring_zero_multiplication_left K add mul hK
+      (ring_inverse K add mul x) hinverseK).
+Qed.
+
+Theorem god1_division_ring_units_core :
+  forall K, forall add mul:set -> set -> set,
+    division_ring K add mul ->
+    ring_units K add mul = K :\: {ring_zero K add}.
+let K add mul.
+assume hK.
+claim hring : ring K add mul.
+exact (god1_division_ring_ring K add mul hK).
+claim honezero : ring_one K mul <> ring_zero K add.
+exact (god1_division_ring_one_ne_zero K add mul hK).
+apply set_ext.
+- let x.
+  assume hx.
+  claim hunit : ring_unit K add mul x.
+  exact (SepE2 K (fun u => ring_unit K add mul u) x hx).
+  exact (setminusI K {ring_zero K add} x
+    (SepE1 K (fun u => ring_unit K add mul u) x hx)
+    (neq_imp_not_mem_singleton x (ring_zero K add)
+      (god1_ring_unit_nonzero K add mul hring honezero x hunit))).
+- let x.
+  assume hx.
+  claim hxK : x :e K.
+  exact (setminusE1 K {ring_zero K add} x hx).
+  claim hxzero : x <> ring_zero K add.
+  exact (not_mem_singleton_imp_neq x (ring_zero K add)
+    (setminusE2 K {ring_zero K add} x hx)).
+  exact (SepI K (fun u => ring_unit K add mul u) x hxK
+    (god1_division_ring_nonzero_is_unit K add mul hK x hxK hxzero)).
+Qed.
 
 Theorem god1_division_ring_units_are_nonzero_elements :
   forall K, forall add mul:set -> set -> set,
@@ -54479,8 +55084,9 @@ assume hK.
 //GOD1PRF:111081 If K is a division ring (and in particular if K is a field) we have
 claim h_s8_division_ring_units_characterization :
   ring_units K add mul = K :\: {ring_zero K add}.
-admit.
-Admitted.
+exact (god1_division_ring_units_core K add mul hK).
+exact h_s8_division_ring_units_characterization.
+Qed.
 
 //GOD1:111349 subfield : "#4 is a subfield of the field #1" | $#4\subseteq #1\text{ is a subfield}$
 Definition subfield :
