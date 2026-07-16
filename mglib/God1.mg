@@ -79380,6 +79380,403 @@ Definition module_negation :
   set -> (set -> set -> set) -> set -> set :=
   fun M addM x => group_inverse M addM x.
 
+Theorem god1_left_module_axiom_components :
+  forall K, forall addK mulK:set -> set -> set,
+  forall M, forall addM smul:set -> set -> set,
+    left_module K addK mulK M addM smul ->
+    (((ring K addK mulK /\ abelian_group M addM)
+      /\ ((forall scalar :e K, forall x :e M,
+            smul scalar x :e M)
+        /\ (forall scalar mu :e K, forall x :e M,
+          smul scalar (smul mu x) = smul (mulK scalar mu) x)))
+      /\ ((forall x :e M, smul (ring_one K mulK) x = x)
+        /\ (forall scalar mu :e K, forall x :e M,
+          smul (addK scalar mu) x
+            = addM (smul scalar x) (smul mu x))))
+    /\ (forall scalar :e K, forall x y :e M,
+      smul scalar (addM x y)
+        = addM (smul scalar x) (smul scalar y)).
+let K addK mulK M addM smul.
+assume hM.
+claim hthroughScalarAdd :
+  (((((ring K addK mulK /\ abelian_group M addM)
+    /\ (forall scalar :e K, forall x :e M,
+      smul scalar x :e M))
+    /\ (forall scalar mu :e K, forall x :e M,
+      smul scalar (smul mu x) = smul (mulK scalar mu) x))
+    /\ (forall x :e M, smul (ring_one K mulK) x = x))
+    /\ (forall scalar mu :e K, forall x :e M,
+      smul (addK scalar mu) x
+        = addM (smul scalar x) (smul mu x))).
+exact (andEL
+  (((((ring K addK mulK /\ abelian_group M addM)
+    /\ (forall scalar :e K, forall x :e M,
+      smul scalar x :e M))
+    /\ (forall scalar mu :e K, forall x :e M,
+      smul scalar (smul mu x) = smul (mulK scalar mu) x))
+    /\ (forall x :e M, smul (ring_one K mulK) x = x))
+    /\ (forall scalar mu :e K, forall x :e M,
+      smul (addK scalar mu) x
+        = addM (smul scalar x) (smul mu x)))
+  (forall scalar :e K, forall x y :e M,
+    smul scalar (addM x y)
+      = addM (smul scalar x) (smul scalar y))
+  hM).
+claim hvectorAdd :
+  forall scalar :e K, forall x y :e M,
+    smul scalar (addM x y)
+      = addM (smul scalar x) (smul scalar y).
+exact (andER
+  (((((ring K addK mulK /\ abelian_group M addM)
+    /\ (forall scalar :e K, forall x :e M,
+      smul scalar x :e M))
+    /\ (forall scalar mu :e K, forall x :e M,
+      smul scalar (smul mu x) = smul (mulK scalar mu) x))
+    /\ (forall x :e M, smul (ring_one K mulK) x = x))
+    /\ (forall scalar mu :e K, forall x :e M,
+      smul (addK scalar mu) x
+        = addM (smul scalar x) (smul mu x)))
+  (forall scalar :e K, forall x y :e M,
+    smul scalar (addM x y)
+      = addM (smul scalar x) (smul scalar y))
+  hM).
+claim hthroughScalarOne :
+  ((((ring K addK mulK /\ abelian_group M addM)
+    /\ (forall scalar :e K, forall x :e M,
+      smul scalar x :e M))
+    /\ (forall scalar mu :e K, forall x :e M,
+      smul scalar (smul mu x) = smul (mulK scalar mu) x))
+    /\ (forall x :e M, smul (ring_one K mulK) x = x)).
+exact (andEL
+  ((((ring K addK mulK /\ abelian_group M addM)
+    /\ (forall scalar :e K, forall x :e M,
+      smul scalar x :e M))
+    /\ (forall scalar mu :e K, forall x :e M,
+      smul scalar (smul mu x) = smul (mulK scalar mu) x))
+    /\ (forall x :e M, smul (ring_one K mulK) x = x))
+  (forall scalar mu :e K, forall x :e M,
+    smul (addK scalar mu) x
+      = addM (smul scalar x) (smul mu x))
+  hthroughScalarAdd).
+claim hscalarAdd :
+  forall scalar mu :e K, forall x :e M,
+    smul (addK scalar mu) x
+      = addM (smul scalar x) (smul mu x).
+exact (andER
+  ((((ring K addK mulK /\ abelian_group M addM)
+    /\ (forall scalar :e K, forall x :e M,
+      smul scalar x :e M))
+    /\ (forall scalar mu :e K, forall x :e M,
+      smul scalar (smul mu x) = smul (mulK scalar mu) x))
+    /\ (forall x :e M, smul (ring_one K mulK) x = x))
+  (forall scalar mu :e K, forall x :e M,
+    smul (addK scalar mu) x
+      = addM (smul scalar x) (smul mu x))
+  hthroughScalarAdd).
+claim hthroughScalarAssoc :
+  (((ring K addK mulK /\ abelian_group M addM)
+    /\ (forall scalar :e K, forall x :e M,
+      smul scalar x :e M))
+    /\ (forall scalar mu :e K, forall x :e M,
+      smul scalar (smul mu x) = smul (mulK scalar mu) x)).
+exact (andEL
+  (((ring K addK mulK /\ abelian_group M addM)
+    /\ (forall scalar :e K, forall x :e M,
+      smul scalar x :e M))
+    /\ (forall scalar mu :e K, forall x :e M,
+      smul scalar (smul mu x) = smul (mulK scalar mu) x))
+  (forall x :e M, smul (ring_one K mulK) x = x)
+  hthroughScalarOne).
+claim hscalarOne :
+  forall x :e M, smul (ring_one K mulK) x = x.
+exact (andER
+  (((ring K addK mulK /\ abelian_group M addM)
+    /\ (forall scalar :e K, forall x :e M,
+      smul scalar x :e M))
+    /\ (forall scalar mu :e K, forall x :e M,
+      smul scalar (smul mu x) = smul (mulK scalar mu) x))
+  (forall x :e M, smul (ring_one K mulK) x = x)
+  hthroughScalarOne).
+claim hthroughClosure :
+  (ring K addK mulK /\ abelian_group M addM)
+  /\ (forall scalar :e K, forall x :e M,
+    smul scalar x :e M).
+exact (andEL
+  ((ring K addK mulK /\ abelian_group M addM)
+    /\ (forall scalar :e K, forall x :e M,
+      smul scalar x :e M))
+  (forall scalar mu :e K, forall x :e M,
+    smul scalar (smul mu x) = smul (mulK scalar mu) x)
+  hthroughScalarAssoc).
+claim hscalarAssoc :
+  forall scalar mu :e K, forall x :e M,
+    smul scalar (smul mu x) = smul (mulK scalar mu) x.
+exact (andER
+  ((ring K addK mulK /\ abelian_group M addM)
+    /\ (forall scalar :e K, forall x :e M,
+      smul scalar x :e M))
+  (forall scalar mu :e K, forall x :e M,
+    smul scalar (smul mu x) = smul (mulK scalar mu) x)
+  hthroughScalarAssoc).
+claim hringAndGroup : ring K addK mulK /\ abelian_group M addM.
+exact (andEL
+  (ring K addK mulK /\ abelian_group M addM)
+  (forall scalar :e K, forall x :e M,
+    smul scalar x :e M)
+  hthroughClosure).
+claim hclosure :
+  forall scalar :e K, forall x :e M, smul scalar x :e M.
+exact (andER
+  (ring K addK mulK /\ abelian_group M addM)
+  (forall scalar :e K, forall x :e M,
+    smul scalar x :e M)
+  hthroughClosure).
+exact (andI
+  (((ring K addK mulK /\ abelian_group M addM)
+    /\ ((forall scalar :e K, forall x :e M,
+          smul scalar x :e M)
+      /\ (forall scalar mu :e K, forall x :e M,
+        smul scalar (smul mu x) = smul (mulK scalar mu) x)))
+    /\ ((forall x :e M, smul (ring_one K mulK) x = x)
+      /\ (forall scalar mu :e K, forall x :e M,
+        smul (addK scalar mu) x
+          = addM (smul scalar x) (smul mu x))))
+  (forall scalar :e K, forall x y :e M,
+    smul scalar (addM x y)
+      = addM (smul scalar x) (smul scalar y))
+  (andI
+    ((ring K addK mulK /\ abelian_group M addM)
+      /\ ((forall scalar :e K, forall x :e M,
+            smul scalar x :e M)
+        /\ (forall scalar mu :e K, forall x :e M,
+          smul scalar (smul mu x) = smul (mulK scalar mu) x)))
+    ((forall x :e M, smul (ring_one K mulK) x = x)
+      /\ (forall scalar mu :e K, forall x :e M,
+        smul (addK scalar mu) x
+          = addM (smul scalar x) (smul mu x)))
+    (andI
+      (ring K addK mulK /\ abelian_group M addM)
+      ((forall scalar :e K, forall x :e M,
+          smul scalar x :e M)
+        /\ (forall scalar mu :e K, forall x :e M,
+          smul scalar (smul mu x) = smul (mulK scalar mu) x))
+      hringAndGroup
+      (andI
+        (forall scalar :e K, forall x :e M,
+          smul scalar x :e M)
+        (forall scalar mu :e K, forall x :e M,
+          smul scalar (smul mu x) = smul (mulK scalar mu) x)
+        hclosure hscalarAssoc))
+    (andI
+      (forall x :e M, smul (ring_one K mulK) x = x)
+      (forall scalar mu :e K, forall x :e M,
+        smul (addK scalar mu) x
+          = addM (smul scalar x) (smul mu x))
+      hscalarOne hscalarAdd))
+  hvectorAdd).
+Qed.
+
+Theorem god1_left_module_ring_and_additive_component :
+  forall K, forall addK mulK:set -> set -> set,
+  forall M, forall addM smul:set -> set -> set,
+    left_module K addK mulK M addM smul ->
+    ring K addK mulK /\ abelian_group M addM.
+let K addK mulK M addM smul.
+assume hM.
+claim hcomponents :
+  (((ring K addK mulK /\ abelian_group M addM)
+    /\ ((forall scalar :e K, forall x :e M,
+          smul scalar x :e M)
+      /\ (forall scalar mu :e K, forall x :e M,
+        smul scalar (smul mu x) = smul (mulK scalar mu) x)))
+    /\ ((forall x :e M, smul (ring_one K mulK) x = x)
+      /\ (forall scalar mu :e K, forall x :e M,
+        smul (addK scalar mu) x
+          = addM (smul scalar x) (smul mu x))))
+  /\ (forall scalar :e K, forall x y :e M,
+    smul scalar (addM x y)
+      = addM (smul scalar x) (smul scalar y)).
+exact (god1_left_module_axiom_components
+  K addK mulK M addM smul hM).
+exact (andEL
+  (ring K addK mulK /\ abelian_group M addM)
+  ((forall scalar :e K, forall x :e M,
+      smul scalar x :e M)
+    /\ (forall scalar mu :e K, forall x :e M,
+      smul scalar (smul mu x) = smul (mulK scalar mu) x))
+  (andEL
+    ((ring K addK mulK /\ abelian_group M addM)
+      /\ ((forall scalar :e K, forall x :e M,
+            smul scalar x :e M)
+        /\ (forall scalar mu :e K, forall x :e M,
+          smul scalar (smul mu x) = smul (mulK scalar mu) x)))
+    ((forall x :e M, smul (ring_one K mulK) x = x)
+      /\ (forall scalar mu :e K, forall x :e M,
+        smul (addK scalar mu) x
+          = addM (smul scalar x) (smul mu x)))
+    (andEL
+      (((ring K addK mulK /\ abelian_group M addM)
+        /\ ((forall scalar :e K, forall x :e M,
+              smul scalar x :e M)
+          /\ (forall scalar mu :e K, forall x :e M,
+            smul scalar (smul mu x) = smul (mulK scalar mu) x)))
+        /\ ((forall x :e M, smul (ring_one K mulK) x = x)
+          /\ (forall scalar mu :e K, forall x :e M,
+            smul (addK scalar mu) x
+              = addM (smul scalar x) (smul mu x))))
+      (forall scalar :e K, forall x y :e M,
+        smul scalar (addM x y)
+          = addM (smul scalar x) (smul scalar y))
+      hcomponents))).
+Qed.
+
+Theorem god1_left_module_scalar_core_component :
+  forall K, forall addK mulK:set -> set -> set,
+  forall M, forall addM smul:set -> set -> set,
+    left_module K addK mulK M addM smul ->
+    (forall scalar :e K, forall x :e M, smul scalar x :e M)
+    /\ (forall scalar mu :e K, forall x :e M,
+      smul scalar (smul mu x) = smul (mulK scalar mu) x).
+let K addK mulK M addM smul.
+assume hM.
+claim hcomponents :
+  (((ring K addK mulK /\ abelian_group M addM)
+    /\ ((forall scalar :e K, forall x :e M,
+          smul scalar x :e M)
+      /\ (forall scalar mu :e K, forall x :e M,
+        smul scalar (smul mu x) = smul (mulK scalar mu) x)))
+    /\ ((forall x :e M, smul (ring_one K mulK) x = x)
+      /\ (forall scalar mu :e K, forall x :e M,
+        smul (addK scalar mu) x
+          = addM (smul scalar x) (smul mu x))))
+  /\ (forall scalar :e K, forall x y :e M,
+    smul scalar (addM x y)
+      = addM (smul scalar x) (smul scalar y)).
+exact (god1_left_module_axiom_components
+  K addK mulK M addM smul hM).
+exact (andER
+  (ring K addK mulK /\ abelian_group M addM)
+  ((forall scalar :e K, forall x :e M,
+      smul scalar x :e M)
+    /\ (forall scalar mu :e K, forall x :e M,
+      smul scalar (smul mu x) = smul (mulK scalar mu) x))
+  (andEL
+    ((ring K addK mulK /\ abelian_group M addM)
+      /\ ((forall scalar :e K, forall x :e M,
+            smul scalar x :e M)
+        /\ (forall scalar mu :e K, forall x :e M,
+          smul scalar (smul mu x) = smul (mulK scalar mu) x)))
+    ((forall x :e M, smul (ring_one K mulK) x = x)
+      /\ (forall scalar mu :e K, forall x :e M,
+        smul (addK scalar mu) x
+          = addM (smul scalar x) (smul mu x)))
+    (andEL
+      (((ring K addK mulK /\ abelian_group M addM)
+        /\ ((forall scalar :e K, forall x :e M,
+              smul scalar x :e M)
+          /\ (forall scalar mu :e K, forall x :e M,
+            smul scalar (smul mu x) = smul (mulK scalar mu) x)))
+        /\ ((forall x :e M, smul (ring_one K mulK) x = x)
+          /\ (forall scalar mu :e K, forall x :e M,
+            smul (addK scalar mu) x
+              = addM (smul scalar x) (smul mu x))))
+      (forall scalar :e K, forall x y :e M,
+        smul scalar (addM x y)
+          = addM (smul scalar x) (smul scalar y))
+      hcomponents))).
+Qed.
+
+Theorem god1_left_module_scalar_add_component :
+  forall K, forall addK mulK:set -> set -> set,
+  forall M, forall addM smul:set -> set -> set,
+    left_module K addK mulK M addM smul ->
+    (forall x :e M, smul (ring_one K mulK) x = x)
+    /\ (forall scalar mu :e K, forall x :e M,
+      smul (addK scalar mu) x
+        = addM (smul scalar x) (smul mu x)).
+let K addK mulK M addM smul.
+assume hM.
+claim hcomponents :
+  (((ring K addK mulK /\ abelian_group M addM)
+    /\ ((forall scalar :e K, forall x :e M,
+          smul scalar x :e M)
+      /\ (forall scalar mu :e K, forall x :e M,
+        smul scalar (smul mu x) = smul (mulK scalar mu) x)))
+    /\ ((forall x :e M, smul (ring_one K mulK) x = x)
+      /\ (forall scalar mu :e K, forall x :e M,
+        smul (addK scalar mu) x
+          = addM (smul scalar x) (smul mu x))))
+  /\ (forall scalar :e K, forall x y :e M,
+    smul scalar (addM x y)
+      = addM (smul scalar x) (smul scalar y)).
+exact (god1_left_module_axiom_components
+  K addK mulK M addM smul hM).
+exact (andER
+  ((ring K addK mulK /\ abelian_group M addM)
+    /\ ((forall scalar :e K, forall x :e M,
+          smul scalar x :e M)
+      /\ (forall scalar mu :e K, forall x :e M,
+        smul scalar (smul mu x) = smul (mulK scalar mu) x)))
+  ((forall x :e M, smul (ring_one K mulK) x = x)
+    /\ (forall scalar mu :e K, forall x :e M,
+      smul (addK scalar mu) x
+        = addM (smul scalar x) (smul mu x)))
+  (andEL
+    (((ring K addK mulK /\ abelian_group M addM)
+      /\ ((forall scalar :e K, forall x :e M,
+            smul scalar x :e M)
+        /\ (forall scalar mu :e K, forall x :e M,
+          smul scalar (smul mu x) = smul (mulK scalar mu) x)))
+      /\ ((forall x :e M, smul (ring_one K mulK) x = x)
+        /\ (forall scalar mu :e K, forall x :e M,
+          smul (addK scalar mu) x
+            = addM (smul scalar x) (smul mu x))))
+    (forall scalar :e K, forall x y :e M,
+      smul scalar (addM x y)
+        = addM (smul scalar x) (smul scalar y))
+    hcomponents)).
+Qed.
+
+Theorem god1_left_module_vector_add_component :
+  forall K, forall addK mulK:set -> set -> set,
+  forall M, forall addM smul:set -> set -> set,
+    left_module K addK mulK M addM smul ->
+    forall scalar :e K, forall x y :e M,
+      smul scalar (addM x y)
+        = addM (smul scalar x) (smul scalar y).
+let K addK mulK M addM smul.
+assume hM.
+claim hcomponents :
+  (((ring K addK mulK /\ abelian_group M addM)
+    /\ ((forall scalar :e K, forall x :e M,
+          smul scalar x :e M)
+      /\ (forall scalar mu :e K, forall x :e M,
+        smul scalar (smul mu x) = smul (mulK scalar mu) x)))
+    /\ ((forall x :e M, smul (ring_one K mulK) x = x)
+      /\ (forall scalar mu :e K, forall x :e M,
+        smul (addK scalar mu) x
+          = addM (smul scalar x) (smul mu x))))
+  /\ (forall scalar :e K, forall x y :e M,
+    smul scalar (addM x y)
+      = addM (smul scalar x) (smul scalar y)).
+exact (god1_left_module_axiom_components
+  K addK mulK M addM smul hM).
+exact (andER
+  (((ring K addK mulK /\ abelian_group M addM)
+    /\ ((forall scalar :e K, forall x :e M,
+          smul scalar x :e M)
+      /\ (forall scalar mu :e K, forall x :e M,
+        smul scalar (smul mu x) = smul (mulK scalar mu) x)))
+    /\ ((forall x :e M, smul (ring_one K mulK) x = x)
+      /\ (forall scalar mu :e K, forall x :e M,
+        smul (addK scalar mu) x
+          = addM (smul scalar x) (smul mu x))))
+  (forall scalar :e K, forall x y :e M,
+    smul scalar (addM x y)
+      = addM (smul scalar x) (smul scalar y))
+  hcomponents).
+Qed.
+
 Theorem god1_module_zero_and_negation_scalar_laws :
   forall K, forall addK mulK:set -> set -> set,
   forall M, forall addM smul:set -> set -> set,
@@ -79393,25 +79790,501 @@ Theorem god1_module_zero_and_negation_scalar_laws :
       = smul (ring_negation K addK (ring_one K mulK)) x).
 let K addK mulK M addM smul.
 assume hM.
-apply andI.
+claim hcomponents :
+  (((ring K addK mulK /\ abelian_group M addM)
+    /\ ((forall scalar :e K, forall x :e M,
+          smul scalar x :e M)
+      /\ (forall scalar mu :e K, forall x :e M,
+        smul scalar (smul mu x) = smul (mulK scalar mu) x)))
+    /\ ((forall x :e M, smul (ring_one K mulK) x = x)
+      /\ (forall scalar mu :e K, forall x :e M,
+        smul (addK scalar mu) x
+          = addM (smul scalar x) (smul mu x))))
+  /\ (forall scalar :e K, forall x y :e M,
+    smul scalar (addM x y)
+      = addM (smul scalar x) (smul scalar y)).
+exact (god1_left_module_axiom_components
+  K addK mulK M addM smul hM).
+claim hcomponentPrefix :
+  ((ring K addK mulK /\ abelian_group M addM)
+    /\ ((forall scalar :e K, forall x :e M,
+          smul scalar x :e M)
+      /\ (forall scalar mu :e K, forall x :e M,
+        smul scalar (smul mu x) = smul (mulK scalar mu) x)))
+  /\ ((forall x :e M, smul (ring_one K mulK) x = x)
+    /\ (forall scalar mu :e K, forall x :e M,
+      smul (addK scalar mu) x
+        = addM (smul scalar x) (smul mu x))).
+exact (andEL
+  (((ring K addK mulK /\ abelian_group M addM)
+    /\ ((forall scalar :e K, forall x :e M,
+          smul scalar x :e M)
+      /\ (forall scalar mu :e K, forall x :e M,
+        smul scalar (smul mu x) = smul (mulK scalar mu) x)))
+    /\ ((forall x :e M, smul (ring_one K mulK) x = x)
+      /\ (forall scalar mu :e K, forall x :e M,
+        smul (addK scalar mu) x
+          = addM (smul scalar x) (smul mu x))))
+  (forall scalar :e K, forall x y :e M,
+    smul scalar (addM x y)
+      = addM (smul scalar x) (smul scalar y))
+  hcomponents).
+claim hvectorAdd :
+  forall scalar :e K, forall x y :e M,
+    smul scalar (addM x y)
+      = addM (smul scalar x) (smul scalar y).
+exact (andER
+  (((ring K addK mulK /\ abelian_group M addM)
+    /\ ((forall scalar :e K, forall x :e M,
+          smul scalar x :e M)
+      /\ (forall scalar mu :e K, forall x :e M,
+        smul scalar (smul mu x) = smul (mulK scalar mu) x)))
+    /\ ((forall x :e M, smul (ring_one K mulK) x = x)
+      /\ (forall scalar mu :e K, forall x :e M,
+        smul (addK scalar mu) x
+          = addM (smul scalar x) (smul mu x))))
+  (forall scalar :e K, forall x y :e M,
+    smul scalar (addM x y)
+      = addM (smul scalar x) (smul scalar y))
+  hcomponents).
+claim hcomponentCore :
+  (ring K addK mulK /\ abelian_group M addM)
+  /\ ((forall scalar :e K, forall x :e M,
+        smul scalar x :e M)
+    /\ (forall scalar mu :e K, forall x :e M,
+      smul scalar (smul mu x) = smul (mulK scalar mu) x)).
+exact (andEL
+  ((ring K addK mulK /\ abelian_group M addM)
+    /\ ((forall scalar :e K, forall x :e M,
+          smul scalar x :e M)
+      /\ (forall scalar mu :e K, forall x :e M,
+        smul scalar (smul mu x) = smul (mulK scalar mu) x)))
+  ((forall x :e M, smul (ring_one K mulK) x = x)
+    /\ (forall scalar mu :e K, forall x :e M,
+      smul (addK scalar mu) x
+        = addM (smul scalar x) (smul mu x)))
+  hcomponentPrefix).
+claim hscalarTail :
+  (forall x :e M, smul (ring_one K mulK) x = x)
+  /\ (forall scalar mu :e K, forall x :e M,
+    smul (addK scalar mu) x
+      = addM (smul scalar x) (smul mu x)).
+exact (andER
+  ((ring K addK mulK /\ abelian_group M addM)
+    /\ ((forall scalar :e K, forall x :e M,
+          smul scalar x :e M)
+      /\ (forall scalar mu :e K, forall x :e M,
+        smul scalar (smul mu x) = smul (mulK scalar mu) x)))
+  ((forall x :e M, smul (ring_one K mulK) x = x)
+    /\ (forall scalar mu :e K, forall x :e M,
+      smul (addK scalar mu) x
+        = addM (smul scalar x) (smul mu x)))
+  hcomponentPrefix).
+claim hringAndAdditive :
+  ring K addK mulK /\ abelian_group M addM.
+exact (andEL
+  (ring K addK mulK /\ abelian_group M addM)
+  ((forall scalar :e K, forall x :e M,
+      smul scalar x :e M)
+    /\ (forall scalar mu :e K, forall x :e M,
+      smul scalar (smul mu x) = smul (mulK scalar mu) x))
+  hcomponentCore).
+claim hscalarCore :
+  (forall scalar :e K, forall x :e M, smul scalar x :e M)
+  /\ (forall scalar mu :e K, forall x :e M,
+    smul scalar (smul mu x) = smul (mulK scalar mu) x).
+exact (andER
+  (ring K addK mulK /\ abelian_group M addM)
+  ((forall scalar :e K, forall x :e M,
+      smul scalar x :e M)
+    /\ (forall scalar mu :e K, forall x :e M,
+      smul scalar (smul mu x) = smul (mulK scalar mu) x))
+  hcomponentCore).
+claim hring : ring K addK mulK.
+exact (andEL (ring K addK mulK) (abelian_group M addM)
+  hringAndAdditive).
+claim habelianM : abelian_group M addM.
+exact (andER (ring K addK mulK) (abelian_group M addM)
+  hringAndAdditive).
+claim hgroupM : group M addM.
+exact (andEL (group M addM) (commutative_on M addM) habelianM).
+claim hgroupK : group K addK.
+exact (god1_ring_additive_group K addK mulK hring).
+claim hclosure :
+  forall scalar :e K, forall x :e M, smul scalar x :e M.
+exact (andEL
+  (forall scalar :e K, forall x :e M, smul scalar x :e M)
+  (forall scalar mu :e K, forall x :e M,
+    smul scalar (smul mu x) = smul (mulK scalar mu) x)
+  hscalarCore).
+claim hscalarOne :
+  forall x :e M, smul (ring_one K mulK) x = x.
+exact (andEL
+  (forall x :e M, smul (ring_one K mulK) x = x)
+  (forall scalar mu :e K, forall x :e M,
+    smul (addK scalar mu) x
+      = addM (smul scalar x) (smul mu x))
+  hscalarTail).
+claim hscalarAdd :
+  forall scalar mu :e K, forall x :e M,
+    smul (addK scalar mu) x
+      = addM (smul scalar x) (smul mu x).
+exact (andER
+  (forall x :e M, smul (ring_one K mulK) x = x)
+  (forall scalar mu :e K, forall x :e M,
+    smul (addK scalar mu) x
+      = addM (smul scalar x) (smul mu x))
+  hscalarTail).
+claim hzeroMData :
+  module_zero M addM :e M
+  /\ forall x :e M,
+    addM x (module_zero M addM) = x
+    /\ addM (module_zero M addM) x = x.
+exact (god1_group_identity_specification M addM hgroupM).
+claim hzeroM : module_zero M addM :e M.
+exact (andEL
+  (module_zero M addM :e M)
+  (forall x :e M,
+    addM x (module_zero M addM) = x
+    /\ addM (module_zero M addM) x = x)
+  hzeroMData).
+claim hzeroMNeutral :
+  forall x :e M,
+    addM x (module_zero M addM) = x
+    /\ addM (module_zero M addM) x = x.
+exact (andER
+  (module_zero M addM :e M)
+  (forall x :e M,
+    addM x (module_zero M addM) = x
+    /\ addM (module_zero M addM) x = x)
+  hzeroMData).
+claim hzeroKData :
+  ring_zero K addK :e K
+  /\ forall scalar :e K,
+    addK scalar (ring_zero K addK) = scalar
+    /\ addK (ring_zero K addK) scalar = scalar.
+exact (god1_group_identity_specification K addK hgroupK).
+claim hzeroK : ring_zero K addK :e K.
+exact (andEL
+  (ring_zero K addK :e K)
+  (forall scalar :e K,
+    addK scalar (ring_zero K addK) = scalar
+    /\ addK (ring_zero K addK) scalar = scalar)
+  hzeroKData).
+claim hzeroKNeutral :
+  forall scalar :e K,
+    addK scalar (ring_zero K addK) = scalar
+    /\ addK (ring_zero K addK) scalar = scalar.
+exact (andER
+  (ring_zero K addK :e K)
+  (forall scalar :e K,
+    addK scalar (ring_zero K addK) = scalar
+    /\ addK (ring_zero K addK) scalar = scalar)
+  hzeroKData).
+claim honeKData :
+  ring_one K mulK :e K
+  /\ forall scalar :e K,
+    mulK scalar (ring_one K mulK) = scalar
+    /\ mulK (ring_one K mulK) scalar = scalar.
+exact (god1_ring_multiplicative_identity_specification
+  K addK mulK hring).
+claim honeK : ring_one K mulK :e K.
+exact (andEL
+  (ring_one K mulK :e K)
+  (forall scalar :e K,
+    mulK scalar (ring_one K mulK) = scalar
+    /\ mulK (ring_one K mulK) scalar = scalar)
+  honeKData).
 //GOD1PRF:197396 Observe that the identities in axiom (M 2) imply the relations
 claim h_s10_scalar_zero_laws :
   (forall a :e K, smul a (module_zero M addM) = module_zero M addM)
   /\ (forall x :e M, smul (ring_zero K addK) x = module_zero M addM).
-admit.
+claim hscalarTimesZeroCore : forall a :e K,
+  smul a (module_zero M addM) = module_zero M addM.
+let a.
+assume ha.
+claim hscaledZeroM : smul a (module_zero M addM) :e M.
+exact (hclosure a ha (module_zero M addM) hzeroM).
+claim hzeroPlusZero :
+  addM (module_zero M addM) (module_zero M addM)
+    = module_zero M addM.
+exact (andEL
+  (addM (module_zero M addM) (module_zero M addM)
+    = module_zero M addM)
+  (addM (module_zero M addM) (module_zero M addM)
+    = module_zero M addM)
+  (hzeroMNeutral (module_zero M addM) hzeroM)).
+claim hscaledZeroDouble :
+  smul a (module_zero M addM)
+  = addM
+    (smul a (module_zero M addM))
+    (smul a (module_zero M addM)).
+exact (eq_i_tra
+  (smul a (module_zero M addM))
+  (smul a
+    (addM (module_zero M addM) (module_zero M addM)))
+  (addM
+    (smul a (module_zero M addM))
+    (smul a (module_zero M addM)))
+  (eq_sym
+    (smul a
+      (addM (module_zero M addM) (module_zero M addM)))
+    (smul a (module_zero M addM))
+    (f_eq_i (smul a)
+      (addM (module_zero M addM) (module_zero M addM))
+      (module_zero M addM) hzeroPlusZero))
+  (hvectorAdd a ha
+    (module_zero M addM) hzeroM
+    (module_zero M addM) hzeroM)).
+claim hcancelEquation :
+  addM (smul a (module_zero M addM)) (module_zero M addM)
+  = addM (smul a (module_zero M addM))
+    (smul a (module_zero M addM)).
+exact (eq_i_tra
+  (addM (smul a (module_zero M addM)) (module_zero M addM))
+  (smul a (module_zero M addM))
+  (addM (smul a (module_zero M addM))
+    (smul a (module_zero M addM)))
+  (andEL
+    (addM (smul a (module_zero M addM)) (module_zero M addM)
+      = smul a (module_zero M addM))
+    (addM (module_zero M addM) (smul a (module_zero M addM))
+      = smul a (module_zero M addM))
+    (hzeroMNeutral
+      (smul a (module_zero M addM)) hscaledZeroM))
+  hscaledZeroDouble).
+exact (eq_sym
+  (module_zero M addM)
+  (smul a (module_zero M addM))
+  (god1_group_left_cancel M addM hgroupM
+    (smul a (module_zero M addM)) hscaledZeroM
+    (module_zero M addM) hzeroM
+    (smul a (module_zero M addM)) hscaledZeroM
+    hcancelEquation)).
+claim hzeroScalarCore : forall x :e M,
+  smul (ring_zero K addK) x = module_zero M addM.
+let x.
+assume hx.
+claim hzeroScaledX : smul (ring_zero K addK) x :e M.
+exact (hclosure (ring_zero K addK) hzeroK x hx).
+claim hzeroPlusOne :
+  addK (ring_zero K addK) (ring_one K mulK) = ring_one K mulK.
+exact (andER
+  (addK (ring_one K mulK) (ring_zero K addK) = ring_one K mulK)
+  (addK (ring_zero K addK) (ring_one K mulK) = ring_one K mulK)
+  (hzeroKNeutral (ring_one K mulK) honeK)).
+claim hzeroScalarPlusX :
+  addM (smul (ring_zero K addK) x) x = x.
+exact (eq_i_tra
+  (addM (smul (ring_zero K addK) x) x)
+  (addM
+    (smul (ring_zero K addK) x)
+    (smul (ring_one K mulK) x))
+  x
+  (f_eq_i (addM (smul (ring_zero K addK) x))
+    x (smul (ring_one K mulK) x)
+    (eq_sym
+      (smul (ring_one K mulK) x) x
+      (hscalarOne x hx)))
+  (eq_i_tra
+    (addM
+      (smul (ring_zero K addK) x)
+      (smul (ring_one K mulK) x))
+    (smul (addK (ring_zero K addK) (ring_one K mulK)) x)
+    x
+    (eq_sym
+      (smul (addK (ring_zero K addK) (ring_one K mulK)) x)
+      (addM
+        (smul (ring_zero K addK) x)
+        (smul (ring_one K mulK) x))
+      (hscalarAdd
+        (ring_zero K addK) hzeroK
+        (ring_one K mulK) honeK x hx))
+    (eq_i_tra
+      (smul (addK (ring_zero K addK) (ring_one K mulK)) x)
+      (smul (ring_one K mulK) x)
+      x
+      (f_eq_i (fun scalar => smul scalar x)
+        (addK (ring_zero K addK) (ring_one K mulK))
+        (ring_one K mulK) hzeroPlusOne)
+      (hscalarOne x hx)))).
+claim hzeroScalarCancel :
+  addM (smul (ring_zero K addK) x) x
+  = addM (module_zero M addM) x.
+exact (eq_i_tra
+  (addM (smul (ring_zero K addK) x) x)
+  x
+  (addM (module_zero M addM) x)
+  hzeroScalarPlusX
+  (eq_sym
+    (addM (module_zero M addM) x) x
+    (andER
+      (addM x (module_zero M addM) = x)
+      (addM (module_zero M addM) x = x)
+      (hzeroMNeutral x hx)))).
+exact (god1_group_right_cancel M addM hgroupM
+  (smul (ring_zero K addK) x) hzeroScaledX
+  (module_zero M addM) hzeroM x hx hzeroScalarCancel).
+exact (andI
+  (forall a :e K,
+    smul a (module_zero M addM) = module_zero M addM)
+  (forall x :e M,
+    smul (ring_zero K addK) x = module_zero M addM)
+  hscalarTimesZeroCore hzeroScalarCore).
 //GOD1PRF:197776 To prove the first of these relations, observe that $\lambda 0+\lambda x=\lambda(0+x)=\lambda x$ for all $x=\mathrm{M}$, hence $\lambda 0=\lambda x-\lambda x=0$ as required.
 claim h_s10_scalar_times_zero : forall a :e K,
   smul a (module_zero M addM) = module_zero M addM.
-admit.
+exact (andEL
+  (forall a :e K,
+    smul a (module_zero M addM) = module_zero M addM)
+  (forall x :e M,
+    smul (ring_zero K addK) x = module_zero M addM)
+  h_s10_scalar_zero_laws).
 //GOD1PRF:197950 The second relation follows from the fact that $0 x+1 x=(0+1) x=1 x$, whence $0 x=x-x=0$.
 claim h_s10_zero_scalar : forall x :e M,
   smul (ring_zero K addK) x = module_zero M addM.
-admit.
+exact (andER
+  (forall a :e K,
+    smul a (module_zero M addM) = module_zero M addM)
+  (forall x :e M,
+    smul (ring_zero K addK) x = module_zero M addM)
+  h_s10_scalar_zero_laws).
 //GOD1PRF:207123 (because $(-1) x+x=(-1) x+(+1) x=(-1+1) x=0 x=0$ ).\\
 claim h_s10_negation_scalar : forall x :e M,
   module_negation M addM x = smul (ring_negation K addK (ring_one K mulK)) x.
-admit.
-Admitted.
+let x.
+assume hx.
+claim hminusOneK :
+  ring_negation K addK (ring_one K mulK) :e K.
+exact (god1_group_inverse_in K addK hgroupK
+  (ring_one K mulK) honeK).
+claim hminusOneScaledX :
+  smul (ring_negation K addK (ring_one K mulK)) x :e M.
+exact (hclosure
+  (ring_negation K addK (ring_one K mulK)) hminusOneK x hx).
+claim hminusOnePlusOne :
+  addK
+    (ring_negation K addK (ring_one K mulK))
+    (ring_one K mulK)
+  = ring_zero K addK.
+exact (andER
+  (ring_negation K addK (ring_one K mulK) :e K)
+  (addK
+    (ring_negation K addK (ring_one K mulK))
+    (ring_one K mulK)
+    = ring_zero K addK)
+  (andEL
+    ((ring_negation K addK (ring_one K mulK) :e K
+      /\ addK
+        (ring_negation K addK (ring_one K mulK))
+        (ring_one K mulK)
+        = ring_zero K addK))
+    (addK
+      (ring_one K mulK)
+      (ring_negation K addK (ring_one K mulK))
+      = ring_zero K addK)
+    (god1_group_inverse_specification K addK hgroupK
+      (ring_one K mulK) honeK))).
+claim hcandidateInverse :
+  addM
+    (smul (ring_negation K addK (ring_one K mulK)) x)
+    x
+  = module_zero M addM.
+exact (eq_i_tra
+  (addM
+    (smul (ring_negation K addK (ring_one K mulK)) x)
+    x)
+  (smul
+    (addK
+      (ring_negation K addK (ring_one K mulK))
+      (ring_one K mulK))
+    x)
+  (module_zero M addM)
+  (eq_i_tra
+    (addM
+      (smul (ring_negation K addK (ring_one K mulK)) x)
+      x)
+    (addM
+      (smul (ring_negation K addK (ring_one K mulK)) x)
+      (smul (ring_one K mulK) x))
+    (smul
+      (addK
+        (ring_negation K addK (ring_one K mulK))
+        (ring_one K mulK))
+      x)
+    (f_eq_i
+      (addM
+        (smul (ring_negation K addK (ring_one K mulK)) x))
+      x (smul (ring_one K mulK) x)
+      (eq_sym
+        (smul (ring_one K mulK) x) x
+        (hscalarOne x hx)))
+    (eq_sym
+      (smul
+        (addK
+          (ring_negation K addK (ring_one K mulK))
+          (ring_one K mulK))
+        x)
+      (addM
+        (smul (ring_negation K addK (ring_one K mulK)) x)
+        (smul (ring_one K mulK) x))
+      (hscalarAdd
+        (ring_negation K addK (ring_one K mulK)) hminusOneK
+        (ring_one K mulK) honeK x hx)))
+  (eq_i_tra
+    (smul
+      (addK
+        (ring_negation K addK (ring_one K mulK))
+        (ring_one K mulK))
+      x)
+    (smul (ring_zero K addK) x)
+    (module_zero M addM)
+    (f_eq_i (fun scalar => smul scalar x)
+      (addK
+        (ring_negation K addK (ring_one K mulK))
+        (ring_one K mulK))
+      (ring_zero K addK) hminusOnePlusOne)
+    (h_s10_zero_scalar x hx))).
+claim hinverseM : module_negation M addM x :e M.
+exact (god1_group_inverse_in M addM hgroupM x hx).
+claim hinverseMLeft :
+  addM (module_negation M addM x) x = module_zero M addM.
+exact (andER
+  (module_negation M addM x :e M)
+  (addM (module_negation M addM x) x = module_zero M addM)
+  (andEL
+    ((module_negation M addM x :e M
+      /\ addM (module_negation M addM x) x = module_zero M addM))
+    (addM x (module_negation M addM x) = module_zero M addM)
+    (god1_group_inverse_specification M addM hgroupM x hx))).
+exact (eq_sym
+  (smul (ring_negation K addK (ring_one K mulK)) x)
+  (module_negation M addM x)
+  (god1_group_right_cancel M addM hgroupM
+    (smul (ring_negation K addK (ring_one K mulK)) x)
+    hminusOneScaledX
+    (module_negation M addM x) hinverseM
+    x hx
+    (eq_i_tra
+      (addM
+        (smul (ring_negation K addK (ring_one K mulK)) x)
+        x)
+      (module_zero M addM)
+      (addM (module_negation M addM x) x)
+      hcandidateInverse
+      (eq_sym
+        (addM (module_negation M addM x) x)
+        (module_zero M addM) hinverseMLeft)))).
+exact (andI
+  ((forall scalar :e K,
+    smul scalar (module_zero M addM) = module_zero M addM)
+    /\ (forall x :e M,
+      smul (ring_zero K addK) x = module_zero M addM))
+  (forall x :e M,
+    module_negation M addM x
+      = smul (ring_negation K addK (ring_one K mulK)) x)
+  h_s10_scalar_zero_laws h_s10_negation_scalar).
+Qed.
 
 //GOD1:199690 module_power_addition : "componentwise addition on the module power #1^#4" | $(x_i)+(y_i)=(x_i+y_i)$
 Definition module_power_addition :
@@ -79422,6 +80295,25 @@ Definition module_power_addition :
 Definition module_power_left_scalar :
   set -> (set -> set -> set) -> set -> set -> set :=
   fun I smul scalar x => fun i :e I => smul scalar (x i).
+
+Theorem god1_module_power_addition_eval :
+  forall I, forall addM:set -> set -> set,
+  forall x y i, i :e I ->
+    module_power_addition I addM x y i = addM (x i) (y i).
+let I addM x y i.
+assume hi.
+exact (beta I (fun j => addM (x j) (y j)) i hi).
+Qed.
+
+Theorem god1_module_power_left_scalar_eval :
+  forall I, forall smul:set -> set -> set,
+  forall scalar x i, i :e I ->
+    module_power_left_scalar I smul scalar x i
+      = smul scalar (x i).
+let I smul scalar x i.
+assume hi.
+exact (beta I (fun j => smul scalar (x j)) i hi).
+Qed.
 
 Theorem god1_module_direct_power_is_module :
   forall K, forall addK mulK:set -> set -> set,
@@ -79439,11 +80331,457 @@ claim h_s10_power_product_group_call :
     (forall i :e I, group (G i) (op i)) ->
     group (Pi_ i :e I, G i) (indexed_group_product_operation I op).
 apply god1_indexed_direct_product_is_group.
+claim hringAndAdditive :
+  ring K addK mulK /\ abelian_group M addM.
+exact (god1_left_module_ring_and_additive_component
+  K addK mulK M addM smul hM).
+claim hring : ring K addK mulK.
+exact (andEL (ring K addK mulK) (abelian_group M addM)
+  hringAndAdditive).
+claim habelianM : abelian_group M addM.
+exact (andER (ring K addK mulK) (abelian_group M addM)
+  hringAndAdditive).
+claim hgroupM : group M addM.
+exact (andEL (group M addM) (commutative_on M addM) habelianM).
+claim hcommM : commutative_on M addM.
+exact (andER (group M addM) (commutative_on M addM) habelianM).
+claim hgroupK : group K addK.
+exact (god1_ring_additive_group K addK mulK hring).
+claim hscalarCore :
+  (forall scalar :e K, forall x :e M, smul scalar x :e M)
+  /\ (forall scalar mu :e K, forall x :e M,
+    smul scalar (smul mu x) = smul (mulK scalar mu) x).
+exact (god1_left_module_scalar_core_component
+  K addK mulK M addM smul hM).
+claim hscalarClosure :
+  forall scalar :e K, forall x :e M, smul scalar x :e M.
+exact (andEL
+  (forall scalar :e K, forall x :e M, smul scalar x :e M)
+  (forall scalar mu :e K, forall x :e M,
+    smul scalar (smul mu x) = smul (mulK scalar mu) x)
+  hscalarCore).
+claim hscalarAssoc :
+  forall scalar mu :e K, forall x :e M,
+    smul scalar (smul mu x) = smul (mulK scalar mu) x.
+exact (andER
+  (forall scalar :e K, forall x :e M, smul scalar x :e M)
+  (forall scalar mu :e K, forall x :e M,
+    smul scalar (smul mu x) = smul (mulK scalar mu) x)
+  hscalarCore).
+claim hscalarAddCore :
+  (forall x :e M, smul (ring_one K mulK) x = x)
+  /\ (forall scalar mu :e K, forall x :e M,
+    smul (addK scalar mu) x
+      = addM (smul scalar x) (smul mu x)).
+exact (god1_left_module_scalar_add_component
+  K addK mulK M addM smul hM).
+claim hscalarOne :
+  forall x :e M, smul (ring_one K mulK) x = x.
+exact (andEL
+  (forall x :e M, smul (ring_one K mulK) x = x)
+  (forall scalar mu :e K, forall x :e M,
+    smul (addK scalar mu) x
+      = addM (smul scalar x) (smul mu x))
+  hscalarAddCore).
+claim hscalarAdd :
+  forall scalar mu :e K, forall x :e M,
+    smul (addK scalar mu) x
+      = addM (smul scalar x) (smul mu x).
+exact (andER
+  (forall x :e M, smul (ring_one K mulK) x = x)
+  (forall scalar mu :e K, forall x :e M,
+    smul (addK scalar mu) x
+      = addM (smul scalar x) (smul mu x))
+  hscalarAddCore).
+claim hvectorAdd :
+  forall scalar :e K, forall x y :e M,
+    smul scalar (addM x y)
+      = addM (smul scalar x) (smul scalar y).
+exact (god1_left_module_vector_add_component
+  K addK mulK M addM smul hM).
+claim hpowerGroup :
+  group (M :^: I) (module_power_addition I addM).
+exact (h_s10_power_product_group_call
+  I (fun i => M) (fun i => addM)
+  (fun i hi => hgroupM)).
+claim hpowerCommutative :
+  commutative_on (M :^: I) (module_power_addition I addM).
+let x.
+assume hx.
+let y.
+assume hy.
+apply (Pi_ext I (fun i => M)
+  (module_power_addition I addM x y)
+  ((god1_group_law_of_composition
+    (M :^: I) (module_power_addition I addM) hpowerGroup) x hx y hy)
+  (module_power_addition I addM y x)
+  ((god1_group_law_of_composition
+    (M :^: I) (module_power_addition I addM) hpowerGroup) y hy x hx)).
+let i.
+assume hi.
+exact (eq_i_tra
+  (module_power_addition I addM x y i)
+  (addM (x i) (y i))
+  (module_power_addition I addM y x i)
+  (god1_module_power_addition_eval I addM x y i hi)
+  (eq_i_tra
+    (addM (x i) (y i))
+    (addM (y i) (x i))
+    (module_power_addition I addM y x i)
+    (hcommM
+      (x i) (ap_Pi I (fun j => M) x i hx hi)
+      (y i) (ap_Pi I (fun j => M) y i hy hi))
+    (eq_sym
+      (module_power_addition I addM y x i)
+      (addM (y i) (x i))
+      (god1_module_power_addition_eval I addM y x i hi)))).
+claim hpowerAbelian :
+  abelian_group (M :^: I) (module_power_addition I addM).
+exact (andI
+  (group (M :^: I) (module_power_addition I addM))
+  (commutative_on (M :^: I) (module_power_addition I addM))
+  hpowerGroup hpowerCommutative).
+claim hpowerScalarClosure :
+  forall scalar :e K, forall x :e (M :^: I),
+    module_power_left_scalar I smul scalar x :e (M :^: I).
+let scalar.
+assume hscalar.
+let x.
+assume hx.
+exact (lam_Pi I (fun i => M)
+  (fun i => smul scalar (x i))
+  (fun i hi => hscalarClosure scalar hscalar
+    (x i) (ap_Pi I (fun j => M) x i hx hi))).
+claim hpowerScalarAssoc :
+  forall scalar mu :e K, forall x :e (M :^: I),
+    module_power_left_scalar I smul scalar
+      (module_power_left_scalar I smul mu x)
+    = module_power_left_scalar I smul (mulK scalar mu) x.
+let scalar.
+assume hscalar.
+let mu.
+assume hmu.
+let x.
+assume hx.
+claim hmuX :
+  module_power_left_scalar I smul mu x :e (M :^: I).
+exact (hpowerScalarClosure mu hmu x hx).
+claim hscalarMu : mulK scalar mu :e K.
+exact (god1_ring_multiplicative_law K addK mulK hring
+  scalar hscalar mu hmu).
+apply (Pi_ext I (fun i => M)
+  (module_power_left_scalar I smul scalar
+    (module_power_left_scalar I smul mu x))
+  (hpowerScalarClosure scalar hscalar
+    (module_power_left_scalar I smul mu x) hmuX)
+  (module_power_left_scalar I smul (mulK scalar mu) x)
+  (hpowerScalarClosure (mulK scalar mu) hscalarMu x hx)).
+let i.
+assume hi.
+exact (eq_i_tra
+  (module_power_left_scalar I smul scalar
+    (module_power_left_scalar I smul mu x) i)
+  (smul scalar
+    (module_power_left_scalar I smul mu x i))
+  (module_power_left_scalar I smul (mulK scalar mu) x i)
+  (god1_module_power_left_scalar_eval I smul scalar
+    (module_power_left_scalar I smul mu x) i hi)
+  (eq_i_tra
+    (smul scalar
+      (module_power_left_scalar I smul mu x i))
+    (smul scalar (smul mu (x i)))
+    (module_power_left_scalar I smul (mulK scalar mu) x i)
+    (f_eq_i (smul scalar)
+      (module_power_left_scalar I smul mu x i)
+      (smul mu (x i))
+      (god1_module_power_left_scalar_eval I smul mu x i hi))
+    (eq_i_tra
+      (smul scalar (smul mu (x i)))
+      (smul (mulK scalar mu) (x i))
+      (module_power_left_scalar I smul (mulK scalar mu) x i)
+      (hscalarAssoc scalar hscalar mu hmu
+        (x i) (ap_Pi I (fun j => M) x i hx hi))
+      (eq_sym
+        (module_power_left_scalar I smul (mulK scalar mu) x i)
+        (smul (mulK scalar mu) (x i))
+        (god1_module_power_left_scalar_eval I smul
+          (mulK scalar mu) x i hi))))).
+claim honeK : ring_one K mulK :e K.
+exact (andEL
+  (ring_one K mulK :e K)
+  (forall scalar :e K,
+    mulK scalar (ring_one K mulK) = scalar
+    /\ mulK (ring_one K mulK) scalar = scalar)
+  (god1_ring_multiplicative_identity_specification
+    K addK mulK hring)).
+claim hpowerScalarOne :
+  forall x :e (M :^: I),
+    module_power_left_scalar I smul (ring_one K mulK) x = x.
+let x.
+assume hx.
+apply (Pi_ext I (fun i => M)
+  (module_power_left_scalar I smul (ring_one K mulK) x)
+  (hpowerScalarClosure (ring_one K mulK) honeK x hx)
+  x hx).
+let i.
+assume hi.
+exact (eq_i_tra
+  (module_power_left_scalar I smul (ring_one K mulK) x i)
+  (smul (ring_one K mulK) (x i))
+  (x i)
+  (god1_module_power_left_scalar_eval I smul
+    (ring_one K mulK) x i hi)
+  (hscalarOne
+    (x i) (ap_Pi I (fun j => M) x i hx hi))).
+claim hpowerScalarAdd :
+  forall scalar mu :e K, forall x :e (M :^: I),
+    module_power_left_scalar I smul (addK scalar mu) x
+    = module_power_addition I addM
+      (module_power_left_scalar I smul scalar x)
+      (module_power_left_scalar I smul mu x).
+let scalar.
+assume hscalar.
+let mu.
+assume hmu.
+let x.
+assume hx.
+claim hscalarPlusMu : addK scalar mu :e K.
+exact ((god1_group_law_of_composition K addK hgroupK)
+  scalar hscalar mu hmu).
+claim hscalarX :
+  module_power_left_scalar I smul scalar x :e (M :^: I).
+exact (hpowerScalarClosure scalar hscalar x hx).
+claim hmuX :
+  module_power_left_scalar I smul mu x :e (M :^: I).
+exact (hpowerScalarClosure mu hmu x hx).
+apply (Pi_ext I (fun i => M)
+  (module_power_left_scalar I smul (addK scalar mu) x)
+  (hpowerScalarClosure (addK scalar mu) hscalarPlusMu x hx)
+  (module_power_addition I addM
+    (module_power_left_scalar I smul scalar x)
+    (module_power_left_scalar I smul mu x))
+  ((god1_group_law_of_composition
+    (M :^: I) (module_power_addition I addM) hpowerGroup)
+    (module_power_left_scalar I smul scalar x) hscalarX
+    (module_power_left_scalar I smul mu x) hmuX)).
+let i.
+assume hi.
+claim hrightScalarAddEval :
+  module_power_addition I addM
+    (module_power_left_scalar I smul scalar x)
+    (module_power_left_scalar I smul mu x) i
+  = addM (smul scalar (x i)) (smul mu (x i)).
+exact (eq_i_tra
+  (module_power_addition I addM
+    (module_power_left_scalar I smul scalar x)
+    (module_power_left_scalar I smul mu x) i)
+  (addM
+    (module_power_left_scalar I smul scalar x i)
+    (module_power_left_scalar I smul mu x i))
+  (addM (smul scalar (x i)) (smul mu (x i)))
+  (god1_module_power_addition_eval I addM
+    (module_power_left_scalar I smul scalar x)
+    (module_power_left_scalar I smul mu x) i hi)
+  (god1_binary_operation_congruence addM
+    (module_power_left_scalar I smul scalar x i)
+    (smul scalar (x i))
+    (module_power_left_scalar I smul mu x i)
+    (smul mu (x i))
+    (god1_module_power_left_scalar_eval I smul scalar x i hi)
+    (god1_module_power_left_scalar_eval I smul mu x i hi))).
+exact (eq_i_tra
+  (module_power_left_scalar I smul (addK scalar mu) x i)
+  (smul (addK scalar mu) (x i))
+  (module_power_addition I addM
+    (module_power_left_scalar I smul scalar x)
+    (module_power_left_scalar I smul mu x) i)
+  (god1_module_power_left_scalar_eval I smul
+    (addK scalar mu) x i hi)
+  (eq_i_tra
+    (smul (addK scalar mu) (x i))
+    (addM (smul scalar (x i)) (smul mu (x i)))
+    (module_power_addition I addM
+      (module_power_left_scalar I smul scalar x)
+      (module_power_left_scalar I smul mu x) i)
+    (hscalarAdd scalar hscalar mu hmu
+      (x i) (ap_Pi I (fun j => M) x i hx hi))
+    (eq_sym
+      (module_power_addition I addM
+        (module_power_left_scalar I smul scalar x)
+        (module_power_left_scalar I smul mu x) i)
+      (addM (smul scalar (x i)) (smul mu (x i)))
+      hrightScalarAddEval))).
+claim hpowerVectorAdd :
+  forall scalar :e K, forall x y :e (M :^: I),
+    module_power_left_scalar I smul scalar
+      (module_power_addition I addM x y)
+    = module_power_addition I addM
+      (module_power_left_scalar I smul scalar x)
+      (module_power_left_scalar I smul scalar y).
+let scalar.
+assume hscalar.
+let x.
+assume hx.
+let y.
+assume hy.
+claim hxy : module_power_addition I addM x y :e (M :^: I).
+exact ((god1_group_law_of_composition
+  (M :^: I) (module_power_addition I addM) hpowerGroup)
+  x hx y hy).
+claim hscalarX :
+  module_power_left_scalar I smul scalar x :e (M :^: I).
+exact (hpowerScalarClosure scalar hscalar x hx).
+claim hscalarY :
+  module_power_left_scalar I smul scalar y :e (M :^: I).
+exact (hpowerScalarClosure scalar hscalar y hy).
+apply (Pi_ext I (fun i => M)
+  (module_power_left_scalar I smul scalar
+    (module_power_addition I addM x y))
+  (hpowerScalarClosure scalar hscalar
+    (module_power_addition I addM x y) hxy)
+  (module_power_addition I addM
+    (module_power_left_scalar I smul scalar x)
+    (module_power_left_scalar I smul scalar y))
+  ((god1_group_law_of_composition
+    (M :^: I) (module_power_addition I addM) hpowerGroup)
+    (module_power_left_scalar I smul scalar x) hscalarX
+    (module_power_left_scalar I smul scalar y) hscalarY)).
+let i.
+assume hi.
+claim hrightVectorAddEval :
+  module_power_addition I addM
+    (module_power_left_scalar I smul scalar x)
+    (module_power_left_scalar I smul scalar y) i
+  = addM (smul scalar (x i)) (smul scalar (y i)).
+exact (eq_i_tra
+  (module_power_addition I addM
+    (module_power_left_scalar I smul scalar x)
+    (module_power_left_scalar I smul scalar y) i)
+  (addM
+    (module_power_left_scalar I smul scalar x i)
+    (module_power_left_scalar I smul scalar y i))
+  (addM (smul scalar (x i)) (smul scalar (y i)))
+  (god1_module_power_addition_eval I addM
+    (module_power_left_scalar I smul scalar x)
+    (module_power_left_scalar I smul scalar y) i hi)
+  (god1_binary_operation_congruence addM
+    (module_power_left_scalar I smul scalar x i)
+    (smul scalar (x i))
+    (module_power_left_scalar I smul scalar y i)
+    (smul scalar (y i))
+    (god1_module_power_left_scalar_eval I smul scalar x i hi)
+    (god1_module_power_left_scalar_eval I smul scalar y i hi))).
+exact (eq_i_tra
+  (module_power_left_scalar I smul scalar
+    (module_power_addition I addM x y) i)
+  (smul scalar (module_power_addition I addM x y i))
+  (module_power_addition I addM
+    (module_power_left_scalar I smul scalar x)
+    (module_power_left_scalar I smul scalar y) i)
+  (god1_module_power_left_scalar_eval I smul scalar
+    (module_power_addition I addM x y) i hi)
+  (eq_i_tra
+    (smul scalar (module_power_addition I addM x y i))
+    (smul scalar (addM (x i) (y i)))
+    (module_power_addition I addM
+      (module_power_left_scalar I smul scalar x)
+      (module_power_left_scalar I smul scalar y) i)
+    (f_eq_i (smul scalar)
+      (module_power_addition I addM x y i)
+      (addM (x i) (y i))
+      (god1_module_power_addition_eval I addM x y i hi))
+    (eq_i_tra
+      (smul scalar (addM (x i) (y i)))
+      (addM (smul scalar (x i)) (smul scalar (y i)))
+      (module_power_addition I addM
+        (module_power_left_scalar I smul scalar x)
+        (module_power_left_scalar I smul scalar y) i)
+      (hvectorAdd scalar hscalar
+        (x i) (ap_Pi I (fun j => M) x i hx hi)
+        (y i) (ap_Pi I (fun j => M) y i hy hi))
+      (eq_sym
+        (module_power_addition I addM
+          (module_power_left_scalar I smul scalar x)
+          (module_power_left_scalar I smul scalar y) i)
+        (addM (smul scalar (x i)) (smul scalar (y i)))
+        hrightVectorAddEval)))).
 claim h_s10_power_module_conclusion :
   left_module K addK mulK (M :^: I)
     (module_power_addition I addM) (module_power_left_scalar I smul).
-admit.
-Admitted.
+exact (andI
+  (((((ring K addK mulK
+    /\ abelian_group (M :^: I) (module_power_addition I addM))
+    /\ (forall scalar :e K, forall x :e (M :^: I),
+      module_power_left_scalar I smul scalar x :e (M :^: I)))
+    /\ (forall scalar mu :e K, forall x :e (M :^: I),
+      module_power_left_scalar I smul scalar
+        (module_power_left_scalar I smul mu x)
+      = module_power_left_scalar I smul (mulK scalar mu) x))
+    /\ (forall x :e (M :^: I),
+      module_power_left_scalar I smul (ring_one K mulK) x = x))
+    /\ (forall scalar mu :e K, forall x :e (M :^: I),
+      module_power_left_scalar I smul (addK scalar mu) x
+      = module_power_addition I addM
+        (module_power_left_scalar I smul scalar x)
+        (module_power_left_scalar I smul mu x)))
+  (forall scalar :e K, forall x y :e (M :^: I),
+    module_power_left_scalar I smul scalar
+      (module_power_addition I addM x y)
+    = module_power_addition I addM
+      (module_power_left_scalar I smul scalar x)
+      (module_power_left_scalar I smul scalar y))
+  (andI
+    ((((ring K addK mulK
+      /\ abelian_group (M :^: I) (module_power_addition I addM))
+      /\ (forall scalar :e K, forall x :e (M :^: I),
+        module_power_left_scalar I smul scalar x :e (M :^: I)))
+      /\ (forall scalar mu :e K, forall x :e (M :^: I),
+        module_power_left_scalar I smul scalar
+          (module_power_left_scalar I smul mu x)
+        = module_power_left_scalar I smul (mulK scalar mu) x))
+      /\ (forall x :e (M :^: I),
+        module_power_left_scalar I smul (ring_one K mulK) x = x))
+    (forall scalar mu :e K, forall x :e (M :^: I),
+      module_power_left_scalar I smul (addK scalar mu) x
+      = module_power_addition I addM
+        (module_power_left_scalar I smul scalar x)
+        (module_power_left_scalar I smul mu x))
+    (andI
+      (((ring K addK mulK
+        /\ abelian_group (M :^: I) (module_power_addition I addM))
+        /\ (forall scalar :e K, forall x :e (M :^: I),
+          module_power_left_scalar I smul scalar x :e (M :^: I)))
+        /\ (forall scalar mu :e K, forall x :e (M :^: I),
+          module_power_left_scalar I smul scalar
+            (module_power_left_scalar I smul mu x)
+          = module_power_left_scalar I smul (mulK scalar mu) x))
+      (forall x :e (M :^: I),
+        module_power_left_scalar I smul (ring_one K mulK) x = x)
+      (andI
+        ((ring K addK mulK
+          /\ abelian_group (M :^: I) (module_power_addition I addM))
+          /\ (forall scalar :e K, forall x :e (M :^: I),
+            module_power_left_scalar I smul scalar x :e (M :^: I)))
+        (forall scalar mu :e K, forall x :e (M :^: I),
+          module_power_left_scalar I smul scalar
+            (module_power_left_scalar I smul mu x)
+          = module_power_left_scalar I smul (mulK scalar mu) x)
+        (andI
+          (ring K addK mulK
+            /\ abelian_group (M :^: I) (module_power_addition I addM))
+          (forall scalar :e K, forall x :e (M :^: I),
+            module_power_left_scalar I smul scalar x :e (M :^: I))
+          (andI
+            (ring K addK mulK)
+            (abelian_group (M :^: I) (module_power_addition I addM))
+            hring hpowerAbelian)
+          hpowerScalarClosure)
+        hpowerScalarAssoc)
+      hpowerScalarOne)
+    hpowerScalarAdd)
+  hpowerVectorAdd).
+exact h_s10_power_module_conclusion.
+Qed.
 
 Theorem god1_mapping_module_is_module :
   forall K, forall addK mulK:set -> set -> set,
@@ -79459,13 +80797,15 @@ assume hM.
 claim h_s10_mapping_module_goal :
   left_module K addK mulK (M :^: X)
     (module_power_addition X addM) (module_power_left_scalar X smul).
-admit.
+exact (god1_module_direct_power_is_module
+  K addK mulK M addM smul X hM).
 //GOD1PRF:202567 The reader should verify in detail that the axioms (M 1) and (M 2) are satisfied.\\
 claim h_s10_mapping_module_axioms :
   left_module K addK mulK (M :^: X)
     (module_power_addition X addM) (module_power_left_scalar X smul).
-admit.
-Admitted.
+exact h_s10_mapping_module_goal.
+exact h_s10_mapping_module_axioms.
+Qed.
 
 //GOD1:206210 submodule : "#7 is a submodule of the left #1-module #4" | $#7\leq_{#1}#4$
 Definition submodule :
