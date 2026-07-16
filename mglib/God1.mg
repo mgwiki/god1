@@ -53939,6 +53939,208 @@ Definition subring :
     /\ (forall x y :e A, mul x y :e A)
     /\ ring_one K mul :e A.
 
+Theorem god1_subring_ambient_ring :
+  forall K, forall add mul:set -> set -> set, forall A,
+    subring K add mul A -> ring K add mul.
+let K add mul A.
+assume hA.
+exact (andEL
+  (ring K add mul) (A c= K)
+  (andEL
+    (ring K add mul /\ A c= K) (subgroup K add A)
+    (andEL
+      ((ring K add mul /\ A c= K) /\ subgroup K add A)
+      (forall x y :e A, mul x y :e A)
+      (andEL
+        (((ring K add mul /\ A c= K) /\ subgroup K add A)
+          /\ forall x y :e A, mul x y :e A)
+        (ring_one K mul :e A) hA)))).
+Qed.
+
+Theorem god1_subring_subset :
+  forall K, forall add mul:set -> set -> set, forall A,
+    subring K add mul A -> A c= K.
+let K add mul A.
+assume hA.
+exact (andER
+  (ring K add mul) (A c= K)
+  (andEL
+    (ring K add mul /\ A c= K) (subgroup K add A)
+    (andEL
+      ((ring K add mul /\ A c= K) /\ subgroup K add A)
+      (forall x y :e A, mul x y :e A)
+      (andEL
+        (((ring K add mul /\ A c= K) /\ subgroup K add A)
+          /\ forall x y :e A, mul x y :e A)
+        (ring_one K mul :e A) hA)))).
+Qed.
+
+Theorem god1_subring_additive_subgroup :
+  forall K, forall add mul:set -> set -> set, forall A,
+    subring K add mul A -> subgroup K add A.
+let K add mul A.
+assume hA.
+exact (andER
+  (ring K add mul /\ A c= K) (subgroup K add A)
+  (andEL
+    ((ring K add mul /\ A c= K) /\ subgroup K add A)
+    (forall x y :e A, mul x y :e A)
+    (andEL
+      (((ring K add mul /\ A c= K) /\ subgroup K add A)
+        /\ forall x y :e A, mul x y :e A)
+      (ring_one K mul :e A) hA))).
+Qed.
+
+Theorem god1_subring_multiplication_closed :
+  forall K, forall add mul:set -> set -> set, forall A,
+    subring K add mul A -> forall x y :e A, mul x y :e A.
+let K add mul A.
+assume hA.
+exact (andER
+  ((ring K add mul /\ A c= K) /\ subgroup K add A)
+  (forall x y :e A, mul x y :e A)
+  (andEL
+    (((ring K add mul /\ A c= K) /\ subgroup K add A)
+      /\ forall x y :e A, mul x y :e A)
+    (ring_one K mul :e A) hA)).
+Qed.
+
+Theorem god1_subring_contains_one :
+  forall K, forall add mul:set -> set -> set, forall A,
+    subring K add mul A -> ring_one K mul :e A.
+let K add mul A.
+assume hA.
+exact (andER
+  (((ring K add mul /\ A c= K) /\ subgroup K add A)
+    /\ forall x y :e A, mul x y :e A)
+  (ring_one K mul :e A) hA).
+Qed.
+
+Theorem god1_ring_multiplicative_associative :
+  forall K, forall add mul:set -> set -> set,
+    ring K add mul -> associative_on K mul.
+let K add mul.
+assume hK.
+exact (andER
+  (abelian_group K add /\ law_of_composition K mul)
+  (associative_on K mul)
+  (andEL
+    ((abelian_group K add /\ law_of_composition K mul)
+      /\ associative_on K mul)
+    (exists one :e K, neutral_element K mul one)
+    (andEL
+      (((abelian_group K add /\ law_of_composition K mul)
+        /\ associative_on K mul)
+        /\ exists one :e K, neutral_element K mul one)
+      (forall x y z :e K,
+        mul x (add y z) = add (mul x y) (mul x z)
+        /\ mul (add x y) z = add (mul x z) (mul y z))
+      hK))).
+Qed.
+
+Theorem god1_subring_multiplicative_identity :
+  forall K, forall add mul:set -> set -> set, forall A,
+    subring K add mul A ->
+    neutral_element A mul (ring_one K mul).
+let K add mul A.
+assume hA.
+claim hK : ring K add mul.
+exact (god1_subring_ambient_ring K add mul A hA).
+claim hAK : A c= K.
+exact (god1_subring_subset K add mul A hA).
+apply (andI
+  (ring_one K mul :e A)
+  (forall x :e A,
+    mul x (ring_one K mul) = x /\ mul (ring_one K mul) x = x)).
+- exact (god1_subring_contains_one K add mul A hA).
+- let x.
+  assume hx.
+  exact ((andER
+    (ring_one K mul :e K)
+    (forall y :e K,
+      mul y (ring_one K mul) = y /\ mul (ring_one K mul) y = y)
+    (god1_ring_multiplicative_identity_specification K add mul hK))
+    x (hAK x hx)).
+Qed.
+
+Theorem god1_subring_induced_ring_core :
+  forall K, forall add mul:set -> set -> set, forall A,
+    subring K add mul A -> ring A add mul.
+let K add mul A.
+assume hA.
+claim hK : ring K add mul.
+exact (god1_subring_ambient_ring K add mul A hA).
+claim hAK : A c= K.
+exact (god1_subring_subset K add mul A hA).
+claim hsubgroup : subgroup K add A.
+exact (god1_subring_additive_subgroup K add mul A hA).
+claim hgroupA : group A add.
+exact (god1_subgroup_induced_group K add A hsubgroup).
+claim hcommA : commutative_on A add.
+let x.
+assume hx.
+let y.
+assume hy.
+exact ((andER
+  (group K add) (commutative_on K add)
+  (god1_ring_additive_abelian_group K add mul hK))
+  x (hAK x hx) y (hAK y hy)).
+claim habelianA : abelian_group A add.
+exact (andI
+  (group A add) (commutative_on A add) hgroupA hcommA).
+claim hassocA : associative_on A mul.
+let x.
+assume hx.
+let y.
+assume hy.
+let z.
+assume hz.
+exact (god1_ring_multiplicative_associative K add mul hK
+  x (hAK x hx) y (hAK y hy) z (hAK z hz)).
+claim honeutralA : neutral_element A mul (ring_one K mul).
+exact (god1_subring_multiplicative_identity K add mul A hA).
+claim honeexists :
+  exists one :e A, neutral_element A mul one.
+witness (ring_one K mul).
+exact (andI
+  (ring_one K mul :e A)
+  (neutral_element A mul (ring_one K mul))
+  (god1_subring_contains_one K add mul A hA) honeutralA).
+claim hdistA : forall x y z :e A,
+  mul x (add y z) = add (mul x y) (mul x z)
+  /\ mul (add x y) z = add (mul x z) (mul y z).
+let x.
+assume hx.
+let y.
+assume hy.
+let z.
+assume hz.
+exact (god1_ring_distributive_laws K add mul hK
+  x (hAK x hx) y (hAK y hy) z (hAK z hz)).
+apply (andI
+  ((((abelian_group A add /\ law_of_composition A mul)
+    /\ associative_on A mul)
+    /\ exists one :e A, neutral_element A mul one))
+  (forall x y z :e A,
+    mul x (add y z) = add (mul x y) (mul x z)
+    /\ mul (add x y) z = add (mul x z) (mul y z))).
+- exact (andI
+    (((abelian_group A add /\ law_of_composition A mul)
+      /\ associative_on A mul))
+    (exists one :e A, neutral_element A mul one)
+    (andI
+      (abelian_group A add /\ law_of_composition A mul)
+      (associative_on A mul)
+      (andI
+        (abelian_group A add)
+        (law_of_composition A mul)
+        habelianA
+        (god1_subring_multiplication_closed K add mul A hA))
+      hassocA)
+    honeexists).
+- exact hdistA.
+Qed.
+
 Theorem god1_subring_induced_ring :
   forall K, forall add mul:set -> set -> set, forall A,
     subring K add mul A -> ring A add mul.
@@ -53946,10 +54148,10 @@ let K add mul A.
 assume hA.
 //GOD1PRF:104675 The set A , together with these two laws of composition, is a ring.
 claim h_s8_subring_induced_goal : ring A add mul.
-admit.
+exact (god1_subring_induced_ring_core K add mul A hA).
 //GOD1PRF:104744 For the set A together with the law of addition is a commutative group (§ 7, section 3); the multiplication is associative in K , hence $a$ fortiori in A , and A contains a neutral element with respect to multiplication, because A contains the identity element of K ; finally the distributive laws are satisfied in A because they are satisfied in K.
 claim h_s8_subring_additive_subgroup : subgroup K add A.
-admit.
+exact (god1_subring_additive_subgroup K add mul A hA).
 claim h_s8_subring_s7_section3_call : group A add.
 apply (god1_subgroup_induced_group K add A h_s8_subring_additive_subgroup).
 claim h_s8_subring_ring_components :
@@ -53959,8 +54161,168 @@ claim h_s8_subring_ring_components :
   /\ forall x y z :e A,
     mul x (add y z) = add (mul x y) (mul x z)
     /\ mul (add x y) z = add (mul x z) (mul y z).
-admit.
-Admitted.
+exact (andI
+  (((group A add /\ associative_on A mul)
+    /\ neutral_element A mul (ring_one K mul)))
+  (forall x y z :e A,
+    mul x (add y z) = add (mul x y) (mul x z)
+    /\ mul (add x y) z = add (mul x z) (mul y z))
+  (andI
+    (group A add /\ associative_on A mul)
+    (neutral_element A mul (ring_one K mul))
+    (andI
+      (group A add) (associative_on A mul)
+      h_s8_subring_s7_section3_call
+      (god1_ring_multiplicative_associative
+        A add mul h_s8_subring_induced_goal))
+    (god1_subring_multiplicative_identity K add mul A hA))
+  (god1_ring_distributive_laws A add mul h_s8_subring_induced_goal)).
+exact h_s8_subring_induced_goal.
+Qed.
+
+Theorem god1_subring_test_forward :
+  forall K, forall add mul:set -> set -> set, forall A,
+    subring K add mul A ->
+    (forall x y :e A, add x y :e A /\ mul x y :e A)
+    /\ ring_negation K add (ring_one K mul) :e A.
+let K add mul A.
+assume hA.
+claim hsubgroup : subgroup K add A.
+exact (god1_subring_additive_subgroup K add mul A hA).
+apply andI.
+- let x.
+  assume hx.
+  let y.
+  assume hy.
+  exact (andI
+    (add x y :e A) (mul x y :e A)
+    (god1_subgroup_product_closed K add A hsubgroup x hx y hy)
+    (god1_subring_multiplication_closed K add mul A hA x hx y hy)).
+- exact (god1_subgroup_inverse_closed K add A hsubgroup
+    (ring_one K mul) (god1_subring_contains_one K add mul A hA)).
+Qed.
+
+Theorem god1_subring_test_reverse :
+  forall K, forall add mul:set -> set -> set, forall A,
+    ring K add mul -> A c= K ->
+    (forall x y :e A, add x y :e A /\ mul x y :e A)
+    /\ ring_negation K add (ring_one K mul) :e A ->
+    subring K add mul A.
+let K add mul A.
+assume hK hAK hdata.
+claim hG : group K add.
+exact (god1_ring_additive_group K add mul hK).
+claim hclosed :
+  forall x y :e A, add x y :e A /\ mul x y :e A.
+exact (andEL
+  (forall x y :e A, add x y :e A /\ mul x y :e A)
+  (ring_negation K add (ring_one K mul) :e A) hdata).
+claim hminusone : ring_negation K add (ring_one K mul) :e A.
+exact (andER
+  (forall x y :e A, add x y :e A /\ mul x y :e A)
+  (ring_negation K add (ring_one K mul) :e A) hdata).
+claim hminusoneK : ring_negation K add (ring_one K mul) :e K.
+exact (hAK (ring_negation K add (ring_one K mul)) hminusone).
+claim honeK : ring_one K mul :e K.
+exact (andEL
+  (ring_one K mul :e K)
+  (forall x :e K,
+    mul x (ring_one K mul) = x /\ mul (ring_one K mul) x = x)
+  (god1_ring_multiplicative_identity_specification K add mul hK)).
+claim hminusproduct :
+  mul (ring_negation K add (ring_one K mul))
+    (ring_negation K add (ring_one K mul)) :e A.
+exact (andER
+  (add (ring_negation K add (ring_one K mul))
+    (ring_negation K add (ring_one K mul)) :e A)
+  (mul (ring_negation K add (ring_one K mul))
+    (ring_negation K add (ring_one K mul)) :e A)
+  (hclosed
+    (ring_negation K add (ring_one K mul)) hminusone
+    (ring_negation K add (ring_one K mul)) hminusone)).
+claim hminusproduct_one :
+  mul (ring_negation K add (ring_one K mul))
+    (ring_negation K add (ring_one K mul)) = ring_one K mul.
+exact (eq_i_tra
+  (mul (ring_negation K add (ring_one K mul))
+    (ring_negation K add (ring_one K mul)))
+  (ring_negation K add
+    (ring_negation K add (ring_one K mul)))
+  (ring_one K mul)
+  (god1_ring_minus_one_multiplication_left K add mul hK
+    (ring_negation K add (ring_one K mul)) hminusoneK)
+  (god1_group_inverse_involutive K add hG (ring_one K mul) honeK)).
+claim hone : ring_one K mul :e A.
+exact (mem_eq_substR A
+  (mul (ring_negation K add (ring_one K mul))
+    (ring_negation K add (ring_one K mul)))
+  (ring_one K mul) hminusproduct_one hminusproduct).
+claim hminusreflection :
+  reflection K add (ring_zero K add) (ring_one K mul)
+    (ring_negation K add (ring_one K mul)).
+exact (god1_group_inverse_specification K add hG (ring_one K mul) honeK).
+claim hzero_sum :
+  add (ring_one K mul) (ring_negation K add (ring_one K mul))
+    = ring_zero K add.
+exact (andER
+  (ring_negation K add (ring_one K mul) :e K
+    /\ add (ring_negation K add (ring_one K mul))
+      (ring_one K mul) = ring_zero K add)
+  (add (ring_one K mul) (ring_negation K add (ring_one K mul))
+    = ring_zero K add)
+  hminusreflection).
+claim hzero : ring_zero K add :e A.
+exact (mem_eq_substR A
+  (add (ring_one K mul) (ring_negation K add (ring_one K mul)))
+  (ring_zero K add) hzero_sum
+  (andEL
+    (add (ring_one K mul) (ring_negation K add (ring_one K mul)) :e A)
+    (mul (ring_one K mul) (ring_negation K add (ring_one K mul)) :e A)
+    (hclosed (ring_one K mul) hone
+      (ring_negation K add (ring_one K mul)) hminusone))).
+claim haddclosed : forall x y :e A, add x y :e A.
+let x.
+assume hx.
+let y.
+assume hy.
+exact (andEL (add x y :e A) (mul x y :e A)
+  (hclosed x hx y hy)).
+claim hmulclosed : forall x y :e A, mul x y :e A.
+let x.
+assume hx.
+let y.
+assume hy.
+exact (andER (add x y :e A) (mul x y :e A)
+  (hclosed x hx y hy)).
+claim hinverseclosed :
+  forall x :e A, ring_negation K add x :e A.
+let x.
+assume hx.
+exact (mem_eq_substR A
+  (mul (ring_negation K add (ring_one K mul)) x)
+  (ring_negation K add x)
+  (god1_ring_minus_one_multiplication_left K add mul hK
+    x (hAK x hx))
+  (hmulclosed
+    (ring_negation K add (ring_one K mul)) hminusone x hx)).
+claim hsubgroup : subgroup K add A.
+exact (god1_subgroup_of_identity_product_inverse K add A
+  hG hAK hzero haddclosed hinverseclosed).
+exact (andI
+  ((((ring K add mul /\ A c= K) /\ subgroup K add A)
+    /\ forall x y :e A, mul x y :e A))
+  (ring_one K mul :e A)
+  (andI
+    ((ring K add mul /\ A c= K) /\ subgroup K add A)
+    (forall x y :e A, mul x y :e A)
+    (andI
+      (ring K add mul /\ A c= K)
+      (subgroup K add A)
+      (andI (ring K add mul) (A c= K) hK hAK)
+      hsubgroup)
+    hmulclosed)
+  hone).
+Qed.
 
 Theorem god1_subring_test_using_minus_one :
   forall K, forall add mul:set -> set -> set, forall A,
@@ -53970,25 +54332,36 @@ Theorem god1_subring_test_using_minus_one :
       /\ ring_negation K add (ring_one K mul) :e A).
 let K add mul A.
 assume hK hAK.
-apply iffI.
 //GOD1PRF:105557 Indeed, suppose that these conditions are fulfilled.
 claim h_s8_subring_test_forward_data :
   ((forall x y :e A, add x y :e A /\ mul x y :e A)
     /\ ring_negation K add (ring_one K mul) :e A) -> A <> 0.
-admit.
+assume hdata.
+assume hzero.
+exact (EmptyE (ring_negation K add (ring_one K mul))
+  (mem_eq_set_subst A 0
+    (ring_negation K add (ring_one K mul)) hzero
+    (andER
+      (forall x y :e A, add x y :e A /\ mul x y :e A)
+      (ring_negation K add (ring_one K mul) :e A) hdata))).
 //GOD1PRF:105610 If $x \in \mathrm{~A}$, then $-x=(-1) x$ belongs to A; but then, if A contains $x$ and $y$, it contains $x$ and $-y$ and therefore also $x-y=x+(-y)$, so that A is a subgroup of the additive group of K , and therefore satisfies the first condition in the definition of a subring.
 claim h_s8_subring_test_additive_subgroup :
   ((forall x y :e A, add x y :e A /\ mul x y :e A)
     /\ ring_negation K add (ring_one K mul) :e A) ->
   subgroup K add A.
-admit.
+assume hdata.
+exact (god1_subring_additive_subgroup K add mul A
+  (god1_subring_test_reverse K add mul A hK hAK hdata)).
 //GOD1PRF:105889 The second is satisfied, by hypothesis, and the third is satisfied because $\mathbf{A}$ contains -1 and therefore also $-(-1)=1$.
 claim h_s8_subring_test_reverse :
   ((forall x y :e A, add x y :e A /\ mul x y :e A)
     /\ ring_negation K add (ring_one K mul) :e A) ->
   subring K add mul A.
-admit.
-Admitted.
+exact (god1_subring_test_reverse K add mul A hK hAK).
+apply iffI.
+- exact (god1_subring_test_forward K add mul A).
+- exact h_s8_subring_test_reverse.
+Qed.
 
 //GOD1:106820 ring_unit : "#4 is a unit of the ring #1" | $#4\in #1^*$
 Definition ring_unit :
