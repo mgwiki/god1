@@ -68598,6 +68598,1066 @@ Definition quadratic_linear_span :
     {z :e L|exists x y :e K,
       z = addL (j x) (mulL omega (j y))}.
 
+Theorem god1_commutative_ring_three_factor_interchange :
+  forall K, forall add mul:set -> set -> set,
+    commutative_ring K add mul -> forall a b c :e K,
+      mul a (mul b c) = mul b (mul a c).
+let K add mul.
+assume hK.
+let a.
+assume ha.
+let b.
+assume hb.
+let c.
+assume hc.
+claim hring : ring K add mul.
+exact (andEL (ring K add mul) (commutative_on K mul) hK).
+claim hcomm : commutative_on K mul.
+exact (andER (ring K add mul) (commutative_on K mul) hK).
+exact (eq_i_tra
+  (mul a (mul b c)) (mul (mul a b) c) (mul b (mul a c))
+  (god1_ring_multiplicative_associative K add mul hring
+    a ha b hb c hc)
+  (eq_i_tra
+    (mul (mul a b) c) (mul (mul b a) c) (mul b (mul a c))
+    (f_eq_i (fun q => mul q c) (mul a b) (mul b a)
+      (hcomm a ha b hb))
+    (god1_ring_multiplicative_associative_reverse K add mul hring
+      b hb a ha c hc))).
+Qed.
+
+Theorem god1_commutative_ring_four_factor_interchange :
+  forall K, forall add mul:set -> set -> set,
+    commutative_ring K add mul -> forall a b c d :e K,
+      mul (mul a b) (mul c d) = mul (mul a c) (mul b d).
+let K add mul.
+assume hK.
+let a.
+assume ha.
+let b.
+assume hb.
+let c.
+assume hc.
+let d.
+assume hd.
+claim hring : ring K add mul.
+exact (andEL (ring K add mul) (commutative_on K mul) hK).
+claim hcd : mul c d :e K.
+exact (god1_ring_multiplicative_law K add mul hring c hc d hd).
+claim hbd : mul b d :e K.
+exact (god1_ring_multiplicative_law K add mul hring b hb d hd).
+exact (eq_i_tra
+  (mul (mul a b) (mul c d))
+  (mul a (mul b (mul c d)))
+  (mul (mul a c) (mul b d))
+  (god1_ring_multiplicative_associative_reverse K add mul hring
+    a ha b hb (mul c d) hcd)
+  (eq_i_tra
+    (mul a (mul b (mul c d)))
+    (mul a (mul c (mul b d)))
+    (mul (mul a c) (mul b d))
+    (f_eq_i (fun q => mul a q)
+      (mul b (mul c d)) (mul c (mul b d))
+      (god1_commutative_ring_three_factor_interchange
+        K add mul hK b hb c hc d hd))
+    (god1_ring_multiplicative_associative K add mul hring
+      a ha c hc (mul b d) hbd))).
+Qed.
+
+Theorem god1_commutative_ring_product_of_sums_grouped :
+  forall K, forall add mul:set -> set -> set,
+    commutative_ring K add mul -> forall a b c d :e K,
+      mul (add a b) (add c d)
+      = add (add (mul a c) (mul b d))
+          (add (mul a d) (mul b c)).
+let K add mul.
+assume hK.
+let a.
+assume ha.
+let b.
+assume hb.
+let c.
+assume hc.
+let d.
+assume hd.
+claim hring : ring K add mul.
+exact (andEL (ring K add mul) (commutative_on K mul) hK).
+claim hA : abelian_group K add.
+exact (god1_ring_additive_abelian_group K add mul hring).
+claim haddcomm : commutative_on K add.
+exact (andER (group K add) (commutative_on K add) hA).
+claim hsumCD : add c d :e K.
+exact (god1_group_law_of_composition K add
+  (andEL (group K add) (commutative_on K add) hA) c hc d hd).
+claim hac : mul a c :e K.
+exact (god1_ring_multiplicative_law K add mul hring a ha c hc).
+claim had : mul a d :e K.
+exact (god1_ring_multiplicative_law K add mul hring a ha d hd).
+claim hbc : mul b c :e K.
+exact (god1_ring_multiplicative_law K add mul hring b hb c hc).
+claim hbd : mul b d :e K.
+exact (god1_ring_multiplicative_law K add mul hring b hb d hd).
+claim houter :
+  mul (add a b) (add c d)
+  = add (mul a (add c d)) (mul b (add c d)).
+exact (andER
+  (mul a (add b (add c d))
+    = add (mul a b) (mul a (add c d)))
+  (mul (add a b) (add c d)
+    = add (mul a (add c d)) (mul b (add c d)))
+  (god1_ring_distributive_laws K add mul hring
+    a ha b hb (add c d) hsumCD)).
+claim hrowA : mul a (add c d) = add (mul a c) (mul a d).
+exact (andEL
+  (mul a (add c d) = add (mul a c) (mul a d))
+  (mul (add a c) d = add (mul a d) (mul c d))
+  (god1_ring_distributive_laws K add mul hring a ha c hc d hd)).
+claim hrowB : mul b (add c d) = add (mul b c) (mul b d).
+exact (andEL
+  (mul b (add c d) = add (mul b c) (mul b d))
+  (mul (add b c) d = add (mul b d) (mul c d))
+  (god1_ring_distributive_laws K add mul hring b hb c hc d hd)).
+claim hexpanded :
+  mul (add a b) (add c d)
+  = add (add (mul a c) (mul a d))
+      (add (mul b c) (mul b d)).
+exact (eq_i_tra
+  (mul (add a b) (add c d))
+  (add (mul a (add c d)) (mul b (add c d)))
+  (add (add (mul a c) (mul a d))
+    (add (mul b c) (mul b d)))
+  houter
+  (god1_binary_operation_congruence add
+    (mul a (add c d)) (add (mul a c) (mul a d))
+    (mul b (add c d)) (add (mul b c) (mul b d))
+    hrowA hrowB)).
+claim hswap :
+  add (add (mul a c) (mul a d))
+    (add (mul b c) (mul b d))
+  = add (add (mul a c) (mul a d))
+    (add (mul b d) (mul b c)).
+exact (f_eq_i (fun q => add (add (mul a c) (mul a d)) q)
+  (add (mul b c) (mul b d)) (add (mul b d) (mul b c))
+  (haddcomm (mul b c) hbc (mul b d) hbd)).
+exact (eq_i_tra
+  (mul (add a b) (add c d))
+  (add (add (mul a c) (mul a d))
+    (add (mul b d) (mul b c)))
+  (add (add (mul a c) (mul b d))
+    (add (mul a d) (mul b c)))
+  (eq_i_tra
+    (mul (add a b) (add c d))
+    (add (add (mul a c) (mul a d))
+      (add (mul b c) (mul b d)))
+    (add (add (mul a c) (mul a d))
+      (add (mul b d) (mul b c)))
+    hexpanded hswap)
+  (god1_abelian_four_term_interchange K add hA
+    (mul a c) hac (mul a d) had (mul b d) hbd (mul b c) hbc)).
+Qed.
+
+Theorem god1_quadratic_linear_span_intro :
+  forall K, forall addK mulK:set -> set -> set,
+  forall L, forall addL mulL:set -> set -> set,
+  forall j:set -> set, forall omega,
+    ring_homomorphism K addK mulK L addL mulL j ->
+    omega :e L -> forall x y :e K,
+      addL (j x) (mulL omega (j y))
+        :e quadratic_linear_span K L addL mulL j omega.
+let K addK mulK L addL mulL j omega.
+assume hj homega.
+let x.
+assume hx.
+let y.
+assume hy.
+claim hrings : ring K addK mulK /\ ring L addL mulL.
+exact (god1_ring_homomorphism_rings
+  K addK mulK L addL mulL j hj).
+claim hringL : ring L addL mulL.
+exact (andER (ring K addK mulK) (ring L addL mulL) hrings).
+claim hjx : j x :e L.
+exact (god1_ring_homomorphism_maps_into
+  K addK mulK L addL mulL j hj x hx).
+claim hjy : j y :e L.
+exact (god1_ring_homomorphism_maps_into
+  K addK mulK L addL mulL j hj y hy).
+claim hproduct : mulL omega (j y) :e L.
+exact (god1_ring_multiplicative_law L addL mulL hringL
+  omega homega (j y) hjy).
+claim hvalue : addL (j x) (mulL omega (j y)) :e L.
+exact (god1_group_law_of_composition L addL
+  (god1_ring_additive_group L addL mulL hringL)
+  (j x) hjx (mulL omega (j y)) hproduct).
+claim hexists : exists u v :e K,
+  addL (j x) (mulL omega (j y))
+    = addL (j u) (mulL omega (j v)).
+exact (ex_intro
+  (fun u => u :e K /\ exists v :e K,
+    addL (j x) (mulL omega (j y))
+      = addL (j u) (mulL omega (j v))) x
+  (andI
+    (x :e K)
+    (exists v :e K,
+      addL (j x) (mulL omega (j y))
+        = addL (j x) (mulL omega (j v)))
+    hx
+    (ex_intro
+      (fun v => v :e K /\
+        addL (j x) (mulL omega (j y))
+          = addL (j x) (mulL omega (j v))) y
+      (andI
+        (y :e K)
+        (addL (j x) (mulL omega (j y))
+          = addL (j x) (mulL omega (j y)))
+        hy (eq_ref (addL (j x) (mulL omega (j y)))))))).
+exact (SepI L
+  (fun z => exists u v :e K,
+    z = addL (j u) (mulL omega (j v)))
+  (addL (j x) (mulL omega (j y))) hvalue hexists).
+Qed.
+
+Theorem god1_quadratic_linear_span_subset :
+  forall K L, forall addL mulL:set -> set -> set,
+  forall j:set -> set, forall omega,
+    quadratic_linear_span K L addL mulL j omega c= L.
+let K L addL mulL j omega.
+exact (fun z hz => SepE1 L
+  (fun q => exists x y :e K,
+    q = addL (j x) (mulL omega (j y))) z hz).
+Qed.
+
+Theorem god1_quadratic_linear_span_contains_base :
+  forall K, forall addK mulK:set -> set -> set,
+  forall L, forall addL mulL:set -> set -> set,
+  forall j:set -> set, forall omega,
+    ring_homomorphism K addK mulK L addL mulL j ->
+    omega :e L ->
+    group_image_of_subset K j
+      c= quadratic_linear_span K L addL mulL j omega.
+let K addK mulK L addL mulL j omega.
+assume hj homega.
+claim hrings : ring K addK mulK /\ ring L addL mulL.
+exact (god1_ring_homomorphism_rings
+  K addK mulK L addL mulL j hj).
+claim hringK : ring K addK mulK.
+exact (andEL (ring K addK mulK) (ring L addL mulL) hrings).
+claim hringL : ring L addL mulL.
+exact (andER (ring K addK mulK) (ring L addL mulL) hrings).
+claim hgroupK : group K addK.
+exact (god1_ring_additive_group K addK mulK hringK).
+claim hgroupL : group L addL.
+exact (god1_ring_additive_group L addL mulL hringL).
+claim hzeroK : ring_zero K addK :e K.
+exact (god1_group_identity_in K addK hgroupK).
+claim hzeroL : ring_zero L addL :e L.
+exact (god1_group_identity_in L addL hgroupL).
+claim hunder : group_homomorphism K addK L addL j.
+exact (god1_ring_homomorphism_additive_group_homomorphism
+  K addK mulK L addL mulL j hj).
+claim hjzero : j (ring_zero K addK) = ring_zero L addL.
+exact (god1_group_homomorphism_preserves_identity
+  K addK L addL j hunder).
+let z.
+assume hz.
+apply (ReplE_impred K j z hz
+  (z :e quadratic_linear_span K L addL mulL j omega)).
+let x.
+assume hx hzx.
+claim hjx : j x :e L.
+exact (god1_ring_homomorphism_maps_into
+  K addK mulK L addL mulL j hj x hx).
+claim hexpression :
+  addL (j x) (mulL omega (j (ring_zero K addK))) = j x.
+exact (eq_i_tra
+  (addL (j x) (mulL omega (j (ring_zero K addK))))
+  (addL (j x) (mulL omega (ring_zero L addL)))
+  (j x)
+  (f_eq_i (fun q => addL (j x) (mulL omega q))
+    (j (ring_zero K addK)) (ring_zero L addL) hjzero)
+  (eq_i_tra
+    (addL (j x) (mulL omega (ring_zero L addL)))
+    (addL (j x) (ring_zero L addL)) (j x)
+    (f_eq_i (fun q => addL (j x) q)
+      (mulL omega (ring_zero L addL)) (ring_zero L addL)
+      (god1_ring_zero_multiplication_right L addL mulL hringL
+        omega homega))
+    (andEL
+      (addL (j x) (ring_zero L addL) = j x)
+      (addL (ring_zero L addL) (j x) = j x)
+      ((andER
+        (ring_zero L addL :e L)
+        (forall q :e L,
+          addL q (ring_zero L addL) = q
+          /\ addL (ring_zero L addL) q = q)
+        (god1_group_identity_specification L addL hgroupL))
+        (j x) hjx)))).
+claim hmember :
+  addL (j x) (mulL omega (j (ring_zero K addK)))
+    :e quadratic_linear_span K L addL mulL j omega.
+exact (god1_quadratic_linear_span_intro
+  K addK mulK L addL mulL j omega hj homega
+  x hx (ring_zero K addK) hzeroK).
+exact (mem_eq_substL
+  (quadratic_linear_span K L addL mulL j omega)
+  (addL (j x) (mulL omega (j (ring_zero K addK)))) z
+  (eq_i_tra z (j x)
+    (addL (j x) (mulL omega (j (ring_zero K addK))))
+    hzx (eq_sym
+      (addL (j x) (mulL omega (j (ring_zero K addK))))
+      (j x) hexpression))
+  hmember).
+Qed.
+
+Theorem god1_quadratic_linear_span_contains_root :
+  forall K, forall addK mulK:set -> set -> set,
+  forall L, forall addL mulL:set -> set -> set,
+  forall j:set -> set, forall omega,
+    ring_homomorphism K addK mulK L addL mulL j ->
+    omega :e L ->
+    omega :e quadratic_linear_span K L addL mulL j omega.
+let K addK mulK L addL mulL j omega.
+assume hj homega.
+claim hrings : ring K addK mulK /\ ring L addL mulL.
+exact (god1_ring_homomorphism_rings
+  K addK mulK L addL mulL j hj).
+claim hringK : ring K addK mulK.
+exact (andEL (ring K addK mulK) (ring L addL mulL) hrings).
+claim hringL : ring L addL mulL.
+exact (andER (ring K addK mulK) (ring L addL mulL) hrings).
+claim hgroupK : group K addK.
+exact (god1_ring_additive_group K addK mulK hringK).
+claim hgroupL : group L addL.
+exact (god1_ring_additive_group L addL mulL hringL).
+claim hzeroK : ring_zero K addK :e K.
+exact (god1_group_identity_in K addK hgroupK).
+claim honeK : ring_one K mulK :e K.
+exact (andEL
+  (ring_one K mulK :e K)
+  (forall q :e K,
+    mulK q (ring_one K mulK) = q
+    /\ mulK (ring_one K mulK) q = q)
+  (god1_ring_multiplicative_identity_specification K addK mulK hringK)).
+claim hunder : group_homomorphism K addK L addL j.
+exact (god1_ring_homomorphism_additive_group_homomorphism
+  K addK mulK L addL mulL j hj).
+claim hjzero : j (ring_zero K addK) = ring_zero L addL.
+exact (god1_group_homomorphism_preserves_identity
+  K addK L addL j hunder).
+claim hjone : j (ring_one K mulK) = ring_one L mulL.
+exact (god1_ring_homomorphism_preserves_one
+  K addK mulK L addL mulL j hj).
+claim hexpression :
+  addL (j (ring_zero K addK))
+    (mulL omega (j (ring_one K mulK))) = omega.
+exact (eq_i_tra
+  (addL (j (ring_zero K addK))
+    (mulL omega (j (ring_one K mulK))))
+  (addL (ring_zero L addL) (mulL omega (ring_one L mulL)))
+  omega
+  (god1_binary_operation_congruence addL
+    (j (ring_zero K addK)) (ring_zero L addL)
+    (mulL omega (j (ring_one K mulK)))
+    (mulL omega (ring_one L mulL))
+    hjzero
+    (f_eq_i (fun q => mulL omega q)
+      (j (ring_one K mulK)) (ring_one L mulL) hjone))
+  (eq_i_tra
+    (addL (ring_zero L addL) (mulL omega (ring_one L mulL)))
+    (addL (ring_zero L addL) omega) omega
+    (f_eq_i (fun q => addL (ring_zero L addL) q)
+      (mulL omega (ring_one L mulL)) omega
+      (andEL
+        (mulL omega (ring_one L mulL) = omega)
+        (mulL (ring_one L mulL) omega = omega)
+        ((andER
+          (ring_one L mulL :e L)
+          (forall q :e L,
+            mulL q (ring_one L mulL) = q
+            /\ mulL (ring_one L mulL) q = q)
+          (god1_ring_multiplicative_identity_specification
+            L addL mulL hringL)) omega homega)))
+    (andER
+      (addL omega (ring_zero L addL) = omega)
+      (addL (ring_zero L addL) omega = omega)
+      ((andER
+        (ring_zero L addL :e L)
+        (forall q :e L,
+          addL q (ring_zero L addL) = q
+          /\ addL (ring_zero L addL) q = q)
+        (god1_group_identity_specification L addL hgroupL))
+        omega homega)))).
+claim hmember :
+  addL (j (ring_zero K addK))
+    (mulL omega (j (ring_one K mulK)))
+    :e quadratic_linear_span K L addL mulL j omega.
+exact (god1_quadratic_linear_span_intro
+  K addK mulK L addL mulL j omega hj homega
+  (ring_zero K addK) hzeroK (ring_one K mulK) honeK).
+exact (mem_eq_substL
+  (quadratic_linear_span K L addL mulL j omega)
+  (addL (j (ring_zero K addK))
+    (mulL omega (j (ring_one K mulK))))
+  omega
+  (eq_sym
+    (addL (j (ring_zero K addK))
+      (mulL omega (j (ring_one K mulK))))
+    omega hexpression)
+  hmember).
+Qed.
+
+Theorem god1_quadratic_linear_span_sum_formula :
+  forall K, forall addK mulK:set -> set -> set,
+  forall L, forall addL mulL:set -> set -> set,
+  forall j:set -> set, forall omega,
+    commutative_ring K addK mulK ->
+    commutative_ring L addL mulL ->
+    ring_homomorphism K addK mulK L addL mulL j ->
+    omega :e L -> forall x y x' y' :e K,
+      addL
+        (addL (j x) (mulL omega (j y)))
+        (addL (j x') (mulL omega (j y')))
+      = addL (j (addK x x'))
+          (mulL omega (j (addK y y'))).
+let K addK mulK L addL mulL j omega.
+assume hK hL hj homega.
+let x.
+assume hx.
+let y.
+assume hy.
+let x'.
+assume hx'.
+let y'.
+assume hy'.
+claim hringL : ring L addL mulL.
+exact (andEL (ring L addL mulL) (commutative_on L mulL) hL).
+claim hA : abelian_group L addL.
+exact (god1_ring_additive_abelian_group L addL mulL hringL).
+claim hjx : j x :e L.
+exact (god1_ring_homomorphism_maps_into
+  K addK mulK L addL mulL j hj x hx).
+claim hjy : j y :e L.
+exact (god1_ring_homomorphism_maps_into
+  K addK mulK L addL mulL j hj y hy).
+claim hjx' : j x' :e L.
+exact (god1_ring_homomorphism_maps_into
+  K addK mulK L addL mulL j hj x' hx').
+claim hjy' : j y' :e L.
+exact (god1_ring_homomorphism_maps_into
+  K addK mulK L addL mulL j hj y' hy').
+claim howy : mulL omega (j y) :e L.
+exact (god1_ring_multiplicative_law L addL mulL hringL
+  omega homega (j y) hjy).
+claim howy' : mulL omega (j y') :e L.
+exact (god1_ring_multiplicative_law L addL mulL hringL
+  omega homega (j y') hjy').
+claim hinterchange :
+  addL
+    (addL (j x) (mulL omega (j y)))
+    (addL (j x') (mulL omega (j y')))
+  = addL
+    (addL (j x) (j x'))
+    (addL (mulL omega (j y)) (mulL omega (j y'))).
+exact (god1_abelian_four_term_interchange L addL hA
+  (j x) hjx (mulL omega (j y)) howy
+  (j x') hjx' (mulL omega (j y')) howy').
+claim hjaddX :
+  j (addK x x') = addL (j x) (j x').
+exact (andEL
+  (j (addK x x') = addL (j x) (j x'))
+  (j (mulK x x') = mulL (j x) (j x'))
+  (god1_ring_homomorphism_operations
+    K addK mulK L addL mulL j hj x hx x' hx')).
+claim hjaddY :
+  j (addK y y') = addL (j y) (j y').
+exact (andEL
+  (j (addK y y') = addL (j y) (j y'))
+  (j (mulK y y') = mulL (j y) (j y'))
+  (god1_ring_homomorphism_operations
+    K addK mulK L addL mulL j hj y hy y' hy')).
+claim hfactorOmega :
+  addL (mulL omega (j y)) (mulL omega (j y'))
+  = mulL omega (j (addK y y')).
+exact (eq_i_tra
+  (addL (mulL omega (j y)) (mulL omega (j y')))
+  (mulL omega (addL (j y) (j y')))
+  (mulL omega (j (addK y y')))
+  (eq_sym
+    (mulL omega (addL (j y) (j y')))
+    (addL (mulL omega (j y)) (mulL omega (j y')))
+    (andEL
+      (mulL omega (addL (j y) (j y'))
+        = addL (mulL omega (j y)) (mulL omega (j y')))
+      (mulL (addL omega (j y)) (j y')
+        = addL (mulL omega (j y')) (mulL (j y) (j y')))
+      (god1_ring_distributive_laws L addL mulL hringL
+        omega homega (j y) hjy (j y') hjy')))
+  (f_eq_i (fun q => mulL omega q)
+    (addL (j y) (j y')) (j (addK y y'))
+    (eq_sym (j (addK y y')) (addL (j y) (j y')) hjaddY))).
+exact (eq_i_tra
+  (addL
+    (addL (j x) (mulL omega (j y)))
+    (addL (j x') (mulL omega (j y'))))
+  (addL (addL (j x) (j x'))
+    (addL (mulL omega (j y)) (mulL omega (j y'))))
+  (addL (j (addK x x'))
+    (mulL omega (j (addK y y'))))
+  hinterchange
+  (god1_binary_operation_congruence addL
+    (addL (j x) (j x')) (j (addK x x'))
+    (addL (mulL omega (j y)) (mulL omega (j y')))
+    (mulL omega (j (addK y y')))
+    (eq_sym (j (addK x x')) (addL (j x) (j x')) hjaddX)
+    hfactorOmega)).
+Qed.
+
+Theorem god1_quadratic_linear_span_product_formula :
+  forall K, forall addK mulK:set -> set -> set,
+  forall L, forall addL mulL:set -> set -> set,
+  forall j:set -> set, forall d omega,
+    commutative_ring K addK mulK ->
+    commutative_ring L addL mulL ->
+    ring_homomorphism K addK mulK L addL mulL j ->
+    d :e K -> omega :e L -> mulL omega omega = j d ->
+    forall x y x' y' :e K,
+      mulL
+        (addL (j x) (mulL omega (j y)))
+        (addL (j x') (mulL omega (j y')))
+      = addL
+          (j (addK (mulK x x') (mulK d (mulK y y'))))
+          (mulL omega
+            (j (addK (mulK x y') (mulK x' y)))).
+let K addK mulK L addL mulL j d omega.
+assume hK hL hj hd homega hsquare.
+let x.
+assume hx.
+let y.
+assume hy.
+let x'.
+assume hx'.
+let y'.
+assume hy'.
+claim hringK : ring K addK mulK.
+exact (andEL (ring K addK mulK) (commutative_on K mulK) hK).
+claim hringL : ring L addL mulL.
+exact (andEL (ring L addL mulL) (commutative_on L mulL) hL).
+claim hmulcommL : commutative_on L mulL.
+exact (andER (ring L addL mulL) (commutative_on L mulL) hL).
+claim hjx : j x :e L.
+exact (god1_ring_homomorphism_maps_into
+  K addK mulK L addL mulL j hj x hx).
+claim hjy : j y :e L.
+exact (god1_ring_homomorphism_maps_into
+  K addK mulK L addL mulL j hj y hy).
+claim hjx' : j x' :e L.
+exact (god1_ring_homomorphism_maps_into
+  K addK mulK L addL mulL j hj x' hx').
+claim hjy' : j y' :e L.
+exact (god1_ring_homomorphism_maps_into
+  K addK mulK L addL mulL j hj y' hy').
+claim howy : mulL omega (j y) :e L.
+exact (god1_ring_multiplicative_law L addL mulL hringL
+  omega homega (j y) hjy).
+claim howy' : mulL omega (j y') :e L.
+exact (god1_ring_multiplicative_law L addL mulL hringL
+  omega homega (j y') hjy').
+claim hxx'K : mulK x x' :e K.
+exact (god1_ring_multiplicative_law K addK mulK hringK x hx x' hx').
+claim hyy'K : mulK y y' :e K.
+exact (god1_ring_multiplicative_law K addK mulK hringK y hy y' hy').
+claim hdyy'K : mulK d (mulK y y') :e K.
+exact (god1_ring_multiplicative_law K addK mulK hringK
+  d hd (mulK y y') hyy'K).
+claim hxy'K : mulK x y' :e K.
+exact (god1_ring_multiplicative_law K addK mulK hringK x hx y' hy').
+claim hx'yK : mulK x' y :e K.
+exact (god1_ring_multiplicative_law K addK mulK hringK x' hx' y hy).
+claim hjprodXX' :
+  j (mulK x x') = mulL (j x) (j x').
+exact (andER
+  (j (addK x x') = addL (j x) (j x'))
+  (j (mulK x x') = mulL (j x) (j x'))
+  (god1_ring_homomorphism_operations
+    K addK mulK L addL mulL j hj x hx x' hx')).
+claim hjprodYY' :
+  j (mulK y y') = mulL (j y) (j y').
+exact (andER
+  (j (addK y y') = addL (j y) (j y'))
+  (j (mulK y y') = mulL (j y) (j y'))
+  (god1_ring_homomorphism_operations
+    K addK mulK L addL mulL j hj y hy y' hy')).
+claim hjprodDYY' :
+  j (mulK d (mulK y y'))
+  = mulL (j d) (j (mulK y y')).
+exact (andER
+  (j (addK d (mulK y y'))
+    = addL (j d) (j (mulK y y')))
+  (j (mulK d (mulK y y'))
+    = mulL (j d) (j (mulK y y')))
+  (god1_ring_homomorphism_operations
+    K addK mulK L addL mulL j hj
+    d hd (mulK y y') hyy'K)).
+claim homegaPair :
+  mulL (mulL omega (j y)) (mulL omega (j y'))
+  = j (mulK d (mulK y y')).
+exact (eq_i_tra
+  (mulL (mulL omega (j y)) (mulL omega (j y')))
+  (mulL (mulL omega omega) (mulL (j y) (j y')))
+  (j (mulK d (mulK y y')))
+  (god1_commutative_ring_four_factor_interchange
+    L addL mulL hL omega homega (j y) hjy
+    omega homega (j y') hjy')
+  (eq_i_tra
+    (mulL (mulL omega omega) (mulL (j y) (j y')))
+    (mulL (j d) (j (mulK y y')))
+    (j (mulK d (mulK y y')))
+    (god1_binary_operation_congruence mulL
+      (mulL omega omega) (j d)
+      (mulL (j y) (j y')) (j (mulK y y'))
+      hsquare
+      (eq_sym (j (mulK y y')) (mulL (j y) (j y')) hjprodYY'))
+    (eq_sym
+      (j (mulK d (mulK y y')))
+      (mulL (j d) (j (mulK y y'))) hjprodDYY'))).
+claim hjaddFirst :
+  j (addK (mulK x x') (mulK d (mulK y y')))
+  = addL (j (mulK x x')) (j (mulK d (mulK y y'))).
+exact (andEL
+  (j (addK (mulK x x') (mulK d (mulK y y')))
+    = addL (j (mulK x x')) (j (mulK d (mulK y y'))))
+  (j (mulK (mulK x x') (mulK d (mulK y y')))
+    = mulL (j (mulK x x')) (j (mulK d (mulK y y'))))
+  (god1_ring_homomorphism_operations
+    K addK mulK L addL mulL j hj
+    (mulK x x') hxx'K (mulK d (mulK y y')) hdyy'K)).
+claim hfirstPair :
+  addL (mulL (j x) (j x'))
+    (mulL (mulL omega (j y)) (mulL omega (j y')))
+  = j (addK (mulK x x') (mulK d (mulK y y'))).
+exact (eq_i_tra
+  (addL (mulL (j x) (j x'))
+    (mulL (mulL omega (j y)) (mulL omega (j y'))))
+  (addL (j (mulK x x')) (j (mulK d (mulK y y'))))
+  (j (addK (mulK x x') (mulK d (mulK y y'))))
+  (god1_binary_operation_congruence addL
+    (mulL (j x) (j x')) (j (mulK x x'))
+    (mulL (mulL omega (j y)) (mulL omega (j y')))
+    (j (mulK d (mulK y y')))
+    (eq_sym (j (mulK x x')) (mulL (j x) (j x')) hjprodXX')
+    homegaPair)
+  (eq_sym
+    (j (addK (mulK x x') (mulK d (mulK y y'))))
+    (addL (j (mulK x x')) (j (mulK d (mulK y y'))))
+    hjaddFirst)).
+claim hjprodXY' :
+  j (mulK x y') = mulL (j x) (j y').
+exact (andER
+  (j (addK x y') = addL (j x) (j y'))
+  (j (mulK x y') = mulL (j x) (j y'))
+  (god1_ring_homomorphism_operations
+    K addK mulK L addL mulL j hj x hx y' hy')).
+claim hjprodX'Y :
+  j (mulK x' y) = mulL (j x') (j y).
+exact (andER
+  (j (addK x' y) = addL (j x') (j y))
+  (j (mulK x' y) = mulL (j x') (j y))
+  (god1_ring_homomorphism_operations
+    K addK mulK L addL mulL j hj x' hx' y hy)).
+claim hcrossOne :
+  mulL (j x) (mulL omega (j y'))
+  = mulL omega (j (mulK x y')).
+exact (eq_i_tra
+  (mulL (j x) (mulL omega (j y')))
+  (mulL omega (mulL (j x) (j y')))
+  (mulL omega (j (mulK x y')))
+  (god1_commutative_ring_three_factor_interchange
+    L addL mulL hL (j x) hjx omega homega (j y') hjy')
+  (f_eq_i (fun q => mulL omega q)
+    (mulL (j x) (j y')) (j (mulK x y'))
+    (eq_sym (j (mulK x y')) (mulL (j x) (j y')) hjprodXY'))).
+claim hcrossTwo :
+  mulL (mulL omega (j y)) (j x')
+  = mulL omega (j (mulK x' y)).
+exact (eq_i_tra
+  (mulL (mulL omega (j y)) (j x'))
+  (mulL (j x') (mulL omega (j y)))
+  (mulL omega (j (mulK x' y)))
+  (hmulcommL (mulL omega (j y)) howy (j x') hjx')
+  (eq_i_tra
+    (mulL (j x') (mulL omega (j y)))
+    (mulL omega (mulL (j x') (j y)))
+    (mulL omega (j (mulK x' y)))
+    (god1_commutative_ring_three_factor_interchange
+      L addL mulL hL (j x') hjx' omega homega (j y) hjy)
+    (f_eq_i (fun q => mulL omega q)
+      (mulL (j x') (j y)) (j (mulK x' y))
+      (eq_sym (j (mulK x' y)) (mulL (j x') (j y)) hjprodX'Y)))).
+claim hjaddCross :
+  j (addK (mulK x y') (mulK x' y))
+  = addL (j (mulK x y')) (j (mulK x' y)).
+exact (andEL
+  (j (addK (mulK x y') (mulK x' y))
+    = addL (j (mulK x y')) (j (mulK x' y)))
+  (j (mulK (mulK x y') (mulK x' y))
+    = mulL (j (mulK x y')) (j (mulK x' y)))
+  (god1_ring_homomorphism_operations
+    K addK mulK L addL mulL j hj
+    (mulK x y') hxy'K (mulK x' y) hx'yK)).
+claim hcrossPair :
+  addL (mulL (j x) (mulL omega (j y')))
+    (mulL (mulL omega (j y)) (j x'))
+  = mulL omega (j (addK (mulK x y') (mulK x' y))).
+exact (eq_i_tra
+  (addL (mulL (j x) (mulL omega (j y')))
+    (mulL (mulL omega (j y)) (j x')))
+  (addL (mulL omega (j (mulK x y')))
+    (mulL omega (j (mulK x' y))))
+  (mulL omega (j (addK (mulK x y') (mulK x' y))))
+  (god1_binary_operation_congruence addL
+    (mulL (j x) (mulL omega (j y')))
+    (mulL omega (j (mulK x y')))
+    (mulL (mulL omega (j y)) (j x'))
+    (mulL omega (j (mulK x' y)))
+    hcrossOne hcrossTwo)
+  (eq_i_tra
+    (addL (mulL omega (j (mulK x y')))
+      (mulL omega (j (mulK x' y))))
+    (mulL omega
+      (addL (j (mulK x y')) (j (mulK x' y))))
+    (mulL omega (j (addK (mulK x y') (mulK x' y))))
+    (eq_sym
+      (mulL omega
+        (addL (j (mulK x y')) (j (mulK x' y))))
+      (addL (mulL omega (j (mulK x y')))
+        (mulL omega (j (mulK x' y))))
+      (andEL
+        (mulL omega
+          (addL (j (mulK x y')) (j (mulK x' y)))
+          = addL (mulL omega (j (mulK x y')))
+            (mulL omega (j (mulK x' y))))
+        (mulL (addL omega (j (mulK x y'))) (j (mulK x' y))
+          = addL (mulL omega (j (mulK x' y)))
+            (mulL (j (mulK x y')) (j (mulK x' y))))
+        (god1_ring_distributive_laws L addL mulL hringL
+          omega homega
+          (j (mulK x y'))
+          (god1_ring_homomorphism_maps_into
+            K addK mulK L addL mulL j hj (mulK x y') hxy'K)
+          (j (mulK x' y))
+          (god1_ring_homomorphism_maps_into
+            K addK mulK L addL mulL j hj (mulK x' y) hx'yK))))
+    (f_eq_i (fun q => mulL omega q)
+      (addL (j (mulK x y')) (j (mulK x' y)))
+      (j (addK (mulK x y') (mulK x' y)))
+      (eq_sym
+        (j (addK (mulK x y') (mulK x' y)))
+        (addL (j (mulK x y')) (j (mulK x' y))) hjaddCross)))).
+claim hfoil :
+  mulL
+    (addL (j x) (mulL omega (j y)))
+    (addL (j x') (mulL omega (j y')))
+  = addL
+    (addL (mulL (j x) (j x'))
+      (mulL (mulL omega (j y)) (mulL omega (j y'))))
+    (addL (mulL (j x) (mulL omega (j y')))
+      (mulL (mulL omega (j y)) (j x'))).
+exact (god1_commutative_ring_product_of_sums_grouped
+  L addL mulL hL
+  (j x) hjx (mulL omega (j y)) howy
+  (j x') hjx' (mulL omega (j y')) howy').
+exact (eq_i_tra
+  (mulL
+    (addL (j x) (mulL omega (j y)))
+    (addL (j x') (mulL omega (j y'))))
+  (addL
+    (addL (mulL (j x) (j x'))
+      (mulL (mulL omega (j y)) (mulL omega (j y'))))
+    (addL (mulL (j x) (mulL omega (j y')))
+      (mulL (mulL omega (j y)) (j x'))))
+  (addL
+    (j (addK (mulK x x') (mulK d (mulK y y'))))
+    (mulL omega (j (addK (mulK x y') (mulK x' y)))))
+  hfoil
+  (god1_binary_operation_congruence addL
+    (addL (mulL (j x) (j x'))
+      (mulL (mulL omega (j y)) (mulL omega (j y'))))
+    (j (addK (mulK x x') (mulK d (mulK y y'))))
+    (addL (mulL (j x) (mulL omega (j y')))
+      (mulL (mulL omega (j y)) (j x')))
+    (mulL omega (j (addK (mulK x y') (mulK x' y))))
+    hfirstPair hcrossPair)).
+Qed.
+
+Theorem god1_quadratic_linear_span_contains_minus_one :
+  forall K, forall addK mulK:set -> set -> set,
+  forall L, forall addL mulL:set -> set -> set,
+  forall j:set -> set, forall omega,
+    ring_homomorphism K addK mulK L addL mulL j ->
+    omega :e L ->
+    ring_negation L addL (ring_one L mulL)
+      :e quadratic_linear_span K L addL mulL j omega.
+let K addK mulK L addL mulL j omega.
+assume hj homega.
+claim hrings : ring K addK mulK /\ ring L addL mulL.
+exact (god1_ring_homomorphism_rings
+  K addK mulK L addL mulL j hj).
+claim hringK : ring K addK mulK.
+exact (andEL (ring K addK mulK) (ring L addL mulL) hrings).
+claim hgroupK : group K addK.
+exact (god1_ring_additive_group K addK mulK hringK).
+claim honeK : ring_one K mulK :e K.
+exact (andEL
+  (ring_one K mulK :e K)
+  (forall q :e K,
+    mulK q (ring_one K mulK) = q
+    /\ mulK (ring_one K mulK) q = q)
+  (god1_ring_multiplicative_identity_specification K addK mulK hringK)).
+claim hminusOneK : ring_negation K addK (ring_one K mulK) :e K.
+exact (god1_group_inverse_in K addK hgroupK
+  (ring_one K mulK) honeK).
+claim hbase :
+  group_image_of_subset K j
+    c= quadratic_linear_span K L addL mulL j omega.
+exact (god1_quadratic_linear_span_contains_base
+  K addK mulK L addL mulL j omega hj homega).
+claim hjminusMember :
+  j (ring_negation K addK (ring_one K mulK))
+    :e quadratic_linear_span K L addL mulL j omega.
+exact (hbase (j (ring_negation K addK (ring_one K mulK)))
+  (ReplI K j (ring_negation K addK (ring_one K mulK)) hminusOneK)).
+claim hunder : group_homomorphism K addK L addL j.
+exact (god1_ring_homomorphism_additive_group_homomorphism
+  K addK mulK L addL mulL j hj).
+claim hjone : j (ring_one K mulK) = ring_one L mulL.
+exact (god1_ring_homomorphism_preserves_one
+  K addK mulK L addL mulL j hj).
+claim hjminus :
+  j (ring_negation K addK (ring_one K mulK))
+  = ring_negation L addL (ring_one L mulL).
+exact (eq_i_tra
+  (j (ring_negation K addK (ring_one K mulK)))
+  (ring_negation L addL (j (ring_one K mulK)))
+  (ring_negation L addL (ring_one L mulL))
+  (god1_group_homomorphism_preserves_inverse
+    K addK L addL j hunder (ring_one K mulK) honeK)
+  (f_eq_i (fun q => ring_negation L addL q)
+    (j (ring_one K mulK)) (ring_one L mulL) hjone)).
+exact (mem_eq_substR
+  (quadratic_linear_span K L addL mulL j omega)
+  (j (ring_negation K addK (ring_one K mulK)))
+  (ring_negation L addL (ring_one L mulL))
+  hjminus hjminusMember).
+Qed.
+
+Theorem god1_quadratic_linear_span_closed :
+  forall K, forall addK mulK:set -> set -> set,
+  forall L, forall addL mulL:set -> set -> set,
+  forall j:set -> set, forall d omega,
+    commutative_ring K addK mulK ->
+    commutative_ring L addL mulL ->
+    ring_homomorphism K addK mulK L addL mulL j ->
+    d :e K -> omega :e L -> mulL omega omega = j d ->
+    forall z w :e quadratic_linear_span K L addL mulL j omega,
+      addL z w :e quadratic_linear_span K L addL mulL j omega
+      /\ mulL z w :e quadratic_linear_span K L addL mulL j omega.
+let K addK mulK L addL mulL j d omega.
+assume hK hL hj hd homega hsquare.
+let z.
+assume hz.
+let w.
+assume hw.
+claim hringK : ring K addK mulK.
+exact (andEL (ring K addK mulK) (commutative_on K mulK) hK).
+claim hgroupK : group K addK.
+exact (god1_ring_additive_group K addK mulK hringK).
+claim hzrepr : exists x y :e K,
+  z = addL (j x) (mulL omega (j y)).
+exact (SepE2 L
+  (fun q => exists x y :e K,
+    q = addL (j x) (mulL omega (j y))) z hz).
+claim hwrepr : exists x y :e K,
+  w = addL (j x) (mulL omega (j y)).
+exact (SepE2 L
+  (fun q => exists x y :e K,
+    q = addL (j x) (mulL omega (j y))) w hw).
+apply hzrepr.
+let x.
+assume hxdata.
+claim hx : x :e K.
+exact (andEL
+  (x :e K)
+  (exists y :e K, z = addL (j x) (mulL omega (j y))) hxdata).
+claim hxrest : exists y :e K,
+  z = addL (j x) (mulL omega (j y)).
+exact (andER
+  (x :e K)
+  (exists y :e K, z = addL (j x) (mulL omega (j y))) hxdata).
+apply hxrest.
+let y.
+assume hydata.
+claim hy : y :e K.
+exact (andEL
+  (y :e K) (z = addL (j x) (mulL omega (j y))) hydata).
+claim hzx : z = addL (j x) (mulL omega (j y)).
+exact (andER
+  (y :e K) (z = addL (j x) (mulL omega (j y))) hydata).
+apply hwrepr.
+let x'.
+assume hx'data.
+claim hx' : x' :e K.
+exact (andEL
+  (x' :e K)
+  (exists y' :e K, w = addL (j x') (mulL omega (j y'))) hx'data).
+claim hx'rest : exists y' :e K,
+  w = addL (j x') (mulL omega (j y')).
+exact (andER
+  (x' :e K)
+  (exists y' :e K, w = addL (j x') (mulL omega (j y'))) hx'data).
+apply hx'rest.
+let y'.
+assume hy'data.
+claim hy' : y' :e K.
+exact (andEL
+  (y' :e K) (w = addL (j x') (mulL omega (j y'))) hy'data).
+claim hwy' : w = addL (j x') (mulL omega (j y')).
+exact (andER
+  (y' :e K) (w = addL (j x') (mulL omega (j y'))) hy'data).
+claim hsumX : addK x x' :e K.
+exact (god1_group_law_of_composition K addK hgroupK x hx x' hx').
+claim hsumY : addK y y' :e K.
+exact (god1_group_law_of_composition K addK hgroupK y hy y' hy').
+claim hxx' : mulK x x' :e K.
+exact (god1_ring_multiplicative_law K addK mulK hringK x hx x' hx').
+claim hyy' : mulK y y' :e K.
+exact (god1_ring_multiplicative_law K addK mulK hringK y hy y' hy').
+claim hdyy' : mulK d (mulK y y') :e K.
+exact (god1_ring_multiplicative_law K addK mulK hringK
+  d hd (mulK y y') hyy').
+claim hprodFirst : addK (mulK x x') (mulK d (mulK y y')) :e K.
+exact (god1_group_law_of_composition K addK hgroupK
+  (mulK x x') hxx' (mulK d (mulK y y')) hdyy').
+claim hxy' : mulK x y' :e K.
+exact (god1_ring_multiplicative_law K addK mulK hringK x hx y' hy').
+claim hx'y : mulK x' y :e K.
+exact (god1_ring_multiplicative_law K addK mulK hringK x' hx' y hy).
+claim hprodSecond : addK (mulK x y') (mulK x' y) :e K.
+exact (god1_group_law_of_composition K addK hgroupK
+  (mulK x y') hxy' (mulK x' y) hx'y).
+claim hsumMember :
+  addL (j (addK x x')) (mulL omega (j (addK y y')))
+    :e quadratic_linear_span K L addL mulL j omega.
+exact (god1_quadratic_linear_span_intro
+  K addK mulK L addL mulL j omega hj homega
+  (addK x x') hsumX (addK y y') hsumY).
+claim hproductMember :
+  addL
+    (j (addK (mulK x x') (mulK d (mulK y y'))))
+    (mulL omega (j (addK (mulK x y') (mulK x' y))))
+    :e quadratic_linear_span K L addL mulL j omega.
+exact (god1_quadratic_linear_span_intro
+  K addK mulK L addL mulL j omega hj homega
+  (addK (mulK x x') (mulK d (mulK y y'))) hprodFirst
+  (addK (mulK x y') (mulK x' y)) hprodSecond).
+claim hsumEq :
+  addL z w
+  = addL (j (addK x x')) (mulL omega (j (addK y y'))).
+exact (eq_i_tra
+  (addL z w)
+  (addL
+    (addL (j x) (mulL omega (j y)))
+    (addL (j x') (mulL omega (j y'))))
+  (addL (j (addK x x')) (mulL omega (j (addK y y'))))
+  (god1_binary_operation_congruence addL
+    z (addL (j x) (mulL omega (j y)))
+    w (addL (j x') (mulL omega (j y')))
+    hzx hwy')
+  (god1_quadratic_linear_span_sum_formula
+    K addK mulK L addL mulL j omega hK hL hj homega
+    x hx y hy x' hx' y' hy')).
+claim hproductEq :
+  mulL z w
+  = addL
+      (j (addK (mulK x x') (mulK d (mulK y y'))))
+      (mulL omega (j (addK (mulK x y') (mulK x' y)))).
+exact (eq_i_tra
+  (mulL z w)
+  (mulL
+    (addL (j x) (mulL omega (j y)))
+    (addL (j x') (mulL omega (j y'))))
+  (addL
+    (j (addK (mulK x x') (mulK d (mulK y y'))))
+    (mulL omega (j (addK (mulK x y') (mulK x' y)))))
+  (god1_binary_operation_congruence mulL
+    z (addL (j x) (mulL omega (j y)))
+    w (addL (j x') (mulL omega (j y')))
+    hzx hwy')
+  (god1_quadratic_linear_span_product_formula
+    K addK mulK L addL mulL j d omega
+    hK hL hj hd homega hsquare
+    x hx y hy x' hx' y' hy')).
+exact (andI
+  (addL z w :e quadratic_linear_span K L addL mulL j omega)
+  (mulL z w :e quadratic_linear_span K L addL mulL j omega)
+  (mem_eq_substL
+    (quadratic_linear_span K L addL mulL j omega)
+    (addL (j (addK x x')) (mulL omega (j (addK y y'))))
+    (addL z w) hsumEq hsumMember)
+  (mem_eq_substL
+    (quadratic_linear_span K L addL mulL j omega)
+    (addL
+      (j (addK (mulK x x') (mulK d (mulK y y'))))
+      (mulL omega (j (addK (mulK x y') (mulK x' y)))))
+    (mulL z w) hproductEq hproductMember)).
+Qed.
+
+Theorem god1_quadratic_linear_span_subring_core :
+  forall K, forall addK mulK:set -> set -> set,
+  forall L, forall addL mulL:set -> set -> set,
+  forall j:set -> set, forall d omega,
+    commutative_ring K addK mulK ->
+    commutative_ring L addL mulL ->
+    ring_homomorphism K addK mulK L addL mulL j ->
+    d :e K -> omega :e L -> mulL omega omega = j d ->
+    subring L addL mulL
+      (quadratic_linear_span K L addL mulL j omega).
+let K addK mulK L addL mulL j d omega.
+assume hK hL hj hd homega hsquare.
+claim hringL : ring L addL mulL.
+exact (andEL (ring L addL mulL) (commutative_on L mulL) hL).
+claim hsubset : quadratic_linear_span K L addL mulL j omega c= L.
+exact (god1_quadratic_linear_span_subset K L addL mulL j omega).
+claim hclosed :
+  forall z w :e quadratic_linear_span K L addL mulL j omega,
+    addL z w :e quadratic_linear_span K L addL mulL j omega
+    /\ mulL z w :e quadratic_linear_span K L addL mulL j omega.
+exact (god1_quadratic_linear_span_closed
+  K addK mulK L addL mulL j d omega
+  hK hL hj hd homega hsquare).
+claim hminusOne :
+  ring_negation L addL (ring_one L mulL)
+    :e quadratic_linear_span K L addL mulL j omega.
+exact (god1_quadratic_linear_span_contains_minus_one
+  K addK mulK L addL mulL j omega hj homega).
+exact (iffER
+  (subring L addL mulL
+    (quadratic_linear_span K L addL mulL j omega))
+  ((forall z w :e quadratic_linear_span K L addL mulL j omega,
+      addL z w :e quadratic_linear_span K L addL mulL j omega
+      /\ mulL z w :e quadratic_linear_span K L addL mulL j omega)
+    /\ ring_negation L addL (ring_one L mulL)
+      :e quadratic_linear_span K L addL mulL j omega)
+  (god1_subring_test_using_minus_one L addL mulL
+    (quadratic_linear_span K L addL mulL j omega)
+    hringL hsubset)
+  (andI
+    (forall z w :e quadratic_linear_span K L addL mulL j omega,
+      addL z w :e quadratic_linear_span K L addL mulL j omega
+      /\ mulL z w :e quadratic_linear_span K L addL mulL j omega)
+    (ring_negation L addL (ring_one L mulL)
+      :e quadratic_linear_span K L addL mulL j omega)
+    hclosed hminusOne)).
+Qed.
+
 Theorem god1_quadratic_linear_span_is_subring :
   forall K, forall addK mulK:set -> set -> set,
   forall L, forall addL mulL:set -> set -> set,
@@ -68614,24 +69674,49 @@ Theorem god1_quadratic_linear_span_is_subring :
     /\ omega :e quadratic_linear_span K L addL mulL j omega.
 let K addK mulK L addL mulL j d omega.
 assume hK hL hj hinj hd homega hsquare.
-apply andI.
 //GOD1PRF:153273 We assert that $\mathrm{L}^{\prime}$ is a subring of L which contains K and in which $d$ has a square root.
 claim h_s9_span_three_goals :
   subring L addL mulL (quadratic_linear_span K L addL mulL j omega)
   /\ group_image_of_subset K j
     c= quadratic_linear_span K L addL mulL j omega
   /\ omega :e quadratic_linear_span K L addL mulL j omega.
-admit.
+exact (andI
+  (subring L addL mulL
+      (quadratic_linear_span K L addL mulL j omega)
+    /\ group_image_of_subset K j
+      c= quadratic_linear_span K L addL mulL j omega)
+  (omega :e quadratic_linear_span K L addL mulL j omega)
+  (andI
+    (subring L addL mulL
+      (quadratic_linear_span K L addL mulL j omega))
+    (group_image_of_subset K j
+      c= quadratic_linear_span K L addL mulL j omega)
+    (god1_quadratic_linear_span_subring_core
+      K addK mulK L addL mulL j d omega
+      hK hL hj hd homega hsquare)
+    (god1_quadratic_linear_span_contains_base
+      K addK mulK L addL mulL j omega hj homega))
+  (god1_quadratic_linear_span_contains_root
+    K addK mulK L addL mulL j omega hj homega)).
 //GOD1PRF:153382 Clearly $\mathrm{L}^{\prime}$ contains K (put $y=0$ in (1)) and $\omega$ (put $x=0, y=1$ ).
 claim h_s9_span_contains_K_and_root :
   group_image_of_subset K j
     c= quadratic_linear_span K L addL mulL j omega
   /\ omega :e quadratic_linear_span K L addL mulL j omega.
-admit.
+exact (andI
+  (group_image_of_subset K j
+    c= quadratic_linear_span K L addL mulL j omega)
+  (omega :e quadratic_linear_span K L addL mulL j omega)
+  (god1_quadratic_linear_span_contains_base
+    K addK mulK L addL mulL j omega hj homega)
+  (god1_quadratic_linear_span_contains_root
+    K addK mulK L addL mulL j omega hj homega)).
 //GOD1PRF:153474 So we have to show that $\mathrm{L}^{\prime}$ is a subring of L .
 claim h_s9_span_subring_goal :
   subring L addL mulL (quadratic_linear_span K L addL mulL j omega).
-admit.
+exact (god1_quadratic_linear_span_subring_core
+  K addK mulK L addL mulL j d omega
+  hK hL hj hd homega hsquare).
 //GOD1PRF:153540 Since $\mathrm{L}^{\prime}$ contains K and therefore the element -1 , it is enough to show that the sum and product of two elements of $L^{\prime}$ are also in $L^{\prime}$.
 claim h_s9_span_subring_test_call :
   subring L addL mulL (quadratic_linear_span K L addL mulL j omega)
@@ -68641,10 +69726,10 @@ claim h_s9_span_subring_test_call :
     /\ ring_negation L addL (ring_one L mulL)
       :e quadratic_linear_span K L addL mulL j omega).
 claim h_s9_span_ring : ring L addL mulL.
-admit.
+exact (andEL (ring L addL mulL) (commutative_on L mulL) hL).
 claim h_s9_span_subset : quadratic_linear_span K L addL mulL j omega c= L.
-admit.
-apply (god1_subring_test_using_minus_one
+exact (god1_quadratic_linear_span_subset K L addL mulL j omega).
+exact (god1_subring_test_using_minus_one
   L addL mulL (quadratic_linear_span K L addL mulL j omega)
   h_s9_span_ring h_s9_span_subset).
 //GOD1PRF:153714 But this follows immediately from the formulae
@@ -68656,11 +69741,21 @@ claim h_s9_span_sum_product_formulae :
   /\ mulL (addL (j x) (mulL omega (j y)))
       (addL (j x') (mulL omega (j y')))
       :e quadratic_linear_span K L addL mulL j omega.
-admit.
+exact (fun x hx y hy x' hx' y' hy' =>
+  god1_quadratic_linear_span_closed
+    K addK mulK L addL mulL j d omega
+    hK hL hj hd homega hsquare
+    (addL (j x) (mulL omega (j y)))
+    (god1_quadratic_linear_span_intro
+      K addK mulK L addL mulL j omega hj homega x hx y hy)
+    (addL (j x') (mulL omega (j y')))
+    (god1_quadratic_linear_span_intro
+      K addK mulK L addL mulL j omega hj homega x' hx' y' hy')).
 //GOD1PRF:154259 which are self-evident if we remember that
 claim h_s9_span_square_relation : mulL omega omega = j d.
-admit.
-Admitted.
+exact hsquare.
+exact h_s9_span_three_goals.
+Qed.
 
 //GOD1:156229 quadratic_extension : "the quadratic extension of #1 obtained by adjoining a square root of #4" | $#1[\sqrt{#4}]$
 Definition quadratic_extension : set -> set :=
