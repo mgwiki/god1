@@ -68210,6 +68210,315 @@ Definition square_root_in_ring :
   set -> set -> prop :=
   fun K add mul d x => x :e K /\ d :e K /\ mul x x = d.
 
+Theorem god1_commutative_ring_difference_of_squares :
+  forall K, forall add mul:set -> set -> set,
+    commutative_ring K add mul -> forall x y :e K,
+      mul (add x (ring_negation K add y)) (add x y)
+      = add (mul x x) (ring_negation K add (mul y y)).
+let K add mul.
+assume hK.
+let x.
+assume hx.
+let y.
+assume hy.
+claim hring : ring K add mul.
+exact (andEL (ring K add mul) (commutative_on K mul) hK).
+claim hmulcomm : commutative_on K mul.
+exact (andER (ring K add mul) (commutative_on K mul) hK).
+claim hA : abelian_group K add.
+exact (god1_ring_additive_abelian_group K add mul hring).
+claim hG : group K add.
+exact (andEL (group K add) (commutative_on K add) hA).
+claim haddcomm : commutative_on K add.
+exact (andER (group K add) (commutative_on K add) hA).
+claim hnegy : ring_negation K add y :e K.
+exact (god1_group_inverse_in K add hG y hy).
+claim hsum : add x y :e K.
+exact (god1_group_law_of_composition K add hG x hx y hy).
+claim hxx : mul x x :e K.
+exact (god1_ring_multiplicative_law K add mul hring x hx x hx).
+claim hxy : mul x y :e K.
+exact (god1_ring_multiplicative_law K add mul hring x hx y hy).
+claim hnyx : mul (ring_negation K add y) x :e K.
+exact (god1_ring_multiplicative_law K add mul hring
+  (ring_negation K add y) hnegy x hx).
+claim hnyy : mul (ring_negation K add y) y :e K.
+exact (god1_ring_multiplicative_law K add mul hring
+  (ring_negation K add y) hnegy y hy).
+claim hyy : mul y y :e K.
+exact (god1_ring_multiplicative_law K add mul hring y hy y hy).
+claim hnegyy : ring_negation K add (mul y y) :e K.
+exact (god1_group_inverse_in K add hG (mul y y) hyy).
+claim hnegxy : ring_negation K add (mul x y) :e K.
+exact (god1_group_inverse_in K add hG (mul x y) hxy).
+claim houter :
+  mul (add x (ring_negation K add y)) (add x y)
+  = add (mul x (add x y))
+      (mul (ring_negation K add y) (add x y)).
+exact (andER
+  (mul x (add (ring_negation K add y) (add x y))
+    = add (mul x (ring_negation K add y)) (mul x (add x y)))
+  (mul (add x (ring_negation K add y)) (add x y)
+    = add (mul x (add x y))
+      (mul (ring_negation K add y) (add x y)))
+  (god1_ring_distributive_laws K add mul hring
+    x hx (ring_negation K add y) hnegy (add x y) hsum)).
+claim hinnerX :
+  mul x (add x y) = add (mul x x) (mul x y).
+exact (andEL
+  (mul x (add x y) = add (mul x x) (mul x y))
+  (mul (add x x) y = add (mul x y) (mul x y))
+  (god1_ring_distributive_laws K add mul hring x hx x hx y hy)).
+claim hinnerNegY :
+  mul (ring_negation K add y) (add x y)
+  = add (mul (ring_negation K add y) x)
+      (mul (ring_negation K add y) y).
+exact (andEL
+  (mul (ring_negation K add y) (add x y)
+    = add (mul (ring_negation K add y) x)
+      (mul (ring_negation K add y) y))
+  (mul (add (ring_negation K add y) x) y
+    = add (mul (ring_negation K add y) y) (mul x y))
+  (god1_ring_distributive_laws K add mul hring
+    (ring_negation K add y) hnegy x hx y hy)).
+claim hexpanded :
+  mul (add x (ring_negation K add y)) (add x y)
+  = add (add (mul x x) (mul x y))
+      (add (mul (ring_negation K add y) x)
+        (mul (ring_negation K add y) y)).
+exact (eq_i_tra
+  (mul (add x (ring_negation K add y)) (add x y))
+  (add (mul x (add x y))
+    (mul (ring_negation K add y) (add x y)))
+  (add (add (mul x x) (mul x y))
+    (add (mul (ring_negation K add y) x)
+      (mul (ring_negation K add y) y)))
+  houter
+  (god1_binary_operation_congruence add
+    (mul x (add x y)) (add (mul x x) (mul x y))
+    (mul (ring_negation K add y) (add x y))
+    (add (mul (ring_negation K add y) x)
+      (mul (ring_negation K add y) y))
+    hinnerX hinnerNegY)).
+claim hswap :
+  add (add (mul x x) (mul x y))
+    (add (mul (ring_negation K add y) x)
+      (mul (ring_negation K add y) y))
+  = add (add (mul x x) (mul x y))
+    (add (mul (ring_negation K add y) y)
+      (mul (ring_negation K add y) x)).
+exact (f_eq_i (fun q => add (add (mul x x) (mul x y)) q)
+  (add (mul (ring_negation K add y) x)
+    (mul (ring_negation K add y) y))
+  (add (mul (ring_negation K add y) y)
+    (mul (ring_negation K add y) x))
+  (haddcomm
+    (mul (ring_negation K add y) x) hnyx
+    (mul (ring_negation K add y) y) hnyy)).
+claim hinterchange :
+  add (add (mul x x) (mul x y))
+    (add (mul (ring_negation K add y) y)
+      (mul (ring_negation K add y) x))
+  = add
+      (add (mul x x) (mul (ring_negation K add y) y))
+      (add (mul x y) (mul (ring_negation K add y) x)).
+exact (god1_abelian_four_term_interchange K add hA
+  (mul x x) hxx (mul x y) hxy
+  (mul (ring_negation K add y) y) hnyy
+  (mul (ring_negation K add y) x) hnyx).
+claim hnegativeYY :
+  mul (ring_negation K add y) y
+  = ring_negation K add (mul y y).
+exact (eq_i_tra
+  (mul (ring_negation K add y) y)
+  (mul y (ring_negation K add y))
+  (ring_negation K add (mul y y))
+  (hmulcomm (ring_negation K add y) hnegy y hy)
+  (god1_commutative_ring_multiply_negation_right
+    K add mul hK y hy y hy)).
+claim hnegativeXY :
+  mul (ring_negation K add y) x
+  = ring_negation K add (mul x y).
+exact (eq_i_tra
+  (mul (ring_negation K add y) x)
+  (mul x (ring_negation K add y))
+  (ring_negation K add (mul x y))
+  (hmulcomm (ring_negation K add y) hnegy x hx)
+  (god1_commutative_ring_multiply_negation_right
+    K add mul hK x hx y hy)).
+claim hreplaceNegatives :
+  add
+    (add (mul x x) (mul (ring_negation K add y) y))
+    (add (mul x y) (mul (ring_negation K add y) x))
+  = add
+    (add (mul x x) (ring_negation K add (mul y y)))
+    (add (mul x y) (ring_negation K add (mul x y))).
+exact (god1_binary_operation_congruence add
+  (add (mul x x) (mul (ring_negation K add y) y))
+  (add (mul x x) (ring_negation K add (mul y y)))
+  (add (mul x y) (mul (ring_negation K add y) x))
+  (add (mul x y) (ring_negation K add (mul x y)))
+  (god1_binary_operation_congruence add
+    (mul x x) (mul x x)
+    (mul (ring_negation K add y) y)
+    (ring_negation K add (mul y y))
+    (eq_ref (mul x x)) hnegativeYY)
+  (god1_binary_operation_congruence add
+    (mul x y) (mul x y)
+    (mul (ring_negation K add y) x)
+    (ring_negation K add (mul x y))
+    (eq_ref (mul x y)) hnegativeXY)).
+claim hcancel :
+  add (mul x y) (ring_negation K add (mul x y))
+  = ring_zero K add.
+exact (andER
+  (ring_negation K add (mul x y) :e K
+    /\ add (ring_negation K add (mul x y)) (mul x y)
+      = ring_zero K add)
+  (add (mul x y) (ring_negation K add (mul x y))
+    = ring_zero K add)
+  (god1_group_inverse_specification K add hG (mul x y) hxy)).
+claim hdifference :
+  add (mul x x) (ring_negation K add (mul y y)) :e K.
+exact (god1_group_law_of_composition K add hG
+  (mul x x) hxx (ring_negation K add (mul y y)) hnegyy).
+claim hfinish :
+  add
+    (add (mul x x) (ring_negation K add (mul y y)))
+    (add (mul x y) (ring_negation K add (mul x y)))
+  = add (mul x x) (ring_negation K add (mul y y)).
+exact (eq_i_tra
+  (add
+    (add (mul x x) (ring_negation K add (mul y y)))
+    (add (mul x y) (ring_negation K add (mul x y))))
+  (add (add (mul x x) (ring_negation K add (mul y y)))
+    (ring_zero K add))
+  (add (mul x x) (ring_negation K add (mul y y)))
+  (f_eq_i
+    (fun q => add
+      (add (mul x x) (ring_negation K add (mul y y))) q)
+    (add (mul x y) (ring_negation K add (mul x y)))
+    (ring_zero K add) hcancel)
+  (andEL
+    (add (add (mul x x) (ring_negation K add (mul y y)))
+      (ring_zero K add)
+      = add (mul x x) (ring_negation K add (mul y y)))
+    (add (ring_zero K add)
+      (add (mul x x) (ring_negation K add (mul y y)))
+      = add (mul x x) (ring_negation K add (mul y y)))
+    ((andER
+      (ring_zero K add :e K)
+      (forall q :e K,
+        add q (ring_zero K add) = q
+        /\ add (ring_zero K add) q = q)
+      (god1_group_identity_specification K add hG))
+      (add (mul x x) (ring_negation K add (mul y y)))
+      hdifference))).
+exact (eq_i_tra
+  (mul (add x (ring_negation K add y)) (add x y))
+  (add (add (mul x x) (mul x y))
+    (add (mul (ring_negation K add y) x)
+      (mul (ring_negation K add y) y)))
+  (add (mul x x) (ring_negation K add (mul y y)))
+  hexpanded
+  (eq_i_tra
+    (add (add (mul x x) (mul x y))
+      (add (mul (ring_negation K add y) x)
+        (mul (ring_negation K add y) y)))
+    (add
+      (add (mul x x) (mul (ring_negation K add y) y))
+      (add (mul x y) (mul (ring_negation K add y) x)))
+    (add (mul x x) (ring_negation K add (mul y y)))
+    (eq_i_tra
+      (add (add (mul x x) (mul x y))
+        (add (mul (ring_negation K add y) x)
+          (mul (ring_negation K add y) y)))
+      (add (add (mul x x) (mul x y))
+        (add (mul (ring_negation K add y) y)
+          (mul (ring_negation K add y) x)))
+      (add
+        (add (mul x x) (mul (ring_negation K add y) y))
+        (add (mul x y) (mul (ring_negation K add y) x)))
+      hswap hinterchange)
+    (eq_i_tra
+      (add
+        (add (mul x x) (mul (ring_negation K add y) y))
+        (add (mul x y) (mul (ring_negation K add y) x)))
+      (add
+        (add (mul x x) (ring_negation K add (mul y y)))
+        (add (mul x y) (ring_negation K add (mul x y))))
+      (add (mul x x) (ring_negation K add (mul y y)))
+      hreplaceNegatives hfinish))).
+Qed.
+
+Theorem god1_integral_domain_sum_difference_zero_cases :
+  forall K, forall add mul:set -> set -> set,
+    integral_domain K add mul -> forall x y :e K,
+      mul (add x (ring_negation K add y)) (add x y)
+        = ring_zero K add ->
+      y = x \/ y = ring_negation K add x.
+let K add mul.
+assume hK.
+let x.
+assume hx.
+let y.
+assume hy hproductZero.
+claim hcommring : commutative_ring K add mul.
+exact (god1_integral_domain_commutative_ring K add mul hK).
+claim hring : ring K add mul.
+exact (andEL (ring K add mul) (commutative_on K mul) hcommring).
+claim hG : group K add.
+exact (god1_ring_additive_group K add mul hring).
+claim hnegy : ring_negation K add y :e K.
+exact (god1_group_inverse_in K add hG y hy).
+claim hdiff : add x (ring_negation K add y) :e K.
+exact (god1_group_law_of_composition K add hG
+  x hx (ring_negation K add y) hnegy).
+claim hsum : add x y :e K.
+exact (god1_group_law_of_composition K add hG x hx y hy).
+claim hzeroProductCases :
+  add x (ring_negation K add y) = ring_zero K add
+  \/ add x y = ring_zero K add.
+exact (god1_integral_domain_zero_product K add mul hK
+  (add x (ring_negation K add y)) hdiff
+  (add x y) hsum hproductZero).
+apply (orE
+  (add x (ring_negation K add y) = ring_zero K add)
+  (add x y = ring_zero K add)
+  hzeroProductCases
+  (y = x \/ y = ring_negation K add x)).
+- assume hdiffZero.
+  claim hxy : x = y.
+  exact (iffER
+    (x = y)
+    (add x (ring_negation K add y) = ring_zero K add)
+    (god1_group_equal_iff_difference_identity K add hG x hx y hy)
+    hdiffZero).
+  exact (orIL (y = x) (y = ring_negation K add x)
+    (eq_sym x y hxy)).
+- assume hsumZero.
+  claim hnegx : ring_negation K add x :e K.
+  exact (god1_group_inverse_in K add hG x hx).
+  claim hcanonical :
+    add x (ring_negation K add x) = ring_zero K add.
+  exact (andER
+    (ring_negation K add x :e K
+      /\ add (ring_negation K add x) x = ring_zero K add)
+    (add x (ring_negation K add x) = ring_zero K add)
+    (god1_group_inverse_specification K add hG x hx)).
+  claim hynegx : y = ring_negation K add x.
+  exact (god1_group_left_cancel K add hG
+    x hx y hy (ring_negation K add x) hnegx
+    (eq_i_tra
+      (add x y) (ring_zero K add)
+      (add x (ring_negation K add x))
+      hsumZero
+      (eq_sym
+        (add x (ring_negation K add x))
+        (ring_zero K add) hcanonical))).
+  exact (orIR (y = x) (y = ring_negation K add x) hynegx).
+Qed.
+
 Theorem god1_integral_domain_square_roots_unique_up_to_sign :
   forall K, forall add mul:set -> set -> set,
     integral_domain K add mul ->
@@ -68225,12 +68534,61 @@ let x.
 assume hx.
 let y.
 assume hy hdx hdy.
+claim hcommring : commutative_ring K add mul.
+exact (god1_integral_domain_commutative_ring K add mul hK).
+claim hring : ring K add mul.
+exact (andEL (ring K add mul) (commutative_on K mul) hcommring).
+claim hG : group K add.
+exact (god1_ring_additive_group K add mul hring).
+claim hsquareX : mul x x = d.
+exact (andER (x :e K /\ d :e K) (mul x x = d) hdx).
+claim hsquareY : mul y y = d.
+exact (andER (y :e K /\ d :e K) (mul y y = d) hdy).
+claim hxx : mul x x :e K.
+exact (god1_ring_multiplicative_law K add mul hring x hx x hx).
+claim hyy : mul y y :e K.
+exact (god1_ring_multiplicative_law K add mul hring y hy y hy).
+claim hequalSquares : mul x x = mul y y.
+exact (eq_i_tra (mul x x) d (mul y y)
+  hsquareX (eq_sym (mul y y) d hsquareY)).
+claim hdifferenceSquaresZero :
+  add (mul x x) (ring_negation K add (mul y y))
+  = ring_zero K add.
+exact (iffEL
+  (mul x x = mul y y)
+  (add (mul x x) (ring_negation K add (mul y y))
+    = ring_zero K add)
+  (god1_group_equal_iff_difference_identity K add hG
+    (mul x x) hxx (mul y y) hyy)
+  hequalSquares).
+claim hproductZero :
+  mul (add x (ring_negation K add y)) (add x y)
+  = ring_zero K add.
+exact (eq_i_tra
+  (mul (add x (ring_negation K add y)) (add x y))
+  (add (mul x x) (ring_negation K add (mul y y)))
+  (ring_zero K add)
+  (god1_commutative_ring_difference_of_squares
+    K add mul hcommring x hx y hy)
+  hdifferenceSquaresZero).
+claim hconclusion : y = x \/ y = ring_negation K add x.
+exact (god1_integral_domain_sum_difference_zero_cases
+  K add mul hK x hx y hy hproductZero).
 //GOD1PRF:151560 Clearly, if $x$ is a square root of $d$ in K , so is $-x$; if also K is an integral domain, then $d$ cannot have more than two square roots in K , because the equation $x^{2}=y^{2}$ is equivalent to $(x-y)(x+y)=0$ and therefore implies that either $y=x$ or $y=-x$ when K is an integral domain.
 claim h_s9_square_roots_factorization :
   mul (add x (ring_negation K add y)) (add x y) = ring_zero K add
   /\ (y = x \/ y = ring_negation K add x).
-admit.
-Admitted.
+exact (andI
+  (mul (add x (ring_negation K add y)) (add x y)
+    = ring_zero K add)
+  (y = x \/ y = ring_negation K add x)
+  hproductZero hconclusion).
+exact (andER
+  (mul (add x (ring_negation K add y)) (add x y)
+    = ring_zero K add)
+  (y = x \/ y = ring_negation K add x)
+  h_s9_square_roots_factorization).
+Qed.
 
 //GOD1:153061 quadratic_linear_span : "the elements of #4 of the form #7(x)+#8#7(y), with x and y in #1" | $#7(#1)+#8#7(#1)$
 Definition quadratic_linear_span :
