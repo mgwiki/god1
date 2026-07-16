@@ -42526,6 +42526,215 @@ Definition god1_s4_equivalence_relation :
     /\ (forall x y :e X, R x y -> R y x)
     /\ (forall x y z :e X, R x y -> R y z -> R x z).
 
+Theorem god1_left_coset_relation_intro :
+  forall G, forall mul:set -> set -> set, forall H x y,
+    x :e G -> y :e G ->
+    mul (group_inverse G mul x) y :e H ->
+    left_coset_relation G mul H x y.
+let G mul H x y.
+assume hx hy hxy.
+exact (andI (x :e G /\ y :e G)
+  (mul (group_inverse G mul x) y :e H)
+  (andI (x :e G) (y :e G) hx hy) hxy).
+Qed.
+
+Theorem god1_left_coset_relation_left_in :
+  forall G, forall mul:set -> set -> set, forall H x y,
+    left_coset_relation G mul H x y -> x :e G.
+let G mul H x y.
+assume hxy.
+exact (andEL (x :e G) (y :e G)
+  (andEL (x :e G /\ y :e G)
+    (mul (group_inverse G mul x) y :e H) hxy)).
+Qed.
+
+Theorem god1_left_coset_relation_right_in :
+  forall G, forall mul:set -> set -> set, forall H x y,
+    left_coset_relation G mul H x y -> y :e G.
+let G mul H x y.
+assume hxy.
+exact (andER (x :e G) (y :e G)
+  (andEL (x :e G /\ y :e G)
+    (mul (group_inverse G mul x) y :e H) hxy)).
+Qed.
+
+Theorem god1_left_coset_relation_difference_in :
+  forall G, forall mul:set -> set -> set, forall H x y,
+    left_coset_relation G mul H x y ->
+    mul (group_inverse G mul x) y :e H.
+let G mul H x y.
+assume hxy.
+exact (andER (x :e G /\ y :e G)
+  (mul (group_inverse G mul x) y :e H) hxy).
+Qed.
+
+Theorem god1_group_inverse_difference_reverse :
+  forall G, forall mul:set -> set -> set,
+    group G mul -> forall x y :e G,
+    group_inverse G mul (mul (group_inverse G mul x) y)
+      = mul (group_inverse G mul y) x.
+let G mul.
+assume hG.
+let x.
+assume hx.
+let y.
+assume hy.
+apply (eq_i_tra
+  (group_inverse G mul (mul (group_inverse G mul x) y))
+  (mul (group_inverse G mul y)
+    (group_inverse G mul (group_inverse G mul x)))
+  (mul (group_inverse G mul y) x)).
+- exact (god1_group_inverse_product G mul hG
+    (group_inverse G mul x) (god1_group_inverse_in G mul hG x hx)
+    y hy).
+- f_equal.
+  exact (god1_group_inverse_involutive G mul hG x hx).
+Qed.
+
+Theorem god1_group_difference_product :
+  forall G, forall mul:set -> set -> set,
+    group G mul -> forall x y z :e G,
+    mul (mul (group_inverse G mul x) y)
+      (mul (group_inverse G mul y) z)
+      = mul (group_inverse G mul x) z.
+let G mul.
+assume hG.
+let x.
+assume hx.
+let y.
+assume hy.
+let z.
+assume hz.
+apply (eq_i_tra
+  (mul (mul (group_inverse G mul x) y)
+    (mul (group_inverse G mul y) z))
+  (mul (group_inverse G mul x)
+    (mul y (mul (group_inverse G mul y) z)))
+  (mul (group_inverse G mul x) z)).
+- apply eq_sym.
+  exact (god1_group_associative G mul hG
+    (group_inverse G mul x) (god1_group_inverse_in G mul hG x hx)
+    y hy
+    (mul (group_inverse G mul y) z)
+    (god1_group_law_of_composition G mul hG
+      (group_inverse G mul y) (god1_group_inverse_in G mul hG y hy)
+      z hz)).
+- apply (eq_i_tra
+    (mul (group_inverse G mul x)
+      (mul y (mul (group_inverse G mul y) z)))
+    (mul (group_inverse G mul x)
+      (mul (mul y (group_inverse G mul y)) z))
+    (mul (group_inverse G mul x) z)).
+  - f_equal.
+    exact (god1_group_associative G mul hG
+      y hy (group_inverse G mul y)
+      (god1_group_inverse_in G mul hG y hy) z hz).
+  - apply (eq_i_tra
+      (mul (group_inverse G mul x)
+        (mul (mul y (group_inverse G mul y)) z))
+      (mul (group_inverse G mul x)
+        (mul (group_identity G mul) z))
+      (mul (group_inverse G mul x) z)).
+    - f_equal.
+      f_equal.
+      exact (andER
+        (group_inverse G mul y :e G
+          /\ mul (group_inverse G mul y) y = group_identity G mul)
+        (mul y (group_inverse G mul y) = group_identity G mul)
+        (god1_group_inverse_specification G mul hG y hy)).
+    - f_equal.
+      exact (andER
+        (mul z (group_identity G mul) = z)
+        (mul (group_identity G mul) z = z)
+        ((andER
+          (group_identity G mul :e G)
+          (forall u :e G,
+            mul u (group_identity G mul) = u
+            /\ mul (group_identity G mul) u = u)
+          (god1_group_identity_specification G mul hG)) z hz)).
+Qed.
+
+//GOD1PRF:51940 in the sense of §4, section 1 .
+//GOD1PRF:51973 First of all, the relation $\mathrm{R}\{x, x\}$ is always true, because it signifies that H contains the identity element
+Theorem god1_left_coset_relation_reflexive :
+  forall G, forall mul:set -> set -> set, forall H,
+    subgroup G mul H ->
+    forall x :e G, left_coset_relation G mul H x x.
+let G mul H.
+assume hH.
+let x.
+assume hx.
+apply (god1_left_coset_relation_intro G mul H x x hx hx).
+apply (mem_eq_substL H (group_identity G mul)
+  (mul (group_inverse G mul x) x)).
+- exact (andER
+    (group_inverse G mul x :e G)
+    (mul (group_inverse G mul x) x = group_identity G mul)
+    (andEL
+      (group_inverse G mul x :e G
+        /\ mul (group_inverse G mul x) x = group_identity G mul)
+      (mul x (group_inverse G mul x) = group_identity G mul)
+      (god1_group_inverse_specification G mul
+        (god1_subgroup_ambient_group G mul H hH) x hx))).
+- exact (god1_subgroup_contains_identity G mul H hH).
+Qed.
+
+//GOD1PRF:52114 Next, to show that $\mathbf{R}\{x, y\}$ implies $\mathbf{R}\{y, x\}$, we observe that, by the definition of a subgroup, the relation
+//GOD1PRF:52279 implies $\left(x^{-1} y\right)^{-1} \in \mathrm{H}$, i.e., $y^{-1} x \in \mathrm{H}$.
+Theorem god1_left_coset_relation_symmetric :
+  forall G, forall mul:set -> set -> set, forall H,
+    subgroup G mul H -> forall x y :e G,
+      left_coset_relation G mul H x y ->
+      left_coset_relation G mul H y x.
+let G mul H.
+assume hH.
+let x.
+assume hx.
+let y.
+assume hy hxy.
+apply (god1_left_coset_relation_intro G mul H y x hy hx).
+apply (mem_eq_substR H
+  (group_inverse G mul (mul (group_inverse G mul x) y))
+  (mul (group_inverse G mul y) x)).
+- exact (god1_group_inverse_difference_reverse G mul
+    (god1_subgroup_ambient_group G mul H hH) x hx y hy).
+- exact (god1_subgroup_inverse_closed G mul H hH
+    (mul (group_inverse G mul x) y)
+    (god1_left_coset_relation_difference_in G mul H x y hxy)).
+Qed.
+
+//GOD1PRF:52365 Finally, the relations $\mathrm{R}\{x, y\}$ and $\mathrm{R}\{y, z\}$, i.e., the relations
+//GOD1PRF:52525 imply the relation $\left(x^{-1} y\right)\left(y^{-1} z\right) \in \mathrm{H}$, i.e., $x^{-1} z \in \mathrm{H}$, which is the relation $\mathrm{R}\{x, z\}$.
+Theorem god1_left_coset_relation_transitive :
+  forall G, forall mul:set -> set -> set, forall H,
+    subgroup G mul H -> forall x y z :e G,
+      left_coset_relation G mul H x y ->
+      left_coset_relation G mul H y z ->
+      left_coset_relation G mul H x z.
+let G mul H.
+assume hH.
+let x.
+assume hx.
+let y.
+assume hy.
+let z.
+assume hz hxy hyz.
+apply (god1_left_coset_relation_intro G mul H x z hx hz).
+apply (mem_eq_substR H
+  (mul (mul (group_inverse G mul x) y)
+    (mul (group_inverse G mul y) z))
+  (mul (group_inverse G mul x) z)).
+- exact (god1_group_difference_product G mul
+    (god1_subgroup_ambient_group G mul H hH)
+    x hx y hy z hz).
+- exact (god1_subgroup_product_closed G mul H hH
+    (mul (group_inverse G mul x) y)
+    (god1_left_coset_relation_difference_in G mul H x y hxy)
+    (mul (group_inverse G mul y) z)
+    (god1_left_coset_relation_difference_in G mul H y z hyz)).
+Qed.
+
+//GOD1PRF:52684 Hence the relation $\mathrm{R}\{x, y\}$ is an equivalence relation on the set G .
 Theorem god1_left_coset_relation_is_equivalence :
   forall G, forall mul:set -> set -> set, forall H,
     subgroup G mul H ->
@@ -42539,56 +42748,80 @@ Theorem god1_left_coset_relation_is_equivalence :
       left_coset_relation G mul H x z).
 let G mul H.
 assume hH.
-apply andI.
-//GOD1PRF:51940 in the sense of §4, section 1 .
-claim h_s7_coset_s4_equivalence_definition_call :
-  god1_s4_equivalence_relation G
-    (fun x y => left_coset_relation G mul H x y).
-admit.
-//GOD1PRF:51973 First of all, the relation $\mathrm{R}\{x, x\}$ is always true, because it signifies that H contains the identity element
-claim h_s7_coset_relation_reflexive :
-  forall x :e G, left_coset_relation G mul H x x.
-admit.
-//GOD1PRF:52114 Next, to show that $\mathbf{R}\{x, y\}$ implies $\mathbf{R}\{y, x\}$, we observe that, by the definition of a subgroup, the relation
-claim h_s7_coset_relation_subgroup_inverse_step :
-  subgroup G mul H -> forall x y :e G,
-    mul (group_inverse G mul x) y :e H ->
-    group_inverse G mul
-      (mul (group_inverse G mul x) y) :e H.
-admit.
-//GOD1PRF:52279 implies $\left(x^{-1} y\right)^{-1} \in \mathrm{H}$, i.e., $y^{-1} x \in \mathrm{H}$.
-claim h_s7_coset_relation_symmetric_membership :
-  forall x y :e G,
-    mul (group_inverse G mul x) y :e H ->
-    mul (group_inverse G mul y) x :e H.
-admit.
-//GOD1PRF:52365 Finally, the relations $\mathrm{R}\{x, y\}$ and $\mathrm{R}\{y, z\}$, i.e., the relations
-claim h_s7_coset_relation_two_memberships :
-  forall x y z :e G,
+exact (andI
+  ((forall x :e G, left_coset_relation G mul H x x)
+    /\ (forall x y :e G,
+      left_coset_relation G mul H x y ->
+      left_coset_relation G mul H y x))
+  (forall x y z :e G,
     left_coset_relation G mul H x y ->
     left_coset_relation G mul H y z ->
-    mul (group_inverse G mul x) y :e H
-    /\ mul (group_inverse G mul y) z :e H.
-admit.
-//GOD1PRF:52525 imply the relation $\left(x^{-1} y\right)\left(y^{-1} z\right) \in \mathrm{H}$, i.e., $x^{-1} z \in \mathrm{H}$, which is the relation $\mathrm{R}\{x, z\}$.
-claim h_s7_coset_relation_transitive_membership :
-  forall x y z :e G,
-    left_coset_relation G mul H x y ->
-    left_coset_relation G mul H y z ->
-    mul (group_inverse G mul x) z :e H.
-admit.
-//GOD1PRF:52684 Hence the relation $\mathrm{R}\{x, y\}$ is an equivalence relation on the set G .
-claim h_s7_coset_relation_equivalence_conclusion :
-  (forall x :e G, left_coset_relation G mul H x x)
-  /\ (forall x y :e G,
-    left_coset_relation G mul H x y ->
-    left_coset_relation G mul H y x)
-  /\ (forall x y z :e G,
-    left_coset_relation G mul H x y ->
-    left_coset_relation G mul H y z ->
-    left_coset_relation G mul H x z).
-admit.
-Admitted.
+    left_coset_relation G mul H x z)
+  (andI
+    (forall x :e G, left_coset_relation G mul H x x)
+    (forall x y :e G,
+      left_coset_relation G mul H x y ->
+      left_coset_relation G mul H y x)
+    (god1_left_coset_relation_reflexive G mul H hH)
+    (god1_left_coset_relation_symmetric G mul H hH))
+  (god1_left_coset_relation_transitive G mul H hH)).
+Qed.
+
+Theorem god1_group_left_cancel :
+  forall G, forall mul:set -> set -> set,
+    group G mul -> forall x a b :e G,
+      mul x a = mul x b -> a = b.
+let G mul.
+assume hG.
+let x.
+assume hx.
+let a.
+assume ha.
+let b.
+assume hb hab.
+apply (eq_i_tra a
+  (mul (group_inverse G mul x) (mul x a)) b).
+- apply eq_sym.
+  exact (god1_group_inverse_left_cancels_product G mul hG x hx a ha).
+- apply (eq_i_tra
+    (mul (group_inverse G mul x) (mul x a))
+    (mul (group_inverse G mul x) (mul x b)) b).
+  - f_equal.
+    exact hab.
+  - exact (god1_group_inverse_left_cancels_product G mul hG x hx b hb).
+Qed.
+
+//GOD1PRF:55039 For every left coset $x \mathrm{H}$ there exists a bijection of H onto $x \mathrm{H}$, namely the mapping $z \rightarrow x z$ : this is surjective by the definition of $x \mathrm{H}$, and injective because each $x \in \mathrm{G}$ is invertible, so that Theorem 4 of § 6 applies.
+Theorem god1_left_coset_map_bijective :
+  forall G, forall mul:set -> set -> set, forall H,
+    subgroup G mul H -> forall x :e G,
+      bij H (left_coset G mul H x) (fun z => mul x z).
+let G mul H.
+assume hH.
+let x.
+assume hx.
+apply (bijI H (left_coset G mul H x) (fun z => mul x z)).
+- let z.
+  assume hz.
+  exact (ReplI H (fun h => mul x h) z hz).
+- let a.
+  assume ha.
+  let b.
+  assume hb hab.
+  exact (god1_group_left_cancel G mul
+    (god1_subgroup_ambient_group G mul H hH)
+    x hx a ((god1_subgroup_subset G mul H hH) a ha)
+    b ((god1_subgroup_subset G mul H hH) b hb) hab).
+- let y.
+  assume hy.
+  apply (ReplE_impred H (fun h => mul x h) y hy
+    (exists z :e H, mul x z = y)).
+  let z.
+  assume hz heq.
+  apply (ex_intro
+    (fun w => w :e H /\ mul x w = y) z).
+  exact (andI (z :e H) (mul x z = y) hz (eq_sym y (mul x z) heq)).
+Qed.
 
 Theorem god1_left_cosets_equipotent_to_subgroup :
   forall G, forall mul:set -> set -> set, forall H,
@@ -42598,39 +42831,742 @@ let G mul H.
 assume hH.
 let x.
 assume hx.
-//GOD1PRF:55039 For every left coset $x \mathrm{H}$ there exists a bijection of H onto $x \mathrm{H}$, namely the mapping $z \rightarrow x z$ : this is surjective by the definition of $x \mathrm{H}$, and injective because each $x \in \mathrm{G}$ is invertible, so that Theorem 4 of § 6 applies.
-claim h_s7_coset_s6_t4_law : law_of_composition G mul.
-admit.
-claim h_s7_coset_s6_t4_associative : associative_on G mul.
-admit.
-claim h_s7_coset_s6_t4_identity :
-  neutral_element G mul (group_identity G mul).
-admit.
-claim h_s7_coset_s6_t4_inverse_member :
-  group_inverse G mul x :e G.
-admit.
-claim h_s7_coset_s6_t4_reflection :
-  reflection G mul (group_identity G mul)
-    x (group_inverse G mul x).
-admit.
-claim h_s7_coset_s6_theorem4_call :
-  forall b :e G,
-    exists z :e G,
-      mul x z = b
-      /\ z = mul (group_inverse G mul x) b
-      /\ forall y :e G, mul x y = b -> y = z.
-apply (god1_s6_theorem4_equation_with_reflexible_left_factor
-  G mul (group_identity G mul)
-  h_s7_coset_s6_t4_law h_s7_coset_s6_t4_associative
-  h_s7_coset_s6_t4_identity
-  x hx (group_inverse G mul x)
-  h_s7_coset_s6_t4_inverse_member h_s7_coset_s6_t4_reflection).
-claim h_s7_coset_bijection :
-  bij H (left_coset G mul H x) (fun z => mul x z).
-admit.
-claim h_s7_coset_equipotence : equip H (left_coset G mul H x).
-admit.
-Admitted.
+apply (ex_intro_setfun
+  (fun f => bij H (left_coset G mul H x) f)
+  (fun z => mul x z)).
+exact (god1_left_coset_map_bijective G mul H hH x hx).
+Qed.
+
+Theorem god1_group_left_reconstruct :
+  forall G, forall mul:set -> set -> set,
+    group G mul -> forall x y :e G,
+      mul x (mul (group_inverse G mul x) y) = y.
+let G mul.
+assume hG.
+let x.
+assume hx.
+let y.
+assume hy.
+apply (eq_i_tra
+  (mul x (mul (group_inverse G mul x) y))
+  (mul (mul x (group_inverse G mul x)) y) y).
+- exact (god1_group_associative G mul hG
+    x hx (group_inverse G mul x)
+    (god1_group_inverse_in G mul hG x hx) y hy).
+- apply (eq_i_tra
+    (mul (mul x (group_inverse G mul x)) y)
+    (mul (group_identity G mul) y) y).
+  - f_equal.
+    exact (andER
+      (group_inverse G mul x :e G
+        /\ mul (group_inverse G mul x) x = group_identity G mul)
+      (mul x (group_inverse G mul x) = group_identity G mul)
+      (god1_group_inverse_specification G mul hG x hx)).
+  - exact (andER
+      (mul y (group_identity G mul) = y)
+      (mul (group_identity G mul) y = y)
+      ((andER
+        (group_identity G mul :e G)
+        (forall z :e G,
+          mul z (group_identity G mul) = z
+          /\ mul (group_identity G mul) z = z)
+        (god1_group_identity_specification G mul hG)) y hy)).
+Qed.
+
+Theorem god1_left_coset_member_iff_relation :
+  forall G, forall mul:set -> set -> set, forall H,
+    subgroup G mul H -> forall x y :e G,
+      (y :e left_coset G mul H x <->
+        left_coset_relation G mul H x y).
+let G mul H.
+assume hH.
+let x.
+assume hx.
+let y.
+assume hy.
+apply iffI.
+- assume hycoset.
+  apply (ReplE_impred H (fun h => mul x h) y hycoset
+    (left_coset_relation G mul H x y)).
+  let h.
+  assume hh heq.
+  apply (god1_left_coset_relation_intro G mul H x y hx hy).
+  apply (mem_eq_substR H h (mul (group_inverse G mul x) y)).
+  apply (eq_i_tra h
+    (mul (group_inverse G mul x) (mul x h))
+    (mul (group_inverse G mul x) y)).
+  - apply eq_sym.
+    exact (god1_group_inverse_left_cancels_product G mul
+      (god1_subgroup_ambient_group G mul H hH)
+      x hx h ((god1_subgroup_subset G mul H hH) h hh)).
+  - f_equal.
+    apply eq_sym.
+    exact heq.
+  - exact hh.
+- assume hrel.
+  apply (mem_eq_substR (left_coset G mul H x)
+    (mul x (mul (group_inverse G mul x) y)) y).
+  - exact (god1_group_left_reconstruct G mul
+      (god1_subgroup_ambient_group G mul H hH) x hx y hy).
+  - exact (ReplI H (fun h => mul x h)
+      (mul (group_inverse G mul x) y)
+      (god1_left_coset_relation_difference_in G mul H x y hrel)).
+Qed.
+
+Theorem god1_left_coset_eq_of_relation :
+  forall G, forall mul:set -> set -> set, forall H,
+    subgroup G mul H -> forall x y :e G,
+      left_coset_relation G mul H x y ->
+      left_coset G mul H x = left_coset G mul H y.
+let G mul H.
+assume hH.
+let x.
+assume hx.
+let y.
+assume hy hxy.
+apply set_ext.
+- let z.
+  assume hz.
+  apply (ReplE_impred H (fun h => mul x h) z hz
+    (z :e left_coset G mul H y)).
+  let h.
+  assume hh heq.
+  apply (iffER
+    (z :e left_coset G mul H y)
+    (left_coset_relation G mul H y z)
+    (god1_left_coset_member_iff_relation G mul H hH y hy z
+      (mem_eq_substL G (mul x h) z heq
+        (god1_group_law_of_composition G mul
+          (god1_subgroup_ambient_group G mul H hH)
+          x hx h ((god1_subgroup_subset G mul H hH) h hh))))).
+  apply (god1_left_coset_relation_transitive G mul H hH y hy x hx z
+    (mem_eq_substL G (mul x h) z heq
+      (god1_group_law_of_composition G mul
+        (god1_subgroup_ambient_group G mul H hH)
+        x hx h ((god1_subgroup_subset G mul H hH) h hh)))).
+  - exact (god1_left_coset_relation_symmetric G mul H hH x hx y hy hxy).
+  - apply (iffEL
+      (z :e left_coset G mul H x)
+      (left_coset_relation G mul H x z)
+      (god1_left_coset_member_iff_relation G mul H hH x hx z
+        (mem_eq_substL G (mul x h) z heq
+          (god1_group_law_of_composition G mul
+            (god1_subgroup_ambient_group G mul H hH)
+            x hx h ((god1_subgroup_subset G mul H hH) h hh))))
+      hz).
+- let z.
+  assume hz.
+  apply (ReplE_impred H (fun h => mul y h) z hz
+    (z :e left_coset G mul H x)).
+  let h.
+  assume hh heq.
+  apply (iffER
+    (z :e left_coset G mul H x)
+    (left_coset_relation G mul H x z)
+    (god1_left_coset_member_iff_relation G mul H hH x hx z
+      (mem_eq_substL G (mul y h) z heq
+        (god1_group_law_of_composition G mul
+          (god1_subgroup_ambient_group G mul H hH)
+          y hy h ((god1_subgroup_subset G mul H hH) h hh))))).
+  apply (god1_left_coset_relation_transitive G mul H hH x hx y hy z
+    (mem_eq_substL G (mul y h) z heq
+      (god1_group_law_of_composition G mul
+        (god1_subgroup_ambient_group G mul H hH)
+        y hy h ((god1_subgroup_subset G mul H hH) h hh)))).
+  - exact hxy.
+  - apply (iffEL
+      (z :e left_coset G mul H y)
+      (left_coset_relation G mul H y z)
+      (god1_left_coset_member_iff_relation G mul H hH y hy z
+        (mem_eq_substL G (mul y h) z heq
+          (god1_group_law_of_composition G mul
+            (god1_subgroup_ambient_group G mul H hH)
+            y hy h ((god1_subgroup_subset G mul H hH) h hh))))
+      hz).
+Qed.
+
+Theorem god1_left_coset_subset :
+  forall G, forall mul:set -> set -> set, forall H,
+    subgroup G mul H -> forall x :e G,
+      left_coset G mul H x c= G.
+let G mul H.
+assume hH.
+let x.
+assume hx.
+let y.
+assume hy.
+apply (ReplE_impred H (fun h => mul x h) y hy (y :e G)).
+let h.
+assume hh heq.
+exact (mem_eq_substL G (mul x h) y heq
+  (god1_group_law_of_composition G mul
+    (god1_subgroup_ambient_group G mul H hH)
+    x hx h ((god1_subgroup_subset G mul H hH) h hh))).
+Qed.
+
+Theorem god1_left_coset_size :
+  forall G, forall mul:set -> set -> set, forall H,
+    subgroup G mul H -> forall r,
+    equip H r -> forall x :e G, equip (left_coset G mul H x) r.
+let G mul H.
+assume hH.
+let r.
+assume hr.
+let x.
+assume hx.
+exact (equip_tra (left_coset G mul H x) H r
+  (equip_sym H (left_coset G mul H x)
+    (god1_left_cosets_equipotent_to_subgroup G mul H hH x hx)) hr).
+Qed.
+
+Theorem god1_left_coset_size_components :
+  forall G, forall mul:set -> set -> set, forall H,
+    subgroup G mul H -> forall r, equip H r -> forall x :e G,
+      left_coset G mul H x c= G /\ equip (left_coset G mul H x) r.
+let G mul H.
+assume hH.
+let r.
+assume hr.
+let x.
+assume hx.
+exact (andI
+  (left_coset G mul H x c= G)
+  (equip (left_coset G mul H x) r)
+  (god1_left_coset_subset G mul H hH x hx)
+  (god1_left_coset_size G mul H hH r hr x hx)).
+Qed.
+
+Theorem god1_left_coset_quotient_uniform_size :
+  forall G, forall mul:set -> set -> set, forall H,
+    subgroup G mul H -> forall r, equip H r ->
+    forall C :e left_coset_quotient G mul H,
+      C c= G /\ equip C r.
+let G mul H.
+assume hH.
+let r.
+assume hr.
+exact (ReplE' G (fun x => left_coset G mul H x)
+  (fun C => C c= G /\ equip C r)
+  (god1_left_coset_size_components G mul H hH r hr)).
+Qed.
+
+Theorem god1_left_cosets_cover_group :
+  forall G, forall mul:set -> set -> set, forall H,
+    subgroup G mul H -> forall x :e G,
+      exists C :e left_coset_quotient G mul H, x :e C.
+let G mul H.
+assume hH.
+let x.
+assume hx.
+apply (ex_intro
+  (fun C => C :e left_coset_quotient G mul H /\ x :e C)
+  (left_coset G mul H x)).
+apply andI.
+- exact (ReplI G (fun y => left_coset G mul H y) x hx).
+- apply (mem_eq_substR (left_coset G mul H x)
+    (mul x (group_identity G mul)) x).
+  - exact (andEL
+      (mul x (group_identity G mul) = x)
+      (mul (group_identity G mul) x = x)
+      ((andER
+        (group_identity G mul :e G)
+        (forall y :e G,
+          mul y (group_identity G mul) = y
+          /\ mul (group_identity G mul) y = y)
+        (god1_group_identity_specification G mul
+          (god1_subgroup_ambient_group G mul H hH))) x hx)).
+  - exact (ReplI H (fun h => mul x h)
+      (group_identity G mul)
+      (god1_subgroup_contains_identity G mul H hH)).
+Qed.
+
+Theorem god1_left_cosets_unique_at_point :
+  forall G, forall mul:set -> set -> set, forall H,
+    subgroup G mul H -> forall x :e G,
+    forall C D :e left_coset_quotient G mul H,
+      x :e C -> x :e D -> C = D.
+let G mul H.
+assume hH.
+let x.
+assume hx.
+let C.
+assume hC.
+let D.
+assume hD hxC hxD.
+apply (ReplE_impred G (fun a => left_coset G mul H a) C hC (C = D)).
+let a.
+assume ha hCa.
+apply (ReplE_impred G (fun b => left_coset G mul H b) D hD (C = D)).
+let b.
+assume hb hDb.
+apply (eq_i_tra C (left_coset G mul H a) D hCa).
+apply (eq_i_tra
+  (left_coset G mul H a) (left_coset G mul H b) D).
+- apply (god1_left_coset_eq_of_relation G mul H hH a ha b hb).
+  apply (god1_left_coset_relation_transitive G mul H hH a ha x hx b hb).
+  - exact (iffEL
+      (x :e left_coset G mul H a)
+      (left_coset_relation G mul H a x)
+      (god1_left_coset_member_iff_relation G mul H hH a ha x hx)
+      (mem_eq_set_subst C (left_coset G mul H a) x hCa hxC)).
+  - exact (god1_left_coset_relation_symmetric G mul H hH b hb x hx
+      (iffEL
+        (x :e left_coset G mul H b)
+        (left_coset_relation G mul H b x)
+        (god1_left_coset_member_iff_relation G mul H hH b hb x hx)
+        (mem_eq_set_subst D (left_coset G mul H b) x hDb hxD))).
+- apply eq_sym.
+  exact hDb.
+Qed.
+
+Theorem god1_bijection_maps_subset :
+  forall A B, forall f:set -> set,
+    bij A B f -> forall X, X c= A -> forall x :e X, f x :e B.
+let A B f.
+assume hf.
+let X.
+assume hXA.
+let x.
+assume hx.
+exact (god1_bijection_maps_into A B f hf x (hXA x hx)).
+Qed.
+
+Theorem god1_bijection_injective_subset :
+  forall A B, forall f:set -> set,
+    bij A B f -> forall X, X c= A ->
+    forall x y :e X, f x = f y -> x = y.
+let A B f.
+assume hf.
+let X.
+assume hXA.
+let x.
+assume hx.
+let y.
+assume hy hxy.
+exact (god1_bijection_injective A B f hf
+  x (hXA x hx) y (hXA y hy) hxy).
+Qed.
+
+Theorem god1_nat_equip_eq :
+  forall n m, nat_p n -> nat_p m -> equip n m -> n = m.
+let n m.
+assume hn hm hequip.
+apply hequip.
+let f.
+assume hf.
+apply (ordinal_trichotomy_or_impred n m
+  (nat_p_ordinal n hn) (nat_p_ordinal m hm) (n = m)).
+- assume hnm.
+  exact (FalseE
+    ((PigeonHole_nat n hn (inv n f)
+      (god1_bijection_maps_subset m n (inv n f)
+        (bij_inv n m f hf) (ordsucc n)
+        (ordinal_ordsucc_In_Subq m (nat_p_ordinal m hm) n hnm)))
+      (god1_bijection_injective_subset m n (inv n f)
+        (bij_inv n m f hf) (ordsucc n)
+        (ordinal_ordsucc_In_Subq m (nat_p_ordinal m hm) n hnm)))
+    (n = m)).
+- assume hnm.
+  exact hnm.
+- assume hmn.
+  exact (FalseE
+    ((PigeonHole_nat m hm f
+      (god1_bijection_maps_subset n m f hf (ordsucc m)
+        (ordinal_ordsucc_In_Subq n (nat_p_ordinal n hn) m hmn)))
+      (god1_bijection_injective_subset n m f hf (ordsucc m)
+        (ordinal_ordsucc_In_Subq n (nat_p_ordinal n hn) m hmn)))
+    (n = m)).
+Qed.
+
+Theorem god1_bij_domain_eq_subst :
+  forall A B C, A = B -> forall f:set -> set,
+    bij A C f -> bij B C f.
+let A B C.
+assume hAB.
+let f.
+assume hf.
+apply (bijI B C f).
+- let x.
+  assume hx.
+  exact (god1_bijection_maps_into A C f hf x
+    (mem_eq_set_subst B A x (eq_sym A B hAB) hx)).
+- let x.
+  assume hx.
+  let y.
+  assume hy hxy.
+  exact (god1_bijection_injective A C f hf
+    x (mem_eq_set_subst B A x (eq_sym A B hAB) hx)
+    y (mem_eq_set_subst B A y (eq_sym A B hAB) hy) hxy).
+- let z.
+  assume hz.
+  apply (exandE_i (fun x => x :e A) (fun x => f x = z)
+    (god1_bijection_surjective A C f hf z hz)).
+  let x.
+  assume hx heq.
+  apply (ex_intro (fun y => y :e B /\ f y = z) x).
+  exact (andI (x :e B) (f x = z)
+    (mem_eq_set_subst A B x hAB hx) heq).
+Qed.
+
+Theorem god1_bij_codomain_eq_subst :
+  forall A B C, B = C -> forall f:set -> set,
+    bij A B f -> bij A C f.
+let A B C.
+assume hBC.
+let f.
+assume hf.
+apply (bijI A C f).
+- let x.
+  assume hx.
+  exact (mem_eq_set_subst B C (f x) hBC
+    (god1_bijection_maps_into A B f hf x hx)).
+- exact (god1_bijection_injective A B f hf).
+- let z.
+  assume hz.
+  exact (god1_bijection_surjective A B f hf z
+    (mem_eq_set_subst C B z (eq_sym B C hBC) hz)).
+Qed.
+
+Theorem god1_equip_domain_eq_subst :
+  forall A B C, A = B -> equip A C -> equip B C.
+let A B C.
+assume hAB hequip.
+apply hequip.
+let f.
+assume hf.
+apply (ex_intro_setfun (fun g => bij B C g) f).
+exact (god1_bij_domain_eq_subst A B C hAB f hf).
+Qed.
+
+Theorem god1_equip_codomain_eq_subst :
+  forall A B C, B = C -> equip A B -> equip A C.
+let A B C.
+assume hBC hequip.
+apply hequip.
+let f.
+assume hf.
+apply (ex_intro_setfun (fun g => bij A C g) f).
+exact (god1_bij_codomain_eq_subst A B C hBC f hf).
+Qed.
+
+Theorem god1_equip_eq_subst :
+  forall A B C D, A = B -> C = D -> equip A C -> equip B D.
+let A B C D.
+assume hAB hCD hequip.
+exact (god1_equip_codomain_eq_subst B C D hCD
+  (god1_equip_domain_eq_subst A B C hAB hequip)).
+Qed.
+
+Theorem god1_disjoint_union_cardinality_zero :
+  forall X, forall n :e omega, equip X n ->
+    forall m :e omega, equip Empty m ->
+    (forall y :e Empty, y /:e X) ->
+    equip (X :\/: Empty) (add_nat n m).
+let X.
+let n.
+assume hn heX.
+let m.
+assume hm heEmpty hdis.
+claim hm0 : m = 0.
+exact (god1_nat_equip_eq m 0
+  (omega_nat_p m hm) nat_0
+  (equip_sym Empty m heEmpty)).
+apply (god1_equip_eq_subst
+  X (X :\/: Empty) n (add_nat n m)).
+- exact (eq_sym (X :\/: Empty) X (binunion_idr X)).
+- apply eq_sym.
+  apply (eq_i_tra (add_nat n m) (add_nat n 0) n).
+  - exact (f_eq_i (fun z => add_nat n z) m 0 hm0).
+  - exact (add_nat_0R n).
+- exact heX.
+Qed.
+
+Theorem god1_disjoint_union_cardinality_step :
+  forall X, forall n :e omega, equip X n ->
+    forall Y y, finite Y -> y /:e Y ->
+    (forall m :e omega, equip Y m ->
+      (forall z :e Y, z /:e X) ->
+      equip (X :\/: Y) (add_nat n m)) ->
+    forall m :e omega, equip (Y :\/: {y}) m ->
+      (forall z :e Y :\/: {y}, z /:e X) ->
+      equip (X :\/: (Y :\/: {y})) (add_nat n m).
+let X.
+let n.
+assume hn heX.
+let Y y.
+assume hfinY hyY hind.
+let m.
+assume hm heYm hdis.
+apply (exandE_i (fun k => k :e omega) (fun k => equip Y k)
+  hfinY).
+let k.
+assume hk heYk.
+claim heYS : equip (Y :\/: {y}) (ordsucc k).
+exact (equip_sym (ordsucc k) (Y :\/: {y})
+  (equip_adjoin_ordsucc k Y y hyY
+    (equip_sym Y k heYk))).
+claim hmSk : m = ordsucc k.
+exact (god1_nat_equip_eq m (ordsucc k)
+  (omega_nat_p m hm)
+  (nat_ordsucc k (omega_nat_p k hk))
+  (equip_tra m (Y :\/: {y}) (ordsucc k)
+    (equip_sym (Y :\/: {y}) m heYm) heYS)).
+claim hdisY : forall z :e Y, z /:e X.
+let z.
+assume hz.
+exact (hdis z (binunionI1 Y {y} z hz)).
+claim hyX : y /:e X.
+exact (hdis y (binunionI2 Y {y} y (SingI y))).
+claim hyXY : y /:e X :\/: Y.
+assume hyXYmem.
+exact (binunionE' X Y y False hyX hyY hyXYmem).
+claim heXY : equip (X :\/: Y) (add_nat n k).
+exact (hind k hk heYk hdisY).
+claim heAdjoin :
+  equip ((X :\/: Y) :\/: {y}) (ordsucc (add_nat n k)).
+exact (equip_sym (ordsucc (add_nat n k))
+  ((X :\/: Y) :\/: {y})
+  (equip_adjoin_ordsucc (add_nat n k) (X :\/: Y) y hyXY
+    (equip_sym (X :\/: Y) (add_nat n k) heXY))).
+apply (god1_equip_eq_subst
+  ((X :\/: Y) :\/: {y}) (X :\/: (Y :\/: {y}))
+  (ordsucc (add_nat n k)) (add_nat n m)).
+- exact (eq_sym
+    (X :\/: (Y :\/: {y})) ((X :\/: Y) :\/: {y})
+    (binunion_asso X Y {y})).
+- apply eq_sym.
+  apply (eq_i_tra
+    (add_nat n m) (add_nat n (ordsucc k))
+    (ordsucc (add_nat n k))).
+  - exact (f_eq_i (fun z => add_nat n z) m (ordsucc k) hmSk).
+  - exact (add_nat_SR n k (omega_nat_p k hk)).
+- exact heAdjoin.
+Qed.
+
+Theorem god1_disjoint_union_cardinality :
+  forall X, forall n :e omega, equip X n ->
+    forall Y, finite Y ->
+    forall m :e omega, equip Y m ->
+      (forall y :e Y, y /:e X) ->
+      equip (X :\/: Y) (add_nat n m).
+let X.
+let n.
+assume hn heX.
+let Y.
+assume hfinY.
+let m.
+assume hm heYm hdis.
+exact (finite_ind
+  (fun Z => forall k :e omega, equip Z k ->
+    (forall z :e Z, z /:e X) ->
+    equip (X :\/: Z) (add_nat n k))
+  (god1_disjoint_union_cardinality_zero X n hn heX)
+  (god1_disjoint_union_cardinality_step X n hn heX)
+  Y hfinY m hm heYm hdis).
+Qed.
+
+Theorem god1_identity_famunion_adjoin :
+  forall Q C,
+    (\/_ D :e Q :\/: {C}, D)
+    = (\/_ D :e Q, D) :\/: C.
+let Q C.
+apply set_ext.
+- let z.
+  assume hz.
+  apply (famunionE_impred (Q :\/: {C}) (fun D => D) z hz
+    (z :e (\/_ D :e Q, D) :\/: C)).
+  let D.
+  assume hD hzD.
+  apply (binunionE' Q {C} D
+    (z :e (\/_ E :e Q, E) :\/: C)).
+  - assume hDQ.
+    exact (binunionI1 (\/_ E :e Q, E) C z
+      (famunionI Q (fun E => E) D z hDQ hzD)).
+  - assume hDC.
+    exact (binunionI2 (\/_ E :e Q, E) C z
+      (mem_eq_set_subst D C z (SingE C D hDC) hzD)).
+  - exact hD.
+- let z.
+  assume hz.
+  apply (binunionE' (\/_ D :e Q, D) C z
+    (z :e (\/_ D :e Q :\/: {C}, D))).
+  - assume hzQ.
+    apply (famunionE_impred Q (fun D => D) z hzQ
+      (z :e (\/_ D :e Q :\/: {C}, D))).
+    let D.
+    assume hDQ hzD.
+    exact (famunionI (Q :\/: {C}) (fun E => E) D z
+      (binunionI1 Q {C} D hDQ) hzD).
+  - assume hzC.
+    exact (famunionI (Q :\/: {C}) (fun D => D) C z
+      (binunionI2 Q {C} C (SingI C)) hzC).
+  - exact hz.
+Qed.
+
+Theorem god1_uniform_famunion_cardinality_zero :
+  forall r :e omega,
+    forall q :e omega, equip Empty q ->
+    (forall C :e Empty, equip C r) ->
+    (forall C D :e Empty, forall x,
+      x :e C -> x :e D -> C = D) ->
+    equip (\/_ C :e Empty, C) (mul_nat q r).
+let r.
+assume hr.
+let q.
+assume hq heQ huniform hunique.
+claim hq0 : q = 0.
+exact (god1_nat_equip_eq q 0
+  (omega_nat_p q hq) nat_0
+  (equip_sym Empty q heQ)).
+apply (god1_equip_eq_subst
+  Empty (\/_ C :e Empty, C) Empty (mul_nat q r)).
+- exact (eq_sym (\/_ C :e Empty, C) Empty
+    (famunion_Empty (fun C => C))).
+- apply eq_sym.
+  apply (eq_i_tra (mul_nat q r) (mul_nat 0 r) 0).
+  - exact (f_eq_i (fun z => mul_nat z r) q 0 hq0).
+  - exact (mul_nat_0L r (omega_nat_p r hr)).
+- exact (equip_ref Empty).
+Qed.
+
+Theorem god1_uniform_famunion_cardinality_step :
+  forall r :e omega,
+    forall Q C, finite Q -> C /:e Q ->
+    (forall q :e omega, equip Q q ->
+      (forall D :e Q, equip D r) ->
+      (forall D E :e Q, forall x,
+        x :e D -> x :e E -> D = E) ->
+      equip (\/_ D :e Q, D) (mul_nat q r)) ->
+    forall q :e omega, equip (Q :\/: {C}) q ->
+      (forall D :e Q :\/: {C}, equip D r) ->
+      (forall D E :e Q :\/: {C}, forall x,
+        x :e D -> x :e E -> D = E) ->
+      equip (\/_ D :e Q :\/: {C}, D) (mul_nat q r).
+let r.
+assume hr.
+let Q C.
+assume hfinQ hCQ hind.
+let q.
+assume hq heQ huniform hunique.
+apply (exandE_i (fun k => k :e omega) (fun k => equip Q k)
+  hfinQ).
+let k.
+assume hk heQk.
+claim heQS : equip (Q :\/: {C}) (ordsucc k).
+exact (equip_sym (ordsucc k) (Q :\/: {C})
+  (equip_adjoin_ordsucc k Q C hCQ
+    (equip_sym Q k heQk))).
+claim hqSk : q = ordsucc k.
+exact (god1_nat_equip_eq q (ordsucc k)
+  (omega_nat_p q hq)
+  (nat_ordsucc k (omega_nat_p k hk))
+  (equip_tra q (Q :\/: {C}) (ordsucc k)
+    (equip_sym (Q :\/: {C}) q heQ) heQS)).
+claim huniformQ : forall D :e Q, equip D r.
+let D.
+assume hDQ.
+exact (huniform D (binunionI1 Q {C} D hDQ)).
+claim huniqueQ :
+  forall D E :e Q, forall x,
+    x :e D -> x :e E -> D = E.
+let D.
+assume hDQ.
+let E.
+assume hEQ.
+let x.
+assume hxD hxE.
+exact (hunique D (binunionI1 Q {C} D hDQ)
+  E (binunionI1 Q {C} E hEQ) x hxD hxE).
+claim heOld :
+  equip (\/_ D :e Q, D) (mul_nat k r).
+exact (hind k hk heQk huniformQ huniqueQ).
+claim heC : equip C r.
+exact (huniform C (binunionI2 Q {C} C (SingI C))).
+claim hfinC : finite C.
+exact (ex_intro (fun t => t :e omega /\ equip C t) r
+  (andI (r :e omega) (equip C r) hr heC)).
+claim hdis : forall z :e C, z /:e (\/_ D :e Q, D).
+let z.
+assume hzC hzOld.
+apply (famunionE_impred Q (fun D => D) z hzOld False).
+let D.
+assume hDQ hzD.
+claim hCD : C = D.
+exact (hunique C (binunionI2 Q {C} C (SingI C))
+  D (binunionI1 Q {C} D hDQ) z hzC hzD).
+exact (hCQ (mem_eq_substL Q D C hCD hDQ)).
+claim heAdd :
+  equip ((\/_ D :e Q, D) :\/: C)
+    (add_nat (mul_nat k r) r).
+exact (god1_disjoint_union_cardinality
+  (\/_ D :e Q, D) (mul_nat k r)
+  (nat_p_omega (mul_nat k r)
+    (mul_nat_p k (omega_nat_p k hk) r (omega_nat_p r hr)))
+  heOld C hfinC r hr heC hdis).
+apply (god1_equip_eq_subst
+  ((\/_ D :e Q, D) :\/: C)
+  (\/_ D :e Q :\/: {C}, D)
+  (add_nat (mul_nat k r) r) (mul_nat q r)).
+- exact (eq_sym
+    (\/_ D :e Q :\/: {C}, D)
+    ((\/_ D :e Q, D) :\/: C)
+    (god1_identity_famunion_adjoin Q C)).
+- apply eq_sym.
+  apply (eq_i_tra
+    (mul_nat q r) (mul_nat (ordsucc k) r)
+    (add_nat (mul_nat k r) r)).
+  - exact (f_eq_i (fun z => mul_nat z r) q (ordsucc k) hqSk).
+  - exact (mul_nat_SL k (omega_nat_p k hk)
+      r (omega_nat_p r hr)).
+- exact heAdd.
+Qed.
+
+Theorem god1_uniform_famunion_cardinality :
+  forall Q, finite Q -> forall q r :e omega,
+    equip Q q ->
+    (forall C :e Q, equip C r) ->
+    (forall C D :e Q, forall x,
+      x :e C -> x :e D -> C = D) ->
+    equip (\/_ C :e Q, C) (mul_nat q r).
+let Q.
+assume hfinQ.
+let q.
+assume hq.
+let r.
+assume hr heQ huniform hunique.
+exact (finite_ind
+  (fun R => forall s :e omega, equip R s ->
+    (forall C :e R, equip C r) ->
+    (forall C D :e R, forall x,
+      x :e C -> x :e D -> C = D) ->
+    equip (\/_ C :e R, C) (mul_nat s r))
+  (god1_uniform_famunion_cardinality_zero r hr)
+  (god1_uniform_famunion_cardinality_step r hr)
+  Q hfinQ q hq heQ huniform hunique).
+Qed.
+
+Theorem god1_partition_famunion_eq :
+  forall X Q,
+    (forall C :e Q, C c= X) ->
+    (forall x :e X, exists C :e Q, x :e C) ->
+    X = (\/_ C :e Q, C).
+let X Q.
+assume hsubset hcover.
+apply set_ext.
+- let x.
+  assume hx.
+  apply (exandE_i (fun C => C :e Q) (fun C => x :e C)
+    (hcover x hx)).
+  let C.
+  assume hCQ hxC.
+  exact (famunionI Q (fun D => D) C x hCQ hxC).
+- let x.
+  assume hx.
+  apply (famunionE_impred Q (fun C => C) x hx (x :e X)).
+  let C.
+  assume hCQ hxC.
+  exact (hsubset C hCQ x hxC).
+Qed.
 
 (** Formal interface for the uniform-partition specialization of §5, Theorem 7. **)
 Theorem god1_s5_theorem7_uniform_partition_cardinality :
@@ -42641,7 +43577,52 @@ Theorem god1_s5_theorem7_uniform_partition_cardinality :
     (forall x :e X, forall C D :e Q,
       x :e C -> x :e D -> C = D) ->
     n = mul_nat q r.
-Admitted.
+let X Q.
+let n.
+assume hn.
+let q.
+assume hq.
+let r.
+assume hr heX heQ huniform hcover hunique.
+claim hfinQ : finite Q.
+exact (ex_intro (fun t => t :e omega /\ equip Q t) q
+  (andI (q :e omega) (equip Q q) hq heQ)).
+claim heach : forall C :e Q, equip C r.
+let C.
+assume hCQ.
+exact (andER (C c= X) (equip C r) (huniform C hCQ)).
+claim hfamily_unique :
+  forall C D :e Q, forall x,
+    x :e C -> x :e D -> C = D.
+let C.
+assume hCQ.
+let D.
+assume hDQ.
+let x.
+assume hxC hxD.
+exact (hunique x
+  ((andEL (C c= X) (equip C r) (huniform C hCQ)) x hxC)
+  C hCQ D hDQ hxC hxD).
+claim heFam :
+  equip (\/_ C :e Q, C) (mul_nat q r).
+exact (god1_uniform_famunion_cardinality
+  Q hfinQ q hq r hr heQ heach hfamily_unique).
+claim hsub : forall C :e Q, C c= X.
+let C.
+assume hCQ.
+exact (andEL (C c= X) (equip C r) (huniform C hCQ)).
+claim hXFam : X = (\/_ C :e Q, C).
+exact (god1_partition_famunion_eq X Q hsub hcover).
+claim heXProduct : equip X (mul_nat q r).
+exact (god1_equip_domain_eq_subst
+  (\/_ C :e Q, C) X (mul_nat q r)
+  (eq_sym X (\/_ C :e Q, C) hXFam) heFam).
+exact (god1_nat_equip_eq n (mul_nat q r)
+  (omega_nat_p n hn)
+  (mul_nat_p q (omega_nat_p q hq) r (omega_nat_p r hr))
+  (equip_tra n X (mul_nat q r)
+    (equip_sym X n heX) heXProduct)).
+Qed.
 
 Theorem god1_s7_theorem4_lagrange_cardinality_formula :
   forall G, forall mul:set -> set -> set, forall H,
@@ -42663,22 +43644,23 @@ assume hr heG heQ heH.
 claim h_s7_t4_cosets_uniform_size :
   forall C :e left_coset_quotient G mul H,
     C c= G /\ equip C r.
-admit.
+exact (god1_left_coset_quotient_uniform_size
+  G mul H hH r heH).
 //GOD1PRF:55476 Now the cosets $x \mathrm{H}$ form a partition of the set G ; hence (§ 5, Theorem 7) the number of elements in G is equal to the number of elements in H multiplied by the number of distinct left cosets $x \mathrm{H}$.
 claim h_s7_t4_cosets_cover :
   forall x :e G,
     exists C :e left_coset_quotient G mul H, x :e C.
-admit.
+exact (god1_left_cosets_cover_group G mul H hH).
 claim h_s7_t4_cosets_unique :
   forall x :e G,
     forall C D :e left_coset_quotient G mul H,
       x :e C -> x :e D -> C = D.
-admit.
+exact (god1_left_cosets_unique_at_point G mul H hH).
 apply (god1_s5_theorem7_uniform_partition_cardinality
   G (left_coset_quotient G mul H) n hn q hq r hr
   heG heQ h_s7_t4_cosets_uniform_size
   h_s7_t4_cosets_cover h_s7_t4_cosets_unique).
-Admitted.
+Qed.
 
 Theorem god1_left_and_right_coset_indices_equal :
   forall G, forall mul:set -> set -> set, forall H,
