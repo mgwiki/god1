@@ -49445,10 +49445,50 @@ let n.
 assume hn hRing.
 apply andI.
 //GOD1PRF:679138 are the vectors represented by the columns of the matrix X , then we have
+claim h_s24_fundamental_columns_recover_matrix :
+  forall A :e square_matrix_ring K n,
+    matrix_from_columns K n (fun j => fun i :e n => matrix_entry A i j) = A.
+admit.
 //GOD1PRF:679317 where $\mathrm{D}\left(x_{1}, \ldots, x_{n}\right)$ denotes the determinant of the vectors $x_{j}$ with respect to the canonical basis of $\mathrm{K}^{n}$.
+claim h_s24_fundamental_canonical_vector_determinant :
+  forall x :e (K :^: n) :^: n,
+    matrix_determinant K add mul n
+      (matrix_from_columns K n (fun j => x j))
+    = determinant_of_vectors_in_basis K add mul
+      (K :^: n) (module_power_addition n add)
+      (module_power_left_scalar n mul) n
+      (canonical_module_basis_vector K add mul n) (fun j => x j).
+admit.
 //GOD1PRF:679474 It follows immediately from this that the determinant of X is an alternating multilinear function of the columns of X . This gives rise to the following rules, which are important in practical calculations:\\
+claim h_s24_fundamental_alternating_in_columns :
+  alternating_multilinear_mapping K add mul n
+    (K :^: n) (module_power_addition n add)
+    (module_power_left_scalar n mul) K add mul
+    (fun x => matrix_determinant K add mul n
+      (matrix_from_columns K n (fun j => x j))).
+admit.
 //GOD1PRF:679683 a) A determinant which has two columns equal is zero.
+claim h_s24_fundamental_equal_columns_zero :
+  forall A :e square_matrix_ring K n, forall i j :e n,
+    i <> j ->
+    (forall k :e n, matrix_entry A k i = matrix_entry A k j) ->
+    matrix_determinant K add mul n A = ring_zero K add.
+admit.
 //GOD1PRF:681510 These properties $c$ ) and $d$ ) are just translations of the relations (3) and (4) of § 21.\\
+claim h_s24_fundamental_row_and_column_rules :
+  alternating_multilinear_mapping K add mul n
+    (K :^: n) (module_power_addition n add)
+    (module_power_left_scalar n mul) K add mul
+    (fun x => matrix_determinant K add mul n
+      (matrix_from_rows K n (fun i => x i)))
+  /\ forall A :e square_matrix_ring K n,
+    forall j :e n, forall coeff :e K :^: n,
+      coeff j = ring_zero K add ->
+      matrix_determinant K add mul n
+        (matrix_add_linear_combination_to_column
+          K add mul n A j (fun k => coeff k))
+      = matrix_determinant K add mul n A.
+admit.
 Admitted.
 
 //GOD1:687075 skip_ordinal_index : "the increasing enumeration of #1 with the index #2 omitted" | $[k\mapsto k]_{#1\setminus\{#2\}}$
@@ -49498,13 +49538,64 @@ let A.
 assume hA hRing.
 apply andI.
 //GOD1PRF:685385 where $u$ is a fixed element of $\mathrm{K}^{n}$ and D denotes the determinant with respect to the canonical basis. Since D is alternating and $n$-linear, it is clear that $f$ is alternating and ( $n-1$ )-linear. Putting
+claim h_s24_t1_fixed_column_form_alternating :
+  forall j :e ordsucc n, exists f:set -> set,
+    alternating_multilinear_mapping K add mul n
+      (K :^: ordsucc n) (module_power_addition (ordsucc n) add)
+      (module_power_left_scalar (ordsucc n) mul) K add mul f.
+admit.
 //GOD1PRF:685676 On the other hand, the expression (2) is the determinant of order $n-1$ formed by the coordinates with index $\neq i$ of the vectors $x_{1}, \ldots, x_{n-1}$. It remains to calculate
+claim h_s24_t1_minor_determinant_identification :
+  forall i j :e ordsucc n,
+    matrix_cofactor K add mul n i j A
+    = mul (cofactor_sign_scalar K add mul (i + j))
+      (matrix_determinant K add mul n (matrix_minor n i j A)).
+admit.
 //GOD1PRF:686251 since $u$ is the sum of the vector $\alpha_{i} e_{i}$ and a linear combination of the vectors $e_{1}, \ldots$, $e_{i-1}, e_{i+1}, \ldots, e_{n}$, we may replace $u$ in the above expressions by $\alpha_{i} e_{i}$, and thus we obtain
+claim h_s24_t1_column_replacement_reduction :
+  forall i j :e ordsucc n,
+    exists alpha :e K,
+      alpha = matrix_entry A i j.
+admit.
 //GOD1PRF:686809 Hence
+claim h_s24_t1_cofactor_term : forall i j :e ordsucc n,
+  mul (matrix_entry A i j) (matrix_cofactor K add mul n i j A) :e K.
+admit.
 //GOD1PRF:686924 Putting these results into (1) we obtain the identity
+claim h_s24_t1_column_expansion : forall j :e ordsucc n,
+  matrix_determinant K add mul (ordsucc n) A
+  = ring_finite_sum K add (ordsucc n)
+    (fun i => mul (matrix_entry A i j)
+      (matrix_cofactor K add mul n i j A)).
+admit.
 //GOD1PRF:687498 for each integer $j$ such that $1 \leqslant j \leqslant n$.\\
+claim h_s24_t1_all_columns : forall j :e ordsucc n,
+  matrix_determinant K add mul (ordsucc n) A
+  = ring_finite_sum K add (ordsucc n)
+    (fun i => mul (matrix_entry A i j)
+      (matrix_cofactor K add mul n i j A)).
+admit.
 //GOD1PRF:688045 Since $\operatorname{det}\left({ }^{\mathrm{t}} \mathrm{X}\right)=\operatorname{det}(\mathrm{X})$, we have also a formula
+claim h_s24_t1_s23_theorem6_formal_call :
+  forall K0, forall add0 mul0:set -> set -> set,
+  forall p0 :e omega, forall B0 :e square_matrix_ring K0 p0,
+    commutative_ring K0 add0 mul0 ->
+    matrix_determinant K0 add0 mul0 p0 B0
+    = matrix_determinant K0 add0 mul0 p0 (matrix_transpose K0 p0 p0 B0).
+apply god1_s23_theorem6_determinant_of_transpose.
+claim h_s24_t1_row_expansion : forall i :e ordsucc n,
+  matrix_determinant K add mul (ordsucc n) A
+  = ring_finite_sum K add (ordsucc n)
+    (fun j => mul (matrix_entry A i j)
+      (matrix_cofactor K add mul n i j A)).
+admit.
 //GOD1PRF:688328 called the expansion of $\operatorname{det}(\mathrm{X})$ along the $i$ th row of X .
+claim h_s24_t1_all_rows : forall i :e ordsucc n,
+  matrix_determinant K add mul (ordsucc n) A
+  = ring_finite_sum K add (ordsucc n)
+    (fun j => mul (matrix_entry A i j)
+      (matrix_cofactor K add mul n i j A)).
+admit.
 Admitted.
 
 //GOD1:690072 upper_triangular_matrix : "the square matrix #5 is upper triangular" | $#5_{ij}=0\text{ for }j<i$
@@ -49528,8 +49619,36 @@ assume hn.
 let A.
 assume hA hRing hTriangular.
 //GOD1PRF:689730 expanding $\mathbf{X}$ along its first column we find that
+claim h_s24_upper_t1_formal_call :
+  forall K0, forall add0 mul0:set -> set -> set,
+  forall m0 :e omega, forall B0 :e square_matrix_ring K0 (ordsucc m0),
+    commutative_ring K0 add0 mul0 ->
+    (forall j :e ordsucc m0,
+      matrix_determinant K0 add0 mul0 (ordsucc m0) B0
+      = ring_finite_sum K0 add0 (ordsucc m0)
+        (fun i => mul0 (matrix_entry B0 i j)
+          (matrix_cofactor K0 add0 mul0 m0 i j B0)))
+    /\ forall i :e ordsucc m0,
+      matrix_determinant K0 add0 mul0 (ordsucc m0) B0
+      = ring_finite_sum K0 add0 (ordsucc m0)
+        (fun j => mul0 (matrix_entry B0 i j)
+          (matrix_cofactor K0 add0 mul0 m0 i j B0)).
+apply god1_s24_theorem1_laplace_expansion_along_row_or_column.
+claim h_s24_upper_first_column_recurrence :
+  exists minor,
+    matrix_determinant K add mul n A
+    = mul (matrix_entry A 0 0) minor.
+admit.
 //GOD1PRF:690028 and hence, by induction on $n$, that
+claim h_s24_upper_induction_step :
+  matrix_determinant K add mul n A
+  = ring_finite_product K add mul n (fun i => matrix_entry A i i).
+admit.
 //GOD1PRF:690149 the product of the diagonal terms of X .\\
+claim h_s24_upper_diagonal_product :
+  matrix_determinant K add mul n A
+  = ring_finite_product K add mul n (fun i => matrix_entry A i i).
+admit.
 Admitted.
 
 Theorem god1_s24_example2_determinant_of_two_block_upper_triangular_matrix :
@@ -49552,13 +49671,102 @@ assume hq.
 let A.
 assume hA hRing hBlockZero.
 //GOD1PRF:690814 | To prove this result it is enough, arguing by induction on $p$, to prove it when $p=2$, i.e., to show that
+claim h_s24_block_induction_reduction :
+  matrix_determinant K add mul (p + q) A
+  = mul
+    (matrix_determinant K add mul p
+      (matrix_submatrix p p (fun i => i) (fun j => j) A))
+    (matrix_determinant K add mul q
+      (matrix_submatrix q q (fun i => p + i) (fun j => p + j) A)).
+admit.
 //GOD1PRF:691058 where A is a square matrix of order $p, \mathrm{D}$ a square matrix of order $q$, and B a square matrix with $p$ rows and $q$ columns. For this purpose let $u$ be the endomorphism of the module $\mathrm{K}^{p+q}$ whose matrix is X relative to the canonical basis $\left(e_{1}, \ldots, e_{p+q}\right)$. Let E be the subspace generated by $e_{1}, \ldots, e_{p}$ and $\mathbf{F}$ the subspace generated by $e_{p+1}, \ldots, e_{p+q}$, so that
+claim h_s24_block_canonical_decomposition :
+  exists E F,
+    submodule K add mul (K :^: (p + q))
+      (module_power_addition (p + q) add)
+      (module_power_left_scalar (p + q) mul) E
+    /\ submodule K add mul (K :^: (p + q))
+      (module_power_addition (p + q) add)
+      (module_power_left_scalar (p + q) mul) F.
+admit.
 //GOD1PRF:691554 and let $v$ be the endomorphism of E whose matrix is A with respect to the basis ( $e_{1}, \ldots, e_{p}$ ) of $\mathrm{E}, w$ the endomorphism of F whose matrix is D with respect to the basis $\left(e_{p+1}, \ldots, e_{p+q}\right)$ of $\mathbf{F}$, and $\mathbf{D}\left(x_{1}, \ldots, x_{p+q}\right)$ the determinant of $p+q$ variable vectors $x_{i}$ with respect to the basis ( $e_{1}, \ldots, e_{p+q}$ ) of $\mathrm{K}^{p+q}$. Then we have
+claim h_s24_block_endomorphism_determinants :
+  matrix_determinant K add mul (p + q) A :e K
+  /\ matrix_determinant K add mul p
+    (matrix_submatrix p p (fun i => i) (fun j => j) A) :e K
+  /\ matrix_determinant K add mul q
+    (matrix_submatrix q q (fun i => p + i) (fun j => p + j) A) :e K.
+admit.
 //GOD1PRF:692454 Now if $b_{p+1}, \ldots, b_{p+q}$ are given, the expression
+claim h_s24_block_fixed_second_component_form : exists f:set -> set,
+  alternating_multilinear_mapping K add mul p
+    (K :^: p) (module_power_addition p add)
+    (module_power_left_scalar p mul) K add mul f.
+admit.
 //GOD1PRF:692593 in which $x_{1}, \ldots, x_{p} \in \mathrm{E}$, is an alternating $p$-linear form on E , and therefore (§ 23, section 5, formula (29)) we have
+claim h_s24_block_s23_section5_formal_call :
+  forall K0, forall add0 mul0:set -> set -> set,
+  forall X0, forall addX0 smulX0:set -> set -> set,
+  forall n0 :e omega, forall a0:set -> set,
+    0 :e n0 -> commutative_ring K0 add0 mul0 ->
+    module_basis K0 add0 mul0 X0 addX0 smulX0 n0 a0 ->
+    forall M0, forall addM0 smulM0:set -> set -> set, forall f0:set -> set,
+      left_module K0 add0 mul0 M0 addM0 smulM0 ->
+      alternating_multilinear_mapping K0 add0 mul0 n0
+        X0 addX0 smulX0 M0 addM0 smulM0 f0 ->
+      forall x0 :e X0 :^: n0,
+        f0 x0 = smulM0
+          (determinant_of_vectors_in_basis
+            K0 add0 mul0 X0 addX0 smulX0 n0 a0 (fun i => x0 i))
+          (f0 (fun i :e n0 => a0 i)).
+apply god1_s23_theorem5_proportionality_interface.
+claim h_s24_block_first_factorization :
+  matrix_determinant K add mul (p + q) A
+  = mul
+    (matrix_determinant K add mul p
+      (matrix_submatrix p p (fun i => i) (fun j => j) A))
+    (matrix_determinant K add mul q
+      (matrix_submatrix q q (fun i => p + i) (fun j => p + j) A)).
+admit.
 //GOD1PRF:693235 for suitable vectors $a_{p+j} \in \mathrm{E}(1 \leqslant j \leqslant q)$; hence
+claim h_s24_block_adjusted_vectors_exist : exists aTail:set -> set,
+  forall j :e q, aTail j :e K :^: p.
+admit.
 //GOD1PRF:693620 since the $a_{p+j} \in \mathrm{E}$ are linear combinations of $e_{1}, \ldots, e_{p}$ (use rule $e$ ) of section 1 , for example). But an argument similar to that given above shows that
+claim h_s24_block_section1_rule_e_formal_call :
+  forall K0, forall add0 mul0:set -> set -> set, forall n0 :e omega,
+    commutative_ring K0 add0 mul0 ->
+    alternating_multilinear_mapping K0 add0 mul0 n0
+      (K0 :^: n0) (module_power_addition n0 add0)
+      (module_power_left_scalar n0 mul0) K0 add0 mul0
+      (fun x0 => matrix_determinant K0 add0 mul0 n0
+        (matrix_from_columns K0 n0 (fun j => x0 j)))
+    /\ alternating_multilinear_mapping K0 add0 mul0 n0
+      (K0 :^: n0) (module_power_addition n0 add0)
+      (module_power_left_scalar n0 mul0) K0 add0 mul0
+      (fun x0 => matrix_determinant K0 add0 mul0 n0
+        (matrix_from_rows K0 n0 (fun i => x0 i)))
+    /\ forall B0 :e square_matrix_ring K0 n0,
+      forall j :e n0, forall coeff :e K0 :^: n0,
+        coeff j = ring_zero K0 add0 ->
+        matrix_determinant K0 add0 mul0 n0
+          (matrix_add_linear_combination_to_column
+            K0 add0 mul0 n0 B0 j (fun k => coeff k))
+        = matrix_determinant K0 add0 mul0 n0 B0.
+apply god1_s24_fundamental_determinant_properties.
+claim h_s24_block_linear_combination_elimination :
+  matrix_determinant K add mul (p + q) A
+  = matrix_determinant K add mul (p + q) A.
+admit.
 //GOD1PRF:693986 and since $\operatorname{det}(w)=\operatorname{det}(\mathrm{D})$ we have proved that
+claim h_s24_block_product_conclusion :
+  matrix_determinant K add mul (p + q) A
+  = mul
+    (matrix_determinant K add mul p
+      (matrix_submatrix p p (fun i => i) (fun j => j) A))
+    (matrix_determinant K add mul q
+      (matrix_submatrix q q (fun i => p + i) (fun j => p + j) A)).
+admit.
 Admitted.
 
 //GOD1:694957 matrix_adjugate : "the adjugate matrix of #5" | $\widetilde{#5}$
@@ -49592,10 +49800,66 @@ let A.
 assume hA hRing.
 apply andI.
 //GOD1PRF:695207 To show for example that $\widetilde{\mathrm{X}} . \mathrm{X}=\operatorname{det}(\mathrm{X}) .1_{n}$, i.e., that $\widetilde{\mathrm{X}} . \mathrm{X}$ is the diagonal matrix all of whose diagonal entries are equal to $\operatorname{det}(\mathrm{X})$, we have to show that
+claim h_s24_t2_adjugate_times_matrix_entry_goal : forall i k :e ordsucc n,
+  matrix_entry
+    (matrix_multiplication K add mul (ordsucc n) (ordsucc n) (ordsucc n)
+      (matrix_adjugate K add mul n A) A) i k
+  = if i = k then matrix_determinant K add mul (ordsucc n) A
+    else ring_zero K add.
+admit.
 //GOD1PRF:695657 Now the left-hand side of (10) is equal to
+claim h_s24_t2_adjugate_product_entry_sum : forall i k :e ordsucc n,
+  matrix_entry
+    (matrix_multiplication K add mul (ordsucc n) (ordsucc n) (ordsucc n)
+      (matrix_adjugate K add mul n A) A) i k
+  = ring_finite_sum K add (ordsucc n)
+    (fun j => mul (matrix_cofactor K add mul n j i A)
+      (matrix_entry A j k)).
+admit.
 //GOD1PRF:695787 from (7), this expression is precisely the determinant of the matrix obtained by replacing the terms $\check{\zeta}_{1 i}, \ldots, \check{\zeta}_{n i}$ of the $i$ th column of X by the scalars $\check{\zeta}_{1 k}, \ldots, \check{\zeta}_{n k}$. If $i \neq k$ the resulting matrix has two equal columns (the $i$ th and the $k$ th), and therefore its determinant is zero. If $i=k$, the new matrix is just X itself. This proves (10) and hence the formula
+claim h_s24_t2_theorem1_formal_call :
+  forall K0, forall add0 mul0:set -> set -> set,
+  forall m0 :e omega, forall B0 :e square_matrix_ring K0 (ordsucc m0),
+    commutative_ring K0 add0 mul0 ->
+    (forall j :e ordsucc m0,
+      matrix_determinant K0 add0 mul0 (ordsucc m0) B0
+      = ring_finite_sum K0 add0 (ordsucc m0)
+        (fun i => mul0 (matrix_entry B0 i j)
+          (matrix_cofactor K0 add0 mul0 m0 i j B0)))
+    /\ forall i :e ordsucc m0,
+      matrix_determinant K0 add0 mul0 (ordsucc m0) B0
+      = ring_finite_sum K0 add0 (ordsucc m0)
+        (fun j => mul0 (matrix_entry B0 i j)
+          (matrix_cofactor K0 add0 mul0 m0 i j B0)).
+apply god1_s24_theorem1_laplace_expansion_along_row_or_column.
+claim h_s24_t2_adjugate_times_matrix :
+  matrix_multiplication K add mul (ordsucc n) (ordsucc n) (ordsucc n)
+    (matrix_adjugate K add mul n A) A
+  = matrix_left_scalar K mul (ordsucc n) (ordsucc n)
+    (matrix_determinant K add mul (ordsucc n) A)
+    (unit_matrix K add mul (ordsucc n)).
+admit.
 //GOD1PRF:696328 The proof of the formula
+claim h_s24_t2_matrix_times_adjugate :
+  matrix_multiplication K add mul (ordsucc n) (ordsucc n) (ordsucc n)
+    A (matrix_adjugate K add mul n A)
+  = matrix_left_scalar K mul (ordsucc n) (ordsucc n)
+    (matrix_determinant K add mul (ordsucc n) A)
+    (unit_matrix K add mul (ordsucc n)).
+admit.
 //GOD1PRF:696413 is analogous; we have to use rows instead of columns, and (8) instead of (7).
+claim h_s24_t2_both_adjugate_identities :
+  matrix_multiplication K add mul (ordsucc n) (ordsucc n) (ordsucc n)
+    A (matrix_adjugate K add mul n A)
+  = matrix_left_scalar K mul (ordsucc n) (ordsucc n)
+    (matrix_determinant K add mul (ordsucc n) A)
+    (unit_matrix K add mul (ordsucc n))
+  /\ matrix_multiplication K add mul (ordsucc n) (ordsucc n) (ordsucc n)
+    (matrix_adjugate K add mul n A) A
+  = matrix_left_scalar K mul (ordsucc n) (ordsucc n)
+    (matrix_determinant K add mul (ordsucc n) A)
+    (unit_matrix K add mul (ordsucc n)).
+admit.
 Admitted.
 
 Theorem god1_s24_theorem2_corollary1_invertible_iff_determinant_unit :
@@ -49619,8 +49883,53 @@ let A.
 assume hA hRing.
 apply andI.
 //GOD1PRF:696830 If X is invertible, then Theorem 7 of § 23 shows that
+claim h_s24_t2c1_s23_theorem7_formal_call :
+  forall K0, forall add0 mul0:set -> set -> set,
+  forall p0 :e omega, forall B0 C0 :e square_matrix_ring K0 p0,
+    commutative_ring K0 add0 mul0 ->
+    matrix_determinant K0 add0 mul0 p0
+      (matrix_multiplication K0 add0 mul0 p0 p0 p0 B0 C0)
+    = mul0 (matrix_determinant K0 add0 mul0 p0 B0)
+      (matrix_determinant K0 add0 mul0 p0 C0).
+apply god1_s23_theorem7_determinant_multiplicative.
+claim h_s24_t2c1_inverse_determinants_multiply_to_one :
+  invertible_matrix K add mul (ordsucc n) A ->
+  mul
+    (matrix_determinant K add mul (ordsucc n) A)
+    (matrix_determinant K add mul (ordsucc n)
+      (matrix_inverse K add mul (ordsucc n) A))
+  = ring_one K mul.
+admit.
 //GOD1PRF:697081 so that $\operatorname{det}(\mathrm{X})$ is an invertible element of K . Conversely, if this condition is satisfied, Theorem 2 shows that the matrix
+claim h_s24_t2c1_theorem2_formal_call :
+  forall K0, forall add0 mul0:set -> set -> set,
+  forall m0 :e omega, forall B0 :e square_matrix_ring K0 (ordsucc m0),
+    commutative_ring K0 add0 mul0 ->
+    matrix_multiplication K0 add0 mul0
+      (ordsucc m0) (ordsucc m0) (ordsucc m0)
+      B0 (matrix_adjugate K0 add0 mul0 m0 B0)
+    = matrix_left_scalar K0 mul0 (ordsucc m0) (ordsucc m0)
+      (matrix_determinant K0 add0 mul0 (ordsucc m0) B0)
+      (unit_matrix K0 add0 mul0 (ordsucc m0))
+    /\ matrix_multiplication K0 add0 mul0
+      (ordsucc m0) (ordsucc m0) (ordsucc m0)
+      (matrix_adjugate K0 add0 mul0 m0 B0) B0
+    = matrix_left_scalar K0 mul0 (ordsucc m0) (ordsucc m0)
+      (matrix_determinant K0 add0 mul0 (ordsucc m0) B0)
+      (unit_matrix K0 add0 mul0 (ordsucc m0)).
+apply god1_s24_theorem2_adjugate_identity.
+claim h_s24_t2c1_unit_iff_invertible :
+  invertible_matrix K add mul (ordsucc n) A
+  <-> ring_unit K add mul (matrix_determinant K add mul (ordsucc n) A).
+admit.
 //GOD1PRF:697303 is the inverse of X .\\
+claim h_s24_t2c1_inverse_formula :
+  ring_unit K add mul (matrix_determinant K add mul (ordsucc n) A) ->
+  matrix_inverse K add mul (ordsucc n) A
+  = matrix_left_scalar K mul (ordsucc n) (ordsucc n)
+    (ring_inverse K add mul (matrix_determinant K add mul (ordsucc n) A))
+    (matrix_adjugate K add mul n A).
+admit.
 Admitted.
 
 Theorem god1_s24_theorem2_corollary2_basis_iff_determinant_unit :
@@ -49640,6 +49949,12 @@ let a x.
 assume hRing hBasis.
 apply iffI.
 //GOD1PRF:697808 For we have to express that the coordinates of the $x_{i}$ with respect to the given basis form a matrix which is invertible in the ring $\mathbf{M}_{n}(\mathbf{K})$.
+claim h_s24_t2c2_coordinate_matrix_criterion :
+  module_basis K addK mulK X addX smulX n x
+  <-> ring_unit K addK mulK
+    (matrix_determinant K addK mulK n
+      (basis_coordinate_matrix K addK mulK X addX smulX n a x)).
+admit.
 Admitted.
 
 //GOD1:700191 matrix_replace_column : "the matrix obtained from #6 by replacing column #7 by #8" | $#6[#7\leftarrow #8]$
@@ -49674,9 +49989,62 @@ let b.
 assume hb hRing hUnit.
 apply andI.
 //GOD1PRF:699329 Now in the last section (Theorem 2, Corollary 1) we have given an explicit formula for calculating the inverse of A; making use of this formula, the solution of (12) is
+claim h_s24_cramer_t2c1_formal_call :
+  forall K0, forall add0 mul0:set -> set -> set,
+  forall m0 :e omega, forall B0 :e square_matrix_ring K0 (ordsucc m0),
+    commutative_ring K0 add0 mul0 ->
+    (invertible_matrix K0 add0 mul0 (ordsucc m0) B0
+    <-> ring_unit K0 add0 mul0
+      (matrix_determinant K0 add0 mul0 (ordsucc m0) B0))
+    /\ (ring_unit K0 add0 mul0
+      (matrix_determinant K0 add0 mul0 (ordsucc m0) B0) ->
+      matrix_inverse K0 add0 mul0 (ordsucc m0) B0
+      = matrix_left_scalar K0 mul0 (ordsucc m0) (ordsucc m0)
+        (ring_inverse K0 add0 mul0
+          (matrix_determinant K0 add0 mul0 (ordsucc m0) B0))
+        (matrix_adjugate K0 add0 mul0 m0 B0)).
+apply god1_s24_theorem2_corollary1_invertible_iff_determinant_unit.
+claim h_s24_cramer_inverse_solution :
+  linear_system_unique_solution K add mul n n A b.
+admit.
 //GOD1PRF:699576 or, explicitly,
+claim h_s24_cramer_explicit_adjugate_coordinates : forall x :e K :^: n,
+  linear_system_solution K add mul n n A b x ->
+  forall i :e n,
+    mul (matrix_determinant K add mul n A) (x i)
+    = ring_finite_sum K add n
+      (fun j => mul (matrix_cofactor K add mul n j i A) (b j)).
+admit.
 //GOD1PRF:699730 where $\mathbf{A}_{j i}$ is the matrix obtained from $\mathbf{A}$ by deleting the $j$ th row and the $i$ th column. But, by Theorem 1, the right-hand side of this formula is just the determinant of the matrix obtained from A by replacing the elements $\alpha_{1 i}, \ldots, \alpha_{n i}$ of the $i$ th column of A by the constant terms $\beta_{1}, \ldots, \beta_{n}$ of the equations (12). Hence the solution of the Cramer system (12) is given by the formulae
+claim h_s24_cramer_theorem1_formal_call :
+  forall K0, forall add0 mul0:set -> set -> set,
+  forall m0 :e omega, forall B0 :e square_matrix_ring K0 (ordsucc m0),
+    commutative_ring K0 add0 mul0 ->
+    (forall j :e ordsucc m0,
+      matrix_determinant K0 add0 mul0 (ordsucc m0) B0
+      = ring_finite_sum K0 add0 (ordsucc m0)
+        (fun i => mul0 (matrix_entry B0 i j)
+          (matrix_cofactor K0 add0 mul0 m0 i j B0)))
+    /\ forall i :e ordsucc m0,
+      matrix_determinant K0 add0 mul0 (ordsucc m0) B0
+      = ring_finite_sum K0 add0 (ordsucc m0)
+        (fun j => mul0 (matrix_entry B0 i j)
+          (matrix_cofactor K0 add0 mul0 m0 i j B0)).
+apply god1_s24_theorem1_laplace_expansion_along_row_or_column.
+claim h_s24_cramer_replaced_column_formula : forall x :e K :^: n,
+  linear_system_solution K add mul n n A b x -> forall i :e n,
+    mul (matrix_determinant K add mul n A) (x i)
+    = matrix_determinant K add mul n (matrix_replace_column n A i b).
+admit.
 //GOD1PRF:700191 These are Cramer's formulae.
+claim h_s24_cramer_formulae_conclusion : forall x :e K :^: n,
+  linear_system_solution K add mul n n A b x -> forall i :e n,
+    mul (matrix_determinant K add mul n A) (x i)
+    = matrix_determinant K add mul n (matrix_replace_column n A i b)
+    /\ x i = mul
+      (ring_inverse K add mul (matrix_determinant K add mul n A))
+      (matrix_determinant K add mul n (matrix_replace_column n A i b)).
+admit.
 Admitted.
 
 (** § 25. Affine spaces. **)
@@ -49745,12 +50113,44 @@ let K addK mulK T addT smulT E action O.
 assume hO hAffine.
 apply andI.
 //GOD1PRF:722738 We shall now show that E , endowed with these operations, is a vector space isomorphic to T .
+claim h_s25_origin_vector_space_and_isomorphism :
+  left_vector_space K addK mulK E
+    (affine_origin_addition T addT E action O)
+    (affine_origin_scalar T smulT E action O)
+  /\ module_isomorphism K addK mulK T addT smulT E
+    (affine_origin_addition T addT E action O)
+    (affine_origin_scalar T smulT E action O)
+    (fun s => action s O).
+admit.
 //GOD1PRF:722833 Consider the mapping $f: \mathrm{T} \rightarrow \mathrm{E}$ defined by
+claim h_s25_origin_map_definition : forall s :e T,
+  action s O = action s O.
+admit.
 //GOD1PRF:722932 it is bijective by (AS 3).
+claim h_s25_origin_map_bijective : bij T E (fun s => action s O).
+admit.
 //GOD1PRF:723329 f(s+t)=f(s)+f(t) .
+claim h_s25_origin_map_additive : forall s t :e T,
+  action (addT s t) O
+  = affine_origin_addition T addT E action O (action s O) (action t O).
+admit.
 //GOD1PRF:723352 A similar calculation based on (3) shows that
+claim h_s25_origin_map_scalar_calculation : forall scalar :e K, forall s :e T,
+  affine_difference T E action O (action (smulT scalar s) O)
+  = smulT scalar s.
+admit.
 //GOD1PRF:723402 f(\lambda s)=\lambda . f(s) .
+claim h_s25_origin_map_linear_scalar : forall scalar :e K, forall s :e T,
+  action (smulT scalar s) O
+  = affine_origin_scalar T smulT E action O scalar (action s O).
+admit.
 //GOD1PRF:723436 Hence, because the vector space axioms are satisfied in T , and because $f$ is a bijection of T onto E , it is clear that the vector space axioms are satisfied in E , and that $f$ is an isomorphism of vector spaces.
+claim h_s25_origin_isomorphism_conclusion :
+  module_isomorphism K addK mulK T addT smulT E
+    (affine_origin_addition T addT E action O)
+    (affine_origin_scalar T smulT E action O)
+    (fun s => action s O).
+admit.
 Admitted.
 
 //GOD1:727842 affine_coefficients_sum_one : "the coefficient family #4 indexed by #3 has sum one in #1" | $\sum_i#4_i=1$
@@ -49792,14 +50192,69 @@ assume hAffine hI hP hCoeff.
 let O.
 assume hO.
 //GOD1PRF:725662 Now if A, B, C are any three points of E we have always
+claim h_s25_barycenter_difference_cocycle : forall A B C :e E,
+  affine_difference T E action C A
+  = addT (affine_difference T E action B A)
+    (affine_difference T E action C B).
+admit.
 //GOD1PRF:725836 for if we put $s=\mathrm{A}-\mathrm{B}$ and $t=\mathrm{B}-\mathrm{C}$ we have $\mathrm{A}=s+\mathrm{B}$ and $\mathrm{B}=t+\mathrm{C}$, so that
+claim h_s25_barycenter_composed_translations : forall A B C :e E,
+  action (affine_difference T E action B A) B = A
+  /\ action (affine_difference T E action C B) C = B.
+admit.
 //GOD1PRF:726032 by axiom (AS 1), and therefore $\mathbf{A}-\mathbf{C}=s+t$ as asserted. Hence we have
+claim h_s25_barycenter_as1_difference_sum : forall A B C :e E,
+  affine_difference T E action C A
+  = addT (affine_difference T E action B A)
+    (affine_difference T E action C B).
+admit.
 //GOD1PRF:726122 \mathrm{P}_{i}-\mathrm{O}^{\prime}=\left(\mathrm{P}_{i}-\mathrm{O}\right)+\left(\mathrm{O}-\mathrm{O}^{\prime}\right)
+claim h_s25_barycenter_change_origin_each_point : forall Oprime :e E,
+  forall i :e I,
+    affine_difference T E action Oprime (P i)
+    = addT (affine_difference T E action O (P i))
+      (affine_difference T E action Oprime O).
+admit.
 //GOD1PRF:726889 since $\mathrm{P}^{\prime}-\mathrm{O}^{\prime}=\left(\mathrm{P}^{\prime}-\mathrm{O}\right)+\left(\mathrm{O}-\mathrm{O}^{\prime}\right)$, we obtain
+claim h_s25_barycenter_change_origin_sum : forall Oprime :e E,
+  module_finitely_supported_sum T addT I
+    (fun i => smulT (coeff i) (affine_difference T E action Oprime (P i)))
+  = addT
+    (module_finitely_supported_sum T addT I
+      (fun i => smulT (coeff i) (affine_difference T E action O (P i))))
+    (affine_difference T E action Oprime O).
+admit.
 //GOD1PRF:727190 since $\mathbf{P}^{\prime}-\mathbf{O}=\left(\mathbf{P}^{\prime}-\mathbf{P}\right)+(\mathbf{P}-\mathbf{O})$, we therefore end up with
+claim h_s25_barycenter_two_constructions_difference : forall Oprime :e E,
+  affine_difference T E action
+    (affine_barycenter T addT smulT E action I P coeff)
+    (affine_barycenter T addT smulT E action I P coeff)
+  = module_zero T addT.
+admit.
 //GOD1PRF:727343 \mathrm{P}^{\prime}-\mathrm{P}=\left(\lambda_{1}+\cdots+\lambda_{n}-1\right) .\left(\mathrm{O}-\mathrm{O}^{\prime}\right) . \tag{7}
+claim h_s25_barycenter_origin_error_coefficient : forall Oprime :e E,
+  smulT
+    (addK (ring_finite_sum K addK I (fun i => coeff i))
+      (ring_negation K addK (ring_one K mulK)))
+    (affine_difference T E action Oprime O)
+  = module_zero T addT.
+admit.
 //GOD1PRF:727493 This formula shows that in general $\mathbf{P} \neq \mathbf{P}^{\prime}$, in other words that the vector space structure in E depends effectively on the choice of origin O in E. However, (7) also shows that we shall have $\mathrm{P}=\mathrm{P}^{\prime}$ provided that
+claim h_s25_barycenter_sum_one_cancels_origin :
+  ring_finite_sum K addK I (fun i => coeff i) = ring_one K mulK ->
+  forall Oprime :e E,
+    smulT
+      (addK (ring_finite_sum K addK I (fun i => coeff i))
+        (ring_negation K addK (ring_one K mulK)))
+      (affine_difference T E action Oprime O) = module_zero T addT.
+admit.
 //GOD1PRF:727842 and therefore when this condition (8) is satisfied, the point $\lambda_{1} \mathrm{P}_{1}+\cdots+\lambda_{n} \mathrm{P}_{n}$ (which was originally defined by choosing an origin O in E ) is in fact independent of the choice of O, and therefore has an "intrinsic" or "canonical" significance. It is called the barycentre (or centre of mass) of the points $\mathrm{P}_{1}, \ldots, \mathrm{P}_{n}$ with masses $\lambda_{1}, \ldots, \lambda_{n}$.
+claim h_s25_barycenter_origin_independent :
+  affine_difference T E action O
+    (affine_barycenter T addT smulT E action I P coeff)
+  = module_finitely_supported_sum T addT I
+    (fun i => smulT (coeff i) (affine_difference T E action O (P i))).
+admit.
 Admitted.
 
 Theorem god1_affine_barycenter_distributive_law :
@@ -49823,14 +50278,84 @@ Theorem god1_affine_barycenter_distributive_law :
 let K addK mulK T addT smulT E action I J P mu lambda.
 assume hAffine hI hJ hP hMu hLambda.
 //GOD1PRF:731641 The following distributive law for barycentres is often useful:
+claim h_s25_barycenter_distributive_statement :
+  affine_barycenter T addT smulT E action I
+    (fun i => affine_barycenter T addT smulT E action J
+      (fun j => P i j) (fun j => lambda i j)) mu
+  = affine_barycenter T addT smulT E action (I :*: J)
+    (fun u => P (u 0) (u 1))
+    (fun u => mulK (mu (u 0)) (lambda (u 0) (u 1))).
+admit.
 //GOD1PRF:731725 \sum_{i} \mu_{i} \sum_{j} \lambda_{i j} \mathrm{P}_{i j}=\sum_{i, j} \mu_{i} \lambda_{i j} . \mathrm{P}_{i j} ; \tag{10}
+claim h_s25_barycenter_nested_equals_flat :
+  affine_barycenter T addT smulT E action I
+    (fun i => affine_barycenter T addT smulT E action J
+      (fun j => P i j) (fun j => lambda i j)) mu
+  = affine_barycenter T addT smulT E action (I :*: J)
+    (fun u => P (u 0) (u 1))
+    (fun u => mulK (mu (u 0)) (lambda (u 0) (u 1))).
+admit.
 //GOD1PRF:731864 this is valid whenever it has a meaning, i.e., whenever the scalars $\mu_{i}, \lambda_{i j}$ satisfy
+claim h_s25_barycenter_distributive_coefficients :
+  affine_coefficients_sum_one K addK mulK I mu
+  /\ forall i :e I,
+    affine_coefficients_sum_one K addK mulK J (fun j => lambda i j).
+admit.
 //GOD1PRF:732097 \sum_{i, j} \mu_{i} \lambda_{i j}=1,
+claim h_s25_barycenter_flat_coefficients_sum_one :
+  affine_coefficients_sum_one K addK mulK (I :*: J)
+    (fun u => mulK (mu (u 0)) (lambda (u 0) (u 1))).
+admit.
 //GOD1PRF:732138 so that the right-hand side of (10) is defined.) To prove (10) it is enough to show that, if $O$ is any point of $E$,
+claim h_s25_barycenter_reduce_to_displacements : forall O :e E,
+  affine_difference T E action O
+    (affine_barycenter T addT smulT E action I
+      (fun i => affine_barycenter T addT smulT E action J
+        (fun j => P i j) (fun j => lambda i j)) mu)
+  = affine_difference T E action O
+    (affine_barycenter T addT smulT E action (I :*: J)
+      (fun u => P (u 0) (u 1))
+      (fun u => mulK (mu (u 0)) (lambda (u 0) (u 1)))).
+admit.
 //GOD1PRF:732260 \sum_{i} \mu_{i}\left(\sum_{j} \lambda_{i j} \cdot \mathrm{P}_{i j}-\mathrm{O}\right)=\sum_{i, j} \mu_{i} \lambda_{i j}\left(\mathrm{P}_{i j}-\mathrm{O}\right) ;
+claim h_s25_barycenter_displacement_distributivity : forall O :e E,
+  module_finitely_supported_sum T addT I
+    (fun i => smulT (mu i)
+      (module_finitely_supported_sum T addT J
+        (fun j => smulT (lambda i j)
+          (affine_difference T E action O (P i j)))))
+  = module_finitely_supported_sum T addT (I :*: J)
+    (fun u => smulT (mulK (mu (u 0)) (lambda (u 0) (u 1)))
+      (affine_difference T E action O (P (u 0) (u 1)))).
+admit.
 //GOD1PRF:732426 but by definition we have
+claim h_s25_barycenter_inner_definition : forall O :e E, forall i :e I,
+  affine_difference T E action O
+    (affine_barycenter T addT smulT E action J
+      (fun j => P i j) (fun j => lambda i j))
+  = module_finitely_supported_sum T addT J
+    (fun j => smulT (lambda i j)
+      (affine_difference T E action O (P i j))).
+admit.
 //GOD1PRF:732456 \sum_{j} \lambda_{i j} \cdot \mathrm{P}_{i j}-\mathrm{O}=\sum_{j} \lambda_{i j}\left(\mathrm{P}_{i j}-\mathrm{O}\right),
+claim h_s25_barycenter_inner_displacement_formula : forall O :e E,
+  forall i :e I,
+    affine_difference T E action O
+      (affine_barycenter T addT smulT E action J
+        (fun j => P i j) (fun j => lambda i j))
+    = module_finitely_supported_sum T addT J
+      (fun j => smulT (lambda i j)
+        (affine_difference T E action O (P i j))).
+admit.
 //GOD1PRF:732581 so that (10) reduces to the distributive law in the vector space T .
+claim h_s25_barycenter_distributive_conclusion :
+  affine_barycenter T addT smulT E action I
+    (fun i => affine_barycenter T addT smulT E action J
+      (fun j => P i j) (fun j => lambda i j)) mu
+  = affine_barycenter T addT smulT E action (I :*: J)
+    (fun u => P (u 0) (u 1))
+    (fun u => mulK (mu (u 0)) (lambda (u 0) (u 1))).
+admit.
 Admitted.
 
 //GOD1:732701 affine_linear_variety : "#9 is a linear variety in the affine space #7" | $#9\subseteq_{\mathrm{aff}}#7$
@@ -49896,20 +50421,125 @@ let K addK mulK T addT smulT E action V.
 assume hAffine hVE hV.
 apply andI.
 //GOD1PRF:736840 We start by proving that $a$ ) implies $b$ ). We have to show that, for all $\mathrm{Q}, \mathrm{R} \in \mathrm{V}$ and scalars $\lambda, \mu \in \mathrm{K}$, there exists $\mathrm{S} \in \mathrm{V}$ such that
+claim h_s25_t1_affine_implies_displacement_closure :
+  affine_linear_variety K addK mulK T addT smulT E action V ->
+  forall P0 Q R :e V, forall lambda mu :e K,
+    exists S :e V,
+      affine_difference T E action P0 S
+      = addT
+        (smulT lambda (affine_difference T E action P0 Q))
+        (smulT mu (affine_difference T E action P0 R)).
+admit.
 //GOD1PRF:737054 \mathrm{S}-\mathrm{P}_{0}=\lambda\left(\mathrm{Q}-\mathrm{P}_{0}\right)+\mu\left(\mathrm{R}-\mathrm{P}_{0}\right)
+claim h_s25_t1_displacement_linear_combination :
+  forall P0 Q R :e V, forall lambda mu :e K,
+  exists S :e V,
+    affine_difference T E action P0 S
+    = addT (smulT lambda (affine_difference T E action P0 Q))
+      (smulT mu (affine_difference T E action P0 R)).
+admit.
 //GOD1PRF:737172 which is equivalent to
+claim h_s25_t1_displacement_equals_barycenter_condition :
+  forall P0 Q R S :e V, forall lambda mu :e K,
+    affine_difference T E action P0 S
+      = addT (smulT lambda (affine_difference T E action P0 Q))
+        (smulT mu (affine_difference T E action P0 R))
+    -> S :e E.
+admit.
 //GOD1PRF:737199 \mathrm{S}-\mathrm{P}_{0}=\lambda\left(\mathrm{Q}-\mathrm{P}_{0}\right)+\mu\left(\mathrm{R}-\mathrm{P}_{0}\right)+(1-\lambda-\mu)\left(\mathrm{P}_{0}-\mathrm{P}_{0}\right)
+claim h_s25_t1_affine_coefficients_sum_one : forall lambda mu :e K,
+  ring_finite_sum K addK 3
+    (fun i => if i = 0 then lambda else if i = 1 then mu
+      else addK (ring_one K mulK)
+        (ring_negation K addK (addK lambda mu)))
+  = ring_one K mulK.
+admit.
 //GOD1PRF:737479 Since V is a linear variety, the point S given by this relation does lie in V .\\
+claim h_s25_t1_barycenter_closure_gives_S :
+  affine_linear_variety K addK mulK T addT smulT E action V ->
+  forall P0 Q R :e V, forall lambda mu :e K,
+    exists S :e V, S :e V.
+admit.
 //GOD1PRF:737561 That $b$ ) implies $c$ ) is trivial ; we shall next prove that $c$ ) implies $a$ ). Consider the point
+claim h_s25_t1_one_origin_suffices :
+  (forall O :e V, vector_subspace K addK mulK T addT smulT
+    (affine_displacement_set T E action V O))
+  <-> exists O :e V, vector_subspace K addK mulK T addT smulT
+    (affine_displacement_set T E action V O).
+admit.
 //GOD1PRF:737785 we have to show that $P \in V$ whenever $P_{1}, \ldots, P_{n} \in V$. Now we have
+claim h_s25_t1_subspace_implies_barycenter_closure :
+  (exists O :e V, vector_subspace K addK mulK T addT smulT
+    (affine_displacement_set T E action V O)) ->
+  forall n :e omega, forall P :e V :^: n, forall coeff:set -> set,
+    affine_coefficients_sum_one K addK mulK n coeff ->
+    affine_barycenter T addT smulT E action n (fun i => P i) coeff :e V.
+admit.
 //GOD1PRF:737871 \mathrm{P}-\mathrm{P}_{0}=\Sigma \lambda_{i}\left(\mathrm{P}_{i}-\mathrm{P}_{0}\right) ;
+claim h_s25_t1_barycenter_displacement_formula :
+  forall O :e V, forall n :e omega, forall P :e V :^: n,
+  forall coeff:set -> set,
+    affine_coefficients_sum_one K addK mulK n coeff ->
+    affine_difference T E action O
+      (affine_barycenter T addT smulT E action n (fun i => P i) coeff)
+    = module_finitely_supported_sum T addT n
+      (fun i => smulT (coeff i) (affine_difference T E action O (P i))).
+admit.
 //GOD1PRF:737964 if $V$ contains the $P_{i}$, the hypothesis $c$ ) shows that $P-P_{0}=P^{\prime}-P_{0}$ for some $P^{\prime} \in V$, and this evidently implies that $P=P^{\prime}$. Hence $P \in V$, as required.
+claim h_s25_t1_equal_displacement_points_equal : forall O P Pprime :e E,
+  affine_difference T E action O P = affine_difference T E action O Pprime ->
+  P = Pprime.
+admit.
 //GOD1PRF:738160 Next, we must show that if V is a non-empty linear variety, then the subspace of T consisting of all vectors $P-P_{0}(P \in V)$ does not depend on the choice of $P_{0} \in V$.
+claim h_s25_t1_displacement_space_origin_independent :
+  affine_linear_variety K addK mulK T addT smulT E action V ->
+  forall O Oprime :e V,
+    affine_displacement_set T E action V O
+    = affine_displacement_set T E action V Oprime.
+admit.
 //GOD1PRF:738337 Let $\mathrm{H}_{0}$ be the vector subspace of T corresponding in this way to $\mathrm{P}_{0} \in \mathrm{~V}$, and let $H_{1}$ be the subspace of $T$ corresponding to another point $P_{1} \in V$. Then, for all $P \in V$, we have
+claim h_s25_t1_compare_displacement_spaces : forall O Oprime P :e V,
+  affine_difference T E action O P
+  = addT (affine_difference T E action Oprime P)
+    (affine_difference T E action O Oprime).
+admit.
 //GOD1PRF:738571 \mathrm{P}-\mathrm{P}_{0}=\left(\mathrm{P}-\mathrm{P}_{1}\right)+\left(\mathrm{P}_{1}-\mathrm{P}_{0}\right)=\left(\mathrm{P}-\mathrm{P}_{1}\right)-\left(\mathrm{P}_{0}-\mathrm{P}_{1}\right) .
+claim h_s25_t1_difference_change_origin : forall P O Oprime :e V,
+  affine_difference T E action O P
+  = addT (affine_difference T E action Oprime P)
+    (module_negation T addT (affine_difference T E action Oprime O)).
+admit.
 //GOD1PRF:738767 Since by definition $H_{1}$ contains $P-P_{1}$ and $P_{0}-P_{1}$, it contains $P-P_{0}$, and therefore $\mathrm{H}_{0} \subset \mathrm{H}_{1}$. Similarly $\mathrm{H}_{1} \subset \mathrm{H}_{0}$, and therefore $\mathrm{H}_{0}=\mathrm{H}_{1}$.
+claim h_s25_t1_displacement_space_equality : forall O Oprime :e V,
+  affine_displacement_set T E action V O
+  = affine_displacement_set T E action V Oprime.
+admit.
 //GOD1PRF:739010 Hence the vector subspace consisting of all vectors $\mathrm{P}-\mathrm{P}_{0}(\mathrm{P} \in \mathrm{V})$ is independent of the choice of $P_{0} \in V$; let us denote this subspace by $H$. It is clear that $H$ is the set of all vectors $\mathrm{P}-\mathrm{Q}$, where $\mathrm{P}, \mathrm{Q}$ run through V . Let $s \in \mathrm{H}$ and $\mathrm{P} \in \mathrm{V}$. Taking P to be $\mathrm{P}_{0}$, we see that there exists $\mathrm{Q} \in \mathrm{V}$ such that $s=\mathrm{Q}-\mathrm{P}$, i.e., $\mathrm{Q}=s+\mathrm{P}$. Hence $s+\mathrm{P} \in \mathrm{V}$ for all $s \in \mathrm{H}$ and all $\mathrm{P} \in \mathrm{V}$.
+claim h_s25_t1_director_translation_invariance :
+  affine_linear_variety K addK mulK T addT smulT E action V ->
+  affine_director_subspace T E action V
+  = {s :e T|forall P :e V, action s P :e V}.
+admit.
 //GOD1PRF:739632 Conversely, consider an element $s \in \mathrm{~T}$ such that $s+\mathrm{P} \in \mathrm{V}$ for all $\mathrm{P} \in \mathrm{V}$. Choose $\mathrm{P} \in \mathrm{V}$ and put $s+\mathrm{P}=\mathrm{Q}$; then $\mathrm{Q} \in \mathrm{V}$ and $s=\mathrm{Q}-\mathrm{P}$, and hence $s \in \mathrm{H}$. The proof is now complete.\\
+claim h_s25_t1_translation_invariance_implies_director : forall s :e T,
+  (forall P :e V, action s P :e V) ->
+  s :e affine_director_subspace T E action V.
+admit.
+Admitted.
+
+(** Projection of Theorem 1 used by the line-generation argument. **)
+Theorem god1_s25_theorem1_displacement_characterization_interface :
+  forall K, forall addK mulK:set -> set -> set,
+  forall T, forall addT smulT:set -> set -> set,
+  forall E, forall action:set -> set -> set, forall V,
+    affine_space K addK mulK T addT smulT E action ->
+    V c= E -> V <> 0 ->
+    (affine_linear_variety K addK mulK T addT smulT E action V
+    <-> exists O :e V,
+      vector_subspace K addK mulK T addT smulT
+        (affine_displacement_set T E action V O)).
+let K addK mulK T addT smulT E action V.
+assume hAffine hVE hV.
 Admitted.
 
 Theorem god1_linear_varieties_with_same_director_are_translates :
@@ -49927,8 +50557,19 @@ Theorem god1_linear_varieties_with_same_director_are_translates :
 let K addK mulK T addT smulT E action V W.
 assume hAffine hV hW hVne hWne hDirector.
 //GOD1PRF:740115 Knowledge of H is not sufficient to determine V uniquely. But if two non-empty linear varieties $\mathrm{V}^{\prime}$ and $\mathrm{V}^{\prime \prime}$ have the same director subspace H in T , then there exists a translation in $E$ which maps $V^{\prime}$ onto $V^{\prime \prime}$. To see this, choose a point $P^{\prime} \in V^{\prime}$ and a point $\mathrm{P}^{\prime \prime} \in \mathrm{V}^{\prime \prime}$, and consider the vector $a=\mathrm{P}^{\prime \prime}-\mathrm{P}^{\prime}$. A point $\mathrm{P} \in \mathrm{V}$ lies in $\mathrm{V}^{\prime}$ if and only if $\mathrm{P}-\mathrm{P}^{\prime} \in \mathrm{H}$; since
+claim h_s25_translate_choose_vector : exists P :e V, exists Q :e W,
+  affine_difference T E action P Q :e T.
+admit.
 //GOD1PRF:740741 \mathrm{P}-\mathrm{P}^{\prime}=(\mathrm{P}+a)-\mathrm{P}^{\prime \prime}
+claim h_s25_translate_difference_identity : forall P0 P :e V, forall Q0 :e W,
+  affine_difference T E action P0 P
+  = affine_difference T E action Q0
+    (action (affine_difference T E action P0 Q0) P).
+admit.
 //GOD1PRF:740818 and since H is also the director subspace of $\mathrm{V}^{\prime \prime}$, it follows that the relations $\mathrm{P} \in \mathrm{V}^{\prime}$ and $\mathrm{P}+a \in \mathrm{~V}^{\prime \prime}$ are equivalent; in other words, the translation $\mathrm{P} \rightarrow \mathrm{P}+a$ maps $\mathrm{V}^{\prime}$ onto $\mathrm{V}^{\prime \prime}$.
+claim h_s25_translate_same_director_conclusion : exists s :e T,
+  {action s P|P :e V} = W.
+admit.
 Admitted.
 
 //GOD1:744870 affine_line : "the line joining the points #9 and #10" | $\overline{#9#10}$
@@ -49939,6 +50580,22 @@ Definition affine_line :
   fun K addK mulK T addT smulT E action P Q =>
     affine_span K addK mulK T addT smulT E action 2
       (fun i => if i = 0 then P else Q).
+
+(** Formal interface for Example 10: the variety generated by two points is
+the affine line joining them and is contained in every variety containing the
+two points. **)
+Theorem god1_s25_example10_line_minimality_interface :
+  forall K, forall addK mulK:set -> set -> set,
+  forall T, forall addT smulT:set -> set -> set,
+  forall E, forall action:set -> set -> set, forall V,
+  forall P Q :e V,
+    affine_linear_variety K addK mulK T addT smulT E action V ->
+    affine_line K addK mulK T addT smulT E action P Q c= V.
+let K addK mulK T addT smulT E action V P.
+assume hP.
+let Q.
+assume hQ hV.
+Admitted.
 
 Theorem god1_s25_theorem2_generation_of_linear_variety_by_lines :
   forall K, forall addK mulK:set -> set -> set,
@@ -49954,15 +50611,92 @@ let K addK mulK T addT smulT E action V.
 assume hAffine hChar hVE.
 apply iffI.
 //GOD1PRF:745791 Suppose that V is a linear variety. If V contains two distinct points $\mathrm{P}, \mathrm{Q}$, then V also contains the linear variety generated by P and Q (Example 10), i.e., the line joining $P$ and $Q$.
+claim h_s25_t2_example10_formal_call :
+  forall K0, forall add0 mul0:set -> set -> set,
+  forall T0, forall addT0 smulT0:set -> set -> set,
+  forall E0, forall action0:set -> set -> set, forall V0,
+  forall P0 Q0 :e V0,
+    affine_linear_variety K0 add0 mul0 T0 addT0 smulT0 E0 action0 V0 ->
+    affine_line K0 add0 mul0 T0 addT0 smulT0 E0 action0 P0 Q0 c= V0.
+apply god1_s25_example10_line_minimality_interface.
+claim h_s25_t2_variety_contains_joining_lines :
+  affine_linear_variety K addK mulK T addT smulT E action V ->
+  forall P Q :e V, P <> Q ->
+    affine_line K addK mulK T addT smulT E action P Q c= V.
+admit.
 //GOD1PRF:745999 Conversely, suppose that this condition is satisfied. Since the empty set is a linear variety, we may assume that $V$ is not empty. Choosing a point $P_{0} \in V$, we have (by Theorem 1) to show that the set of vectors $\mathrm{Q}-\mathrm{P}_{0}$, where $\mathrm{Q} \in \mathrm{V}$, is a vector subspace of T , i.e., that for all choices of scalars $\lambda, \mu \in \mathrm{K}$ and points $\mathrm{Q}, \mathrm{R} \in \mathrm{V}$, there exists $S \in V$ such that
+claim h_s25_t2_theorem1_formal_call :
+  forall K0, forall add0 mul0:set -> set -> set,
+  forall T0, forall addT0 smulT0:set -> set -> set,
+  forall E0, forall action0:set -> set -> set, forall V0,
+    affine_space K0 add0 mul0 T0 addT0 smulT0 E0 action0 ->
+    V0 c= E0 -> V0 <> 0 ->
+    (affine_linear_variety K0 add0 mul0 T0 addT0 smulT0 E0 action0 V0
+    <-> exists O0 :e V0,
+      vector_subspace K0 add0 mul0 T0 addT0 smulT0
+        (affine_displacement_set T0 E0 action0 V0 O0)).
+apply god1_s25_theorem1_displacement_characterization_interface.
+claim h_s25_t2_displacement_subspace_goal :
+  V <> 0 -> exists P0 :e V,
+    vector_subspace K addK mulK T addT smulT
+      (affine_displacement_set T E action V P0).
+admit.
 //GOD1PRF:746467 \mathrm{S}-\mathrm{P}_{0}=\lambda\left(\mathrm{Q}-\mathrm{P}_{0}\right)+\mu\left(\mathrm{R}-\mathrm{P}_{0}\right) .
+claim h_s25_t2_required_linear_combination : forall P0 Q R :e V,
+  forall lambda mu :e K, exists S :e V,
+    affine_difference T E action P0 S
+    = addT (smulT lambda (affine_difference T E action P0 Q))
+      (smulT mu (affine_difference T E action P0 R)).
+admit.
 //GOD1PRF:746587 But the point S defined by this formula is clearly
+claim h_s25_t2_S_is_affine_combination : forall P0 Q R :e V,
+  forall lambda mu :e K, exists S :e E,
+    affine_difference T E action P0 S
+    = addT (smulT lambda (affine_difference T E action P0 Q))
+      (smulT mu (affine_difference T E action P0 R)).
+admit.
 //GOD1PRF:746642 \mathbf{S}=\lambda \mathbf{Q}+\mu \mathbf{R}+(1-\lambda-\mu) \mathbf{P}_{\mathbf{0}} .
+claim h_s25_t2_three_point_coefficients : forall lambda mu :e K,
+  exists nu :e K, addK (addK lambda mu) nu = ring_one K mulK.
+admit.
 //GOD1PRF:746733 Hence, changing the notation, we are reduced to showing that, for all points $\mathrm{P}, \mathrm{Q}, \mathrm{R} \in \mathrm{V}$ and all scalars $\lambda, \mu, v, \in \mathrm{~K}$ such that
+claim h_s25_t2_three_point_closure_goal : forall P Q R :e V,
+  forall lambda mu nu :e K,
+    addK (addK lambda mu) nu = ring_one K mulK ->
+    affine_barycenter T addT smulT E action 3
+      (fun i => if i = 0 then P else if i = 1 then Q else R)
+      (fun i => if i = 0 then lambda else if i = 1 then mu else nu) :e V.
+admit.
 //GOD1PRF:747069 Now, because the characteristic of K is not 2 , we have $2 \neq 0$ and therefore $3 \neq 1$ in K; hence it cannot happen that $\lambda=\mu=\nu=1$, and we may therefore suppose that $\lambda \neq 1$, for example. Then $1-\lambda$ is invertible, and formula (10) of section 4 enables us to write
+claim h_s25_t2_one_coefficient_not_one : forall lambda mu nu :e K,
+  addK (addK lambda mu) nu = ring_one K mulK ->
+  lambda <> ring_one K mulK \/ mu <> ring_one K mulK \/ nu <> ring_one K mulK.
+admit.
 //GOD1PRF:747367 \lambda \mathbf{P}+\mu \mathbf{Q}+\nu \mathbf{R}=\lambda \mathbf{P}+(1-\lambda) \mathbf{M},
+claim h_s25_t2_nested_barycenter_decomposition : forall P Q R :e V,
+  forall lambda mu nu :e K,
+    lambda <> ring_one K mulK ->
+    exists Mpoint :e E,
+      affine_barycenter T addT smulT E action 3
+        (fun i => if i = 0 then P else if i = 1 then Q else R)
+        (fun i => if i = 0 then lambda else if i = 1 then mu else nu)
+      = affine_barycenter T addT smulT E action 2
+        (fun i => if i = 0 then P else Mpoint)
+        (fun i => if i = 0 then lambda else
+          addK (ring_one K mulK) (ring_negation K addK lambda)).
+admit.
 //GOD1PRF:747473 \mathbf{M}=\frac{\mu}{1-\lambda} \mathbf{Q}+\frac{v}{1-\lambda} \mathbf{R} .
+claim h_s25_t2_inner_point_on_QR : forall Q R :e V,
+  forall lambda mu nu :e K, lambda <> ring_one K mulK ->
+  exists Mpoint :e affine_line K addK mulK T addT smulT E action Q R,
+    Mpoint :e E.
+admit.
 //GOD1PRF:747554 If $Q=R$, we have $M=Q=R$, so that $M \in V$. If $Q \neq R$, the point $M$ is on the line joining $Q$ and $R$, hence $M \in V$ by hypothesis. So $M \in V$ in all cases. The same argument then shows that V contains the point $\lambda \mathrm{P}+(1-\lambda) \mathrm{M}$, and this completes the proof. \(\square\)\\
+claim h_s25_t2_nested_line_closure_conclusion :
+  (forall P Q :e V, P <> Q ->
+    affine_line K addK mulK T addT smulT E action P Q c= V) ->
+  affine_linear_variety K addK mulK T addT smulT E action V.
+admit.
 Admitted.
 
 //GOD1:749545 affine_space_dimension : "the dimension of the affine space #7" | $\dim(#7)$
@@ -50036,11 +50770,68 @@ let P.
 assume hAffine hFinite hDim hP.
 apply andI.
 //GOD1PRF:748193 Let T be a vector space over a division ring K , and let E be an affine space associated with T . The affine space E is said to be finite-dimensional if T is finite-dimensional\\
+claim h_s25_t3_finite_affine_dimension :
+  finite_dimensional_vector_space K addK mulK T addT smulT
+  /\ affine_space_dimension K addK mulK T addT smulT E = n.
+admit.
 //GOD1PRF:751442 Let E be an affine space associated with a finite-dimensional vector space T . We have seen above that points $\mathrm{P}_{0}, \ldots, \mathrm{P}_{n} \in \mathrm{E}$ form an affine basis of E if and only if the vectors $\mathrm{P}_{i}-\mathrm{P}_{0}(1 \leqslant i \leqslant n)$ form a basis of T . It follows immediately that all affine bases of $E$ have the same number of points, namely $n+1$, where $n=\operatorname{dim}(E)$.
+claim h_s25_t3_affine_basis_vector_basis :
+  affine_basis K addK mulK T addT smulT E action n P
+  <-> module_basis K addK mulK T addT smulT n
+    (fun i => affine_difference T E action (P 0) (P (ordsucc i))).
+admit.
 //GOD1PRF:751872 The vectors $\mathrm{P}_{i}-\mathrm{P}_{0}(1 \leqslant i \leqslant n)$ form a basis of T if and only if they generate T (§ 19, Theorem 10), i.e., if and only if every $\mathrm{P} \in \mathrm{E}$ can be written in at least one way in the form
+claim h_s25_t3_s19_theorem10_formal_call :
+  forall K0, forall add0 mul0:set -> set -> set,
+  forall M0, forall addM0 smulR0:set -> set -> set,
+  forall n0 :e omega, forall x0:set -> set,
+    right_vector_space K0 add0 mul0 M0 addM0 smulR0 ->
+    let mulOp := opposite_ring_multiplication mul0 in
+    (right_module_basis K0 add0 mul0 M0 addM0 smulR0 n0 x0
+    <-> linearly_independent_family K0 add0 mulOp M0 addM0
+      (fun scalar y => smulR0 y scalar) n0 x0
+      /\ finite_dimensional_right_vector_space K0 add0 mul0 M0 addM0 smulR0
+      /\ right_vector_dimension K0 add0 mul0 M0 addM0 smulR0 = n0)
+    /\ (right_module_basis K0 add0 mul0 M0 addM0 smulR0 n0 x0
+    <-> linearly_independent_family K0 add0 mulOp M0 addM0
+      (fun scalar y => smulR0 y scalar) n0 x0
+      /\ independent_family_size_bound K0 add0 mulOp M0 addM0
+        (fun scalar y => smulR0 y scalar) n0)
+    /\ (right_module_basis K0 add0 mul0 M0 addM0 smulR0 n0 x0
+    <-> generating_family K0 add0 mulOp M0 addM0
+      (fun scalar y => smulR0 y scalar) n0 x0
+      /\ finite_dimensional_right_vector_space K0 add0 mul0 M0 addM0 smulR0
+      /\ right_vector_dimension K0 add0 mul0 M0 addM0 smulR0 = n0)
+    /\ (right_module_basis K0 add0 mul0 M0 addM0 smulR0 n0 x0
+    <-> generating_family K0 add0 mulOp M0 addM0
+      (fun scalar y => smulR0 y scalar) n0 x0
+      /\ generating_family_size_bound K0 add0 mulOp M0 addM0
+        (fun scalar y => smulR0 y scalar) n0).
+apply god1_s19_theorem10_basis_characterizations.
+claim h_s25_t3_basis_iff_generates :
+  affine_basis K addK mulK T addT smulT E action n P
+  <-> forall Q :e E, exists coeff:set -> set,
+    affine_coefficients_sum_one K addK mulK (ordsucc n) coeff
+    /\ affine_barycenter T addT smulT E action (ordsucc n) P coeff = Q.
+admit.
 //GOD1PRF:752119 \mathrm{P}=\sum_{i=0}^{n} \xi_{i} \mathrm{P}_{i}, \quad \text { with } \quad \sum_{i=0}^{n} \xi_{i}=1,
+claim h_s25_t3_affine_coordinate_representation :
+  forall Q :e E, exists coeff:set -> set,
+    affine_coefficients_sum_one K addK mulK (ordsucc n) coeff
+    /\ affine_barycenter T addT smulT E action (ordsucc n) P coeff = Q.
+admit.
 //GOD1PRF:752226 or, equivalently, if and only if the linear variety generated by the $\mathrm{P}_{i}$ is the whole of E . Since this linear variety is the smallest one which contains the $P_{i}$, we have the following result:
+claim h_s25_t3_span_whole_space :
+  affine_basis K addK mulK T addT smulT E action n P
+  <-> affine_span K addK mulK T addT smulT E action (ordsucc n) P = E.
+admit.
 //GOD1PRF:752437 THEOREM 3. Let E be an affine space of dimension $n$ over a division ring K . In order that $n+1$ points of E should form an affine basis of E , it is necessary and sufficient that they should not be contained in any linear variety other than E itself.
+claim h_s25_t3_no_proper_variety_criterion :
+  affine_basis K addK mulK T addT smulT E action n P
+  <-> forall V,
+    affine_linear_variety K addK mulK T addT smulT E action V ->
+    (forall i :e ordsucc n, P i :e V) -> V = E.
+admit.
 Admitted.
 
 Theorem god1_affine_variety_dimension_monotonicity :
@@ -50061,10 +50852,31 @@ let K addK mulK T addT smulT E action V W.
 assume hAffine hFinite hV hW hVne hVW.
 apply andI.
 //GOD1PRF:748193 Let T be a vector space over a division ring K , and let E be an affine space associated with T . The affine space E is said to be finite-dimensional if T is finite-dimensional\\
+claim h_s25_dim_finite_context :
+  finite_dimensional_vector_space K addK mulK T addT smulT.
+admit.
 //GOD1PRF:750692 Remark 5. Let V be a non-empty linear variety in E . We have seen (Remark 2) that we may regard $V$ as an affine space in its own right, associated with its director subspace $H$. The dimension of the linear variety $V$ is therefore defined to be the dimension of $H$. If $V$ is generated by points $\mathrm{P}_{0}, \ldots, \mathrm{P}_{n}$, then by Remark 3 the dimension of V is equal to the rank of the family of vectors $\mathrm{P}_{i}-\mathrm{P}_{0}(1 \leqslant i \leqslant n)$.
+claim h_s25_dim_director_definition :
+  affine_variety_dimension K addK mulK T addT smulT E action V
+  = module_dimension K addK mulK
+    (affine_director_subspace T E action V) addT smulT.
+admit.
 //GOD1PRF:751176 Let $\mathrm{V}, \mathrm{W}$ be two linear varieties in E , such that $\mathrm{V} \subset \mathrm{W}$. Then we have
+claim h_s25_dim_director_inclusion :
+  affine_director_subspace T E action V
+  c= affine_director_subspace T E action W.
+admit.
 //GOD1PRF:751296 \operatorname{dim}(V) \leqslant \operatorname{dim}(W)
+claim h_s25_dim_monotone :
+  affine_variety_dimension K addK mulK T addT smulT E action V
+  c= affine_variety_dimension K addK mulK T addT smulT E action W.
+admit.
 //GOD1PRF:751354 with equality if and only if $\mathrm{V}=\mathrm{W}$. The proof is left to the reader.
+claim h_s25_dim_equal_iff_varieties_equal :
+  affine_variety_dimension K addK mulK T addT smulT E action V
+    = affine_variety_dimension K addK mulK T addT smulT E action W
+  <-> V = W.
+admit.
 Admitted.
 
 //GOD1:753757 affine_coordinate_matrix : "the affine-coordinate matrix of point family #13 in affine basis #12" | $([#13_j]_{#12,i}^{\mathrm{aff}})_{i,j}$
@@ -50100,32 +50912,232 @@ assume hn.
 let P Q.
 assume hAffine hBasis hQ.
 //GOD1PRF:754264 By Remark 5, the dimension $r$ is equal to the rank of the family of vectors
+claim h_s25_t4_dimension_as_difference_rank :
+  affine_variety_dimension K addK mulK T addT smulT E action
+    (affine_span K addK mulK T addT smulT E action (ordsucc n) Q)
+  = module_family_rank K addK mulK T addT smulT n
+    (fun j => affine_difference T E action (Q 0) (Q (ordsucc j))).
+admit.
 //GOD1PRF:754345 \mathrm{Q}_{j}-\mathrm{Q}_{0}(1 \leqslant j \leqslant n) .
+claim h_s25_t4_difference_family : forall j :e n,
+  affine_difference T E action (Q 0) (Q (ordsucc j)) :e T.
+admit.
 //GOD1PRF:754408 Now we have
+claim h_s25_t4_affine_coordinate_expansion : forall j :e ordsucc n,
+  affine_coefficients_sum_one K addK mulK (ordsucc m)
+    (fun i => affine_coordinates K addK mulK T addT smulT E action m P
+      (Q j) i).
+admit.
 //GOD1PRF:754440 \mathrm{Q}_{j}-\mathrm{Q}_{0}=\left(\mathrm{Q}_{j}-\mathrm{P}_{0}\right)-\left(\mathrm{Q}_{0}-\mathrm{P}_{0}\right) & =\sum_{i} \alpha_{i j}\left(\mathrm{P}_{i}-\mathrm{P}_{0}\right)-\sum_{i} \alpha_{i 0}\left(\mathrm{P}_{i}-\mathrm{P}_{0}\right) \\
+claim h_s25_t4_difference_of_coordinate_expansions : forall j :e n,
+  affine_difference T E action (Q 0) (Q (ordsucc j))
+  = addT (affine_difference T E action (P 0) (Q (ordsucc j)))
+    (module_negation T addT (affine_difference T E action (P 0) (Q 0))).
+admit.
 //GOD1PRF:754690 & =\sum_{i=1}^{m}\left(\alpha_{i j}-\alpha_{i 0}\right) \cdot a_{i}
+claim h_s25_t4_difference_coordinate_matrix : exists Aprime :e matrix_space K m n,
+  forall j :e n,
+    affine_difference T E action (Q 0) (Q (ordsucc j))
+    = module_finitely_supported_sum T addT m
+      (fun i => smulT (matrix_entry Aprime i j)
+        (affine_difference T E action (P 0) (P (ordsucc i)))).
+admit.
 //GOD1PRF:754871 form a basis of T. Consequently (§ 19, Theorem 15) the number $r$ is equal to the rank of the matrix
+claim h_s25_t4_s19_theorem15_formal_call :
+  forall K0, forall add0 mul0:set -> set -> set,
+  forall M0, forall addM0 smulR0:set -> set -> set,
+  forall n0 p0 :e omega, forall b0 x0:set -> set,
+  forall A0 :e matrix_space K0 n0 p0,
+    right_vector_space K0 add0 mul0 M0 addM0 smulR0 ->
+    right_module_basis K0 add0 mul0 M0 addM0 smulR0 n0 b0 ->
+    (forall j :e p0,
+      x0 j = module_finitely_supported_sum M0 addM0 n0
+        (fun i => smulR0 (b0 i) (matrix_entry A0 i j))) ->
+    right_vector_family_rank K0 add0 mul0 M0 addM0 smulR0 p0 x0
+    = matrix_rank K0 add0 mul0 n0 p0 A0.
+apply god1_s19_theorem15_rank_of_family_equals_coefficient_matrix_rank.
+claim h_s25_t4_difference_rank_is_matrix_rank : exists Aprime :e matrix_space K m n,
+  affine_variety_dimension K addK mulK T addT smulT E action
+    (affine_span K addK mulK T addT smulT E action (ordsucc n) Q)
+  = matrix_rank K addK mulK m n Aprime.
+admit.
 //GOD1PRF:754977 \mathbf{A}^{\prime}=\left(\alpha_{i j}-\alpha_{i 0}\right)_{1 \leqslant i \leqslant m, 1 \leqslant j \leqslant n} .
+claim h_s25_t4_Aprime_entries : exists Aprime :e matrix_space K m n,
+  forall i :e m, forall j :e n,
+    matrix_entry Aprime i j
+    = addK
+      (affine_coordinates K addK mulK T addT smulT E action m P
+        (Q (ordsucc j)) (ordsucc i))
+      (ring_negation K addK
+        (affine_coordinates K addK mulK T addT smulT E action m P
+          (Q 0) (ordsucc i))).
+admit.
 //GOD1PRF:755097 Hence it remains to be shown, using of course the relations
+claim h_s25_t4_reduce_to_rank_identity :
+  exists Aprime :e matrix_space K m n,
+    matrix_rank K addK mulK (ordsucc m) (ordsucc n)
+      (affine_coordinate_matrix K addK mulK T addT smulT E action m n P Q)
+    = ordsucc (matrix_rank K addK mulK m n Aprime).
+admit.
 //GOD1PRF:755177 \sum_{i=0}^{m} \alpha_{i j}=1 \quad(0 \leqslant j \leqslant n) \tag{14}
+claim h_s25_t4_affine_coordinate_sums : forall j :e ordsucc n,
+  ring_finite_sum K addK (ordsucc m)
+    (fun i => affine_coordinates K addK mulK T addT smulT E action m P
+      (Q j) i)
+  = ring_one K mulK.
+admit.
 //GOD1PRF:755267 between the affine coordinates of the points $Q_{j}$, that the rank of $A$ is equal to $1+\operatorname{rank}\left(\mathbf{A}^{\prime}\right)$.
+claim h_s25_t4_affine_rank_increment : exists Aprime :e matrix_space K m n,
+  matrix_rank K addK mulK (ordsucc m) (ordsucc n)
+    (affine_coordinate_matrix K addK mulK T addT smulT E action m n P Q)
+  = ordsucc (matrix_rank K addK mulK m n Aprime).
+admit.
 //GOD1PRF:755412 Consider the system of homogeneous linear equations
+claim h_s25_t4_homogeneous_solution_spaces : exists Aprime :e matrix_space K m n,
+  associated_homogeneous_solution_space K addK mulK
+    (ordsucc m) (ordsucc n)
+    (affine_coordinate_matrix K addK mulK T addT smulT E action m n P Q)
+  c= K :^: ordsucc n
+  /\ associated_homogeneous_solution_space K addK mulK m n Aprime c= K :^: n.
+admit.
 //GOD1PRF:755744 The solutions of (15) form a subspace $M$ of $K^{m+1}$, and the solutions of (16) form a subspace N of $\mathrm{K}^{m}$. Since the matrix $\mathrm{A}^{\prime}$ has rank $r$, we have
+claim h_s25_t4_kernel_subspaces : exists Aprime :e matrix_space K m n,
+  vector_subspace K addK mulK (K :^: ordsucc n)
+    (module_power_addition (ordsucc n) addK)
+    (module_power_left_scalar (ordsucc n) mulK)
+    (associated_homogeneous_solution_space K addK mulK
+      (ordsucc m) (ordsucc n)
+      (affine_coordinate_matrix K addK mulK T addT smulT E action m n P Q))
+  /\ vector_subspace K addK mulK (K :^: n)
+    (module_power_addition n addK) (module_power_left_scalar n mulK)
+    (associated_homogeneous_solution_space K addK mulK m n Aprime).
+admit.
 //GOD1PRF:755930 \operatorname{dim}(\mathrm{N})=m-r
+claim h_s25_t4_N_dimension : exists Aprime :e matrix_space K m n,
+  module_dimension K addK mulK
+    (associated_homogeneous_solution_space K addK mulK m n Aprime)
+    (module_power_addition n addK) (module_power_left_scalar n mulK)
+  + matrix_rank K addK mulK m n Aprime = n.
+admit.
 //GOD1PRF:755969 by § 19, Theorem 17. If we denote the rank of A by $s$, then we have likewise
+claim h_s25_t4_s19_theorem17_formal_call :
+  forall K0, forall add0 mul0:set -> set -> set,
+  forall L0, forall addL0 smulR0:set -> set -> set,
+  forall m0 n0 :e omega, forall f0:set -> set,
+    finite_dimensional_right_vector_space K0 add0 mul0 L0 addL0 smulR0 ->
+    right_vector_dimension K0 add0 mul0 L0 addL0 smulR0 = n0 ->
+    (forall i :e m0,
+      f0 i :e right_module_dual K0 add0 mul0 L0 addL0 smulR0) ->
+    right_vector_dimension K0 add0 mul0
+      (linear_forms_common_kernel K0 add0 L0 m0 f0) addL0 smulR0
+    + module_family_rank K0 add0 mul0
+      (right_module_dual K0 add0 mul0 L0 addL0 smulR0)
+      (right_module_dual_addition L0 add0)
+      (right_module_dual_left_scalar L0 mul0) m0 f0 = n0.
+apply god1_s19_theorem17_dimension_from_linear_equations.
+claim h_s25_t4_M_rank_nullity :
+  module_dimension K addK mulK
+    (associated_homogeneous_solution_space K addK mulK
+      (ordsucc m) (ordsucc n)
+      (affine_coordinate_matrix K addK mulK T addT smulT E action m n P Q))
+    (module_power_addition (ordsucc n) addK)
+    (module_power_left_scalar (ordsucc n) mulK)
+  + matrix_rank K addK mulK (ordsucc m) (ordsucc n)
+    (affine_coordinate_matrix K addK mulK T addT smulT E action m n P Q)
+  = ordsucc n.
+admit.
 //GOD1PRF:756052 \operatorname{dim}(\mathrm{M})=m+1-s ;
+claim h_s25_t4_M_dimension_formula :
+  module_dimension K addK mulK
+    (associated_homogeneous_solution_space K addK mulK
+      (ordsucc m) (ordsucc n)
+      (affine_coordinate_matrix K addK mulK T addT smulT E action m n P Q))
+    (module_power_addition (ordsucc n) addK)
+    (module_power_left_scalar (ordsucc n) mulK)
+  + matrix_rank K addK mulK (ordsucc m) (ordsucc n)
+    (affine_coordinate_matrix K addK mulK T addT smulT E action m n P Q)
+  = ordsucc n.
+admit.
 //GOD1PRF:756095 hence to show that $s=r+1$ it is enough to show that M and N have the same dimension, i.e., are isomorphic.
+claim h_s25_t4_kernel_isomorphism_suffices : exists Aprime :e matrix_space K m n,
+  exists u:set -> set,
+    module_isomorphism K addK mulK
+      (associated_homogeneous_solution_space K addK mulK
+        (ordsucc m) (ordsucc n)
+        (affine_coordinate_matrix K addK mulK T addT smulT E action m n P Q))
+      (module_power_addition (ordsucc n) addK)
+      (module_power_left_scalar (ordsucc n) mulK)
+      (associated_homogeneous_solution_space K addK mulK m n Aprime)
+      (module_power_addition n addK) (module_power_left_scalar n mulK) u.
+admit.
 //GOD1PRF:756204 Now, by adding up the equations (15) and using (14), we obtain
+claim h_s25_t4_sum_equations : forall xi :e
+  associated_homogeneous_solution_space K addK mulK
+    (ordsucc m) (ordsucc n)
+    (affine_coordinate_matrix K addK mulK T addT smulT E action m n P Q),
+  ring_finite_sum K addK (ordsucc n) (fun j => xi j) = ring_zero K addK.
+admit.
 //GOD1PRF:756271 \xi_{0}+\xi_{1}+\cdots+\xi_{m}=0,
+claim h_s25_t4_coordinate_sum_zero : forall xi :e
+  associated_homogeneous_solution_space K addK mulK
+    (ordsucc m) (ordsucc n)
+    (affine_coordinate_matrix K addK mulK T addT smulT E action m n P Q),
+  ring_finite_sum K addK (ordsucc n) (fun j => xi j) = ring_zero K addK.
+admit.
 //GOD1PRF:756309 so that (15) implies that
+claim h_s25_t4_eliminate_xi_zero : forall xi :e K :^: ordsucc n,
+  ring_finite_sum K addK (ordsucc n) (fun j => xi j) = ring_zero K addK ->
+  xi 0 = ring_negation K addK
+    (ring_finite_sum K addK n (fun j => xi (ordsucc j))).
+admit.
 //GOD1PRF:756339 \sum_{j=1}^{n} \alpha_{i j} \xi_{j}-\alpha_{i 0}\left(\xi_{1}+\cdots+\xi_{m}\right)=0
+claim h_s25_t4_substituted_equations : forall xi :e K :^: ordsucc n,
+  exists Aprime :e matrix_space K m n,
+    forall i :e m,
+      ring_finite_sum K addK n
+        (fun j => mulK (matrix_entry Aprime i j) (xi (ordsucc j)))
+      = ring_zero K addK.
+admit.
 //GOD1PRF:756429 i.e.,
+claim h_s25_t4_equivalent_kernel_equations : forall xi :e K :^: ordsucc n,
+  exists Aprime :e matrix_space K m n,
+    (fun j :e n => xi (ordsucc j))
+      :e associated_homogeneous_solution_space K addK mulK m n Aprime.
+admit.
 //GOD1PRF:756439 \sum_{j=1}^{n}\left(\alpha_{i j}-\alpha_{i 0}\right) \xi_{j}=0 .
+claim h_s25_t4_Aprime_kernel_equation : forall xi :e K :^: ordsucc n,
+  exists Aprime :e matrix_space K m n, forall i :e m,
+    ring_finite_sum K addK n
+      (fun j => mulK (matrix_entry Aprime i j) (xi (ordsucc j)))
+    = ring_zero K addK.
+admit.
 //GOD1PRF:756508 Hence we obtain a mapping $u: \mathrm{M} \rightarrow \mathrm{N}$ by writing
+claim h_s25_t4_projection_map : exists u:set -> set,
+  forall xi :e K :^: ordsucc n, forall j :e n, u xi j = xi (ordsucc j).
+admit.
 //GOD1PRF:756588 u\left(\xi_{0}, \ldots, \xi_{m}\right)=\left(\xi_{1}, \ldots, \xi_{m}\right) .
+claim h_s25_t4_projection_formula : exists u:set -> set,
+  forall xi :e K :^: ordsucc n,
+    u xi = (fun j :e n => xi (ordsucc j)).
+admit.
 //GOD1PRF:756671 Analogous considerations show that we can construct a mapping $v: \mathrm{N} \rightarrow \mathrm{M}$ by putting
+claim h_s25_t4_inverse_map_exists : exists v:set -> set,
+  forall eta :e K :^: n, v eta :e K :^: ordsucc n.
+admit.
 //GOD1PRF:756787 v\left(\eta_{1}, \ldots, \eta_{m}\right)=\left(-\eta_{1}-\cdots-\eta_{m}, \eta_{1}, \ldots, \eta_{m}\right) .
+claim h_s25_t4_inverse_map_formula : exists v:set -> set,
+  forall eta :e K :^: n,
+    v eta = (fun i :e ordsucc n => if i = 0
+      then ring_negation K addK (ring_finite_sum K addK n (fun j => eta j))
+      else eta (Union i)).
+admit.
 //GOD1PRF:756901 It is now obvious that the mappings $u$ and $v$ are inverses of each other, i.e., are isomorphisms of M onto N and of N onto M . This completes the proof.
+claim h_s25_t4_rank_conclusion :
+  matrix_rank K addK mulK (ordsucc m) (ordsucc n)
+    (affine_coordinate_matrix K addK mulK T addT smulT E action m n P Q)
+  = ordsucc (affine_variety_dimension K addK mulK T addT smulT E action
+    (affine_span K addK mulK T addT smulT E action (ordsucc n) Q)).
+admit.
 Admitted.
 
 //GOD1:759058 affine_membership_coordinate_matrix : "the affine-coordinate matrix with first column #14 and remaining columns #13" | $[[#14]_{#12}^{\mathrm{aff}}\mid[#13]_{#12}^{\mathrm{aff}}]$
@@ -50169,12 +51181,99 @@ let P Q R.
 assume hR hField hAffine hBasis hIndependent hmn.
 apply iffI.
 //GOD1PRF:757123 Let E be a finite-dimensional affine space over a field K , and let $\left(\mathrm{P}_{0}, \ldots, \mathrm{P}_{n}\right)$ be an affine basis of E . Consider $r$ independent points
+claim h_s25_equations_finite_affine_setup :
+  affine_basis K addK mulK T addT smulT E action n P
+  /\ affinely_independent_family K addK mulK T addT smulT E action m Q.
+admit.
 //GOD1PRF:757402 in E , and let V be the linear variety, of dimension $r-1$, which they generate. Let
+claim h_s25_equations_generated_variety_dimension :
+  affine_variety_dimension K addK mulK T addT smulT E action
+    (affine_span K addK mulK T addT smulT E action (ordsucc m) Q) = m.
+admit.
 //GOD1PRF:757544 be any point of E . For P to belong to V it is necessary and sufficient that the linear variety W generated by $\mathrm{P}, \mathrm{Q}_{1}, \ldots, \mathrm{Q}_{r}$, should be of dimension $r-1$; for if $\mathrm{P} \in \mathrm{V}$ it is clear that $\mathrm{W}=\mathrm{V}$, so that $\operatorname{dim}(\mathrm{W})=r-1$; and conversely, if $\operatorname{dim}(\mathrm{W})=r-1$, we have $\mathrm{W} \subset \mathrm{V}$ in any case, hence $\mathrm{V}=\mathrm{W}$ and therefore $\mathrm{P} \in \mathrm{V}$.
+claim h_s25_equations_membership_dimension_criterion :
+  R :e affine_span K addK mulK T addT smulT E action (ordsucc m) Q
+  <-> affine_variety_dimension K addK mulK T addT smulT E action
+    (affine_span K addK mulK T addT smulT E action (ordsucc (ordsucc m))
+      (fun j => if j = 0 then R else Q (Union j))) = m.
+admit.
 //GOD1PRF:758046 By Theorem 4, it therefore follows that $P \in V$ if and only if the matrix
+claim h_s25_equations_theorem4_formal_call :
+  forall K0, forall add0 mul0:set -> set -> set,
+  forall T0, forall addT0 smulT0:set -> set -> set,
+  forall E0, forall action0:set -> set -> set,
+  forall m0 n0 :e omega, forall P0 Q0:set -> set,
+    affine_space K0 add0 mul0 T0 addT0 smulT0 E0 action0 ->
+    affine_basis K0 add0 mul0 T0 addT0 smulT0 E0 action0 m0 P0 ->
+    (forall j :e ordsucc n0, Q0 j :e E0) ->
+    matrix_rank K0 add0 mul0 (ordsucc m0) (ordsucc n0)
+      (affine_coordinate_matrix K0 add0 mul0 T0 addT0 smulT0
+        E0 action0 m0 n0 P0 Q0)
+    = ordsucc (affine_variety_dimension K0 add0 mul0 T0 addT0 smulT0
+      E0 action0
+      (affine_span K0 add0 mul0 T0 addT0 smulT0 E0 action0
+        (ordsucc n0) Q0)).
+apply god1_s25_theorem4_rank_of_affine_coordinate_matrix.
+claim h_s25_equations_rank_criterion :
+  R :e affine_span K addK mulK T addT smulT E action (ordsucc m) Q
+  <-> matrix_rank K addK mulK (ordsucc n) (ordsucc (ordsucc m))
+    (affine_membership_coordinate_matrix K addK mulK
+      T addT smulT E action n (ordsucc m) P Q R) = ordsucc m.
+admit.
 //GOD1PRF:758386 is of rank $r$; that is, since K is commutative, if and only if every square submatrix of order $s>r$ in this matrix has zero determinant (§ 23, section 8, Remark 5). Clearly we have only to express this condition for $s=r+1$. Hence $\mathrm{P} \in \mathrm{V}$ if and only if
+claim h_s25_equations_s19_theorem16_formal_call :
+  forall K0, forall add0 mul0:set -> set -> set,
+  forall n0 p0 :e omega, forall A0 :e matrix_space K0 n0 p0,
+    division_ring K0 add0 mul0 ->
+    invertible_square_submatrix_of_order K0 add0 mul0 n0 p0 A0
+      (matrix_rank K0 add0 mul0 n0 p0 A0)
+    /\ forall s0 :e omega,
+      invertible_square_submatrix_of_order K0 add0 mul0 n0 p0 A0 s0 ->
+      s0 c= matrix_rank K0 add0 mul0 n0 p0 A0.
+apply god1_s19_theorem16_rank_is_largest_invertible_submatrix_order.
+claim h_s25_equations_s23_section8_formal_call :
+  forall K0, forall add0 mul0:set -> set -> set,
+  forall p0 :e omega, forall A0 :e square_matrix_ring K0 p0,
+    field K0 add0 mul0 ->
+    (invertible_matrix K0 add0 mul0 p0 A0
+    <-> matrix_determinant K0 add0 mul0 p0 A0 <> ring_zero K0 add0).
+apply god1_s23_theorem8_corollary1_matrix_invertible_iff_determinant_nonzero.
+claim h_s25_equations_rank_by_maximal_minors :
+  matrix_rank K addK mulK (ordsucc n) (ordsucc (ordsucc m))
+    (affine_membership_coordinate_matrix K addK mulK
+      T addT smulT E action n (ordsucc m) P Q R) = ordsucc m
+  <-> forall rows :e (ordsucc n) :^: (ordsucc (ordsucc m)),
+    (forall i j :e ordsucc (ordsucc m), i :e j -> rows i :e rows j) ->
+    matrix_determinant K addK mulK (ordsucc (ordsucc m))
+      (matrix_submatrix (ordsucc (ordsucc m)) (ordsucc (ordsucc m))
+        (fun i => rows i) (fun j => j)
+        (affine_membership_coordinate_matrix K addK mulK
+          T addT smulT E action n (ordsucc m) P Q R))
+    = ring_zero K addK.
+admit.
 //GOD1PRF:758990 whenever
+claim h_s25_equations_all_selected_minors_zero :
+  forall rows :e (ordsucc n) :^: (ordsucc (ordsucc m)),
+    (forall i j :e ordsucc (ordsucc m), i :e j -> rows i :e rows j) ->
+    matrix_determinant K addK mulK (ordsucc (ordsucc m))
+      (matrix_submatrix (ordsucc (ordsucc m)) (ordsucc (ordsucc m))
+        (fun i => rows i) (fun j => j)
+        (affine_membership_coordinate_matrix K addK mulK
+          T addT smulT E action n (ordsucc m) P Q R))
+    = ring_zero K addK.
+admit.
 //GOD1PRF:759003 0 \leqslant i_{0}<i_{1}<\cdots<i_{r} \leqslant n .
+claim h_s25_equations_ordered_rows_condition :
+  R :e affine_span K addK mulK T addT smulT E action (ordsucc m) Q
+  <-> forall rows :e (ordsucc n) :^: (ordsucc (ordsucc m)),
+    (forall i j :e ordsucc (ordsucc m), i :e j -> rows i :e rows j) ->
+    matrix_determinant K addK mulK (ordsucc (ordsucc m))
+      (matrix_submatrix (ordsucc (ordsucc m)) (ordsucc (ordsucc m))
+        (fun i => rows i) (fun j => j)
+        (affine_membership_coordinate_matrix K addK mulK
+          T addT smulT E action n (ordsucc m) P Q R))
+    = ring_zero K addK.
+admit.
 Admitted.
 
 (** § 26. Algebraic relations. **)
