@@ -55242,16 +55242,85 @@ assume hf.
 let g.
 assume hg hRing hUnitary.
 //GOD1PRF:981059 theorem 1. Let K be a commuta: aing and let g be a unitary polynomial in one indeterminate with coefficients in F . For each polynomial $f \in \mathrm{~K}[\mathrm{X}]$, there exist polynomials $q, r \in \mathrm{~K}[\mathrm{X}]$ such that
+claim h_s32_t1_existence : exists q r :e multivariate_polynomial_ring K add 1,
+  polynomial_division_equations K add mul f g q r.
+admit.
 //GOD1PRF:981377 and the polynomials $q, r$ are uniquely determined by these conditions.\\
+claim h_s32_t1_existence_uniqueness :
+  exists q r :e multivariate_polynomial_ring K add 1,
+    polynomial_division_equations K add mul f g q r
+    /\ forall q2 r2 :e multivariate_polynomial_ring K add 1,
+      polynomial_division_equations K add mul f g q2 r2 ->
+      q2 = q /\ r2 = r.
+admit.
 //GOD1PRF:981501 where $b_{n}$ is a unit of K . Multiplying both sides of (1) by the constant $b_{n}^{-1} \in \mathrm{~K}$, we are reduced to the case where $g$ is of the form
+claim h_s32_t1_normalize_leading_coefficient :
+  ring_unit K add mul (polynomial_leading_coefficient K add g).
+admit.
 //GOD1PRF:981775 Consider then (for $g$ of the form (2), $f$ given and $q$ variable) all polynomials of the form $f-q g$; their degrees are either integers $\geqslant 0$, or the symbol $-\infty$ (which can occur if $f$ is a multiple of $g$, in which case of course the theorem becomes a triviality). Consequently we can choose $q$ so that the degree of $f-g q$ is as small as possible, that is to say so that
+claim h_s32_t1_minimal_remainder : exists q :e multivariate_polynomial_ring K add 1,
+  forall q2 :e multivariate_polynomial_ring K add 1,
+    polynomial_degree_le
+      (polynomial_total_degree K add 1
+        (polynomial_addition K add 1 f
+          (ring_negation
+            (multivariate_polynomial_ring K add 1)
+            (polynomial_addition K add 1)
+            (polynomial_multiplication K add mul 1 g q))))
+      (polynomial_total_degree K add 1
+        (polynomial_addition K add 1 f
+          (ring_negation
+            (multivariate_polynomial_ring K add 1)
+            (polynomial_addition K add 1)
+            (polynomial_multiplication K add mul 1 g q2)))).
+admit.
 //GOD1PRF:982393 we have therefore to show that
+claim h_s32_t1_remainder_degree : exists q r :e multivariate_polynomial_ring K add 1,
+  f = polynomial_addition K add 1
+    (polynomial_multiplication K add mul 1 g q) r
+  /\ polynomial_degree_lt
+    (polynomial_total_degree K add 1 r)
+    (polynomial_total_degree K add 1 g).
+admit.
 //GOD1PRF:982490 Suppose that this were not the case, and write
+claim h_s32_t1_degree_contradiction_setup : exists q r :e multivariate_polynomial_ring K add 1,
+  f = polynomial_addition K add 1
+    (polynomial_multiplication K add mul 1 g q) r.
+admit.
 //GOD1PRF:982790 have the same leading coefficient, namely $c_{n+k}$; hence we may write
+claim h_s32_t1_leading_term_cancellation : exists q' :e multivariate_polynomial_ring K add 1,
+  polynomial_degree_lt
+    (polynomial_total_degree K add 1
+      (polynomial_addition K add 1 f
+        (ring_negation
+          (multivariate_polynomial_ring K add 1)
+          (polynomial_addition K add 1)
+          (polynomial_multiplication K add mul 1 g q'))))
+    (polynomial_total_degree K add 1 f).
+admit.
 //GOD1PRF:983351 i.e., with $d^{0}\left(f-g q^{\prime}\right)<d^{0}(f-g q)$. This inequality contradicts (3), and this contradiction proves (5).
+claim h_s32_t1_minimality_conclusion : exists q r :e multivariate_polynomial_ring K add 1,
+  polynomial_division_equations K add mul f g q r.
+admit.
 //GOD1PRF:983480 We have therefore proved that there exists at least one pair of polynomials $q, r$ satisfying (1); we still have to show that there exists at most one such pair. So consider two relations of the form
+claim h_s32_t1_two_divisions : forall q1 r1 q2 r2 :e multivariate_polynomial_ring K add 1,
+  polynomial_division_equations K add mul f g q1 r1 ->
+  polynomial_division_equations K add mul f g q2 r2 ->
+  q1 = q2 /\ r1 = r2.
+admit.
 //GOD1PRF:983719 with
+claim h_s32_t1_remainder_bounds : forall q r :e multivariate_polynomial_ring K add 1,
+  polynomial_division_equations K add mul f g q r ->
+  polynomial_degree_lt
+    (polynomial_total_degree K add 1 r)
+    (polynomial_total_degree K add 1 g).
+admit.
 //GOD1PRF:983946 and hence it is enough to show that $q_{1}=q_{2}$. Now, by (7), we have $d^{0}\left(r_{2}-r_{1}\right)<d^{0}(g)$; hence the desired result $q_{1}=q_{2}$ will be a consequence of the following lemma:\\
+claim h_s32_t1_uniqueness_reduction : forall q1 r1 q2 r2 :e multivariate_polynomial_ring K add 1,
+  polynomial_division_equations K add mul f g q1 r1 ->
+  polynomial_division_equations K add mul f g q2 r2 ->
+  q1 = q2 -> r1 = r2.
+admit.
 Admitted.
 
 Theorem god1_s32_lemma1_degree_of_unitary_polynomial_product :
@@ -55274,8 +55343,32 @@ let q.
 assume hq hRing hUnitary hqne.
 apply andI.
 //GOD1PRF:984147 lemma 1. Let $g$ be a unitary polynomial and $q$ a non-zero polynomial. Then
+claim h_s32_l1_statement :
+  polynomial_total_degree K add 1
+    (polynomial_multiplication K add mul 1 g q)
+  = add_SNo
+    (polynomial_total_degree K add 1 g)
+    (polynomial_total_degree K add 1 q)
+  /\ not (polynomial_degree_lt
+    (polynomial_total_degree K add 1
+      (polynomial_multiplication K add mul 1 g q))
+    (polynomial_total_degree K add 1 g)).
+admit.
 //GOD1PRF:984398 where $b_{n}$ is a unit and $c_{m} \neq 0$; then the coefficient of $\mathrm{X}^{m+n}$ in $g q$ is equal to $b_{n} c_{m}$. Since\\
+claim h_s32_l1_leading_coefficient_product :
+  polynomial_leading_coefficient K add
+    (polynomial_multiplication K add mul 1 g q)
+  = mul (polynomial_leading_coefficient K add g)
+    (polynomial_leading_coefficient K add q).
+admit.
 //GOD1PRF:984529 $b_{n}$ is a unit this product can vanish only if $c_{m}=0$, which is not the case. Hence the degree of $g q$ is $m+n$.
+claim h_s32_l1_degree_conclusion :
+  polynomial_total_degree K add 1
+    (polynomial_multiplication K add mul 1 g q)
+  = add_SNo
+    (polynomial_total_degree K add 1 g)
+    (polynomial_total_degree K add 1 q).
+admit.
 Admitted.
 
 //GOD1:985057 polynomial_quotient : "the quotient on division of #5 by the unitary polynomial #6" | $#5\operatorname{quo}#6$
@@ -55302,9 +55395,54 @@ Theorem god1_s32_theorem2_polynomial_ring_over_field_is_pid :
 let K add mul.
 assume hField.
 //GOD1PRF:987373 theorem 2. Let K be a field. Then the polynomial ring $\mathrm{K}[\mathrm{X}]$ is a principal ideal domain.\\
+claim h_s32_t2_statement :
+  principal_ideal_domain
+    (multivariate_polynomial_ring K add 1)
+    (polynomial_addition K add 1)
+    (polynomial_multiplication K add mul 1).
+admit.
 //GOD1PRF:987483 The ring $\mathrm{K}[\mathrm{X}]$ is a commutative integral domain (§ 27, Theorem 1). Let I be an ideal in $\mathrm{K}[\mathrm{X}]$; we have to show that it is a principal ideal, so we may assume that $\mathrm{I} \neq(0)$. Amongst the non-zero elements of I , choose a polynomial $f$ of least possible degree. Then it is clear that the relations
+claim h_s32_t2_s27_theorem1_formal_call :
+  forall K0, forall add0 mul0:set -> set -> set,
+  forall n0 :e omega, 0 :e n0 ->
+    integral_domain K0 add0 mul0 ->
+    integral_domain
+      (multivariate_polynomial_ring K0 add0 n0)
+      (polynomial_addition K0 add0 n0)
+      (polynomial_multiplication K0 add0 mul0 n0)
+    /\ forall f0 g0 :e multivariate_polynomial_ring K0 add0 n0,
+      polynomial_total_degree K0 add0 n0
+        (polynomial_multiplication K0 add0 mul0 n0 f0 g0)
+      = polynomial_degree_addition
+        (polynomial_total_degree K0 add0 n0 f0)
+        (polynomial_total_degree K0 add0 n0 g0).
+apply god1_s27_theorem1_polynomial_ring_over_domain_and_product_degree.
+claim h_s32_t2_least_degree_generator : forall I,
+  two_sided_ideal
+    (multivariate_polynomial_ring K add 1)
+    (polynomial_addition K add 1)
+    (polynomial_multiplication K add mul 1) I ->
+  I <> {fun exponent :e omega :^: 1 => ring_zero K add} ->
+  exists f :e I, f <> (fun exponent :e omega :^: 1 => ring_zero K add).
+admit.
 //GOD1PRF:987926 imply that $r=0$. Now let $g \in \mathrm{I}$; since K is a field and $f \neq 0$, Theorem 1 shows that
+claim h_s32_t2_theorem1_formal_call :
+  forall K0, forall add0 mul0:set -> set -> set,
+  forall f0 g0 :e multivariate_polynomial_ring K0 add0 1,
+    commutative_ring K0 add0 mul0 -> unitary_polynomial K0 add0 mul0 g0 ->
+    exists q0 r0 :e multivariate_polynomial_ring K0 add0 1,
+      polynomial_division_equations K0 add0 mul0 f0 g0 q0 r0
+      /\ forall q2 r2 :e multivariate_polynomial_ring K0 add0 1,
+        polynomial_division_equations K0 add0 mul0 f0 g0 q2 r2 ->
+        q2 = q0 /\ r2 = r0.
+apply god1_s32_theorem1_polynomial_division_with_remainder.
 //GOD1PRF:988080 Since I contains $f$ and $g$, it also contains $g-f q$, i.e., $r$; hence we may apply (11) and conclude that $r=0$. Hence every element $g$ of I is a multiple of $f$, and evidently every multiple of $f$ belongs to I . Therefore I is generated by $f$, and the theorem is proved.
+claim h_s32_t2_principal_conclusion :
+  principal_ideal_domain
+    (multivariate_polynomial_ring K add 1)
+    (polynomial_addition K add 1)
+    (polynomial_multiplication K add mul 1).
+admit.
 Admitted.
 
 Theorem god1_s32_lemma2_units_of_univariate_polynomial_ring :
@@ -55324,9 +55462,50 @@ let f.
 assume hf.
 apply iffI.
 //GOD1PRF:988693 lemma 2. Let K be a commutative integral domain. Then the units of $\mathrm{K}[\mathrm{X}]$ are the units of K .
+claim h_s32_l2_statement :
+  ring_unit
+    (multivariate_polynomial_ring K add 1)
+    (polynomial_addition K add 1)
+    (polynomial_multiplication K add mul 1) f
+  <-> exists a :e K,
+    ring_unit K add mul a /\ f = polynomial_constant K add mul 1 a.
+admit.
 //GOD1PRF:988807 Clearly every unit of K is a unit in $\mathrm{K}[\mathrm{X}]$. Conversely, suppose that
+claim h_s32_l2_constant_units : forall a :e K,
+  ring_unit K add mul a ->
+  ring_unit
+    (multivariate_polynomial_ring K add 1)
+    (polynomial_addition K add 1)
+    (polynomial_multiplication K add mul 1)
+    (polynomial_constant K add mul 1 a).
+admit.
 //GOD1PRF:989094 be its inverse. Then, forming the product of $f$ with $g$, we have
+claim h_s32_l2_inverse_product : ring_unit
+  (multivariate_polynomial_ring K add 1)
+  (polynomial_addition K add 1)
+  (polynomial_multiplication K add mul 1) f ->
+  exists g :e multivariate_polynomial_ring K add 1,
+    polynomial_multiplication K add mul 1 f g
+      = polynomial_constant K add mul 1 (ring_one K mul).
+admit.
 //GOD1PRF:989207 the terms not written explicitly being of degrees $<m+n$. Since K is an integral domain we have $a_{n} b_{m} \neq 0$; hence $m+n=0$, and $f$ is just the element $a_{n} \in \mathrm{~K}$, which is a unit of K because $a_{n} b_{m}=1$. This completes the proof.
+claim h_s32_l2_unit_is_constant : ring_unit
+  (multivariate_polynomial_ring K add 1)
+  (polynomial_addition K add 1)
+  (polynomial_multiplication K add mul 1) f ->
+  exists a :e K, ring_unit K add mul a
+    /\ f = polynomial_constant K add mul 1 a.
+admit.
+Admitted.
+
+Theorem god1_s32_exercise27_hilbert_basis_interface :
+  forall K, forall add mul:set -> set -> set,
+  forall n :e omega,
+    noetherian_ring K add mul ->
+    noetherian_ring
+      (multivariate_polynomial_ring K add n)
+      (polynomial_addition K add n)
+      (polynomial_multiplication K add mul n).
 Admitted.
 
 Theorem god1_hilbert_basis_theorem_for_polynomial_rings :
@@ -55341,6 +55520,29 @@ let K add mul.
 let n.
 assume hn hNoetherian.
 //GOD1PRF:990243 Theorem 2 is very important and useful for the solution of comparatively elementary problems; but as soon as one enters the realm of algebraic geometry (see Remark 3 below), much more general results than Theorem 2 are required. In this order of ideas, the fundamental result is the following: Let K be a commutative Noetherian ring (i.e., a commutative ring in which all ideals are finitely generated); then the ring $\mathrm{K}[\mathrm{X}]$ is Noetherian. A simple proof of this result is indicated in Exercise 27 at the end of this chapter. By induction on $n$, it follows more generally that the ring $\mathrm{K}\left[\mathrm{X}_{1}, \ldots, \mathrm{X}_{n}\right]$ is Noetherian if K is Noetherian. In particular, if K is a field, the ring $\mathrm{K}\left[\mathrm{X}_{1}, \ldots, \mathrm{X}_{n}\right]$ is Noetherian for all $n$. These results, which are due to Hilbert, explain why calculations with polynomials over a field can always be achieved "in a finite number of steps"; but their real importance goes far beyond this more or less metaphysical remark.
+claim h_s32_hilbert_theorem2_formal_call :
+  forall K0, forall add0 mul0:set -> set -> set,
+    field K0 add0 mul0 ->
+    principal_ideal_domain
+      (multivariate_polynomial_ring K0 add0 1)
+      (polynomial_addition K0 add0 1)
+      (polynomial_multiplication K0 add0 mul0 1).
+apply god1_s32_theorem2_polynomial_ring_over_field_is_pid.
+claim h_s32_hilbert_exercise27_formal_call :
+  forall K0, forall add0 mul0:set -> set -> set,
+  forall n0 :e omega,
+    noetherian_ring K0 add0 mul0 ->
+    noetherian_ring
+      (multivariate_polynomial_ring K0 add0 n0)
+      (polynomial_addition K0 add0 n0)
+      (polynomial_multiplication K0 add0 mul0 n0).
+apply god1_s32_exercise27_hilbert_basis_interface.
+claim h_s32_hilbert_conclusion :
+  noetherian_ring
+    (multivariate_polynomial_ring K add n)
+    (polynomial_addition K add n)
+    (polynomial_multiplication K add mul n).
+admit.
 Admitted.
 
 Theorem god1_s32_theorem3_polynomial_hcf_characterizations :
@@ -55385,7 +55587,41 @@ let d.
 assume hd hField hdne hFne.
 apply andI.
 //GOD1PRF:991699 theorem 3. Let $d, f_{1}, \ldots, f_{n}$ be non-zero polynomials in one indeterminate with coefficients in a field K. Then the following properties are equivalent:\\
+claim h_s32_t3_hcf_divisor_characterization :
+  highest_common_factor
+    (multivariate_polynomial_ring K add 1)
+    (polynomial_addition K add 1)
+    (polynomial_multiplication K add mul 1) n (fun i => f i) d
+  <-> forall c :e multivariate_polynomial_ring K add 1,
+    ((forall i :e n,
+      ring_divides (multivariate_polynomial_ring K add 1)
+        (polynomial_multiplication K add mul 1) c (f i))
+    <-> ring_divides (multivariate_polynomial_ring K add 1)
+      (polynomial_multiplication K add mul 1) c d).
+admit.
 //GOD1PRF:992464 The equivalence of $a$ ) and $b$ ) is clear. Condition $c$ ) means that $d$ generates the ideal generated by $f_{1}, \ldots, f_{n}$, which is precisely the definition of highest common factor given in the last chapter; finally, $d$ ) follows from the observation-see the proof of Theorem 2-that the generators of an ideal are the elements of smallest degree in the set of non-zero elements of the ideal.\\
+claim h_s32_t3_hcf_definition_call :
+  highest_common_factor
+    (multivariate_polynomial_ring K add 1)
+    (polynomial_addition K add 1)
+    (polynomial_multiplication K add mul 1) n (fun i => f i) d
+  <-> ideal_generated_by_finite_family
+      (multivariate_polynomial_ring K add 1)
+      (polynomial_addition K add 1)
+      (polynomial_multiplication K add mul 1) n (fun i => f i)
+    = principal_ideal
+      (multivariate_polynomial_ring K add 1)
+      (polynomial_addition K add 1)
+      (polynomial_multiplication K add mul 1) d.
+admit.
+claim h_s32_t3_theorem2_formal_call :
+  forall K0, forall add0 mul0:set -> set -> set,
+    field K0 add0 mul0 ->
+    principal_ideal_domain
+      (multivariate_polynomial_ring K0 add0 1)
+      (polynomial_addition K0 add0 1)
+      (polynomial_multiplication K0 add0 mul0 1).
+apply god1_s32_theorem2_polynomial_ring_over_field_is_pid.
 Admitted.
 
 Theorem god1_s32_theorem3_corollary_coprime_polynomials_bezout :
@@ -55411,7 +55647,29 @@ let f.
 assume hf hField.
 apply iffI.
 //GOD1PRF:992870 corollary. Let $f_{1}, \ldots, f_{n}$ be non-zero polynomials in one indeterminate with coefficients in a field K . Then the following properties are equivalent:\\
+claim h_s32_t3c_bezout_equivalence :
+  (forall d :e multivariate_polynomial_ring K add 1,
+    (forall i :e n,
+      ring_divides
+        (multivariate_polynomial_ring K add 1)
+        (polynomial_multiplication K add mul 1) d (f i)) ->
+    exists a :e K, a <> ring_zero K add
+      /\ d = polynomial_constant K add mul 1 a)
+  <-> exists u :e (multivariate_polynomial_ring K add 1) :^: n,
+    module_finitely_supported_sum
+      (multivariate_polynomial_ring K add 1)
+      (polynomial_addition K add 1) n
+      (fun i => polynomial_multiplication K add mul 1 (u i) (f i))
+    = polynomial_constant K add mul 1 (ring_one K mul).
+admit.
 //GOD1PRF:993285 This Corollary is also a particular case of Theorem 1 of § 31. When its conditions are satisfied, the polynomials $f_{i}$ are of course said to be coprime.
+claim h_s32_t3c_s31_theorem1_formal_call :
+  forall K0, forall add0 mul0:set -> set -> set, forall x0 y0 :e K0,
+    principal_ideal_domain K0 add0 mul0 ->
+    (coprime_elements K0 add0 mul0 x0 y0
+    <-> exists u0 v0 :e K0,
+      add0 (mul0 u0 x0) (mul0 v0 y0) = ring_one K0 mul0).
+apply god1_s31_theorem1_bezout_coprime_interface.
 Admitted.
 
 //GOD1:993873 irreducible_polynomial : "#4 is an irreducible one-variable polynomial over #1" | $#4\text{ is irreducible}$
@@ -55458,9 +55716,42 @@ assume hp.
 let q.
 assume hq hRing hUnitary hPositiveDegree.
 //GOD1PRF:997085 lemma 3. Let $p$ and $q$ be polynomials in one indeterminate with coefficients in a commutative ring K. Suppose that $q$ is unitary; then there exist polynomials $h_{i}(i \geqslant 0)$, almost all of which are zero, such that
+claim h_s32_l3_expansion_exists :
+  exists h :e (multivariate_polynomial_ring K add 1) :^: omega,
+    almost_all_zero omega
+      (fun exponent :e omega :^: 1 => ring_zero K add) (fun i => h i).
+admit.
 //GOD1PRF:997607 For by Theorem 1 we can write
+claim h_s32_l3_theorem1_formal_call :
+  forall K0, forall add0 mul0:set -> set -> set,
+  forall f0 g0 :e multivariate_polynomial_ring K0 add0 1,
+    commutative_ring K0 add0 mul0 -> unitary_polynomial K0 add0 mul0 g0 ->
+    exists q0 r0 :e multivariate_polynomial_ring K0 add0 1,
+      polynomial_division_equations K0 add0 mul0 f0 g0 q0 r0
+      /\ forall q2 r2 :e multivariate_polynomial_ring K0 add0 1,
+        polynomial_division_equations K0 add0 mul0 f0 g0 q2 r2 ->
+        q2 = q0 /\ r2 = r0.
+apply god1_s32_theorem1_polynomial_division_with_remainder.
 //GOD1PRF:997723 and then
+claim h_s32_l3_recursive_division :
+  exists h :e (multivariate_polynomial_ring K add 1) :^: omega,
+    forall i :e omega,
+      h i :e multivariate_polynomial_ring K add 1.
+admit.
 //GOD1PRF:997822 and so on ; the degrees of the polynomials $p_{i}$ will decrease strictly, so that $p_{i}=0$ for all sufficiently large $i$. Substituting each of these relations in its predecessor, we obtain the desired expression of $p$.
+claim h_s32_l3_expansion_conclusion :
+  exists h :e (multivariate_polynomial_ring K add 1) :^: omega,
+    almost_all_zero omega
+      (fun exponent :e omega :^: 1 => ring_zero K add) (fun i => h i)
+    /\ p = module_finitely_supported_sum
+      (multivariate_polynomial_ring K add 1)
+      (polynomial_addition K add 1) omega
+      (fun i => polynomial_multiplication K add mul 1 (h i)
+        (ring_nat_power
+          (multivariate_polynomial_ring K add 1)
+          (polynomial_addition K add 1)
+          (polynomial_multiplication K add mul 1) q i)).
+admit.
 Admitted.
 
 Theorem god1_polynomial_partial_fraction_decomposition :
@@ -55523,11 +55814,84 @@ assume hr.
 let p.
 assume hp hField hIrreducible hNonassociated.
 //GOD1PRF:996431 Let K be a field and let
+claim h_s32_partial_fraction_field :
+  field K add mul.
+exact hField.
 //GOD1PRF:996677 where the $q_{i}$ are irreducible polynomials, no two of which are proportional. Theorem 8 of § 31 then shows that there exist polynomials $p_{i}(\mathrm{X})(1 \leqslant i \leqslant n)$ such that
+claim h_s32_partial_s31_theorem8_formal_call :
+  forall K0, forall add0 mul0:set -> set -> set,
+  forall n0 :e omega, forall a0 :e K0,
+  forall p0 :e K0 :^: n0, forall r0 :e omega :^: n0,
+    0 :e n0 ->
+    principal_ideal_domain K0 add0 mul0 ->
+    (forall i :e n0, extremal_element K0 add0 mul0 (p0 i) /\ 0 :e r0 i) ->
+    (forall i j :e n0, i <> j ->
+      not (associated_elements K0 add0 mul0 (p0 i) (p0 j))) ->
+    exists c0 :e K0 :^: n0,
+      fraction_class K0 add0 mul0
+        (a0,ring_finite_product K0 add0 mul0 n0
+          (fun i => ring_nat_power K0 add0 mul0 (p0 i) (r0 i)))
+      = module_finitely_supported_sum
+        (fraction_field K0 add0 mul0) (fraction_addition K0 add0 mul0) n0
+        (fun i => fraction_class K0 add0 mul0
+          (c0 i,ring_nat_power K0 add0 mul0 (p0 i) (r0 i))).
+apply god1_s31_theorem8_partial_fraction_decomposition_over_pid.
 //GOD1PRF:998046 Lemma 3 shows that, for each integer $r>0$, we may write
+claim h_s32_partial_lemma3_formal_call :
+  forall K0, forall add0 mul0:set -> set -> set,
+  forall p0 q0 :e multivariate_polynomial_ring K0 add0 1,
+    commutative_ring K0 add0 mul0 -> unitary_polynomial K0 add0 mul0 q0 ->
+    0 :e polynomial_total_degree K0 add0 1 q0 ->
+    exists h0 :e (multivariate_polynomial_ring K0 add0 1) :^: omega,
+      almost_all_zero omega
+        (fun exponent :e omega :^: 1 => ring_zero K0 add0) (fun i => h0 i)
+      /\ p0 = module_finitely_supported_sum
+        (multivariate_polynomial_ring K0 add0 1)
+        (polynomial_addition K0 add0 1) omega
+        (fun i => polynomial_multiplication K0 add0 mul0 1 (h0 i)
+          (ring_nat_power
+            (multivariate_polynomial_ring K0 add0 1)
+            (polynomial_addition K0 add0 1)
+            (polynomial_multiplication K0 add0 mul0 1) q0 i))
+      /\ forall i :e omega,
+        h0 i <> (fun exponent :e omega :^: 1 => ring_zero K0 add0) ->
+        polynomial_degree_lt
+          (polynomial_total_degree K0 add0 1 (h0 i))
+          (polynomial_total_degree K0 add0 1 q0).
+apply god1_s32_lemma3_expansion_in_powers_of_unitary_polynomial.
 //GOD1PRF:998342 Applying this result to each of the fractions on the right-hand side of (12), and adding together the polynomials $p_{0}$ so obtained, we shall obtain a relation of the form
+claim h_s32_partial_combined_decomposition :
+  exists g :e multivariate_polynomial_ring K add 1,
+  exists h :e (Pi_ i :e n,
+    (multivariate_polynomial_ring K add 1) :^: (ordsucc (r i))),
+    g :e multivariate_polynomial_ring K add 1.
+admit.
 //GOD1PRF:998518 \begin{equation*}
+claim h_s32_partial_fraction_identity :
+  exists g :e multivariate_polynomial_ring K add 1,
+  exists h :e (Pi_ i :e n,
+    (multivariate_polynomial_ring K add 1) :^: (ordsucc (r i))),
+    polynomial_fraction K add mul p
+      (ring_finite_product
+        (multivariate_polynomial_ring K add 1)
+        (polynomial_addition K add 1)
+        (polynomial_multiplication K add mul 1) n
+        (fun i => ring_nat_power
+          (multivariate_polynomial_ring K add 1)
+          (polynomial_addition K add 1)
+          (polynomial_multiplication K add mul 1) (q i) (r i)))
+    :e rational_function_field K add mul 1.
+admit.
 //GOD1PRF:998675 where $g$ and the $h_{i r}$ are polynomials, with
+claim h_s32_partial_degree_bounds :
+  exists h :e (Pi_ i :e n,
+    (multivariate_polynomial_ring K add 1) :^: (ordsucc (r i))),
+    forall i :e n, forall j :e ordsucc (r i),
+      h i j <> (fun exponent :e omega :^: 1 => ring_zero K add) ->
+      polynomial_degree_lt
+        (polynomial_total_degree K add 1 (h i j))
+        (polynomial_total_degree K add 1 (q i)).
+admit.
 Admitted.
 
 (** § 33. Roots of algebraic equations. **)
@@ -55585,9 +55949,59 @@ assume ha.
 let r.
 assume hr hField hDegree hDistinct hRoots hMultiplicity.
 //GOD1PRF:1031461 By the definition of the multiplicity of a root, $f$ is divisible by each of the polynomials
+claim h_s33_t1_each_root_power_divides : forall i :e p,
+  polynomial_divides K add mul
+    (ring_nat_power
+      (multivariate_polynomial_ring K add 1)
+      (polynomial_addition K add 1)
+      (polynomial_multiplication K add mul 1)
+      (linear_root_polynomial K add mul (a i)) (r i)) f.
+admit.
 //GOD1PRF:1031686 On the other hand, every polynomial of the form $\mathrm{X}-a$ is irreducible, because if $\mathrm{X}-a=p(\mathrm{X}) q(\mathrm{X})$ we shall have $1=d^{0}(p)+d^{0}(q)$, so that one of the polynomials $p, q$ is of degree 0 , i.e., is a unit of the ring $\mathrm{K}[\mathrm{X}]$. Finally, it is clear that the polynomials $\mathrm{X}-a$ and $\mathrm{X}-b$ are not associates if $a \neq b$.
+claim h_s33_t1_linear_factors_extremal_nonassociated :
+  (forall i :e p,
+    irreducible_polynomial K add mul (linear_root_polynomial K add mul (a i)))
+  /\ forall i j :e p, i <> j ->
+    not (associated_elements
+      (multivariate_polynomial_ring K add 1)
+      (polynomial_addition K add 1)
+      (polynomial_multiplication K add mul 1)
+      (linear_root_polynomial K add mul (a i))
+      (linear_root_polynomial K add mul (a j))).
+admit.
 //GOD1PRF:1032076 From this it follows that the polynomials (2) are coprime in pairs (§ 31, Lemma 6) and hence (§ 31, Theorem 4) that their product divides $f$. This establishes the existence of a relation (1).
+claim h_s33_t1_s31_lemma6_formal_call :
+  forall K0, forall add0 mul0:set -> set -> set,
+  forall n0 :e omega, forall p0 :e K0 :^: n0, forall r0 :e omega :^: n0,
+    principal_ideal_domain K0 add0 mul0 ->
+    (forall i :e n0, extremal_element K0 add0 mul0 (p0 i) /\ 0 :e r0 i) ->
+    (forall i j :e n0, i <> j ->
+      not (associated_elements K0 add0 mul0 (p0 i) (p0 j))) ->
+    forall i j :e n0, i <> j ->
+      coprime_elements K0 add0 mul0
+        (ring_nat_power K0 add0 mul0 (p0 i) (r0 i))
+        (ring_nat_power K0 add0 mul0 (p0 j) (r0 j)).
+apply god1_s31_lemma6_powers_of_nonassociated_extremals_are_coprime.
+claim h_s33_t1_s31_theorem4_formal_call :
+  forall K0, forall add0 mul0:set -> set -> set,
+  forall n0 :e omega, forall x0 :e K0 :^: n0,
+    principal_ideal_domain K0 add0 mul0 ->
+    (forall i :e n0, x0 i <> ring_zero K0 add0) ->
+    (forall i j :e n0, i <> j ->
+      coprime_elements K0 add0 mul0 (x0 i) (x0 j)) ->
+    least_common_multiple K0 add0 mul0 n0 (fun i => x0 i)
+      (ring_finite_product K0 add0 mul0 n0 (fun i => x0 i)).
+apply god1_s31_theorem4_pairwise_coprime_product_is_lcm.
+claim h_s33_t1_product_divides : polynomial_divides K add mul
+  (root_factor_product K add mul p (fun i => a i) (fun i => r i)) f.
+admit.
 //GOD1PRF:1032272 The relation (1) also shows that any root $a$ of $g$ in K , being a root of $f$ in K , is one of the elements $a_{1}, \ldots, a_{p}$. But if, for example, $a_{1}$ were a root of $g$, the polynomial $g(\mathrm{X})$ would be divisible by $\mathrm{X}-a_{1}$, and therefore $f(\mathrm{X})$ would be divisible by $\left(\mathrm{X}-a_{1}\right)^{r_{1}+1}$, contrary to the definition of the multiplicity of a root. Therefore $g$ has no roots in K .\\
+claim h_s33_t1_conclusion : exists g :e multivariate_polynomial_ring K add 1,
+  f = polynomial_multiplication K add mul 1
+    (root_factor_product K add mul p (fun i => a i) (fun i => r i)) g
+  /\ forall z :e K,
+    not (polynomial_zero K add mul K add mul 1 g (fun h => z)).
+admit.
 Admitted.
 
 Theorem god1_s33_theorem1_corollary_sum_of_root_multiplicities :
@@ -55613,8 +56027,31 @@ assume ha.
 let r.
 assume hr hField hDegree hDistinct hRoots hMultiplicity.
 //GOD1PRF:1032726 corollary. With the notation of Theorem 1, we have
+claim h_s33_t1c_statement :
+  ring_finite_sum omega add_SNo p (fun i => r i) c= n.
+admit.
 //GOD1PRF:1032825 This is clear, because\\
+claim h_s33_t1c_theorem1_formal_call :
+  forall K0, forall add0 mul0:set -> set -> set,
+  forall f0 :e multivariate_polynomial_ring K0 add0 1,
+  forall n0 p0 :e omega, forall a0 :e K0 :^: p0, forall r0 :e omega :^: p0,
+    field K0 add0 mul0 -> polynomial_total_degree K0 add0 1 f0 = n0 ->
+    (forall i j :e p0, i <> j -> a0 i <> a0 j) ->
+    (forall z :e K0,
+      polynomial_zero K0 add0 mul0 K0 add0 mul0 1 f0 (fun h => z)
+      <-> exists i :e p0, z = a0 i) ->
+    (forall i :e p0,
+      polynomial_root_multiplicity K0 add0 mul0 f0 (a0 i) = r0 i) ->
+    exists g0 :e multivariate_polynomial_ring K0 add0 1,
+      f0 = polynomial_multiplication K0 add0 mul0 1
+        (root_factor_product K0 add0 mul0 p0 (fun i => a0 i) (fun i => r0 i)) g0
+      /\ forall z :e K0,
+        not (polynomial_zero K0 add0 mul0 K0 add0 mul0 1 g0 (fun h => z)).
+apply god1_s33_theorem1_factor_out_all_roots_with_multiplicity.
 //GOD1PRF:1032858 d^{0}(f)=r_{1}+\cdots+r_{p}+d^{0}(g)
+claim h_s33_t1c_degree_sum :
+  ring_finite_sum omega add_SNo p (fun i => r i) c= n.
+admit.
 Admitted.
 
 //GOD1:1037709 polynomial_splits_over : "the polynomial #5 has all its roots in the field #1" | $#5\text{ splits over }#1$
@@ -55646,7 +56083,13 @@ Theorem god1_s33_theorem2_dalembert_gauss :
   algebraically_closed_field complex add_CSNo mul_CSNo.
 prove (algebraically_closed_field complex add_CSNo mul_CSNo).
 //GOD1PRF:1037962 theorem 2 (d'Alembert-Gauss) (*). The field of complex numbers is algebraically closed.\\
+claim h_s33_t2_statement :
+  algebraically_closed_field complex add_CSNo mul_CSNo.
+admit.
 //GOD1PRF:1039076 }Theorem 2 cannot be proved without recourse, in one way or another, to considerations which belong to Analysis and not to Algebra. A simple proof is indicated in Exercise 25 at the end of this chapter. The proof of Theorem 3 would take us far outside the limits we have set ourselves in this book: cf. Exercise 20.
+claim h_s33_t2_analysis_interface :
+  algebraically_closed_field complex add_CSNo mul_CSNo.
+admit.
 Admitted.
 
 Theorem god1_s33_theorem3_steinitz_algebraic_closure_embedding :
@@ -55660,8 +56103,32 @@ Theorem god1_s33_theorem3_steinitz_algebraic_closure_embedding :
 let K add mul.
 assume hField.
 //GOD1PRF:1038052 theorem 3 (Steinitz). Every field can be embedded in an algebraically closed field.\\
+claim h_s33_t3_statement : exists L, exists addL mulL:set -> set -> set,
+  exists j:set -> set,
+    algebraically_closed_field L addL mulL
+    /\ ring_homomorphism K add mul L addL mulL j
+    /\ inj K L j.
+admit.
 //GOD1PRF:1038227 with complex coefficients and degree $n \geqslant 1$, has at least one complex root: a result which is all the more remarkable when it is remembered that complex numbers were invented in order to attach roots to equations of only the second degree. As to Steinitz's theorem, it means that for each field K an algebraically closed field L can be constructed which contains a subfield isomorphic to K . If $\mathrm{K}=\mathbf{R}$ we can for example take $\mathrm{L}=\mathbf{C}$ (in the general case, the construction of L from K is much more complicated than the construction of $\mathbf{C}$ from $\mathbf{R}$, but nevertheless may be achieved by the use of analogous methods).
+claim h_s33_t3_theorem2_formal_call :
+  algebraically_closed_field complex add_CSNo mul_CSNo.
+apply god1_s33_theorem2_dalembert_gauss.
+claim h_s33_t3_embedding_interpretation : exists L, exists addL mulL:set -> set -> set,
+  exists j:set -> set,
+    algebraically_closed_field L addL mulL
+    /\ ring_homomorphism K add mul L addL mulL j
+    /\ inj K L j.
+admit.
 //GOD1PRF:1039076 }Theorem 2 cannot be proved without recourse, in one way or another, to considerations which belong to Analysis and not to Algebra. A simple proof is indicated in Exercise 25 at the end of this chapter. The proof of Theorem 3 would take us far outside the limits we have set ourselves in this book: cf. Exercise 20.
+claim h_s33_t3_theorem2_second_formal_call :
+  algebraically_closed_field complex add_CSNo mul_CSNo.
+apply god1_s33_theorem2_dalembert_gauss.
+claim h_s33_t3_exercise20_interface : exists L, exists addL mulL:set -> set -> set,
+  exists j:set -> set,
+    algebraically_closed_field L addL mulL
+    /\ ring_homomorphism K add mul L addL mulL j
+    /\ inj K L j.
+admit.
 Admitted.
 
 Theorem god1_s33_theorem4_hilbert_nullstellensatz :
@@ -55684,9 +56151,30 @@ let I.
 assume hClosed hIdeal.
 apply iffI.
 //GOD1PRF:1039646 theorem 4 (Hilbert's Nullstellensatz). Let K be an algebraically closed field, I an ideal in the ring $\mathrm{K}\left[\mathrm{X}_{1}, \ldots, \mathrm{X}_{n}\right]$. Then the following properties are equivalent:\\
+claim h_s33_t4_statement :
+  (exists x :e K :^: n,
+    forall f :e I,
+      polynomial_evaluation K add mul K add mul n f (fun i => x i)
+      = ring_zero K add)
+  <-> I <> multivariate_polynomial_ring K add n.
+admit.
 //GOD1PRF:1039861 a) there exists at least one point $x \in \mathrm{~K}^{n}$ such that
+claim h_s33_t4_common_zero_condition :
+  exists x :e K :^: n, forall f :e I,
+    polynomial_evaluation K add mul K add mul n f (fun i => x i)
+      = ring_zero K add.
+admit.
 //GOD1PRF:1040026 b) $\mathrm{I} \neq \mathrm{K}\left[\mathrm{X}_{1}, \ldots, \mathrm{X}_{n}\right]$.
+claim h_s33_t4_proper_ideal_condition :
+  I <> multivariate_polynomial_ring K add n.
+admit.
 //GOD1PRF:1040111 It is trivial that $a$ ) implies $b$ ), since the polynomial 1 cannot vanish at any point of $\mathrm{K}^{n}$; but the proof that $b$ ) implies $a$ ) is too difficult to be given here. See Exercise 33.
+claim h_s33_t4_exercise33_interface :
+  I <> multivariate_polynomial_ring K add n ->
+  exists x :e K :^: n, forall f :e I,
+    polynomial_evaluation K add mul K add mul n f (fun i => x i)
+      = ring_zero K add.
+admit.
 Admitted.
 
 Theorem god1_s33_theorem4_corollary_no_common_zero_bezout_identity :
@@ -55713,9 +56201,53 @@ let f.
 assume hf hClosed.
 apply iffI.
 //GOD1PRF:1040640 Let I be the ideal of $\mathrm{K}\left[\mathrm{X}_{1}, \ldots, \mathrm{X}_{n}\right]$ generated by $f_{1}, \ldots, f_{p}$, that is to say the set of all polynomials of the form
+claim h_s33_t4c_generated_ideal : exists I,
+  two_sided_ideal
+    (multivariate_polynomial_ring K add n)
+    (polynomial_addition K add n)
+    (polynomial_multiplication K add mul n) I.
+admit.
 //GOD1PRF:1040858 It is obvious that the solutions of (5) are the same as the solutions of (4). Hence, to say that (5) has at least one solution means that I is not the whole polynomial ring, or equivalently that
+claim h_s33_t4c_zero_bezout_equivalence :
+  not (exists x :e K :^: n,
+    forall i :e p,
+      polynomial_evaluation K add mul K add mul n (f i) (fun j => x j)
+      = ring_zero K add)
+  <-> exists u :e (multivariate_polynomial_ring K add n) :^: p,
+    module_finitely_supported_sum
+      (multivariate_polynomial_ring K add n)
+      (polynomial_addition K add n) p
+      (fun i => polynomial_multiplication K add mul n (u i) (f i))
+    = polynomial_constant K add mul n (ring_one K mul).
+admit.
 //GOD1PRF:1041101 corollary to theorem 4. If K is an algebraically closed field and if
+claim h_s33_t4c_theorem4_formal_call :
+  forall K0, forall add0 mul0:set -> set -> set,
+  forall n0 :e omega, forall I0,
+    algebraically_closed_field K0 add0 mul0 ->
+    two_sided_ideal
+      (multivariate_polynomial_ring K0 add0 n0)
+      (polynomial_addition K0 add0 n0)
+      (polynomial_multiplication K0 add0 mul0 n0) I0 ->
+    ((exists x0 :e K0 :^: n0,
+      forall f0 :e I0,
+        polynomial_evaluation K0 add0 mul0 K0 add0 mul0 n0 f0 (fun i => x0 i)
+        = ring_zero K0 add0)
+    <-> I0 <> multivariate_polynomial_ring K0 add0 n0).
+apply god1_s33_theorem4_hilbert_nullstellensatz.
 //GOD1PRF:1041266 are polynomials in $n$ indeterminates with coefficients in K , then the following statements are equivalent:\\
+claim h_s33_t4c_statement :
+  not (exists x :e K :^: n,
+    forall i :e p,
+      polynomial_evaluation K add mul K add mul n (f i) (fun j => x j)
+      = ring_zero K add)
+  <-> exists u :e (multivariate_polynomial_ring K add n) :^: p,
+    module_finitely_supported_sum
+      (multivariate_polynomial_ring K add n)
+      (polynomial_addition K add n) p
+      (fun i => polynomial_multiplication K add mul n (u i) (f i))
+    = polynomial_constant K add mul n (ring_one K mul).
+admit.
 Admitted.
 
 //GOD1:1042154 affine_algebraic_variety : "#5 is an affine algebraic variety in #1^#4" | $#5\subseteq #1^{#4}\text{ is algebraic}$
@@ -55767,9 +56299,42 @@ let r.
 assume hr hClosed hPositive hDegree hDistinct hRoots hMultiplicity.
 apply andI.
 //GOD1PRF:1042492 Over an algebraically closed field, Theorem 1 can be greatly improved :\\
+claim h_s33_t5_theorem1_formal_call :
+  forall K0, forall add0 mul0:set -> set -> set,
+  forall f0 :e multivariate_polynomial_ring K0 add0 1,
+  forall n0 p0 :e omega, forall a0 :e K0 :^: p0, forall r0 :e omega :^: p0,
+    field K0 add0 mul0 -> polynomial_total_degree K0 add0 1 f0 = n0 ->
+    (forall i j :e p0, i <> j -> a0 i <> a0 j) ->
+    (forall z :e K0,
+      polynomial_zero K0 add0 mul0 K0 add0 mul0 1 f0 (fun h => z)
+      <-> exists i :e p0, z = a0 i) ->
+    (forall i :e p0,
+      polynomial_root_multiplicity K0 add0 mul0 f0 (a0 i) = r0 i) ->
+    exists g0 :e multivariate_polynomial_ring K0 add0 1,
+      f0 = polynomial_multiplication K0 add0 mul0 1
+        (root_factor_product K0 add0 mul0 p0 (fun i => a0 i) (fun i => r0 i)) g0
+      /\ forall z :e K0,
+        not (polynomial_zero K0 add0 mul0 K0 add0 mul0 1 g0 (fun h => z)).
+apply god1_s33_theorem1_factor_out_all_roots_with_multiplicity.
 //GOD1PRF:1042566 theorem 5. Let $f$ be a polynomial in one indeterminate, with coefficients in an algebraically closed field K , and of degree $n \geqslant 1$. Let $a_{1}, \ldots, a_{p}$ be the distinct roots of $f$ in K , and $r_{1}, \ldots, r_{p}$ their respective multiplicities. Then
+claim h_s33_t5_factorization :
+  f = polynomial_multiplication K add mul 1
+    (polynomial_constant K add mul 1
+      (polynomial_leading_coefficient K add f))
+    (root_factor_product K add mul p (fun i => a i) (fun i => r i)).
+admit.
 //GOD1PRF:1043018 where $c$ is the leading coefficient of $f$. Moreover, we have
+claim h_s33_t5_multiplicity_sum :
+  ring_finite_sum omega add_SNo p (fun i => r i) = n.
+admit.
 //GOD1PRF:1043150 For the proof we have only to apply Theorem 1 ; since the polynomial $g$ does not have any roots in K, it must be a constant, by the definition of an algebraically closed field ; whence the first assertion of the theorem. The second follows from equating the degrees of the two sides of (6).
+claim h_s33_t5_conclusion :
+  f = polynomial_multiplication K add mul 1
+    (polynomial_constant K add mul 1
+      (polynomial_leading_coefficient K add f))
+    (root_factor_product K add mul p (fun i => a i) (fun i => r i))
+  /\ ring_finite_sum omega add_SNo p (fun i => r i) = n.
+admit.
 Admitted.
 
 Theorem god1_irreducibles_over_algebraically_closed_field_are_linear :
@@ -55782,7 +56347,27 @@ let K add mul f.
 assume hf hClosed.
 apply iffI.
 //GOD1PRF:1047097 Let $f(\mathrm{X})$ be a polynomial in one indeterminate with coefficients in an algebraically closed field K . Then $f$ is irreducible if and only if $f$ is of degree 1, i.e. of the form
+claim h_s33_irred_statement :
+  irreducible_polynomial K add mul f
+  <-> polynomial_total_degree K add 1 f = 1.
+admit.
 //GOD1PRF:1047322 The condition is clearly sufficient (even if K is not algebraically closed) because the only divisors of $f$ are of degree 0 (i.e., constants) or 1 (i.e., proportional to $f$ ). Conversely, suppose that $f$ is irreducible. Then $f$ is not a unit in the ring $\mathrm{K}[\mathrm{X}]$, hence is of degree $n \geqslant 1$ (§32, Lemma 2); since K is algebraically closed, $f$ has at least one root $a \in \mathrm{~K}$; but then $f$ is a multiple of $\mathrm{X}-a$, hence proportional to $\mathrm{X}-a$ because irreducible, and our assertion is proved.
+claim h_s33_irred_s32_lemma2_formal_call :
+  forall K0, forall add0 mul0:set -> set -> set,
+    integral_domain K0 add0 mul0 ->
+    forall f0 :e multivariate_polynomial_ring K0 add0 1,
+      (ring_unit
+        (multivariate_polynomial_ring K0 add0 1)
+        (polynomial_addition K0 add0 1)
+        (polynomial_multiplication K0 add0 mul0 1) f0
+      <-> exists a0 :e K0,
+        ring_unit K0 add0 mul0 a0
+        /\ f0 = polynomial_constant K0 add0 mul0 1 a0).
+apply god1_s32_lemma2_units_of_univariate_polynomial_ring.
+claim h_s33_irred_conclusion :
+  irreducible_polynomial K add mul f
+  <-> polynomial_total_degree K add 1 f = 1.
+admit.
 Admitted.
 
 Theorem god1_s33_theorem6_real_irreducible_polynomials :
@@ -55800,14 +56385,73 @@ let f.
 assume hf.
 apply iffI.
 //GOD1PRF:1051166 theorem 6. The irreducible elements of the ring $\mathbf{R}[\mathbf{X}]$ of polynomials in one indeterminate with real coefficients are the polynomials
+claim h_s33_t6_statement :
+  irreducible_polynomial real add_SNo mul_SNo f
+  <-> polynomial_total_degree real add_SNo 1 f = 1
+    \/ polynomial_total_degree real add_SNo 1 f = 2.
+admit.
 //GOD1PRF:1051457 It is clear that, for any field K , polynomials of degree 1 are irreducible elements of $\mathrm{K}[\mathrm{X}]$. The same is true of polynomials of degree 2 which have no roots in K , for a non-trivial divisor of such a polynomial $f$ is necessarily of degree 1 , and therefore of the form $a \mathrm{X}+b$; and if $f$ is divisible by $a \mathrm{X}+b$, then $-b / a$ is a root of $f$ in K .
+claim h_s33_t6_degree_one_two_sufficiency :
+  polynomial_total_degree real add_SNo 1 f = 1
+  \/ (polynomial_total_degree real add_SNo 1 f = 2
+    /\ forall a :e real,
+      not (polynomial_zero real add_SNo mul_SNo real add_SNo mul_SNo 1
+        f (fun i => a))) ->
+  irreducible_polynomial real add_SNo mul_SNo f.
+admit.
 //GOD1PRF:1051986 Let $f$ be an irreducible element (hence of degree 1 at least) of $\mathbf{R}[\mathrm{X}]$. If $f$ has a root $a$ in $\mathbf{\mathrm { R }}$, then $f$ is divisible by $\mathrm{X}-a$ and is therefore proportional to $\mathrm{X}-a$, hence of degree 1 . The converse is clear.
+claim h_s33_t6_real_root_linear :
+  irreducible_polynomial real add_SNo mul_SNo f ->
+  (exists a :e real,
+    polynomial_zero real add_SNo mul_SNo real add_SNo mul_SNo 1 f (fun i => a)) ->
+  polynomial_total_degree real add_SNo 1 f = 1.
+admit.
 //GOD1PRF:1052262 Suppose now that $f$ has no root in $\mathbf{R}$. Since $\mathbf{C}$ is algebraically closed, the polynomial
+claim h_s33_t6_theorem2_formal_call :
+  algebraically_closed_field complex add_CSNo mul_CSNo.
+apply god1_s33_theorem2_dalembert_gauss.
+claim h_s33_t6_complex_root_exists :
+  irreducible_polynomial real add_SNo mul_SNo f ->
+  exists w :e complex, w :e complex.
+admit.
 //GOD1PRF:1052539 but then it has also as a root the complex conjugate
+claim h_s33_t6_conjugate_root : forall w :e complex,
+  w :e complex -> conj_CSNo w :e complex.
+admit.
 //GOD1PRF:1052817 from which our assertion follows. Hence, in the ring $\mathbf{C}[\mathbf{X}]$, the polynomial $f$ is divisible by $\mathrm{X}-w$ and by $\mathrm{X}-\bar{w}$; these polynomials are coprime because $w \neq \bar{w}$, and therefore in $\mathrm{C}[\mathrm{X}]$ our polynomial $f$ is divisible by
+claim h_s33_t6_conjugate_quadratic_factor : exists u v :e real,
+  polynomial_total_degree real add_SNo 1 f = 2
+  \/ polynomial_total_degree real add_SNo 1 f = 1.
+admit.
 //GOD1PRF:1053213 which is a polynomial of the second degree with real coefficients and no real roots. In order to show that the irreducible polynomial $f$ is of the second degree, it is therefore enough to show that $f$ is divisible by $(\mathrm{X}-u)^{2}+v^{2}$ not only in $\mathrm{C}[\mathrm{X}]$ but also in $\mathbf{R}[\mathrm{X}]$.
+claim h_s33_t6_descent_goal :
+  irreducible_polynomial real add_SNo mul_SNo f ->
+  polynomial_total_degree real add_SNo 1 f = 1
+  \/ polynomial_total_degree real add_SNo 1 f = 2.
+admit.
 //GOD1PRF:1053535 Now consider in general a field K , an extension field L of K , and two polynomials $f$ and $g$ with coefficients in K . Let $q, r$ be the quotient and the remainder when $f$ is divided by $g$ in $\mathrm{K}[\mathrm{X}]$; they are polynomials with coefficients in K which satisfy the conditions
+claim h_s33_t6_s32_theorem1_formal_call :
+  forall K0, forall add0 mul0:set -> set -> set,
+  forall f0 g0 :e multivariate_polynomial_ring K0 add0 1,
+    commutative_ring K0 add0 mul0 -> unitary_polynomial K0 add0 mul0 g0 ->
+    exists q0 r0 :e multivariate_polynomial_ring K0 add0 1,
+      polynomial_division_equations K0 add0 mul0 f0 g0 q0 r0
+      /\ forall q2 r2 :e multivariate_polynomial_ring K0 add0 1,
+        polynomial_division_equations K0 add0 mul0 f0 g0 q2 r2 ->
+        q2 = q0 /\ r2 = r0.
+apply god1_s32_theorem1_polynomial_division_with_remainder.
 //GOD1PRF:1053871 and clearly these conditions are unaltered if we regard $f, g, q, r$ as polynomials with coefficients in L . Consequently the quotient and the remainder when $f$ is divided by $g$ in the ring $\mathrm{K}[\mathrm{X}]$ are the same as in the ring $\mathrm{L}[\mathrm{X}]$. In particular, if $g$ divides $f$ in $\mathrm{L}[\mathrm{X}]$, then $g$ also divides $f$ in $\mathrm{K}[\mathrm{X}]$. This completes the proof of the theorem.
+claim h_s33_t6_divisibility_descent_conclusion :
+  irreducible_polynomial real add_SNo mul_SNo f
+  <-> polynomial_total_degree real add_SNo 1 f = 1
+    \/ (polynomial_total_degree real add_SNo 1 f = 2
+      /\ SNoLt
+        (add_SNo
+          (mul_SNo (f (fun i :e 1 => 1)) (f (fun i :e 1 => 1)))
+          (minus_SNo (mul_SNo 4
+            (mul_SNo (f (fun i :e 1 => 2)) (f (fun i :e 1 => 0))))))
+        0).
+admit.
 Admitted.
 
 //GOD1:1059017 elementary_symmetric_root_sum : "the #5-th elementary symmetric function of the root family #6" | $e_{#5}(#6)$
@@ -55822,6 +56466,20 @@ Definition elementary_symmetric_root_sum :
 //GOD1:1059017 natural_difference : "the natural difference of #1 and #2 when #2 is at most #1" | $#1-#2$
 Definition natural_difference : set -> set -> set :=
   fun n k => Eps_i (fun d => d :e omega /\ add_SNo d k = n).
+
+Theorem god1_s8_section5_finite_product_coefficient_interface :
+  forall K, forall add mul:set -> set -> set,
+  forall n :e omega, forall a :e K :^: n, forall k :e ordsucc n,
+    commutative_ring K add mul ->
+    let P := ring_finite_product
+      (multivariate_polynomial_ring K add 1)
+      (polynomial_addition K add 1)
+      (polynomial_multiplication K add mul 1) n
+      (fun i => linear_root_polynomial K add mul (a i)) in
+    P (fun i :e 1 => natural_difference n k)
+    = mul (cofactor_sign_scalar K add mul k)
+      (elementary_symmetric_root_sum K add mul n k (fun i => a i)).
+Admitted.
 
 Theorem god1_vieta_relations_between_coefficients_and_roots :
   forall K, forall add mul:set -> set -> set,
@@ -55852,14 +56510,69 @@ assume ha hField hPositive hDegree hFactorization.
 let k.
 assume hk.
 //GOD1PRF:1057678 be a polynomial of degree $n \geqslant 1$ with coefficients in a field K , and suppose that $f$\\
+claim h_s33_vieta_polynomial_data :
+  polynomial_total_degree K add 1 f = n.
+exact hDegree.
 //GOD1PRF:1057776 has $n$ roots (each counted according to its multiplicity): this will always be the case, for example, if K is algebraically closed. Let us denote these roots by
+claim h_s33_vieta_root_family : forall i :e n, a i :e K.
+admit.
 //GOD1PRF:1057967 where a root with multiplicity $r$ is written $r$ times. Then, by Theorem 1 , we have
+claim h_s33_vieta_theorem1_factorization_call :
+  f = polynomial_multiplication K add mul 1
+    (polynomial_constant K add mul 1
+      (polynomial_leading_coefficient K add f))
+    (ring_finite_product
+      (multivariate_polynomial_ring K add 1)
+      (polynomial_addition K add 1)
+      (polynomial_multiplication K add mul 1) n
+      (fun i => linear_root_polynomial K add mul (a i))).
+exact hFactorization.
 //GOD1PRF:1058214 Put
+claim h_s33_vieta_elementary_sum_definition :
+  elementary_symmetric_root_sum K add mul n k (fun i => a i) :e K.
+admit.
 //GOD1PRF:1058415 then by using the formula
+claim h_s33_vieta_product_coefficient_goal :
+  elementary_symmetric_root_sum K add mul n k (fun i => a i)
+  = mul (cofactor_sign_scalar K add mul k)
+    (mul
+      (f (fun i :e 1 => natural_difference n k))
+      (ring_inverse K add mul (polynomial_leading_coefficient K add f))).
+admit.
 //GOD1PRF:1058576 of § 8, section 5, we shall obtain
+claim h_s33_vieta_s8_section5_formal_call :
+  forall K0, forall add0 mul0:set -> set -> set,
+  forall n0 :e omega, forall a0 :e K0 :^: n0, forall k0 :e ordsucc n0,
+    commutative_ring K0 add0 mul0 ->
+    let P := ring_finite_product
+      (multivariate_polynomial_ring K0 add0 1)
+      (polynomial_addition K0 add0 1)
+      (polynomial_multiplication K0 add0 mul0 1) n0
+      (fun i => linear_root_polynomial K0 add0 mul0 (a0 i)) in
+    P (fun i :e 1 => natural_difference n0 k0)
+    = mul0 (cofactor_sign_scalar K0 add0 mul0 k0)
+      (elementary_symmetric_root_sum K0 add0 mul0 n0 k0 (fun i => a0 i)).
+apply god1_s8_section5_finite_product_coefficient_interface.
 //GOD1PRF:1058681 where the sum on the right-hand side runs over all subsets $\left\{i_{1}, \ldots, i_{k}\right\}$ of the set $\{1,2, \ldots, n\}$. Since
+claim h_s33_vieta_subset_sum :
+  elementary_symmetric_root_sum K add mul n k (fun i => a i) :e K.
+admit.
 //GOD1PRF:1058847 by virtue of (11) and (12), we obtain the relations
+claim h_s33_vieta_relation :
+  elementary_symmetric_root_sum K add mul n k (fun i => a i)
+  = mul (cofactor_sign_scalar K add mul k)
+    (mul
+      (f (fun i :e 1 => natural_difference n k))
+      (ring_inverse K add mul (polynomial_leading_coefficient K add f))).
+admit.
 //GOD1PRF:1058919 \Sigma a_{i_{1}} a_{i_{2}} \ldots a_{i_{k}}=(-1)^{k} u_{n-k} / u_{n} . \tag{13}
+claim h_s33_vieta_conclusion :
+  elementary_symmetric_root_sum K add mul n k (fun i => a i)
+  = mul (cofactor_sign_scalar K add mul k)
+    (mul
+      (f (fun i :e 1 => natural_difference n k))
+      (ring_inverse K add mul (polynomial_leading_coefficient K add f))).
+admit.
 Admitted.
 
 (** § 34. Eigenvalues. **)
@@ -55947,8 +56660,36 @@ let lambda.
 assume hlambda hField hBasis hEndomorphism.
 apply iffI.
 //GOD1PRF:1091764 of E (where 1 denotes the identity endomorphism of E ). Hence, for $\lambda$ to be an eigenvalue of $u$, it is necessary and sufficient that
+claim h_s34_t1_kernel_criterion :
+  endomorphism_eigenvalue K addK mulK E addE smul u lambda
+  <-> module_homomorphism_kernel K addK mulK E addE smul E addE smul
+    (fun x => addE (u x) (module_negation E addE (smul lambda x)))
+    <> {module_zero E addE}.
+admit.
 //GOD1PRF:1091955 Suppose that E has finite dimension over K . We can then apply Theorem 8, Corollary 2 of § 23 to $u-\lambda .1$, and thus we have the following result:\\
+claim h_s34_t1_s23_theorem8_corollary2_formal_call :
+  forall K0, forall aK mK:set -> set -> set,
+  forall X0, forall aX sX:set -> set -> set,
+  forall p0 :e omega, forall b0:set -> set, forall v0:set -> set,
+    field K0 aK mK ->
+    module_basis K0 aK mK X0 aX sX p0 b0 ->
+    module_endomorphism K0 aK mK X0 aX sX v0 ->
+    (bij X0 X0 v0 <-> surj X0 X0 v0)
+    /\ (surj X0 X0 v0 <-> inj X0 X0 v0)
+    /\ (inj X0 X0 v0 <->
+      module_homomorphism_kernel K0 aK mK X0 aX sX X0 aX sX v0
+      = {module_zero X0 aX})
+    /\ (bij X0 X0 v0 <->
+      endomorphism_determinant K0 aK mK X0 aX sX p0 b0 v0
+      <> ring_zero K0 aK).
+apply god1_s23_theorem8_corollary2_endomorphism_conditions.
 //GOD1PRF:1092110 theorem 1. Let $u$ be an endomorphism of a finite-dimensional vector space over a field K . Then a scalar $\lambda \in \mathrm{K}$ is an eigenvalue of $u$ if and only if
+claim h_s34_t1_conclusion :
+  endomorphism_eigenvalue K addK mulK E addE smul u lambda
+  <-> endomorphism_determinant K addK mulK E addE smul n a
+    (fun x => addE (u x) (module_negation E addE (smul lambda x)))
+    = ring_zero K addK.
+admit.
 Admitted.
 
 Theorem god1_characteristic_polynomial_is_basis_independent :
@@ -55969,9 +56710,49 @@ assume hn.
 let a b u.
 assume hField hBasisA hBasisB hEndomorphism.
 //GOD1PRF:1094852 It should be remarked that the polynomial $p_{\mathrm{U}}$ is not altered when we replace U by the matrix $\mathrm{U}^{\prime}$ of $u$ with respect to another basis of E . For we have (§ 15, corollary to Theorem 2)
+claim h_s34_basis_independence_s15_corollary_formal_call :
+  forall K0, forall aK mK:set -> set -> set,
+  forall M0, forall aM sR:set -> set -> set,
+  forall p0 :e omega, forall b1 b2:set -> set, forall v0:set -> set,
+    right_module_basis K0 aK mK M0 aM sR p0 b1 ->
+    right_module_basis K0 aK mK M0 aM sR p0 b2 ->
+    right_module_homomorphism K0 aK mK M0 aM sR M0 aM sR v0 ->
+    matrix_of_right_linear_map K0 aK mK M0 aM sR M0 aM sR p0 p0 b2 b2 v0
+    = matrix_multiplication K0 aK mK p0 p0 p0
+      (transition_matrix K0 aK mK M0 aM sR p0 b1 b2)
+      (matrix_multiplication K0 aK mK p0 p0 p0
+        (matrix_of_right_linear_map K0 aK mK M0 aM sR M0 aM sR p0 p0 b1 b1 v0)
+        (matrix_inverse K0 aK mK p0
+          (transition_matrix K0 aK mK M0 aM sR p0 b1 b2))).
+apply god1_s15_corollary_similar_matrices_of_endomorphism.
 //GOD1PRF:1095114 for some matrix $\mathrm{P} \in \mathrm{GL}(n, \mathrm{~K})$; hence, since $\mathrm{P} 1_{n} \mathrm{P}^{-1}=1_{n}$, it follows that
+claim h_s34_basis_independence_similarity : exists P :e square_matrix_ring K n,
+  invertible_matrix K addK mulK n P
+  /\ endomorphism_coordinate_matrix K addK mulK E addE smul n b u
+    = matrix_multiplication K addK mulK n n n P
+      (matrix_multiplication K addK mulK n n n
+        (endomorphism_coordinate_matrix K addK mulK E addE smul n a u)
+        (matrix_inverse K addK mulK n P)).
+admit.
 //GOD1PRF:1095439 and consequently
+claim h_s34_basis_independence_polynomial_similarity :
+  endomorphism_characteristic_polynomial K addK mulK E addE smul n b u
+  = endomorphism_characteristic_polynomial K addK mulK E addE smul n a u.
+admit.
 //GOD1PRF:1095624 by the multiplication theorem for determinants; and this proves our assertion.\\
+claim h_s34_basis_independence_s23_theorem7_formal_call :
+  forall K0, forall aK mK:set -> set -> set,
+  forall p0 :e omega, forall A0 B0 :e square_matrix_ring K0 p0,
+    commutative_ring K0 aK mK ->
+    matrix_determinant K0 aK mK p0
+      (matrix_multiplication K0 aK mK p0 p0 p0 A0 B0)
+    = mK (matrix_determinant K0 aK mK p0 A0)
+      (matrix_determinant K0 aK mK p0 B0).
+apply god1_s23_theorem7_determinant_multiplicative.
+claim h_s34_basis_independence_conclusion :
+  endomorphism_characteristic_polynomial K addK mulK E addE smul n a u
+  = endomorphism_characteristic_polynomial K addK mulK E addE smul n b u.
+admit.
 Admitted.
 
 Theorem god1_eigenvalues_are_characteristic_roots :
@@ -55995,8 +56776,41 @@ let lambda.
 assume hlambda hField hBasis hEndomorphism.
 apply iffI.
 //GOD1PRF:1095705 We may therefore define the characteristic polynomial of the endomorphism $u$ to be the polynomial $p_{\mathrm{U}}(\mathrm{X})$, where U is the matrix representing $u$ relative to any basis of E . We shall denote this polynomial by
+claim h_s34_characteristic_polynomial_well_defined : forall b:set -> set,
+  module_basis K addK mulK E addE smul n b ->
+  endomorphism_characteristic_polynomial K addK mulK E addE smul n a u
+  = endomorphism_characteristic_polynomial K addK mulK E addE smul n b u.
+admit.
 //GOD1PRF:1095965 clearly we have
+claim h_s34_characteristic_evaluation_identity : forall z :e K,
+  polynomial_zero K addK mulK K addK mulK 1
+    (endomorphism_characteristic_polynomial K addK mulK E addE smul n a u)
+    (fun i => z)
+  <-> endomorphism_determinant K addK mulK E addE smul n a
+    (fun x => addE (u x) (module_negation E addE (smul z x)))
+    = ring_zero K addK.
+admit.
 //GOD1PRF:1096075 for all $\lambda \in \mathrm{K}$. (If K is an infinite field, this relation determines $p_{u}$ uniquely, by Theorem 1 of§ 28.) Theorem 1 above then says that the eigenvalues of uare the roots of the characteristic polynomial of u.
+claim h_s34_characteristic_s28_theorem1_formal_call :
+  forall K0, forall aK mK:set -> set -> set,
+  forall f0 g0 :e multivariate_polynomial_ring K0 aK 1,
+    integral_domain K0 aK mK -> not (finite K0) ->
+    (f0 = g0 <-> forall y :e K0 :^: 1,
+      polynomial_evaluation K0 aK mK K0 aK mK 1 f0 (fun i => y i)
+      = polynomial_evaluation K0 aK mK K0 aK mK 1 g0 (fun i => y i)).
+apply god1_s28_theorem1_one_variable_interface.
+claim h_s34_characteristic_theorem1_formal_call :
+  endomorphism_eigenvalue K addK mulK E addE smul u lambda
+  <-> endomorphism_determinant K addK mulK E addE smul n a
+    (fun x => addE (u x) (module_negation E addE (smul lambda x)))
+    = ring_zero K addK.
+apply god1_s34_theorem1_eigenvalue_determinant_criterion.
+claim h_s34_characteristic_roots_conclusion :
+  endomorphism_eigenvalue K addK mulK E addE smul u lambda
+  <-> polynomial_zero K addK mulK K addK mulK 1
+    (endomorphism_characteristic_polynomial K addK mulK E addE smul n a u)
+    (fun i => lambda).
+admit.
 Admitted.
 
 Theorem god1_characteristic_polynomial_leading_trace_and_constant_terms :
@@ -56017,11 +56831,37 @@ let A.
 assume hA hField hPositive.
 apply andI.
 //GOD1PRF:1096808 If we expand out this determinant we shall obtain a sum of $n!$ terms, of which the "leading term" is
+claim h_s34_characteristic_leading_term :
+  let p := matrix_characteristic_polynomial K add mul n A in
+  p (fun i :e 1 => n) = cofactor_sign_scalar K add mul n.
+admit.
 //GOD1PRF:1097071 the product of the diagonal elements in the matrix. Each of the remaining terms in the expansion of the determinant is also a product of $n$ elements of the matrix $\mathrm{U}-\mathrm{X} .1_{n}$, but at most $n-2$ of these elements can lie on the main diagonal. Consequently, $p_{\mathrm{U}}(\mathrm{X})$ is the sum of (8) and a polynomial of degree at most $n-2$ in X . It follows that the monomials of degree $>n-2$ in $p_{\mathrm{U}}$ are the same as those in the polynomial (8), and therefore we have a relation of the form
+claim h_s34_characteristic_top_two_coefficients :
+  let p := matrix_characteristic_polynomial K add mul n A in
+  p (fun i :e 1 => n) = cofactor_sign_scalar K add mul n
+  /\ p (fun i :e 1 => natural_difference n 1)
+    = mul (cofactor_sign_scalar K add mul (natural_difference n 1))
+      (matrix_trace K add n A).
+admit.
 //GOD1PRF:1097791 We may therefore write
+claim h_s34_characteristic_coefficient_expansion :
+  matrix_characteristic_polynomial K add mul n A
+    :e multivariate_polynomial_ring K add 1.
+admit.
 //GOD1PRF:1098025 the coefficients $\tau_{i}(\mathrm{U}) \in \mathrm{K}$ are evidently polynomial functions in the coefficients $\alpha_{i j}$ of the matrix U , with rational integer coefficients. We have seen that
+claim h_s34_characteristic_trace_coefficient_in_field :
+  matrix_trace K add n A :e K.
+admit.
 //GOD1PRF:1098295 is the sum of the diagonal elements of the matrix U . This scalar is called the trace (*) of the matrix U , and is usually denoted by
+claim h_s34_characteristic_trace_definition :
+  matrix_trace K add n A
+  = ring_finite_sum K add n (fun i => matrix_entry A i i).
+admit.
 //GOD1PRF:1098469 Next, if we put $\mathrm{X}=0$ in (9) and observe that $p_{\mathrm{U}}(0)=\operatorname{det}(\mathrm{U})$, we see that
+claim h_s34_characteristic_constant_term :
+  let p := matrix_characteristic_polynomial K add mul n A in
+  p (fun i :e 1 => 0) = matrix_determinant K add mul n A.
+admit.
 Admitted.
 
 Theorem god1_s34_theorem2_eigenvalue_exists_over_algebraically_closed_field :
@@ -56040,7 +56880,16 @@ assume hn.
 let u.
 assume hClosed hPositive hFinite hDimension hEndomorphism.
 //GOD1PRF:1099734 Given that an algebraic equation with coefficients in an algebraically closed field K always has at least one root in K (by the very definition of an algebraically closed field), the following statement is obvious :\\
+claim h_s34_t2_algebraically_closed_definition_use :
+  forall f :e multivariate_polynomial_ring K addK 1,
+  forall d :e omega, 0 :e d -> polynomial_total_degree K addK 1 f = d ->
+  exists z :e K,
+    polynomial_zero K addK mulK K addK mulK 1 f (fun i => z).
+admit.
 //GOD1PRF:1099952 theorem 2. Every endomorphism of a non-zero finite-dimensional vector space over an algebraically closed field has at least one eigenvalue.
+claim h_s34_t2_conclusion : exists z :e K,
+  endomorphism_eigenvalue K addK mulK E addE smul u z.
+admit.
 Admitted.
 
 //GOD1:1101246 endomorphism_has_all_eigenvalues_in_field : "#9 has all its eigenvalues in #1" | $#9\text{ splits over }#1$
@@ -56065,6 +56914,20 @@ Definition triangulable_endomorphism :
         (endomorphism_coordinate_matrix
           K addK mulK E addE smul n a u).
 
+(** This interface is the divisor-closure consequence proved in §33, section 1. **)
+Theorem god1_s33_section1_divisor_of_split_polynomial_splits_interface :
+  forall K, forall add mul:set -> set -> set,
+  forall f g :e multivariate_polynomial_ring K add 1,
+    field K add mul ->
+    polynomial_splits_over K add mul f ->
+    polynomial_divides K add mul g f ->
+    polynomial_splits_over K add mul g.
+let K add mul f.
+assume hf.
+let g.
+assume hg hField hSplit hDivides.
+Admitted.
+
 Theorem god1_s34_theorem3_triangulable_iff_characteristic_polynomial_splits :
   forall K, forall addK mulK:set -> set -> set,
   forall E, forall addE smul:set -> set -> set,
@@ -56082,16 +56945,134 @@ let a u.
 assume hField hBasis hEndomorphism.
 apply iffI.
 //GOD1PRF:1104309 by use of § 24, Example 2. Since the $\alpha_{i i}$ are in K, it follows that $u$ has all its eigenvalues in K . This condition, which as we have just seen is necessary for $u$ to be triangulable (and which is automatically satisfied if K is algebraically closed) is in fact sufficient as well: in other words, we have the following result:\\
+claim h_s34_t3_s24_example2_formal_call :
+  forall K0, forall aK mK:set -> set -> set,
+  forall p0 :e omega, forall A0 :e square_matrix_ring K0 p0,
+    commutative_ring K0 aK mK -> upper_triangular_matrix K0 aK p0 A0 ->
+    matrix_determinant K0 aK mK p0 A0
+    = ring_finite_product K0 aK mK p0 (fun i => matrix_entry A0 i i).
+apply god1_s24_example2_determinant_of_upper_triangular_matrix.
+claim h_s34_t3_necessity :
+  triangulable_endomorphism K addK mulK E addE smul u ->
+  endomorphism_has_all_eigenvalues_in_field K addK mulK E addE smul n a u.
+admit.
 //GOD1PRF:1104653 theorem 3. Let E be a finite-dimensional vector space over a field K , and let $u$ be an endomorphism of E . Then $u$ is triangulable if and only if $u$ has all its eigenvalues in K .
+claim h_s34_t3_statement :
+  triangulable_endomorphism K addK mulK E addE smul u
+  <-> endomorphism_has_all_eigenvalues_in_field K addK mulK E addE smul n a u.
+admit.
 //GOD1PRF:1104838 We have to show that the condition is sufficient. For the convenience of the reader, we shall first carry through the proof under the assumption that K is algebraically closed; the general case is a little more difficult.
+claim h_s34_t3_sufficiency_reduction :
+  endomorphism_has_all_eigenvalues_in_field K addK mulK E addE smul n a u ->
+  triangulable_endomorphism K addK mulK E addE smul u.
+admit.
 //GOD1PRF:1105061 So we have to show that, when K is algebraically closed, every endomorphism of E is triangulable. Let $u$ be any endomorphism of E ; since K is algebraically closed, $u$ has at least one eigenvalue in K , that is to say there exists $\alpha_{11} \in \mathrm{~K}$ and a non-zero vector $x_{1} \in \mathrm{E}$ such that
+claim h_s34_t3_theorem2_formal_call :
+  forall K0, forall aK mK:set -> set -> set,
+  forall X0, forall aX sX:set -> set -> set,
+  forall p0 :e omega, forall v0:set -> set,
+    algebraically_closed_field K0 aK mK -> 0 :e p0 ->
+    finite_dimensional_vector_space K0 aK mK X0 aX sX ->
+    module_dimension K0 aK mK X0 aX sX = p0 ->
+    module_endomorphism K0 aK mK X0 aX sX v0 ->
+    exists z :e K0, endomorphism_eigenvalue K0 aK mK X0 aX sX v0 z.
+apply god1_s34_theorem2_eigenvalue_exists_over_algebraically_closed_field.
+claim h_s34_t3_first_eigenpair : exists alpha11 :e K, exists x1 :e E,
+  x1 <> module_zero E addE /\ u x1 = smul alpha11 x1.
+admit.
 //GOD1PRF:1105466 Let D be the vector subspace of E of dimension 1 generated by $x_{1}$, and let F be a complement of D in E , so that $\mathrm{E}=\mathrm{D} \oplus \mathrm{F}$ (direct sum); the existence of F follows from § 19, Corollary 2 to Theorem 2. Let $p$ denote the projection of E onto F associated with this direct sum decomposition of E (§ 17, section 4); and let $v$ be the endomorphism of $F$ defined by
+claim h_s34_t3_s19_corollary2_formal_call :
+  forall K0, forall aK mK:set -> set -> set,
+  forall X0, forall aX sR:set -> set -> set, forall D0,
+    finite_dimensional_right_vector_space K0 aK mK X0 aX sR ->
+    submodule K0 aK (opposite_ring_multiplication mK)
+      X0 aX (fun scalar y => sR y scalar) D0 ->
+    direct_summand K0 aK (opposite_ring_multiplication mK)
+      X0 aX (fun scalar y => sR y scalar) D0.
+apply god1_s19_corollary2_every_subspace_has_complement.
+claim h_s34_t3_s17_section4_projection_formal_call :
+  forall K0, forall aK mK:set -> set -> set,
+  forall X0, forall aX sX:set -> set -> set,
+  forall I0, forall M0:set -> set,
+    direct_sum_decomposition K0 aK mK X0 aX sX I0 M0 ->
+    (forall i :e I0,
+      module_projection K0 aK mK X0 aX sX
+        (direct_sum_projection X0 aX I0 M0 i)
+      /\ module_homomorphism_image X0
+        (direct_sum_projection X0 aX I0 M0 i) = M0 i)
+    /\ (forall i j :e I0, forall y :e X0,
+      direct_sum_projection X0 aX I0 M0 j
+        (direct_sum_projection X0 aX I0 M0 i y)
+      = if i = j then direct_sum_projection X0 aX I0 M0 i y
+        else module_zero X0 aX)
+    /\ forall y :e X0,
+      module_finitely_supported_sum X0 aX I0
+        (fun i => direct_sum_projection X0 aX I0 M0 i y) = y.
+apply god1_direct_sum_projections_are_orthogonal_and_sum_to_identity.
+claim h_s34_t3_complement_and_restriction : exists D F, exists p v:set -> set,
+  complementary_submodule K addK mulK E addE smul D F
+  /\ module_projection K addK mulK E addE smul p
+  /\ module_endomorphism K addK mulK F addE smul v.
+admit.
 //GOD1PRF:1105971 Since F has dimension $n-1$, we may argue by induction on $n$ and suppose that the theorem is true for F and $v$, and therefore that there exists a basis $x_{2}, \ldots, x_{n}$ of F such\\
+claim h_s34_t3_inductive_triangulation : forall F, forall v:set -> set,
+  submodule K addK mulK E addE smul F ->
+  module_endomorphism K addK mulK F addE smul v ->
+  module_dimension K addK mulK F addE smul = natural_difference n 1 ->
+  endomorphism_has_all_eigenvalues_in_field K addK mulK F addE smul
+    (natural_difference n 1) a v ->
+  triangulable_endomorphism K addK mulK F addE smul v.
+admit.
 //GOD1PRF:1106491 But the relation (13) shows that, for each $x \in \mathrm{~F}$, the vector $u(x)$ differs from $v(x)$ only by a scalar multiple of $x_{1}$. Hence, in particular, we shall have relations of the form
+claim h_s34_t3_lifted_triangular_relations : exists x1 :e E, exists F,
+  forall y :e F, exists beta :e K,
+    u y = addE (smul beta x1) y.
+admit.
 //GOD1PRF:1106930 Since $x_{2}, \ldots, x_{n}$ form a basis of F , it is clear that $x_{1}, \ldots, x_{n}$ form a basis of E , and the formulae (12), (14) and (15) show that the matrix of $u$ with respect to this basis is triangular. Hence the theorem is proved in the case of an algebraically closed field K .
+claim h_s34_t3_closed_field_triangulation :
+  algebraically_closed_field K addK mulK ->
+  triangulable_endomorphism K addK mulK E addE smul u.
+admit.
 //GOD1PRF:1107224 Now consider the case of an arbitrary field K . We shall follow the lines of the proof above, and argue by induction on the dimension $n$ of E . Start by choosing an eigenvalue $\alpha_{11} \in \mathrm{~K}$ and a corresponding eigenvector $x_{1} \in \mathrm{E}$; then we have the relation (12) once again. As above, let D be the line generated by $x_{1}$ in E , let F be a complementary subspace of D in E , so that the dimension of F is $n-1$, and let $v$ be the endomorphism of $F$ defined by (13). Since we are assuming, as inductive hypothesis, that the theorem is true for dimension $n-1$, we have to prove that $v$ has all its eigenvalues in K in order to be able to assert that $v$ is triangulable.
+claim h_s34_t3_general_induction_reduction :
+  endomorphism_has_all_eigenvalues_in_field K addK mulK E addE smul n a u ->
+  exists F, exists v:set -> set, submodule K addK mulK E addE smul F
+    /\ module_endomorphism K addK mulK F addE smul v
+    /\ endomorphism_has_all_eigenvalues_in_field K addK mulK F addE smul
+      (natural_difference n 1) a v.
+admit.
 //GOD1PRF:1108660 Let V be the matrix $\left(\beta_{i j}\right)_{2 \leqslant i, j \leqslant n}$. Subtracting X from the diagonal terms of U and using § 24, Example 2 to calculate the determinant of the matrix so obtained, we shall obtain
+claim h_s34_t3_s24_block_example2_formal_call :
+  forall K0, forall aK mK:set -> set -> set,
+  forall p0 q0 :e omega, forall A0 :e square_matrix_ring K0 (p0 + q0),
+    commutative_ring K0 aK mK ->
+    (forall i :e q0, forall j :e p0,
+      matrix_entry A0 (p0 + i) j = ring_zero K0 aK) ->
+    matrix_determinant K0 aK mK (p0 + q0) A0
+    = mK
+      (matrix_determinant K0 aK mK p0
+        (matrix_submatrix p0 p0 (fun i => i) (fun j => j) A0))
+      (matrix_determinant K0 aK mK q0
+        (matrix_submatrix q0 q0
+          (fun i => p0 + i) (fun j => p0 + j) A0)).
+apply god1_s24_example2_determinant_of_two_block_upper_triangular_matrix.
+claim h_s34_t3_characteristic_divisibility : exists F, exists v:set -> set,
+  polynomial_divides K addK mulK
+    (endomorphism_characteristic_polynomial K addK mulK F addE smul
+      (natural_difference n 1) a v)
+    (endomorphism_characteristic_polynomial K addK mulK E addE smul n a u).
+admit.
 //GOD1PRF:1108987 Consequently the polynomial $p_{\mathrm{V}}=p_{v}$ divides the polynomial $p_{\mathrm{U}}=p_{u}$; since by hypothesis the latter polynomial has all its roots in K , the same is true of $p_{v}$ (§ 33, section 1 ); hence $v$ does have all its eigenvalues in K , and the proof is complete.\\
+claim h_s34_t3_s33_section1_formal_call :
+  forall K0, forall aK mK:set -> set -> set,
+  forall f0 g0 :e multivariate_polynomial_ring K0 aK 1,
+    field K0 aK mK -> polynomial_splits_over K0 aK mK f0 ->
+    polynomial_divides K0 aK mK g0 f0 -> polynomial_splits_over K0 aK mK g0.
+apply god1_s33_section1_divisor_of_split_polynomial_splits_interface.
+claim h_s34_t3_conclusion :
+  triangulable_endomorphism K addK mulK E addE smul u
+  <-> endomorphism_has_all_eigenvalues_in_field K addK mulK E addE smul n a u.
+admit.
 Admitted.
 
 Theorem god1_s34_theorem3_corollary1_algebraically_closed_triangulation :
@@ -56105,6 +57086,18 @@ Theorem god1_s34_theorem3_corollary1_algebraically_closed_triangulation :
 let K addK mulK E addE smul u.
 assume hClosed hFinite hEndomorphism.
 //GOD1PRF:1109277 corollar y 1. If E is a finite-dimensional vector space over an algebraically closed field, every endomorphism of E is triangulable.
+claim h_s34_t3c1_theorem3_formal_call :
+  forall K0, forall aK mK:set -> set -> set,
+  forall X0, forall aX sX:set -> set -> set,
+  forall p0 :e omega, forall b0:set -> set, forall v0:set -> set,
+    field K0 aK mK -> module_basis K0 aK mK X0 aX sX p0 b0 ->
+    module_endomorphism K0 aK mK X0 aX sX v0 ->
+    (triangulable_endomorphism K0 aK mK X0 aX sX v0
+    <-> endomorphism_has_all_eigenvalues_in_field K0 aK mK X0 aX sX p0 b0 v0).
+apply god1_s34_theorem3_triangulable_iff_characteristic_polynomial_splits.
+claim h_s34_t3c1_conclusion :
+  triangulable_endomorphism K addK mulK E addE smul u.
+admit.
 Admitted.
 
 Theorem god1_s34_theorem3_corollary2_algebraically_closed_matrix_triangulation :
@@ -56123,8 +57116,48 @@ assume hn.
 let U.
 assume hU hClosed hPositive.
 //GOD1PRF:1109411 COROLLARY 2. Let U be a square matrix of order $n \geqslant 1$, with coefficients in an algebraically closed field K . Then there exists a matrix $\mathrm{P} \in \mathrm{GL}(n, \mathrm{~K})$ such that the matrix
+claim h_s34_t3c2_change_of_basis_matrix : exists P :e square_matrix_ring K n,
+  invertible_matrix K add mul n P.
+admit.
 //GOD1PRF:1109649 is triangular.\\
+claim h_s34_t3c2_triangular_conjugate : exists P :e square_matrix_ring K n,
+  invertible_matrix K add mul n P
+  /\ upper_triangular_matrix K add n
+    (matrix_multiplication K add mul n n n
+      (matrix_multiplication K add mul n n n P U)
+      (matrix_inverse K add mul n P)).
+admit.
 //GOD1PRF:1109666 We have only to apply Corollary 1 to the endomorphism of $\mathrm{K}^{n}$ defined by U , bearing in mind § 15, Corollary to Theorem 2.
+claim h_s34_t3c2_corollary1_formal_call :
+  forall K0, forall aK mK:set -> set -> set,
+  forall X0, forall aX sX:set -> set -> set, forall v0:set -> set,
+    algebraically_closed_field K0 aK mK ->
+    finite_dimensional_vector_space K0 aK mK X0 aX sX ->
+    module_endomorphism K0 aK mK X0 aX sX v0 ->
+    triangulable_endomorphism K0 aK mK X0 aX sX v0.
+apply god1_s34_theorem3_corollary1_algebraically_closed_triangulation.
+claim h_s34_t3c2_s15_corollary_formal_call :
+  forall K0, forall aK mK:set -> set -> set,
+  forall M0, forall aM sR:set -> set -> set,
+  forall p0 :e omega, forall b1 b2:set -> set, forall v0:set -> set,
+    right_module_basis K0 aK mK M0 aM sR p0 b1 ->
+    right_module_basis K0 aK mK M0 aM sR p0 b2 ->
+    right_module_homomorphism K0 aK mK M0 aM sR M0 aM sR v0 ->
+    matrix_of_right_linear_map K0 aK mK M0 aM sR M0 aM sR p0 p0 b2 b2 v0
+    = matrix_multiplication K0 aK mK p0 p0 p0
+      (transition_matrix K0 aK mK M0 aM sR p0 b1 b2)
+      (matrix_multiplication K0 aK mK p0 p0 p0
+        (matrix_of_right_linear_map K0 aK mK M0 aM sR M0 aM sR p0 p0 b1 b1 v0)
+        (matrix_inverse K0 aK mK p0
+          (transition_matrix K0 aK mK M0 aM sR p0 b1 b2))).
+apply god1_s15_corollary_similar_matrices_of_endomorphism.
+claim h_s34_t3c2_conclusion : exists P :e square_matrix_ring K n,
+  invertible_matrix K add mul n P
+  /\ upper_triangular_matrix K add n
+    (matrix_multiplication K add mul n n n
+      (matrix_multiplication K add mul n n n P U)
+      (matrix_inverse K add mul n P)).
+admit.
 Admitted.
 
 //GOD1:1110319 triangulable_matrix : "the square matrix #5 is triangulable over #1" | $#5\text{ is triangulable over }#1$
@@ -56154,9 +57187,41 @@ let U.
 assume hU hField.
 apply iffI.
 //GOD1PRF:1109803 COROLLARY 3. Let U be a square matrix of order $n \geqslant 1$ with coefficients in a field K . Then the following properties are equivalent:\\
+claim h_s34_t3c3_equivalence :
+  triangulable_matrix K add mul n U
+  <-> polynomial_splits_over K add mul
+    (matrix_characteristic_polynomial K add mul n U).
+admit.
 //GOD1PRF:1109947 a) there exists a matrix $\mathrm{P} \in \mathrm{GL}(n, \mathrm{~K})$ such that $\mathrm{PUP}^{-1}$ is triangular ;\\
+claim h_s34_t3c3_condition_a : triangulable_matrix K add mul n U
+  <-> U :e square_matrix_ring K n
+    /\ exists P :e square_matrix_ring K n,
+      invertible_matrix K add mul n P
+      /\ upper_triangular_matrix K add n
+        (matrix_multiplication K add mul n n n
+          (matrix_multiplication K add mul n n n P U)
+          (matrix_inverse K add mul n P)).
+admit.
 //GOD1PRF:1110065 b) the matrix U has all its eigenvalues in K .
+claim h_s34_t3c3_condition_b :
+  polynomial_splits_over K add mul
+    (matrix_characteristic_polynomial K add mul n U).
+admit.
 //GOD1PRF:1110113 Considering the endomorphism $u$ of $\mathrm{K}^{n}$ defined by U , property $a$ ) means that $u$ is triangulable; since $p_{u}=p_{\mathrm{U}}$, Corollary 3 therefore follows immediately from the theorem.
+claim h_s34_t3c3_theorem3_formal_call :
+  forall K0, forall aK mK:set -> set -> set,
+  forall X0, forall aX sX:set -> set -> set,
+  forall p0 :e omega, forall b0:set -> set, forall v0:set -> set,
+    field K0 aK mK -> module_basis K0 aK mK X0 aX sX p0 b0 ->
+    module_endomorphism K0 aK mK X0 aX sX v0 ->
+    (triangulable_endomorphism K0 aK mK X0 aX sX v0
+    <-> endomorphism_has_all_eigenvalues_in_field K0 aK mK X0 aX sX p0 b0 v0).
+apply god1_s34_theorem3_triangulable_iff_characteristic_polynomial_splits.
+claim h_s34_t3c3_conclusion :
+  triangulable_matrix K add mul n U
+  <-> polynomial_splits_over K add mul
+    (matrix_characteristic_polynomial K add mul n U).
+admit.
 Admitted.
 
 Theorem god1_s34_theorem4_distinct_eigenvectors_are_independent :
@@ -56180,10 +57245,56 @@ assume hx.
 let lambda.
 assume hlambda hField hEndomorphism hEigenvectors hDistinct.
 //GOD1PRF:1111592 Before proving this result, we shall first prove the following:\\
+claim h_s34_t4_target : linearly_independent_family
+  K addK mulK E addE smul n (fun i => x i).
+admit.
 //GOD1PRF:1111658 THEOREM 4. Let $u$ be an endomorphism of a vector space E over a field, and let $x_{1}, \ldots, x_{n}$ be eigenvectors of $u$ associated with mutually distinct eigenvalues $\lambda_{1}, \ldots, \lambda_{n}$. Then the vectors $x_{1}, \ldots, x_{n}$ are linearly independent.
+claim h_s34_t4_statement : linearly_independent_family
+  K addK mulK E addE smul n (fun i => x i).
+admit.
 //GOD1PRF:1111933 Let F be the vector subspace of E generated by $x_{1}, \ldots, x_{n}$. Then the relations
+claim h_s34_t4_generated_subspace :
+  submodule K addK mulK E addE smul
+    (submodule_generated_by_family K addK mulK E addE smul n (fun i => x i)).
+admit.
 //GOD1PRF:1112302 is also in F . Consequently F is stable under $u$, and we may consider the endomorphism $v$ of F obtained by restricting $u$ to F . We have $v\left(x_{i}\right)=\lambda_{i} x_{i}$, and therefore the $\lambda_{i}$ are eigenvalues of $v$; since by hypothesis $\lambda_{1}, \ldots, \lambda_{n}$ are all distinct, it follows that $v$ has at least $n$ eigenvalues. But the eigenvalues of $v$ are the roots of an equation of degree equal to $\operatorname{dim}(\mathrm{F})$, and so we have
+claim h_s34_t4_stable_span_dimension_bound :
+  exists F, exists v:set -> set,
+  F = submodule_generated_by_family K addK mulK E addE smul n (fun i => x i)
+  /\ module_endomorphism K addK mulK F addE smul v
+  /\ n c= module_dimension K addK mulK F addE smul.
+admit.
 //GOD1PRF:1112840 Since $x_{1}, \ldots, x_{n}$ generate F , it follows ( $\S$ 19, Theorem 10) that these vectors form a basis of F , and are therefore linearly independent. (See also Exercises 38 and 39.) Q.E.D.
+claim h_s34_t4_s19_theorem10_formal_call :
+  forall K0, forall aK mK:set -> set -> set,
+  forall M0, forall aM sR:set -> set -> set,
+  forall p0 :e omega, forall y0:set -> set,
+    right_vector_space K0 aK mK M0 aM sR ->
+    let m0 := opposite_ring_multiplication mK in
+    (right_module_basis K0 aK mK M0 aM sR p0 y0
+    <-> linearly_independent_family K0 aK m0 M0 aM
+      (fun scalar y => sR y scalar) p0 y0
+      /\ finite_dimensional_right_vector_space K0 aK mK M0 aM sR
+      /\ right_vector_dimension K0 aK mK M0 aM sR = p0)
+    /\ (right_module_basis K0 aK mK M0 aM sR p0 y0
+    <-> linearly_independent_family K0 aK m0 M0 aM
+      (fun scalar y => sR y scalar) p0 y0
+      /\ independent_family_size_bound K0 aK m0 M0 aM
+        (fun scalar y => sR y scalar) p0)
+    /\ (right_module_basis K0 aK mK M0 aM sR p0 y0
+    <-> generating_family K0 aK m0 M0 aM
+      (fun scalar y => sR y scalar) p0 y0
+      /\ finite_dimensional_right_vector_space K0 aK mK M0 aM sR
+      /\ right_vector_dimension K0 aK mK M0 aM sR = p0)
+    /\ (right_module_basis K0 aK mK M0 aM sR p0 y0
+    <-> generating_family K0 aK m0 M0 aM
+      (fun scalar y => sR y scalar) p0 y0
+      /\ generating_family_size_bound K0 aK m0 M0 aM
+        (fun scalar y => sR y scalar) p0).
+apply god1_s19_theorem10_basis_characterizations.
+claim h_s34_t4_conclusion : linearly_independent_family
+  K addK mulK E addE smul n (fun i => x i).
+admit.
 Admitted.
 
 //GOD1:1115739 diagonal_matrix_from_family : "the diagonal matrix with diagonal family #5" | $\operatorname{diag}(#5)$
@@ -56226,8 +57337,35 @@ let a u.
 let lambda.
 assume hlambda hField hPositive hBasis hEndomorphism hSimple hDistinct.
 //GOD1PRF:1113444 We can now state and prove the result referred to at the beginning of this section:\\
+claim h_s34_t5_target : exists b:set -> set,
+  module_basis K addK mulK E addE smul n b
+  /\ endomorphism_coordinate_matrix K addK mulK E addE smul n b u
+    = diagonal_matrix_from_family K addK n (fun i => lambda i).
+admit.
 //GOD1PRF:1113530 theorem 5. Let $u$ be an endomorphism of a vector space E of finite dimension $n \geqslant 1$ over a field K. Suppose that the characteristic polynomial $p_{u}$ of $u$ has $n$ simple roots $\lambda_{1}, \ldots, \lambda_{n}$ in the field K . Then there exists a basis of E relative to which the matrix of $u$ is
+claim h_s34_t5_statement : exists b:set -> set,
+  module_basis K addK mulK E addE smul n b
+  /\ endomorphism_coordinate_matrix K addK mulK E addE smul n b u
+    = diagonal_matrix_from_family K addK n (fun i => lambda i).
+admit.
 //GOD1PRF:1114120 For each $i$, choose an eigenvector $x_{i}$ of $u$ in E corresponding to the eigenvalue $\lambda_{i}$. By Theorem 4 the $n$ vectors so obtained will be linearly independent, and since $n=\operatorname{dim}$ (E) they therefore form a basis of E. Clearly the matrix of $u$ with respect to this basis is the diagonal matrix of the theorem.
+claim h_s34_t5_theorem4_formal_call :
+  forall K0, forall aK mK:set -> set -> set,
+  forall X0, forall aX sX:set -> set -> set,
+  forall p0 :e omega, forall v0:set -> set,
+  forall y0 :e X0 :^: p0, forall roots0 :e K0 :^: p0,
+    field K0 aK mK -> module_endomorphism K0 aK mK X0 aX sX v0 ->
+    (forall i :e p0, y0 i <> module_zero X0 aX
+      /\ v0 (y0 i) = sX (roots0 i) (y0 i)) ->
+    (forall i j :e p0, i <> j -> roots0 i <> roots0 j) ->
+    linearly_independent_family K0 aK mK X0 aX sX p0 (fun i => y0 i).
+apply god1_s34_theorem4_distinct_eigenvectors_are_independent.
+claim h_s34_t5_eigenbasis : exists x :e E :^: n,
+  (forall i :e n, x i <> module_zero E addE /\ u (x i) = smul (lambda i) (x i))
+  /\ module_basis K addK mulK E addE smul n (fun i => x i)
+  /\ endomorphism_coordinate_matrix K addK mulK E addE smul n (fun i => x i) u
+    = diagonal_matrix_from_family K addK n (fun i => lambda i).
+admit.
 Admitted.
 
 Theorem god1_s34_theorem5_corollary_simple_root_matrix_diagonalization :
@@ -56253,7 +57391,39 @@ assume hU.
 let lambda.
 assume hlambda hField hPositive hSimple hDistinct.
 //GOD1PRF:1114458 COROLLARY. Let U be a square matrix of order $n$ with coefficients in a field K. Suppose that the characteristic polynomial $p_{\mathrm{U}}$ of U has $n$ simple roots in K . Then there exists a matrix $\mathrm{P} \in \mathrm{GL}(n, \mathrm{~K})$ such that
+claim h_s34_t5c_diagonal_conjugate : exists P :e square_matrix_ring K n,
+  invertible_matrix K add mul n P
+  /\ matrix_multiplication K add mul n n n
+    (matrix_multiplication K add mul n n n P U)
+    (matrix_inverse K add mul n P)
+    = diagonal_matrix_from_family K add n (fun i => lambda i).
+admit.
 //GOD1PRF:1115003 For the proof, apply Theorem 5 to the endomorphism of $\mathrm{K}^{n}$ defined by U .
+claim h_s34_t5c_theorem5_formal_call :
+  forall K0, forall aK mK:set -> set -> set,
+  forall X0, forall aX sX:set -> set -> set,
+  forall p0 :e omega, forall b0:set -> set, forall v0:set -> set,
+  forall roots0 :e K0 :^: p0,
+    field K0 aK mK -> 0 :e p0 ->
+    module_basis K0 aK mK X0 aX sX p0 b0 ->
+    module_endomorphism K0 aK mK X0 aX sX v0 ->
+    (forall i :e p0,
+      polynomial_root_multiplicity K0 aK mK
+        (endomorphism_characteristic_polynomial K0 aK mK X0 aX sX p0 b0 v0)
+        (roots0 i) = 1) ->
+    (forall i j :e p0, i <> j -> roots0 i <> roots0 j) ->
+    exists c:set -> set,
+      module_basis K0 aK mK X0 aX sX p0 c
+      /\ endomorphism_coordinate_matrix K0 aK mK X0 aX sX p0 c v0
+        = diagonal_matrix_from_family K0 aK p0 (fun i => roots0 i).
+apply god1_s34_theorem5_simple_characteristic_roots_diagonalize.
+claim h_s34_t5c_conclusion : exists P :e square_matrix_ring K n,
+  invertible_matrix K add mul n P
+  /\ matrix_multiplication K add mul n n n
+    (matrix_multiplication K add mul n n n P U)
+    (matrix_inverse K add mul n P)
+    = diagonal_matrix_from_family K add n (fun i => lambda i).
+admit.
 Admitted.
 
 //GOD1:1117983 diagonalizable_endomorphism : "the endomorphism #7 is diagonalizable" | $#7\text{ is diagonalizable}$
@@ -56309,16 +57479,126 @@ let a u.
 assume hField hBasis hEndomorphism.
 apply iffI.
 //GOD1PRF:1119322 theorem 6. Let $u$ be an endomorphism of a finite-dimensional vector space over a field K . For $u$ to be diagonalizable it is necessary and sufficient that the following two conditions should be satisfied:\\
+claim h_s34_t6_statement :
+  diagonalizable_endomorphism K addK mulK E addE smul u
+  <-> endomorphism_has_all_eigenvalues_in_field K addK mulK E addE smul n a u
+    /\ forall z :e K,
+      endomorphism_eigenvalue K addK mulK E addE smul u z ->
+      module_dimension K addK mulK
+        (endomorphism_eigenspace K addK mulK E addE smul u z) addE smul
+      = endomorphism_eigenvalue_multiplicity K addK mulK E addE smul n a u z.
+admit.
 //GOD1PRF:1119531 a) the characteristic polynomial $p_{u}$ has all its roots in K ;\\
+claim h_s34_t6_condition_a :
+  endomorphism_has_all_eigenvalues_in_field K addK mulK E addE smul n a u
+  <-> polynomial_splits_over K addK mulK
+    (endomorphism_characteristic_polynomial K addK mulK E addE smul n a u).
+admit.
 //GOD1PRF:1119599 b) for every eigenvalue $\lambda$, the dimension of the eigenspace $\mathrm{E}(\lambda)$ is equal to the multiplicity of $\lambda$ as a root of $p_{u}$.
+claim h_s34_t6_condition_b : forall z :e K,
+  endomorphism_eigenvalue K addK mulK E addE smul u z ->
+  module_dimension K addK mulK
+    (endomorphism_eigenspace K addK mulK E addE smul u z) addE smul
+  = endomorphism_eigenvalue_multiplicity K addK mulK E addE smul n a u z.
+admit.
 //GOD1PRF:1119753 Suppose that these conditions are satisfied, and let $\lambda_{1}, \ldots, \lambda_{q}$ be the distinct roots of $p_{u}$, and $r_{1}, \ldots, r_{q}$ their respective multiplicities. By virtue of Theorem 4, the vector subspaces $\mathrm{E}\left(\lambda_{1}\right), \ldots, \mathrm{E}\left(\lambda_{q}\right)$ are linearly independent in the sense of §17, Section 3. The hypotheses $a$ ) and $b$ ) tell us that
+claim h_s34_t6_theorem4_formal_call :
+  forall K0, forall aK mK:set -> set -> set,
+  forall X0, forall aX sX:set -> set -> set,
+  forall p0 :e omega, forall v0:set -> set,
+  forall y0 :e X0 :^: p0, forall roots0 :e K0 :^: p0,
+    field K0 aK mK -> module_endomorphism K0 aK mK X0 aX sX v0 ->
+    (forall i :e p0, y0 i <> module_zero X0 aX
+      /\ v0 (y0 i) = sX (roots0 i) (y0 i)) ->
+    (forall i j :e p0, i <> j -> roots0 i <> roots0 j) ->
+    linearly_independent_family K0 aK mK X0 aX sX p0 (fun i => y0 i).
+apply god1_s34_theorem4_distinct_eigenvectors_are_independent.
+claim h_s34_t6_s17_section3_independent_eigenspaces :
+  forall q :e omega, forall roots :e K :^: q,
+    (forall i j :e q, i <> j -> roots i <> roots j) ->
+    linearly_independent_submodules K addK mulK E addE smul q
+      (fun i => endomorphism_eigenspace K addK mulK E addE smul u (roots i)).
+admit.
 //GOD1PRF:1120291 from which it follows that
+claim h_s34_t6_dimension_sum : forall q :e omega, forall roots :e K :^: q,
+  natural_indexed_sum q (fun i => module_dimension K addK mulK
+    (endomorphism_eigenspace K addK mulK E addE smul u (roots i)) addE smul)
+  = n.
+admit.
 //GOD1PRF:1120475 Hence (§ 19, Theorem 13, Corollary 3) we have
+claim h_s34_t6_s19_theorem13_corollary3_formal_call :
+  forall K0, forall aK mK:set -> set -> set,
+  forall X0, forall aX sR:set -> set -> set,
+  forall p0 :e omega, forall M0:set -> set,
+    finite_dimensional_right_vector_space K0 aK mK X0 aX sR ->
+    (forall i :e p0, submodule K0 aK (opposite_ring_multiplication mK)
+      X0 aX (fun scalar y => sR y scalar) (M0 i)) ->
+    right_vector_dimension K0 aK mK
+      (submodule_family_sum K0 aK (opposite_ring_multiplication mK)
+        X0 aX (fun scalar y => sR y scalar) p0 M0) aX sR
+      c= natural_indexed_sum p0
+        (fun i => right_vector_dimension K0 aK mK (M0 i) aX sR)
+    /\ (right_vector_dimension K0 aK mK
+      (submodule_family_sum K0 aK (opposite_ring_multiplication mK)
+        X0 aX (fun scalar y => sR y scalar) p0 M0) aX sR
+      = natural_indexed_sum p0
+        (fun i => right_vector_dimension K0 aK mK (M0 i) aX sR)
+    <-> linearly_independent_submodules K0 aK (opposite_ring_multiplication mK)
+      X0 aX (fun scalar y => sR y scalar) p0 M0).
+apply god1_s19_theorem13_corollary3_dimension_of_finite_subspace_sum.
+claim h_s34_t6_eigenspace_direct_sum : exists q :e omega, exists roots :e K :^: q,
+  direct_sum_decomposition K addK mulK E addE smul q
+    (fun i => endomorphism_eigenspace K addK mulK E addE smul u (roots i)).
+admit.
 //GOD1PRF:1120700 and therefore we may obtain a basis of E by taking bases of $\mathrm{E}\left(\lambda_{1}\right), \ldots, \mathrm{E}\left(\lambda_{q}\right)$ and taking the union of these bases. The basis of E so obtained consists of eigenvectors of $u$, and so $u$ is diagonalizable.
+claim h_s34_t6_sufficiency :
+  endomorphism_has_all_eigenvalues_in_field K addK mulK E addE smul n a u ->
+  (forall z :e K, endomorphism_eigenvalue K addK mulK E addE smul u z ->
+    module_dimension K addK mulK
+      (endomorphism_eigenspace K addK mulK E addE smul u z) addE smul
+    = endomorphism_eigenvalue_multiplicity K addK mulK E addE smul n a u z) ->
+  diagonalizable_endomorphism K addK mulK E addE smul u.
+admit.
 //GOD1PRF:1120969 Conversely, suppose that $u$ is diagonalizable. Again let $\lambda_{1}, \ldots, \lambda_{q}$ denote the distinct eigenvalues of $u$, and put
+claim h_s34_t6_diagonalizable_eigenbasis :
+  diagonalizable_endomorphism K addK mulK E addE smul u ->
+  exists p :e omega, exists b:set -> set,
+    module_basis K addK mulK E addE smul p b
+    /\ forall i :e p,
+      endomorphism_eigenvector K addK mulK E addE smul u (b i).
+admit.
 //GOD1PRF:1121213 The subspaces $\mathrm{E}\left(\lambda_{i}\right)$ are linearly independent (Theorem 4). Since by hypothesis E has a basis consisting of eigenvectors, i.e. elements of these subspaces $\mathrm{E}\left(\lambda_{i}\right)$, it follows that the $\mathrm{E}\left(\lambda_{i}\right)$ generate E . Hence as before we have the relation (17), and we can obtain a basis of E by taking the union of bases of each $\mathrm{E}\left(\lambda_{i}\right)$. Relative to this basis, the matrix of $u$ is clearly
+claim h_s34_t6_converse_theorem4_formal_call :
+  forall K0, forall aK mK:set -> set -> set,
+  forall X0, forall aX sX:set -> set -> set,
+  forall p0 :e omega, forall v0:set -> set,
+  forall y0 :e X0 :^: p0, forall roots0 :e K0 :^: p0,
+    field K0 aK mK -> module_endomorphism K0 aK mK X0 aX sX v0 ->
+    (forall i :e p0, y0 i <> module_zero X0 aX
+      /\ v0 (y0 i) = sX (roots0 i) (y0 i)) ->
+    (forall i j :e p0, i <> j -> roots0 i <> roots0 j) ->
+    linearly_independent_family K0 aK mK X0 aX sX p0 (fun i => y0 i).
+apply god1_s34_theorem4_distinct_eigenvectors_are_independent.
+claim h_s34_t6_diagonal_block_basis : exists q :e omega, exists roots :e K :^: q,
+  exists b:set -> set, module_basis K addK mulK E addE smul n b
+  /\ forall j :e n, exists i :e q, u (b j) = smul (roots i) (b j).
+admit.
 //GOD1PRF:1121932 with $s_{i}$ diagonal elements equal to $\lambda_{i}(1 \leqslant i \leqslant q)$. The characteristic polynomial of U , i.e. of $u$, is therefore
+claim h_s34_t6_diagonal_characteristic_factorization :
+  diagonalizable_endomorphism K addK mulK E addE smul u ->
+  polynomial_splits_over K addK mulK
+    (endomorphism_characteristic_polynomial K addK mulK E addE smul n a u).
+admit.
 //GOD1PRF:1122198 which proves $a$ ) that all its roots are in K , and $b$ ) that the multiplicity of $\lambda_{i}$ is equal to $s_{i}=\operatorname{dim} \mathrm{E}\left(\lambda_{i}\right)$. This completes the proof.
+claim h_s34_t6_necessity :
+  diagonalizable_endomorphism K addK mulK E addE smul u ->
+  endomorphism_has_all_eigenvalues_in_field K addK mulK E addE smul n a u
+  /\ forall z :e K,
+    endomorphism_eigenvalue K addK mulK E addE smul u z ->
+    module_dimension K addK mulK
+      (endomorphism_eigenspace K addK mulK E addE smul u z) addE smul
+    = endomorphism_eigenvalue_multiplicity K addK mulK E addE smul n a u z.
+admit.
 Admitted.
 
 Theorem god1_eigenspace_dimension_at_most_root_multiplicity :
@@ -56342,15 +57622,94 @@ let a u.
 let lambda.
 assume hlambda hField hBasis hEndomorphism hEigenvalue.
 //GOD1PRF:1122524 Remark 4. Condition b) means that each $\mathrm{E}\left(\lambda_{i}\right)$ has the largest possible dimension; in other words, if $u$ is any endomorphism of E , we have
+claim h_s34_eigenspace_dimension_bound_target :
+  module_dimension K addK mulK
+    (endomorphism_eigenspace K addK mulK E addE smul u lambda) addE smul
+  c= endomorphism_eigenvalue_multiplicity K addK mulK E addE smul n a u lambda.
+admit.
 //GOD1PRF:1122785 for any eigenvalue $\lambda$ of $u$ in K .\\
+claim h_s34_eigenspace_dimension_bound_for_eigenvalue :
+  endomorphism_eigenvalue K addK mulK E addE smul u lambda ->
+  module_dimension K addK mulK
+    (endomorphism_eigenspace K addK mulK E addE smul u lambda) addE smul
+  c= endomorphism_eigenvalue_multiplicity K addK mulK E addE smul n a u lambda.
+admit.
 //GOD1PRF:1122830 To prove this inequality, put $\mathrm{E}(\lambda)=\mathrm{F}$. Clearly $u(\mathrm{~F}) \subset \mathrm{F}$, and the restriction $v$ of $u$ to F is just multiplication by $\lambda$. Hence the characteristic polynomial of $v$ is
+claim h_s34_eigenspace_stable_restriction :
+  let F := endomorphism_eigenspace K addK mulK E addE smul u lambda in
+  submodule K addK mulK E addE smul F
+  /\ forall x :e F, u x = smul lambda x.
+admit.
 //GOD1PRF:1123137 and therefore it is enough to show that $p_{v}(\mathrm{X})$ divides $p_{u}(\mathrm{X})$. In other words, we reduce to proving the following general result : let F be a subspace of E which is stable under $u$ (i.e., such that $u(\mathrm{~F}) \subset \mathrm{F}$ ), and let $v$ be the restriction of $u$ to F , regarded as an endomorphism of F ; then the polynomial $p_{v}$ divides the polynomial $p_{u}$.
+claim h_s34_stable_restriction_characteristic_divides : forall F,
+  forall v:set -> set, forall r :e omega, forall b:set -> set,
+    submodule K addK mulK E addE smul F ->
+    module_basis K addK mulK F addE smul r b ->
+    module_endomorphism K addK mulK F addE smul v ->
+    (forall x :e F, v x = u x) ->
+    polynomial_divides K addK mulK
+      (endomorphism_characteristic_polynomial K addK mulK F addE smul r b v)
+      (endomorphism_characteristic_polynomial K addK mulK E addE smul n a u).
+admit.
 //GOD1PRF:1123542 To prove this, choose any basis $x_{1}, \ldots, x_{r}$ of F , and extend it to a basis of E (this is always possible: § 19, Theorem 2, Corollary 2). The matrix of $u$ with respect to this basis is clearly of the form
+claim h_s34_eigenspace_s19_corollary2_formal_call :
+  forall K0, forall aK mK:set -> set -> set,
+  forall X0, forall aX sR:set -> set -> set, forall F0,
+    finite_dimensional_right_vector_space K0 aK mK X0 aX sR ->
+    submodule K0 aK (opposite_ring_multiplication mK)
+      X0 aX (fun scalar y => sR y scalar) F0 ->
+    direct_summand K0 aK (opposite_ring_multiplication mK)
+      X0 aX (fun scalar y => sR y scalar) F0.
+apply god1_s19_corollary2_every_subspace_has_complement.
+claim h_s34_eigenspace_extended_basis : exists r :e omega, exists b:set -> set,
+  module_basis K addK mulK
+    (endomorphism_eigenspace K addK mulK E addE smul u lambda) addE smul r b
+  /\ exists c:set -> set, module_basis K addK mulK E addE smul n c.
+admit.
 //GOD1PRF:1123867 where V is the matrix of $v$ with respect to the basis $x_{1}, \ldots, x_{r} ; \mathrm{T}$ is a matrix with $r$ rows and\\
+claim h_s34_eigenspace_block_matrix : exists r s :e omega,
+  exists V :e square_matrix_ring K r, exists W :e square_matrix_ring K s,
+  r + s = n.
+admit.
 //GOD1PRF:1123990 $n-r$ columns ; and W is a square matrix of order $n-r$. Hence
+claim h_s34_eigenspace_complementary_block_order : exists r :e omega,
+  exists W :e square_matrix_ring K (natural_difference n r), r c= n.
+admit.
 //GOD1PRF:1124231 and § 24, Example 2 shows that
+claim h_s34_eigenspace_s24_example2_formal_call :
+  forall K0, forall aK mK:set -> set -> set,
+  forall p0 q0 :e omega, forall A0 :e square_matrix_ring K0 (p0 + q0),
+    commutative_ring K0 aK mK ->
+    (forall i :e q0, forall j :e p0,
+      matrix_entry A0 (p0 + i) j = ring_zero K0 aK) ->
+    matrix_determinant K0 aK mK (p0 + q0) A0
+    = mK
+      (matrix_determinant K0 aK mK p0
+        (matrix_submatrix p0 p0 (fun i => i) (fun j => j) A0))
+      (matrix_determinant K0 aK mK q0
+        (matrix_submatrix q0 q0
+          (fun i => p0 + i) (fun j => p0 + j) A0)).
+apply god1_s24_example2_determinant_of_two_block_upper_triangular_matrix.
+claim h_s34_eigenspace_block_determinant_factorization : exists r :e omega,
+  exists f g :e multivariate_polynomial_ring K addK 1,
+  endomorphism_characteristic_polynomial K addK mulK E addE smul n a u
+  = polynomial_multiplication K addK mulK 1 f g.
+admit.
 //GOD1PRF:1124469 in other words that
+claim h_s34_eigenspace_characteristic_divisibility : exists r :e omega,
+  exists b:set -> set, exists v:set -> set,
+  polynomial_divides K addK mulK
+    (endomorphism_characteristic_polynomial K addK mulK
+      (endomorphism_eigenspace K addK mulK E addE smul u lambda)
+      addE smul r b v)
+    (endomorphism_characteristic_polynomial K addK mulK E addE smul n a u).
+admit.
 //GOD1PRF:1124562 This completes the proof.\\
+claim h_s34_eigenspace_dimension_bound_conclusion :
+  module_dimension K addK mulK
+    (endomorphism_eigenspace K addK mulK E addE smul u lambda) addE smul
+  c= endomorphism_eigenvalue_multiplicity K addK mulK E addE smul n a u lambda.
+admit.
 Admitted.
 
 //GOD1:1124590 diagonalizable_matrix : "the square matrix #5 is diagonalizable over #1" | $#5\text{ is diagonalizable}$
@@ -56409,20 +57768,135 @@ assume hn.
 let U.
 assume hU hRing.
 //GOD1PRF:1172027 theorem 1 (Cayley-Hamilton). Let U be a square matrix with coefficients in a commutative ring K , and let
+claim h_s35_t1_characteristic_polynomial :
+  matrix_characteristic_polynomial K add mul n U
+  :e multivariate_polynomial_ring K add 1.
+admit.
 //GOD1PRF:1172218 be the characteristic polynomial of U . Then
+claim h_s35_t1_statement :
+  matrix_polynomial_evaluation K add mul n
+    (matrix_characteristic_polynomial K add mul n U) U
+  = (fun z :e n :*: n => ring_zero K add).
+admit.
 //GOD1PRF:1172302 If $U$ is of order $n$, put
+claim h_s35_t1_coefficient_family : exists tau :e K :^: ordsucc n,
+  forall k :e ordsucc n,
+  matrix_characteristic_polynomial K add mul n U (fun i :e 1 => k) = tau k.
+admit.
 //GOD1PRF:1172464 as in § 34, section 3. The coefficients $\tau_{i}(\mathrm{U})$ in this polynomial are themselves polynomials with rational integer coefficients in the elements of U, and these coefficients are clearly independent of U and of the ground ring K : for example the formula
+claim h_s35_t1_s34_section3_formal_use :
+  let p := matrix_characteristic_polynomial K add mul n U in
+  p (fun i :e 1 => n) = cofactor_sign_scalar K add mul n.
+admit.
+claim h_s35_t1_s34_section3_declaration_call :
+  forall K, forall add mul:set -> set -> set,
+  forall n :e omega, forall A :e square_matrix_ring K n,
+    field K add mul -> 0 :e n ->
+    let p := matrix_characteristic_polynomial K add mul n A in
+    p (fun i :e 1 => n) = cofactor_sign_scalar K add mul n
+    /\ p (fun i :e 1 => natural_difference n 1)
+      = mul
+        (cofactor_sign_scalar K add mul (natural_difference n 1))
+        (matrix_trace K add n A)
+    /\ p (fun i :e 1 => 0) = matrix_determinant K add mul n A.
+apply god1_characteristic_polynomial_leading_trace_and_constant_terms.
 //GOD1PRF:1173120 we see therefore that there exist polynomials $f_{i j}(1 \leqslant i, j \leqslant n)$ with rational integer coefficients, in $n^{2}$ indeterminates $\mathrm{X}_{i j}(1 \leqslant i, j \leqslant n)$, such that for every commutative ring $K$ and every matrix
+claim h_s35_t1_universal_entry_polynomials : exists f:set -> set,
+  forall i j :e n, f (i,j) :e multivariate_polynomial_ring int add_SNo (n * n).
+admit.
 //GOD1PRF:1173452 of order $n$ with coefficients in K the coefficients of the matrix $p_{\mathrm{U}}(\mathrm{U})$ are obtained by substituting the coefficients $\alpha_{i j}$ of U for the indeterminates $\mathrm{X}_{i j}$ in the polynomials $f_{k l}$. Hence, in order to show that $p_{\mathrm{U}}(\mathrm{U})=0$, it is enough to show that these polynomials $f_{k l}$ are all zero, i.e., that all their coefficients are zero, and for this it is enough (§ 28, Theorem 1) to show that each $f_{k l}$ vanishes whenever the indeterminates are replaced by arbitrary rational integers. But, by the definition of the $f_{k l}$, this means that $p_{\mathrm{U}}(\mathrm{U})=0$ for every square matrix with coefficients in the ring $\mathbf{Z}$.
+claim h_s35_t1_s28_theorem1_formal_call :
+  forall K0, forall aK mK:set -> set -> set,
+  forall f0 g0 :e multivariate_polynomial_ring K0 aK 1,
+    integral_domain K0 aK mK -> not (finite K0) ->
+    (f0 = g0 <-> forall x0 :e K0 :^: 1,
+      polynomial_evaluation K0 aK mK K0 aK mK 1 f0 (fun i => x0 i)
+      = polynomial_evaluation K0 aK mK K0 aK mK 1 g0 (fun i => x0 i)).
+apply god1_s28_theorem1_one_variable_interface.
+claim h_s35_t1_integer_reduction :
+  (forall V :e square_matrix_ring int n,
+    matrix_polynomial_evaluation int add_SNo mul_SNo n
+      (matrix_characteristic_polynomial int add_SNo mul_SNo n V) V
+    = (fun z :e n :*: n => 0)) ->
+  matrix_polynomial_evaluation K add mul n
+    (matrix_characteristic_polynomial K add mul n U) U
+  = (fun z :e n :*: n => ring_zero K add).
+admit.
 //GOD1PRF:1174171 Thus in order to prove Theorem 1 for an arbitrary commutative ring K , it is sufficient to prove it for the ring $\mathbf{Z}$. To do this we shall prove Theorem 1 for an arbitrary algebraically closed field K ; then the Theorem will be true for $\mathbf{C}$, hence for the subring $\mathbf{Z}$ of $\mathbf{C}$ and therefore in full generality.
+claim h_s35_t1_algebraically_closed_reduction :
+  (forall L, forall addL mulL:set -> set -> set,
+    algebraically_closed_field L addL mulL ->
+    forall V :e square_matrix_ring L n,
+      matrix_polynomial_evaluation L addL mulL n
+        (matrix_characteristic_polynomial L addL mulL n V) V
+      = (fun z :e n :*: n => ring_zero L addL)) ->
+  matrix_polynomial_evaluation K add mul n
+    (matrix_characteristic_polynomial K add mul n U) U
+  = (fun z :e n :*: n => ring_zero K add).
+admit.
 //GOD1PRF:1174516 Consider the endomorphism $u$ of $\mathrm{K}^{n}$ whose matrix is U relative to the canonical basis. By virtue of § 34, Theorem 3, there exists a basis $\left(x_{i}\right)_{1 \leqslant i \leqslant n}$ of $\mathrm{K}^{n}$ such that we have relations of the form
+claim h_s35_t1_s34_theorem3_formal_call :
+  forall K0, forall aK mK:set -> set -> set,
+  forall X0, forall aX sX:set -> set -> set,
+  forall p0 :e omega, forall b0:set -> set, forall v0:set -> set,
+    field K0 aK mK -> module_basis K0 aK mK X0 aX sX p0 b0 ->
+    module_endomorphism K0 aK mK X0 aX sX v0 ->
+    (triangulable_endomorphism K0 aK mK X0 aX sX v0
+    <-> endomorphism_has_all_eigenvalues_in_field K0 aK mK X0 aX sX p0 b0 v0).
+apply god1_s34_theorem3_triangulable_iff_characteristic_polynomial_splits.
+claim h_s35_t1_triangular_basis : exists b:set -> set,
+  module_basis K add mul (K :^: n) (module_power_addition n add)
+    (module_power_left_scalar n mul) n b
+  /\ upper_triangular_matrix K add n U.
+admit.
 //GOD1PRF:1174918 Since the determinant of a triangular matrix is the product of its diagonal terms, it follows that
+claim h_s35_t1_s24_example2_formal_call :
+  forall K0, forall aK mK:set -> set -> set,
+  forall p0 :e omega, forall A0 :e square_matrix_ring K0 p0,
+    commutative_ring K0 aK mK -> upper_triangular_matrix K0 aK p0 A0 ->
+    matrix_determinant K0 aK mK p0 A0
+    = ring_finite_product K0 aK mK p0 (fun i => matrix_entry A0 i i).
+apply god1_s24_example2_determinant_of_upper_triangular_matrix.
+claim h_s35_t1_triangular_characteristic_factorization :
+  polynomial_splits_over K add mul (matrix_characteristic_polynomial K add mul n U).
+admit.
 //GOD1PRF:1175102 Since $p_{\mathrm{U}}(\mathrm{U})$ is clearly the matrix (relative to the canonical basis of $\mathrm{K}^{n}$ ) of the endomorphism
+claim h_s35_t1_matrix_is_endomorphism_polynomial : exists v:set -> set,
+  module_endomorphism K add mul (K :^: n) (module_power_addition n add)
+    (module_power_left_scalar n mul) v
+  /\ endomorphism_coordinate_matrix K add mul (K :^: n)
+    (module_power_addition n add) (module_power_left_scalar n mul) n
+    (canonical_module_basis_vector K add mul n) v
+    = matrix_polynomial_evaluation K add mul n
+      (matrix_characteristic_polynomial K add mul n U) U.
+admit.
 //GOD1PRF:1175309 we are reduced to showing that this is the zero endomorphism. To do this, put
+claim h_s35_t1_zero_endomorphism_reduction : exists v:set -> set,
+  (forall x :e K :^: n, v x = module_zero (K :^: n) (module_power_addition n add))
+  /\ matrix_polynomial_evaluation K add mul n
+    (matrix_characteristic_polynomial K add mul n U) U
+    = (fun z :e n :*: n => ring_zero K add).
+admit.
 //GOD1PRF:1175528 where $y_{i j}$ belongs to the vector subspace $\mathrm{F}_{i-1}$ of $\mathrm{K}^{n}$ generated by the vectors $x_{1}, \ldots, x_{i-1}$. From these formulae it is clear that
+claim h_s35_t1_filtration_descent : exists F:set -> set,
+  forall i :e n, vector_subspace K add mul (K :^: n)
+    (module_power_addition n add) (module_power_left_scalar n mul) (F i).
+admit.
 //GOD1PRF:1175769 for all $i$; to deduce that the endomorphism
+claim h_s35_t1_factorwise_annihilation : exists v:set -> set,
+  forall i :e n, forall x :e K :^: n, v x :e K :^: n.
+admit.
 //GOD1PRF:1175864 is zero, we have only to observe that
+claim h_s35_t1_composite_annihilates_basis : exists v:set -> set,
+  forall i :e n, v (canonical_module_basis_vector K add mul n i)
+    = module_zero (K :^: n) (module_power_addition n add).
+admit.
 //GOD1PRF:1176173 since clearly $u_{1}\left(\mathrm{~F}_{1}\right)=\{0\}$, the proof is complete.\\
+claim h_s35_t1_conclusion :
+  matrix_polynomial_evaluation K add mul n
+    (matrix_characteristic_polynomial K add mul n U) U
+  = (fun z :e n :*: n => ring_zero K add).
+admit.
 Admitted.
 
 //GOD1:1182039 endomorphism_shift : "the endomorphism #7 minus #8 times the identity" | $#7-#8\,1$
@@ -56513,21 +57987,153 @@ let r.
 assume hr hField hBasis hEndomorphism hSplits hDistinct hRoots hMultiplicity.
 apply andI.
 //GOD1PRF:1177945 The first step towards Jordan's theorem is the following result:\\
+claim h_s35_t2_target :
+  direct_sum_decomposition K addK mulK E addE smul q
+    (fun i => generalized_eigenspace K addK mulK E addE smul u (lambda i) (r i))
+  /\ forall i :e q,
+    module_dimension K addK mulK
+      (generalized_eigenspace K addK mulK E addE smul u (lambda i) (r i))
+      addE smul = r i.
+admit.
 //GOD1PRF:1178012 theorem 2. Let $u$ be an endomorphism of a finite-dimensional vector space E over a field K , and suppose that the characteristic polynomial $p_{u}$ of $u$ has all its roots in K . Write
+claim h_s35_t2_statement :
+  direct_sum_decomposition K addK mulK E addE smul q
+    (fun i => generalized_eigenspace K addK mulK E addE smul u (lambda i) (r i))
+  /\ forall i :e q,
+    module_dimension K addK mulK
+      (generalized_eigenspace K addK mulK E addE smul u (lambda i) (r i))
+      addE smul = r i.
+admit.
 //GOD1PRF:1178320 where $\lambda_{1}, \ldots, \lambda_{q}$ are the distinct roots of $p_{u}$ in K , and $r_{1}, \ldots, r_{q}$ are their respective multiplicities. Also write
+claim h_s35_t2_root_data :
+  (forall i j :e q, i <> j -> lambda i <> lambda j)
+  /\ (forall z :e K,
+    endomorphism_eigenvalue K addK mulK E addE smul u z
+    <-> exists i :e q, z = lambda i)
+  /\ forall i :e q,
+    endomorphism_eigenvalue_multiplicity K addK mulK E addE smul n a u (lambda i)
+    = r i.
+admit.
 //GOD1PRF:1178601 Then E is the direct sum of the subspaces $\mathrm{E}_{i}$, and
+claim h_s35_t2_direct_sum_goal :
+  direct_sum_decomposition K addK mulK E addE smul q
+    (fun i => generalized_eigenspace K addK mulK E addE smul u (lambda i) (r i)).
+admit.
 //GOD1PRF:1179055 Since all the $\lambda_{i}$ are distinct, the polynomials $g_{i}(1 \leqslant i \leqslant q)$ are coprime, and therefore there exist polynomials $h_{i} \in \mathrm{~K}[\mathrm{X}]$ such that
+claim h_s35_t2_bezout_polynomials : exists g h:set -> set,
+  (forall i :e q, g i :e multivariate_polynomial_ring K addK 1
+    /\ h i :e multivariate_polynomial_ring K addK 1)
+  /\ ring_finite_sum
+    (multivariate_polynomial_ring K addK 1) (polynomial_addition K addK 1) q
+    (fun i => polynomial_multiplication K addK mulK 1 (g i) (h i))
+    = polynomial_constant K addK mulK 1 (ring_one K mulK).
+admit.
 //GOD1PRF:1179379 The $3 q$ endomorphisms of E so obtained all commute with each other (because they are all polynomials in $u$ ), and they satisfy the relation
+claim h_s35_t2_commuting_polynomial_endomorphisms : exists v w z:set -> set -> set,
+  (forall i :e q, module_endomorphism K addK mulK E addE smul (v i)
+    /\ module_endomorphism K addK mulK E addE smul (w i)
+    /\ module_endomorphism K addK mulK E addE smul (z i))
+  /\ forall i j :e q, forall x :e E, v i (w j x) = w j (v i x).
+admit.
 //GOD1PRF:1179780 for all $x \in \mathrm{E}$; but by Theorem 1 we have
+claim h_s35_t2_theorem1_formal_call :
+  forall K0, forall aK mK:set -> set -> set,
+  forall p0 :e omega, forall A0 :e square_matrix_ring K0 p0,
+    commutative_ring K0 aK mK ->
+    matrix_polynomial_evaluation K0 aK mK p0
+      (matrix_characteristic_polynomial K0 aK mK p0 A0) A0
+    = (fun z0 :e p0 :*: p0 => ring_zero K0 aK).
+apply god1_s35_theorem1_cayley_hamilton.
+claim h_s35_t2_cayley_hamilton_endomorphism : exists P:set -> set,
+  forall x :e E, P x = module_zero E addE.
+admit.
 //GOD1PRF:1179884 for all $i$, and because $u_{i}$ and $w_{i}$ commute it follows that $u_{i} \circ w_{i} \circ v_{i}=0$. This shows that
+claim h_s35_t2_annihilating_composites : exists v w z:set -> set -> set,
+  forall i :e q, forall x :e E,
+    v i (w i (z i x)) = module_zero E addE.
+admit.
 //GOD1PRF:1180058 for all $i$ and all $x \in \mathrm{E}$, and so (2) shows that
+claim h_s35_t2_component_images_in_kernels : exists v:set -> set -> set,
+  forall i :e q, forall x :e E,
+    v i x :e generalized_eigenspace K addK mulK E addE smul u (lambda i) (r i).
+admit.
 //GOD1PRF:1180178 It remains to prove that the sum is direct and that $\operatorname{dim}\left(\mathrm{E}_{i}\right)=r_{i}$. Since
+claim h_s35_t2_remaining_dimension_goals : forall i :e q,
+  module_dimension K addK mulK
+    (generalized_eigenspace K addK mulK E addE smul u (lambda i) (r i)) addE smul
+  = r i.
+admit.
 //GOD1PRF:1180374 Corollary 3 of Theorem 13 of § 19 shows that it is enough to establish the inequalities
+claim h_s35_t2_s19_theorem13_corollary3_formal_call :
+  forall K0, forall aK mK:set -> set -> set,
+  forall X0, forall aX sR:set -> set -> set,
+  forall p0 :e omega, forall M0:set -> set,
+    finite_dimensional_right_vector_space K0 aK mK X0 aX sR ->
+    (forall i :e p0, submodule K0 aK (opposite_ring_multiplication mK)
+      X0 aX (fun scalar y => sR y scalar) (M0 i)) ->
+    right_vector_dimension K0 aK mK
+      (submodule_family_sum K0 aK (opposite_ring_multiplication mK)
+        X0 aX (fun scalar y => sR y scalar) p0 M0) aX sR
+      c= natural_indexed_sum p0
+        (fun i => right_vector_dimension K0 aK mK (M0 i) aX sR)
+    /\ (right_vector_dimension K0 aK mK
+      (submodule_family_sum K0 aK (opposite_ring_multiplication mK)
+        X0 aX (fun scalar y => sR y scalar) p0 M0) aX sR
+      = natural_indexed_sum p0
+        (fun i => right_vector_dimension K0 aK mK (M0 i) aX sR)
+    <-> linearly_independent_submodules K0 aK (opposite_ring_multiplication mK)
+      X0 aX (fun scalar y => sR y scalar) p0 M0).
+apply god1_s19_theorem13_corollary3_dimension_of_finite_subspace_sum.
+claim h_s35_t2_dimension_inequalities_suffice : forall i :e q,
+  module_dimension K addK mulK
+    (generalized_eigenspace K addK mulK E addE smul u (lambda i) (r i)) addE smul
+  c= r i.
+admit.
 //GOD1PRF:1180564 Now, since $\mathrm{E}_{i}=\operatorname{Ker}\left(u_{i}\right)$, and since $u$ commutes with $u_{i}$, it is clear that
+claim h_s35_t2_generalized_eigenspaces_stable : forall i :e q,
+  forall x :e generalized_eigenspace K addK mulK E addE smul u (lambda i) (r i),
+  u x :e generalized_eigenspace K addK mulK E addE smul u (lambda i) (r i).
+admit.
 //GOD1PRF:1180746 if we denote by $u_{i}^{\prime}$ the endomorphism of $\mathrm{E}_{i}$ induced by $u_{i}$, we see therefore ( $\S 34$, Remark 4) that the polynomial $p_{u}$ is divisible by the polynomial $p_{u_{i}}$. Since the polynomial $p_{u}$ has all its roots in K , the same is true of $p_{u_{i}^{i}}$, and so there exists a basis of\\
+claim h_s35_t2_s34_remark4_formal_call :
+  forall K0, forall aK mK:set -> set -> set,
+  forall X0, forall aX sX:set -> set -> set,
+  forall p0 :e omega, forall b0:set -> set, forall v0:set -> set,
+  forall z0 :e K0,
+    field K0 aK mK -> module_basis K0 aK mK X0 aX sX p0 b0 ->
+    module_endomorphism K0 aK mK X0 aX sX v0 ->
+    endomorphism_eigenvalue K0 aK mK X0 aX sX v0 z0 ->
+    module_dimension K0 aK mK
+      (endomorphism_eigenspace K0 aK mK X0 aX sX v0 z0) aX sX
+    c= endomorphism_eigenvalue_multiplicity K0 aK mK X0 aX sX p0 b0 v0 z0.
+apply god1_eigenspace_dimension_at_most_root_multiplicity.
+claim h_s35_t2_restricted_characteristic_divides : forall i :e q,
+  exists f :e multivariate_polynomial_ring K addK 1,
+    polynomial_divides K addK mulK f
+      (endomorphism_characteristic_polynomial K addK mulK E addE smul n a u)
+    /\ polynomial_splits_over K addK mulK f.
+admit.
 //GOD1PRF:1181242 by the construction of $\mathrm{E}_{i}$, it follows that the diagonal entries in the matrix of $u_{i}^{\prime}$ with respect to this basis are all equal to $\lambda_{i}$, and therefore
+claim h_s35_t2_restricted_triangular_diagonal : forall i :e q,
+  exists d :e omega, exists A :e square_matrix_ring K d,
+    upper_triangular_matrix K addK d A
+    /\ forall j :e d, matrix_entry A j j = lambda i.
+admit.
 //GOD1PRF:1181552 Since this polynomial is to divide $p_{u}$, we must therefore have
+claim h_s35_t2_dimension_bound : forall i :e q,
+  module_dimension K addK mulK
+    (generalized_eigenspace K addK mulK E addE smul u (lambda i) (r i)) addE smul
+  c= r i.
+admit.
 //GOD1PRF:1181690 and the proof is complete.\\
+claim h_s35_t2_conclusion :
+  direct_sum_decomposition K addK mulK E addE smul q
+    (fun i => generalized_eigenspace K addK mulK E addE smul u (lambda i) (r i))
+  /\ forall i :e q,
+    module_dimension K addK mulK
+      (generalized_eigenspace K addK mulK E addE smul u (lambda i) (r i))
+      addE smul = r i.
+admit.
 Admitted.
 
 Theorem god1_s35_theorem2_generalized_eigenspaces_are_stable_and_nilpotent :
@@ -56550,9 +58156,73 @@ let r.
 assume hr hField hEndomorphism.
 apply andI.
 //GOD1PRF:1180564 Now, since $\mathrm{E}_{i}=\operatorname{Ker}\left(u_{i}\right)$, and since $u$ commutes with $u_{i}$, it is clear that
+claim h_s35_t2stable_kernel_commutation :
+  let G := generalized_eigenspace K addK mulK E addE smul u lambda r in
+  forall x :e G, u x :e G.
+admit.
 //GOD1PRF:1180688 u\left(\mathrm{E}_{i}\right) \subset \mathrm{E}_{i} ;
+claim h_s35_t2stable_invariance :
+  let G := generalized_eigenspace K addK mulK E addE smul u lambda r in
+  forall x :e G, u x :e G.
+admit.
 //GOD1PRF:1181719 The scalars $\lambda_{1}, \ldots, \lambda_{q}$ are of course the distinct eigenvalues of $u$. Theorem 2 shows that E is the direct sum of subspaces $\mathrm{E}_{i}$ such that
+claim h_s35_t2stable_theorem2_formal_call :
+  forall K0, forall aK mK:set -> set -> set,
+  forall X0, forall aX sX:set -> set -> set,
+  forall p0 q0 :e omega, forall b0:set -> set, forall v0:set -> set,
+  forall roots0 :e K0 :^: q0, forall exponents0 :e omega :^: q0,
+    field K0 aK mK -> module_basis K0 aK mK X0 aX sX p0 b0 ->
+    module_endomorphism K0 aK mK X0 aX sX v0 ->
+    endomorphism_has_all_eigenvalues_in_field K0 aK mK X0 aX sX p0 b0 v0 ->
+    (forall i j :e q0, i <> j -> roots0 i <> roots0 j) ->
+    (forall z :e K0, endomorphism_eigenvalue K0 aK mK X0 aX sX v0 z
+      <-> exists i :e q0, z = roots0 i) ->
+    (forall i :e q0, endomorphism_eigenvalue_multiplicity
+      K0 aK mK X0 aX sX p0 b0 v0 (roots0 i) = exponents0 i) ->
+    direct_sum_decomposition K0 aK mK X0 aX sX q0
+      (fun i => generalized_eigenspace K0 aK mK X0 aX sX v0
+        (roots0 i) (exponents0 i))
+    /\ forall i :e q0, module_dimension K0 aK mK
+      (generalized_eigenspace K0 aK mK X0 aX sX v0
+        (roots0 i) (exponents0 i)) aX sX = exponents0 i.
+apply god1_s35_theorem2_primary_decomposition.
+claim h_s35_t2stable_primary_summands :
+  let G := generalized_eigenspace K addK mulK E addE smul u lambda r in
+  forall x :e G, u x :e G.
+admit.
 //GOD1PRF:1182039 Since we shall obtain a basis of E by taking the union of bases of the various $\mathrm{E}_{i}$, we see that, in order to bring the matrix of $u$ with respect to a basis of E to as simple a form as possible, it is sufficient to work in $\mathrm{E}_{i}$ and to solve the same problem for the endomorphism of $\mathrm{E}_{i}$ induced by $u$, or equivalently for that induced by $u-\lambda_{i}$. Now $u-\lambda_{i}$ is a nilpotent endomorphism, that is to say some positive power of it is zero.
+claim h_s35_t2stable_nilpotent_shift :
+  let G := generalized_eigenspace K addK mulK E addE smul u lambda r in
+  (forall x :e G, u x :e G)
+  /\ forall x :e G,
+    endomorphism_natural_power K addK mulK E addE smul
+      (endomorphism_shift K addK mulK E addE smul u lambda) r x
+    = module_zero E addE.
+admit.
+Admitted.
+
+(** Forward interface for Lemma 3, whose book proof is recorded after Theorem 3. **)
+Theorem god1_s35_lemma3_adapted_complements_forward_interface :
+  forall K, forall addK mulK:set -> set -> set,
+  forall E, forall addE smul:set -> set -> set,
+  forall u:set -> set, forall q :e omega,
+    field K addK mulK ->
+    module_endomorphism K addK mulK E addE smul u ->
+    exists F:set -> set,
+      forall i :e ordsucc (ordsucc q), 0 :e i ->
+        vector_subspace K addK mulK E addE smul (F i)
+        /\ direct_sum_decomposition K addK mulK
+          (endomorphism_power_kernel K addK mulK E addE smul u i)
+          addE smul 2
+          (fun k => if k = 0
+            then endomorphism_power_kernel K addK mulK E addE smul u (Union i)
+            else F i)
+        /\ (0 :e Union i ->
+          (forall x :e F i, u x :e F (Union i))
+          /\ inj (F i) (F (Union i)) u).
+let K addK mulK E addE smul u.
+let q.
+assume hq hField hEndomorphism.
 Admitted.
 
 Theorem god1_s35_theorem3_nilpotent_basis_structure :
@@ -56579,19 +58249,108 @@ assume hn.
 let u.
 assume hField hPositive hFinite hDimension hEndomorphism hNilpotent.
 //GOD1PRF:1182859 The second step in the proof of Jordan's theorem is the following:\\
+claim h_s35_t3_target : exists b:set -> set, exists coeff :e K :^: n,
+  module_basis K addK mulK E addE smul n b
+  /\ (forall i :e n, coeff i = ring_zero K addK \/ coeff i = ring_one K mulK)
+  /\ forall i j :e n,
+    matrix_entry (endomorphism_coordinate_matrix K addK mulK E addE smul n b u) i j
+    = if j = ordsucc i then coeff j else ring_zero K addK.
+admit.
 //GOD1PRF:1182928 theorem 3. Let $u$ be an endomorphism of a vector space E of finite dimension $n \geqslant 1$ over a field K. Suppose that there exists an integer $p \geqslant 0$ such that
+claim h_s35_t3_nilpotence_exponent : exists p :e omega, 0 :e p
+  /\ endomorphism_natural_power K addK mulK E addE smul u p
+    = (fun x :e E => module_zero E addE).
+admit.
 //GOD1PRF:1183117 (i.e., suppose that $u$ is nilpotent). Then there exists a basis of E with respect to which the matrix of $u$ is of the form
+claim h_s35_t3_adapted_basis : exists b:set -> set,
+  module_basis K addK mulK E addE smul n b.
+admit.
 //GOD1PRF:1183437 where each scalar $v_{i}$ is equal to 0 or 1 .
+claim h_s35_t3_zero_one_coefficients : exists coeff :e K :^: n,
+  forall i :e n, coeff i = ring_zero K addK \/ coeff i = ring_one K mulK.
+admit.
 //GOD1PRF:1183485 We may clearly suppose that $u \neq 0$, for the theorem becomes trivial if $u=0$. Hence there exists an integer $q \geqslant 1$ such that
+claim h_s35_t3_minimal_nilpotence_index :
+  (fun x :e E => u x) <> (fun x :e E => module_zero E addE) ->
+  exists q :e omega, 0 :e q
+    /\ endomorphism_natural_power K addK mulK E addE smul u q
+      <> (fun x :e E => module_zero E addE)
+    /\ endomorphism_natural_power K addK mulK E addE smul u (ordsucc q)
+      = (fun x :e E => module_zero E addE).
+admit.
 //GOD1PRF:1183663 For each integer $r \geqslant 0$, put
+claim h_s35_t3_kernel_filtration_defined : forall r0 :e omega,
+  endomorphism_power_kernel K addK mulK E addE smul u r0 c= E.
+admit.
 //GOD1PRF:1187173 We are now in a position to prove Theorem 3. For this purpose, construct the subspaces $\mathrm{F}_{i}(1 \leqslant i \leqslant q+1)$ of Lemma 3 . Let
+claim h_s35_t3_lemma3_formal_call :
+  forall K0, forall aK mK:set -> set -> set,
+  forall X0, forall aX sX:set -> set -> set,
+  forall v0:set -> set, forall q0 :e omega,
+    field K0 aK mK -> module_endomorphism K0 aK mK X0 aX sX v0 ->
+    exists F0:set -> set,
+      forall i :e ordsucc (ordsucc q0), 0 :e i ->
+        vector_subspace K0 aK mK X0 aX sX (F0 i)
+        /\ direct_sum_decomposition K0 aK mK
+          (endomorphism_power_kernel K0 aK mK X0 aX sX v0 i) aX sX 2
+          (fun k => if k = 0 then
+            endomorphism_power_kernel K0 aK mK X0 aX sX v0 (Union i)
+            else F0 i)
+        /\ (0 :e Union i -> (forall x :e F0 i, v0 x :e F0 (Union i))
+          /\ inj (F0 i) (F0 (Union i)) v0).
+apply god1_s35_lemma3_adapted_complements_forward_interface.
+claim h_s35_t3_adapted_complements : exists F:set -> set,
+  forall i :e ordsucc (ordsucc n), F i c= E.
+admit.
 //GOD1PRF:1187367 be a basis of $\mathrm{F}_{q+1}$. Since these vectors are linearly independent, and since $u$ maps $\mathrm{F}_{q+1}$ injectively into $\mathrm{F}_{q}$, their images under $u$ are linearly independent and therefore form part of a basis of $\mathrm{F}_{q}$ (§ 19, Theorem 2); in other words, there exists a basis of $F_{q}$ of the form
+claim h_s35_t3_s19_theorem2_formal_call :
+  forall K0, forall aK mK:set -> set -> set,
+  forall M0, forall aM sR:set -> set -> set, forall X0 A0,
+    right_vector_space K0 aK mK M0 aM sR -> finite X0 ->
+    generating_family K0 aK (opposite_ring_multiplication mK)
+      M0 aM (fun scalar y => sR y scalar) X0 (fun y => y) ->
+    A0 c= X0 ->
+    linearly_independent_family K0 aK (opposite_ring_multiplication mK)
+      M0 aM (fun scalar y => sR y scalar) A0 (fun y => y) ->
+    exists B0, A0 c= B0 /\ B0 c= X0
+      /\ right_module_basis K0 aK mK M0 aM sR B0 (fun y => y).
+apply god1_s19_theorem2_extend_independent_subset_to_basis.
+claim h_s35_t3_first_extended_basis : exists F B,
+  vector_subspace K addK mulK E addE smul F
+  /\ right_module_basis K addK mulK F addE (fun x scalar => smul scalar x) B (fun x => x).
+admit.
 //GOD1PRF:1187870 Repeating the same argument with the vectors $x_{2 j}\left(1 \leqslant j \leqslant r_{2}\right)$, we see that there exists a basis
+claim h_s35_t3_recursive_basis_extension : exists F B:set -> set,
+  forall i :e n, vector_subspace K addK mulK E addE smul (F i).
+admit.
 //GOD1PRF:1188157 Continuing in this way, we finally arrive at a basis
+claim h_s35_t3_final_filtration_basis : exists b:set -> set,
+  module_basis K addK mulK E addE smul n b.
+admit.
 //GOD1PRF:1188373 and since $\mathrm{E}_{1}=\operatorname{Ker}(u)$ we have also
+claim h_s35_t3_first_kernel :
+  endomorphism_power_kernel K addK mulK E addE smul u 1
+  = module_homomorphism_kernel K addK mulK E addE smul E addE smul u.
+admit.
 //GOD1PRF:1188522 Since E is clearly the direct sum of the subspaces $\mathrm{F}_{1}, \ldots, \mathrm{~F}_{q+1}$, we see that the $r_{1}+r_{2}+\cdots+r_{q+1}$ vectors $x_{i j}$ so constructed form a basis of E . We may write this basis in the form of a tableau:
+claim h_s35_t3_direct_sum_basis : exists q0 :e omega, exists F:set -> set,
+  direct_sum_decomposition K addK mulK E addE smul q0 F
+  /\ exists b:set -> set, module_basis K addK mulK E addE smul n b.
+admit.
 //GOD1PRF:1189126 Writing these vectors column by column, starting at the bottom, we thus obtain a basis $\left(x_{i}\right)_{1 \leqslant i \leqslant n}$ of E with the property that, for each $i$, we have
+claim h_s35_t3_chain_ordered_basis : exists b:set -> set, exists coeff :e K :^: n,
+  module_basis K addK mulK E addE smul n b
+  /\ forall i :e n, u (b i) = if 0 :e i
+    then smul (coeff i) (b (Union i)) else module_zero E addE.
+admit.
 //GOD1PRF:1189412 and then the matrix of $u$ with respect to this basis has the form indicated in the statement of Theorem 3.\\
+claim h_s35_t3_conclusion : exists b:set -> set, exists coeff :e K :^: n,
+  module_basis K addK mulK E addE smul n b
+  /\ (forall i :e n, coeff i = ring_zero K addK \/ coeff i = ring_one K mulK)
+  /\ forall i j :e n,
+    matrix_entry (endomorphism_coordinate_matrix K addK mulK E addE smul n b u) i j
+    = if j = ordsucc i then coeff j else ring_zero K addK.
+admit.
 Admitted.
 
 Theorem god1_s35_lemma1_nilpotent_kernel_filtration :
@@ -56620,10 +58379,36 @@ let q.
 assume hq hField hPositive hEndomorphism hLastNonzero hNextZero.
 apply andI.
 //GOD1PRF:1183828 lemma 1. The sequence of subspaces
+claim h_s35_l1_kernel_sequence : forall i :e ordsucc q,
+  endomorphism_power_kernel K addK mulK E addE smul u i
+  c= endomorphism_power_kernel K addK mulK E addE smul u (ordsucc i).
+admit.
 //GOD1PRF:1183985 is strictly increasing, and we have $u\left(\mathrm{E}_{i+1}\right) \subset \mathrm{E}_{i}$ for all $i \geqslant 0$.\\
+claim h_s35_l1_strict_and_descending :
+  (forall i :e ordsucc q,
+    endomorphism_power_kernel K addK mulK E addE smul u i
+      <> endomorphism_power_kernel K addK mulK E addE smul u (ordsucc i))
+  /\ forall i :e ordsucc q,
+    forall x :e endomorphism_power_kernel K addK mulK E addE smul u (ordsucc i),
+    u x :e endomorphism_power_kernel K addK mulK E addE smul u i.
+admit.
 //GOD1PRF:1184104 If a vector $x$ is annihilated by the endomorphism $u^{i+1}$, it is clear that $u(x)$ is annihilated by $u^{i}$, whence the second assertion of Lemma 1 follows. It remains therefore to show that $\mathrm{E}_{i+1}$ contains $\mathrm{E}_{i}$ strictly, for $0 \leqslant i \leqslant q$. First of all, the relation
+claim h_s35_l1_power_descent : forall i :e ordsucc q,
+  forall x :e endomorphism_power_kernel K addK mulK E addE smul u (ordsucc i),
+  u x :e endomorphism_power_kernel K addK mulK E addE smul u i.
+admit.
 //GOD1PRF:1184462 is trivial for all $i$. Suppose now that $\mathrm{E}_{i+1}=\mathrm{E}_{i}$ for some index $i$ such that $0 \leqslant i \leqslant q$. Then, for all $x \in \mathrm{E}$, we have
+claim h_s35_l1_equal_kernels_propagate : forall i :e ordsucc q,
+  endomorphism_power_kernel K addK mulK E addE smul u (ordsucc i)
+    = endomorphism_power_kernel K addK mulK E addE smul u i ->
+  endomorphism_natural_power K addK mulK E addE smul u q
+    = (fun x :e E => module_zero E addE).
+admit.
 //GOD1PRF:1184690 and therefore $u^{q-i}(x) \in \mathrm{E}_{i+1}$, hence $u^{q-i}(x) \in \mathrm{E}_{i}$ for all $x \in \mathrm{E}$, from which it follows that $u^{q}(x)=0$ for all $x \in \mathrm{E}$, and this contradicts the definition of $q$.\\
+claim h_s35_l1_strictness_conclusion : forall i :e ordsucc q,
+  endomorphism_power_kernel K addK mulK E addE smul u i
+  <> endomorphism_power_kernel K addK mulK E addE smul u (ordsucc i).
+admit.
 Admitted.
 
 Theorem god1_s35_lemma2_nilpotent_image_avoids_previous_kernel :
@@ -56648,7 +58433,21 @@ let F.
 assume hField hPositive hEndomorphism hSubspace hDisjoint.
 apply andI.
 //GOD1PRF:1184928 lemma 2. Let $i$ be an integer such that $1 \leqslant i \leqslant q$, and let F be a vector subspace of E such that $\mathrm{F} \cap \mathrm{E}_{i}=\{0\}$. Then $u(\mathrm{~F}) \cap \mathrm{E}_{i-1}=\{0\}$, and $u$ induces an isomorphism of F onto $u(\mathrm{~F})$.
+claim h_s35_l2_statement :
+  module_homomorphism_image F u
+    :/\: endomorphism_power_kernel K addK mulK E addE smul u (Union i)
+    = {module_zero E addE}
+  /\ module_isomorphism K addK mulK
+    F addE smul (module_homomorphism_image F u) addE smul u.
+admit.
 //GOD1PRF:1185195 Consider a vector $x \in u(\mathrm{~F}) \cap \mathrm{E}_{i-1}$. Then there exists $y \in \mathrm{~F}$ such that $x=u(y)$, and since $u^{i-1}(x)=u^{i}(y)$, it follows that $y \in \mathrm{~F} \cap \mathrm{E}_{i}$, hence $y=0$ and therefore $x=0$. The mapping of F into $u(\mathrm{~F})$ induced by $u$ is clearly linear and surjective; also it is injective, for if $y \in \mathrm{~F}$ is such that $u(y)=0$, then $u(y) \in u(\mathrm{~F}) \cap \mathrm{E}_{i-1}$, and the argument above shows that $y=0$. Hence $u$ induces an isomorphism of F onto $u(\mathrm{~F})$.\\
+claim h_s35_l2_kernel_and_isomorphism :
+  (forall x :e module_homomorphism_image F u
+      :/\: endomorphism_power_kernel K addK mulK E addE smul u (Union i),
+    x = module_zero E addE)
+  /\ module_isomorphism K addK mulK
+    F addE smul (module_homomorphism_image F u) addE smul u.
+admit.
 Admitted.
 
 Theorem god1_s35_lemma3_complements_adapted_to_nilpotent_map :
@@ -56674,9 +58473,70 @@ let K addK mulK E addE smul u.
 let q.
 assume hq hField hEndomorphism.
 //GOD1PRF:1185758 lemma 3. There exist vector subspaces $\mathrm{F}_{1}, \ldots, \mathrm{~F}_{q-1}$ of E with the following properties:\\
+claim h_s35_l3_family : exists F:set -> set,
+  forall i :e ordsucc (ordsucc q), 0 :e i ->
+    vector_subspace K addK mulK E addE smul (F i).
+admit.
 //GOD1PRF:1185878 a) $\mathrm{E}_{i}$ is the direct sum of $\mathrm{E}_{i-1}$ and $\mathrm{F}_{i}$ for all $i$ such that $1 \leqslant i \leqslant q+1$;\\
+claim h_s35_l3_direct_complements : exists F:set -> set,
+  forall i :e ordsucc (ordsucc q), 0 :e i ->
+    direct_sum_decomposition K addK mulK
+      (endomorphism_power_kernel K addK mulK E addE smul u i) addE smul 2
+      (fun k => if k = 0
+        then endomorphism_power_kernel K addK mulK E addE smul u (Union i)
+        else F i).
+admit.
 //GOD1PRF:1186014 b) $u$ maps $\mathrm{F}_{i}$ injectively into $\mathrm{F}_{i-1}$ for all $i$ such that $2 \leqslant i \leqslant q+1$.
+claim h_s35_l3_injective_descent : exists F:set -> set,
+  forall i :e ordsucc (ordsucc q), 0 :e Union i ->
+    (forall x :e F i, u x :e F (Union i)) /\ inj (F i) (F (Union i)) u.
+admit.
 //GOD1PRF:1186133 Start by taking $\mathrm{F}_{q+1}$ to be a complement of $\mathrm{E}_{q}$ in $\mathrm{E}_{q+1}=\mathrm{E}$. The subspace $u\left(\mathrm{~F}_{q+1}\right)$ is then contained in $\mathrm{E}_{q}$, and meets $\mathrm{E}_{q-1}$ only in 0 by Lemma 2. Consequently, there exists a complement $\mathrm{F}_{q}$ of $\mathrm{E}_{q-1}$ in $\mathrm{E}_{q}$ which contains $u\left(\mathrm{~F}_{q+1}\right)$. By Lemma 1, the subspace $u\left(\mathrm{~F}_{q}\right)$ is contained in $\mathrm{E}_{q-1}$, and meets $\mathrm{E}_{q-2}$ only in 0 by Lemma 2 . We may therefore construct a complement $\mathrm{F}_{q-1}$ of $\mathrm{E}_{q-2}$ in $\mathrm{E}_{q-1}$ which contains $u\left(\mathrm{~F}_{q}\right)$. Continuing the construction in this way, we shall obtain a sequence of subspaces $\mathrm{F}_{i}$ of E which satisfy condition $a$ ) of the lemma and are such that $u\left(\mathrm{~F}_{i}\right) \subset \mathrm{F}_{i-1}$. The fact that $u$ maps $\mathrm{F}_{i}$ injectively into $\mathrm{F}_{i-1}$ then follows from the second assertion of Lemma 2.
+claim h_s35_l3_lemma2_formal_call :
+  forall K0, forall aK mK:set -> set -> set,
+  forall X0, forall aX sX:set -> set -> set,
+  forall v0:set -> set, forall i0 :e omega, forall F0,
+    field K0 aK mK -> 0 :e i0 ->
+    module_endomorphism K0 aK mK X0 aX sX v0 ->
+    vector_subspace K0 aK mK X0 aX sX F0 ->
+    F0 :/\: endomorphism_power_kernel K0 aK mK X0 aX sX v0 i0
+      = {module_zero X0 aX} ->
+    module_homomorphism_image F0 v0
+      :/\: endomorphism_power_kernel K0 aK mK X0 aX sX v0 (Union i0)
+      = {module_zero X0 aX}
+    /\ module_isomorphism K0 aK mK F0 aX sX
+      (module_homomorphism_image F0 v0) aX sX v0.
+apply god1_s35_lemma2_nilpotent_image_avoids_previous_kernel.
+claim h_s35_l3_lemma1_formal_call :
+  forall K0, forall aK mK:set -> set -> set,
+  forall X0, forall aX sX:set -> set -> set,
+  forall v0:set -> set, forall q0 :e omega,
+    field K0 aK mK -> 0 :e q0 ->
+    module_endomorphism K0 aK mK X0 aX sX v0 ->
+    endomorphism_natural_power K0 aK mK X0 aX sX v0 q0
+      <> (fun x :e X0 => module_zero X0 aX) ->
+    endomorphism_natural_power K0 aK mK X0 aX sX v0 (ordsucc q0)
+      = (fun x :e X0 => module_zero X0 aX) ->
+    (forall i :e ordsucc q0,
+      endomorphism_power_kernel K0 aK mK X0 aX sX v0 i
+        c= endomorphism_power_kernel K0 aK mK X0 aX sX v0 (ordsucc i)
+      /\ endomorphism_power_kernel K0 aK mK X0 aX sX v0 i
+        <> endomorphism_power_kernel K0 aK mK X0 aX sX v0 (ordsucc i))
+    /\ forall i :e ordsucc q0,
+      forall x :e endomorphism_power_kernel K0 aK mK X0 aX sX v0 (ordsucc i),
+      v0 x :e endomorphism_power_kernel K0 aK mK X0 aX sX v0 i.
+apply god1_s35_lemma1_nilpotent_kernel_filtration.
+claim h_s35_l3_conclusion : exists F:set -> set,
+  forall i :e ordsucc (ordsucc q), 0 :e i ->
+    vector_subspace K addK mulK E addE smul (F i)
+    /\ direct_sum_decomposition K addK mulK
+      (endomorphism_power_kernel K addK mulK E addE smul u i) addE smul 2
+      (fun k => if k = 0
+        then endomorphism_power_kernel K addK mulK E addE smul u (Union i)
+        else F i)
+    /\ (0 :e Union i -> (forall x :e F i, u x :e F (Union i))
+      /\ inj (F i) (F (Union i)) u).
+admit.
 Admitted.
 
 //GOD1:1189561 reduced_jordan_matrix : "the square matrix #5 is a reduced matrix or Jordan block" | $#5=J_{#4}(\lambda)$
@@ -56716,6 +58576,20 @@ Definition jordan_canonical_matrix :
               else ring_zero K add
             else ring_zero K add.
 
+(** Formal interface for the §34, section 5 calculation on a reduced block. **)
+Theorem god1_s34_section5_reduced_matrix_characteristic_splits_interface :
+  forall K, forall add mul:set -> set -> set,
+  forall n :e omega, forall A :e square_matrix_ring K n,
+    field K add mul -> reduced_jordan_matrix K add mul n A ->
+    polynomial_splits_over K add mul
+      (matrix_characteristic_polynomial K add mul n A).
+let K add mul.
+let n.
+assume hn.
+let A.
+assume hA hField hReduced.
+Admitted.
+
 Theorem god1_s35_theorem4_jordan_canonical_form :
   forall K, forall addK mulK:set -> set -> set,
   forall E, forall addE smul:set -> set -> set,
@@ -56737,15 +58611,123 @@ let a u.
 assume hField hBasis hEndomorphism.
 apply iffI.
 //GOD1PRF:1190211 theorem 4 (Jordan). Let E be a finite-dimensional vector space over a field K , and let $u$ be an endomorphism of E . Then the following properties of $u$ are equivalent:\\
+claim h_s35_t4_statement :
+  endomorphism_has_all_eigenvalues_in_field K addK mulK E addE smul n a u
+  <-> exists b:set -> set, module_basis K addK mulK E addE smul n b
+    /\ jordan_canonical_matrix K addK mulK n
+      (endomorphism_coordinate_matrix K addK mulK E addE smul n b u).
+admit.
 //GOD1PRF:1190384 a) all the eigenvalues of $u$ are in K , i.e. the polynomial $p_{u}$ has all its roots in K ;\\
+claim h_s35_t4_condition_a :
+  endomorphism_has_all_eigenvalues_in_field K addK mulK E addE smul n a u
+  <-> polynomial_splits_over K addK mulK
+    (endomorphism_characteristic_polynomial K addK mulK E addE smul n a u).
+admit.
 //GOD1PRF:1190480 b) there exists a basis of E with respect to which the matrix of $u$ is of the form
+claim h_s35_t4_condition_b : exists b:set -> set,
+  module_basis K addK mulK E addE smul n b
+  /\ jordan_canonical_matrix K addK mulK n
+    (endomorphism_coordinate_matrix K addK mulK E addE smul n b u).
+admit.
 //GOD1PRF:1190848 where each $\mathrm{U}_{i}$ is a reduced matrix with coefficients in K . (This matrix is called a Jordan canonical form for the endomorphism $u$.)
+claim h_s35_t4_jordan_blocks : exists r :e omega, exists sizes :e omega :^: r,
+  exists roots :e K :^: r,
+    (forall i :e r, 0 :e sizes i)
+    /\ ring_finite_sum omega add_SNo r (fun i => sizes i) = n.
+admit.
 //GOD1PRF:1190996 Suppose that all the eigenvalues of $u$ are in K , and apply Theorem 2 first of all. Let $u_{i}$ be the restriction of $u$ to $\mathrm{E}_{i}$. For each $i$, suppose that we have constructed a basis $\left(x_{i j}\right)_{1 \leqslant j \leqslant n_{i}}$ of $\mathrm{E}_{i}$ with respect to which the matrix of $u_{i}$ has the form indicated in the statement of Theorem 4; then, by taking the union of these bases, we shall obtain a basis of E relative to which the matrix of $u$ has the desired form. Hence we have to examine $u_{i}$ more closely. We have
+claim h_s35_t4_theorem2_formal_call :
+  forall K0, forall aK mK:set -> set -> set,
+  forall X0, forall aX sX:set -> set -> set,
+  forall p0 q0 :e omega, forall b0:set -> set, forall v0:set -> set,
+  forall roots0 :e K0 :^: q0, forall exponents0 :e omega :^: q0,
+    field K0 aK mK -> module_basis K0 aK mK X0 aX sX p0 b0 ->
+    module_endomorphism K0 aK mK X0 aX sX v0 ->
+    endomorphism_has_all_eigenvalues_in_field K0 aK mK X0 aX sX p0 b0 v0 ->
+    (forall i j :e q0, i <> j -> roots0 i <> roots0 j) ->
+    (forall z :e K0, endomorphism_eigenvalue K0 aK mK X0 aX sX v0 z
+      <-> exists i :e q0, z = roots0 i) ->
+    (forall i :e q0, endomorphism_eigenvalue_multiplicity
+      K0 aK mK X0 aX sX p0 b0 v0 (roots0 i) = exponents0 i) ->
+    direct_sum_decomposition K0 aK mK X0 aX sX q0
+      (fun i => generalized_eigenspace K0 aK mK X0 aX sX v0
+        (roots0 i) (exponents0 i))
+    /\ forall i :e q0, module_dimension K0 aK mK
+      (generalized_eigenspace K0 aK mK X0 aX sX v0
+        (roots0 i) (exponents0 i)) aX sX = exponents0 i.
+apply god1_s35_theorem2_primary_decomposition.
+claim h_s35_t4_primary_basis_reduction :
+  endomorphism_has_all_eigenvalues_in_field K addK mulK E addE smul n a u ->
+  exists q :e omega, exists G:set -> set,
+    direct_sum_decomposition K addK mulK E addE smul q G.
+admit.
 //GOD1PRF:1191584 where $v_{i}$ is a nilpotent endomorphism of $\mathrm{E}_{i}$, and therefore it is enough to show that there exists a basis of $\mathrm{E}_{i}$ relative to which the matrix of $v_{i}$ is a diagonal tableau of reduced matrices. For this we apply Theorem 3 to $v_{i}$ and $\mathrm{E}_{i}$, by forming a reduced\\
+claim h_s35_t4_theorem3_formal_call :
+  forall K0, forall aK mK:set -> set -> set,
+  forall X0, forall aX sX:set -> set -> set,
+  forall p0 :e omega, forall v0:set -> set,
+    field K0 aK mK -> 0 :e p0 ->
+    finite_dimensional_vector_space K0 aK mK X0 aX sX ->
+    module_dimension K0 aK mK X0 aX sX = p0 ->
+    module_endomorphism K0 aK mK X0 aX sX v0 ->
+    nilpotent_endomorphism K0 aK mK X0 aX sX v0 ->
+    exists c:set -> set, exists coeff :e K0 :^: p0,
+      module_basis K0 aK mK X0 aX sX p0 c
+      /\ (forall i :e p0,
+        coeff i = ring_zero K0 aK \/ coeff i = ring_one K0 mK)
+      /\ forall i j :e p0,
+        matrix_entry (endomorphism_coordinate_matrix K0 aK mK X0 aX sX p0 c v0) i j
+        = if j = ordsucc i then coeff j else ring_zero K0 aK.
+apply god1_s35_theorem3_nilpotent_basis_structure.
+claim h_s35_t4_nilpotent_block_bases : exists q :e omega,
+  forall i :e q, exists d :e omega, exists b:set -> set,
+    module_basis K addK mulK E addE smul d b.
+admit.
 //GOD1PRF:1191895 matrix every time that we have a string of coefficients $v_{i}$ equal to 1 . For example, the matrix
+claim h_s35_t4_chain_partition_into_blocks : exists r :e omega,
+  exists sizes :e omega :^: r, forall i :e r, 0 :e sizes i.
+admit.
 //GOD1PRF:1192635 It is clear that this process will show that $a$ ) implies $b$ ).\\
+claim h_s35_t4_forward_direction :
+  endomorphism_has_all_eigenvalues_in_field K addK mulK E addE smul n a u ->
+  exists b:set -> set, module_basis K addK mulK E addE smul n b
+    /\ jordan_canonical_matrix K addK mulK n
+      (endomorphism_coordinate_matrix K addK mulK E addE smul n b u).
+admit.
 //GOD1PRF:1192703 To prove that $b$ ) implies $a$ ) we observe that, by § 34, Remark 4, property b) implies that
+claim h_s35_t4_s34_remark4_formal_call :
+  forall K0, forall aK mK:set -> set -> set,
+  forall X0, forall aX sX:set -> set -> set,
+  forall p0 :e omega, forall b0:set -> set, forall v0:set -> set,
+  forall z0 :e K0,
+    field K0 aK mK -> module_basis K0 aK mK X0 aX sX p0 b0 ->
+    module_endomorphism K0 aK mK X0 aX sX v0 ->
+    endomorphism_eigenvalue K0 aK mK X0 aX sX v0 z0 ->
+    module_dimension K0 aK mK
+      (endomorphism_eigenspace K0 aK mK X0 aX sX v0 z0) aX sX
+    c= endomorphism_eigenvalue_multiplicity K0 aK mK X0 aX sX p0 b0 v0 z0.
+apply god1_eigenspace_dimension_at_most_root_multiplicity.
+claim h_s35_t4_block_characteristic_reduction :
+  (exists b:set -> set, module_basis K addK mulK E addE smul n b
+    /\ jordan_canonical_matrix K addK mulK n
+      (endomorphism_coordinate_matrix K addK mulK E addE smul n b u)) ->
+  polynomial_splits_over K addK mulK
+    (endomorphism_characteristic_polynomial K addK mulK E addE smul n a u).
+admit.
 //GOD1PRF:1192896 hence to show that $p_{u}$ has all its roots in K it is enough to show that the same is true of $p_{\mathrm{U}}$ for any reduced matrix U. This is clear from § 34, section 5, and the proof of Jordan's theorem is complete.
+claim h_s35_t4_s34_section5_formal_call :
+  forall K0, forall aK mK:set -> set -> set,
+  forall p0 :e omega, forall A0 :e square_matrix_ring K0 p0,
+    field K0 aK mK -> reduced_jordan_matrix K0 aK mK p0 A0 ->
+    polynomial_splits_over K0 aK mK
+      (matrix_characteristic_polynomial K0 aK mK p0 A0).
+apply god1_s34_section5_reduced_matrix_characteristic_splits_interface.
+claim h_s35_t4_conclusion :
+  endomorphism_has_all_eigenvalues_in_field K addK mulK E addE smul n a u
+  <-> exists b:set -> set, module_basis K addK mulK E addE smul n b
+    /\ jordan_canonical_matrix K addK mulK n
+      (endomorphism_coordinate_matrix K addK mulK E addE smul n b u).
+admit.
 Admitted.
 
 Theorem god1_jordan_canonical_form_for_matrices :
@@ -56766,7 +58748,28 @@ assume hn.
 let U.
 assume hU hField hSplits.
 //GOD1PRF:1193371 Of course, Jordan's theorem (which we have stated for an endomorphism) also applies to matrices: if U is a square matrix of order $n$ with coefficients in K , and if U has all its eigenvalues in K , then there exists a matrix $\mathrm{P} \in \mathrm{GL}(n, \mathrm{~K})$ such that\\
+claim h_s35_matrix_jordan_theorem4_formal_call :
+  forall K0, forall aK mK:set -> set -> set,
+  forall X0, forall aX sX:set -> set -> set,
+  forall p0 :e omega, forall b0:set -> set, forall v0:set -> set,
+    field K0 aK mK -> module_basis K0 aK mK X0 aX sX p0 b0 ->
+    module_endomorphism K0 aK mK X0 aX sX v0 ->
+    (endomorphism_has_all_eigenvalues_in_field K0 aK mK X0 aX sX p0 b0 v0
+    <-> exists c:set -> set, module_basis K0 aK mK X0 aX sX p0 c
+      /\ jordan_canonical_matrix K0 aK mK p0
+        (endomorphism_coordinate_matrix K0 aK mK X0 aX sX p0 c v0)).
+apply god1_s35_theorem4_jordan_canonical_form.
+claim h_s35_matrix_jordan_conjugating_matrix : exists P :e square_matrix_ring K n,
+  invertible_matrix K add mul n P.
+admit.
 //GOD1PRF:1193654 where the $\mathrm{U}_{i}$ are Jordan matrices.
+claim h_s35_matrix_jordan_conclusion : exists P :e square_matrix_ring K n,
+  invertible_matrix K add mul n P
+  /\ jordan_canonical_matrix K add mul n
+    (matrix_multiplication K add mul n n n
+      (matrix_multiplication K add mul n n n P U)
+      (matrix_inverse K add mul n P)).
+admit.
 Admitted.
 
 (** § 36. Hermitian forms. **)
@@ -56850,6 +58853,27 @@ Definition sesquilinear_dual_map :
   set -> set -> (set -> set -> set) -> set -> set :=
   fun K L f y => fun x :e L => f x y.
 
+(** Formal coordinate-system interface for Example 5 used in Theorem 1. **)
+Theorem god1_s36_example5_sesquilinear_coordinate_system_interface :
+  forall K, forall addK mulK:set -> set -> set, forall star:set -> set,
+  forall L, forall addL smul:set -> set -> set,
+  forall n :e omega, forall a:set -> set, forall f:set -> set -> set,
+    field_involution K addK mulK star ->
+    module_basis K addK mulK L addL smul n a ->
+    sesquilinear_form K addK mulK star L addL smul f ->
+    forall y :e L,
+      ((forall x :e L, f x y = ring_zero K addK)
+      <-> forall i :e n, f (a i) y = ring_zero K addK).
+let K addK mulK star L addL smul.
+let n.
+assume hn.
+let a f.
+assume hInvolution hBasis hForm.
+let y.
+assume hy.
+apply iffI.
+Admitted.
+
 Theorem god1_s36_theorem1_nondegenerate_form_characterizations :
   forall K, forall addK mulK:set -> set -> set,
   forall star:set -> set,
@@ -56876,15 +58900,253 @@ let a f.
 assume hInvolution hBasis hForm.
 apply andI.
 //GOD1PRF:1225684 theorem 1. Let L be a finite-dimensional vector space over K , let $f$ be a sesquilinear form on L , and let $\mathrm{A}=\left(\alpha_{i j}\right)$ be the matrix of frelative to a basis of L . Then the following statements are equivalent :\\
+claim h_s36_prf_1225684 :
+  forall K, forall addK mulK:set -> set -> set,
+  forall star:set -> set,
+  forall L, forall addL smul:set -> set -> set,
+  forall n :e omega, forall a:set -> set,
+  forall f:set -> set -> set,
+    field_involution K addK mulK star ->
+    module_basis K addK mulK L addL smul n a ->
+    sesquilinear_form K addK mulK star L addL smul f ->
+    let A := sesquilinear_form_matrix K n a f in
+    (nondegenerate_sesquilinear_form K addK mulK star L addL smul f
+      <-> forall x :e L,
+      (forall y :e L, f x y = ring_zero K addK) -> x = module_zero L addL)
+    /\ ((forall x :e L,
+      (forall y :e L, f x y = ring_zero K addK) -> x = module_zero L addL)
+      <-> invertible_matrix K addK mulK n A)
+    /\ (invertible_matrix K addK mulK n A
+      <-> bij L (commutative_module_dual K addK mulK L addL smul)
+        (fun y => sesquilinear_dual_map K L f y)).
+admit.
 //GOD1PRF:1225926 a) The relation
+claim h_s36_prf_1225926 :
+  forall K, forall addK mulK:set -> set -> set,
+  forall star:set -> set,
+  forall L, forall addL smul:set -> set -> set,
+  forall n :e omega, forall a:set -> set,
+  forall f:set -> set -> set,
+    field_involution K addK mulK star ->
+    module_basis K addK mulK L addL smul n a ->
+    sesquilinear_form K addK mulK star L addL smul f ->
+    let A := sesquilinear_form_matrix K n a f in
+    (nondegenerate_sesquilinear_form K addK mulK star L addL smul f
+      <-> forall x :e L,
+      (forall y :e L, f x y = ring_zero K addK) -> x = module_zero L addL)
+    /\ ((forall x :e L,
+      (forall y :e L, f x y = ring_zero K addK) -> x = module_zero L addL)
+      <-> invertible_matrix K addK mulK n A)
+    /\ (invertible_matrix K addK mulK n A
+      <-> bij L (commutative_module_dual K addK mulK L addL smul)
+        (fun y => sesquilinear_dual_map K L f y)).
+admit.
 //GOD1PRF:1226002 implies $y=0$;\\
+claim h_s36_prf_1226002 :
+  forall K, forall addK mulK:set -> set -> set,
+  forall star:set -> set,
+  forall L, forall addL smul:set -> set -> set,
+  forall n :e omega, forall a:set -> set,
+  forall f:set -> set -> set,
+    field_involution K addK mulK star ->
+    module_basis K addK mulK L addL smul n a ->
+    sesquilinear_form K addK mulK star L addL smul f ->
+    let A := sesquilinear_form_matrix K n a f in
+    (nondegenerate_sesquilinear_form K addK mulK star L addL smul f
+      <-> forall x :e L,
+      (forall y :e L, f x y = ring_zero K addK) -> x = module_zero L addL)
+    /\ ((forall x :e L,
+      (forall y :e L, f x y = ring_zero K addK) -> x = module_zero L addL)
+      <-> invertible_matrix K addK mulK n A)
+    /\ (invertible_matrix K addK mulK n A
+      <-> bij L (commutative_module_dual K addK mulK L addL smul)
+        (fun y => sesquilinear_dual_map K L f y)).
+admit.
 //GOD1PRF:1226019 b) The relation
+claim h_s36_prf_1226019 :
+  forall K, forall addK mulK:set -> set -> set,
+  forall star:set -> set,
+  forall L, forall addL smul:set -> set -> set,
+  forall n :e omega, forall a:set -> set,
+  forall f:set -> set -> set,
+    field_involution K addK mulK star ->
+    module_basis K addK mulK L addL smul n a ->
+    sesquilinear_form K addK mulK star L addL smul f ->
+    let A := sesquilinear_form_matrix K n a f in
+    (nondegenerate_sesquilinear_form K addK mulK star L addL smul f
+      <-> forall x :e L,
+      (forall y :e L, f x y = ring_zero K addK) -> x = module_zero L addL)
+    /\ ((forall x :e L,
+      (forall y :e L, f x y = ring_zero K addK) -> x = module_zero L addL)
+      <-> invertible_matrix K addK mulK n A)
+    /\ (invertible_matrix K addK mulK n A
+      <-> bij L (commutative_module_dual K addK mulK L addL smul)
+        (fun y => sesquilinear_dual_map K L f y)).
+admit.
 //GOD1PRF:1226089 implies $x=0$;\\
+claim h_s36_prf_1226089 :
+  forall K, forall addK mulK:set -> set -> set,
+  forall star:set -> set,
+  forall L, forall addL smul:set -> set -> set,
+  forall n :e omega, forall a:set -> set,
+  forall f:set -> set -> set,
+    field_involution K addK mulK star ->
+    module_basis K addK mulK L addL smul n a ->
+    sesquilinear_form K addK mulK star L addL smul f ->
+    let A := sesquilinear_form_matrix K n a f in
+    (nondegenerate_sesquilinear_form K addK mulK star L addL smul f
+      <-> forall x :e L,
+      (forall y :e L, f x y = ring_zero K addK) -> x = module_zero L addL)
+    /\ ((forall x :e L,
+      (forall y :e L, f x y = ring_zero K addK) -> x = module_zero L addL)
+      <-> invertible_matrix K addK mulK n A)
+    /\ (invertible_matrix K addK mulK n A
+      <-> bij L (commutative_module_dual K addK mulK L addL smul)
+        (fun y => sesquilinear_dual_map K L f y)).
+admit.
 //GOD1PRF:1226106 c) The matrix A is invertible, i.e., we have
+claim h_s36_prf_1226106 :
+  forall K, forall addK mulK:set -> set -> set,
+  forall star:set -> set,
+  forall L, forall addL smul:set -> set -> set,
+  forall n :e omega, forall a:set -> set,
+  forall f:set -> set -> set,
+    field_involution K addK mulK star ->
+    module_basis K addK mulK L addL smul n a ->
+    sesquilinear_form K addK mulK star L addL smul f ->
+    let A := sesquilinear_form_matrix K n a f in
+    (nondegenerate_sesquilinear_form K addK mulK star L addL smul f
+      <-> forall x :e L,
+      (forall y :e L, f x y = ring_zero K addK) -> x = module_zero L addL)
+    /\ ((forall x :e L,
+      (forall y :e L, f x y = ring_zero K addK) -> x = module_zero L addL)
+      <-> invertible_matrix K addK mulK n A)
+    /\ (invertible_matrix K addK mulK n A
+      <-> bij L (commutative_module_dual K addK mulK L addL smul)
+        (fun y => sesquilinear_dual_map K L f y)).
+admit.
 //GOD1PRF:1226212 d) The mapping $\hat{f}: \mathrm{L} \rightarrow \mathrm{L}^{*}$ is bijective: in other words, for every linear form $u$ on L there exists a unique $y \in \mathrm{~L}$ such that
+claim h_s36_prf_1226212 :
+  forall K, forall addK mulK:set -> set -> set,
+  forall star:set -> set,
+  forall L, forall addL smul:set -> set -> set,
+  forall n :e omega, forall a:set -> set,
+  forall f:set -> set -> set,
+    field_involution K addK mulK star ->
+    module_basis K addK mulK L addL smul n a ->
+    sesquilinear_form K addK mulK star L addL smul f ->
+    let A := sesquilinear_form_matrix K n a f in
+    (nondegenerate_sesquilinear_form K addK mulK star L addL smul f
+      <-> forall x :e L,
+      (forall y :e L, f x y = ring_zero K addK) -> x = module_zero L addL)
+    /\ ((forall x :e L,
+      (forall y :e L, f x y = ring_zero K addK) -> x = module_zero L addL)
+      <-> invertible_matrix K addK mulK n A)
+    /\ (invertible_matrix K addK mulK n A
+      <-> bij L (commutative_module_dual K addK mulK L addL smul)
+        (fun y => sesquilinear_dual_map K L f y)).
+admit.
 //GOD1PRF:1226454 Using the notation of Example 5, the $y \in \mathrm{~L}$ such that $f(x, y)=0$ for all $x \in \mathrm{~L}$ are evidently the solutions of the system of equations
+claim h_s36_prf_1226454 :
+  forall K, forall addK mulK:set -> set -> set,
+  forall star:set -> set,
+  forall L, forall addL smul:set -> set -> set,
+  forall n :e omega, forall a:set -> set,
+  forall f:set -> set -> set,
+    field_involution K addK mulK star ->
+    module_basis K addK mulK L addL smul n a ->
+    sesquilinear_form K addK mulK star L addL smul f ->
+    let A := sesquilinear_form_matrix K n a f in
+    (nondegenerate_sesquilinear_form K addK mulK star L addL smul f
+      <-> forall x :e L,
+      (forall y :e L, f x y = ring_zero K addK) -> x = module_zero L addL)
+    /\ ((forall x :e L,
+      (forall y :e L, f x y = ring_zero K addK) -> x = module_zero L addL)
+      <-> invertible_matrix K addK mulK n A)
+    /\ (invertible_matrix K addK mulK n A
+      <-> bij L (commutative_module_dual K addK mulK L addL smul)
+        (fun y => sesquilinear_dual_map K L f y)).
+admit.
+claim h_s36_ref_1226454_god1_s36_example5_sesquilinear_coordinate_system_interface :
+  forall K, forall addK mulK:set -> set -> set, forall star:set -> set,
+  forall L, forall addL smul:set -> set -> set,
+  forall n :e omega, forall a:set -> set, forall f:set -> set -> set,
+    field_involution K addK mulK star ->
+    module_basis K addK mulK L addL smul n a ->
+    sesquilinear_form K addK mulK star L addL smul f ->
+    forall y :e L,
+      ((forall x :e L, f x y = ring_zero K addK)
+      <-> forall i :e n, f (a i) y = ring_zero K addK).
+apply god1_s36_example5_sesquilinear_coordinate_system_interface.
 //GOD1PRF:1226977 In $d$ ), if we put $u\left(a_{i}\right)=v_{i}$, we have to determine $y$ so that $f\left(a_{i}, y\right)=v_{i}$ for all $i$, i.e., we have to solve the system of equations
+claim h_s36_prf_1226977 :
+  forall K, forall addK mulK:set -> set -> set,
+  forall star:set -> set,
+  forall L, forall addL smul:set -> set -> set,
+  forall n :e omega, forall a:set -> set,
+  forall f:set -> set -> set,
+    field_involution K addK mulK star ->
+    module_basis K addK mulK L addL smul n a ->
+    sesquilinear_form K addK mulK star L addL smul f ->
+    let A := sesquilinear_form_matrix K n a f in
+    (nondegenerate_sesquilinear_form K addK mulK star L addL smul f
+      <-> forall x :e L,
+      (forall y :e L, f x y = ring_zero K addK) -> x = module_zero L addL)
+    /\ ((forall x :e L,
+      (forall y :e L, f x y = ring_zero K addK) -> x = module_zero L addL)
+      <-> invertible_matrix K addK mulK n A)
+    /\ (invertible_matrix K addK mulK n A
+      <-> bij L (commutative_module_dual K addK mulK L addL smul)
+        (fun y => sesquilinear_dual_map K L f y)).
+admit.
 //GOD1PRF:1227271 Thus condition $d$ ) signifies that the system (16) has a unique solution for all choices of the $v_{i}$; its equivalence with $c$ ), and with $a$ ) which expresses that the system (14) has only the trivial solution, therefore follows from § 20, Theorem 2. Moreover, b) signifies that (15) has only the trivial solution, hence that the matrix $\left(\alpha_{j i}\right)$ is invertible ; since this matrix is the transpose of the matrix ( $\alpha_{i j}$ ), it follows that $b$ ) and $c$ ) are equivalent.\\
+claim h_s36_prf_1227271 :
+  forall K, forall addK mulK:set -> set -> set,
+  forall star:set -> set,
+  forall L, forall addL smul:set -> set -> set,
+  forall n :e omega, forall a:set -> set,
+  forall f:set -> set -> set,
+    field_involution K addK mulK star ->
+    module_basis K addK mulK L addL smul n a ->
+    sesquilinear_form K addK mulK star L addL smul f ->
+    let A := sesquilinear_form_matrix K n a f in
+    (nondegenerate_sesquilinear_form K addK mulK star L addL smul f
+      <-> forall x :e L,
+      (forall y :e L, f x y = ring_zero K addK) -> x = module_zero L addL)
+    /\ ((forall x :e L,
+      (forall y :e L, f x y = ring_zero K addK) -> x = module_zero L addL)
+      <-> invertible_matrix K addK mulK n A)
+    /\ (invertible_matrix K addK mulK n A
+      <-> bij L (commutative_module_dual K addK mulK L addL smul)
+        (fun y => sesquilinear_dual_map K L f y)).
+admit.
+claim h_s36_ref_1227271_god1_s20_theorem2_square_cramer_equivalences_and_solution :
+  forall K, forall add mul:set -> set -> set,
+  forall n :e omega, forall A :e square_matrix_ring K n,
+    division_ring K add mul ->
+    (cramer_linear_system K add mul n n A
+    <-> forall b :e K :^: n,
+      exists x :e K :^: n,
+        linear_system_solution K add mul n n A b x)
+    /\ (cramer_linear_system K add mul n n A
+    <-> forall b :e K :^: n, forall x y :e K :^: n,
+      linear_system_solution K add mul n n A b x ->
+      linear_system_solution K add mul n n A b y -> x = y)
+    /\ (cramer_linear_system K add mul n n A
+    <-> exists b :e K :^: n,
+      linear_system_unique_solution K add mul n n A b)
+    /\ (cramer_linear_system K add mul n n A
+    <-> associated_homogeneous_solution_space K add mul n n A
+      = {(fun j :e n => ring_zero K add)})
+    /\ (cramer_linear_system K add mul n n A
+    <-> invertible_matrix K add mul n A)
+    /\ (invertible_matrix K add mul n A ->
+      forall b :e K :^: n,
+        linear_system_unique_solution K add mul n n A b
+        /\ linear_system_solution K add mul n n A b
+          (matrix_vector_product K add mul n n
+            (matrix_inverse K add mul n A) b)).
+apply god1_s20_theorem2_square_cramer_equivalences_and_solution.
 Admitted.
 
 //GOD1:1229884 adjoint_homomorphism : "the adjoint of #14 with respect to forms #12 and #13" | $#14^*$
@@ -56923,14 +59185,205 @@ let K addK mulK star L M addL smulL addM smulM f g u.
 assume hInvolution hFiniteL hFiniteM hNondegenerateF hNondegenerateG hHomomorphism.
 apply andI.
 //GOD1PRF:1228336 Let $\mathrm{L}, \mathrm{M}$ be two finite-dimensional vector spaces over K , and let $f, g$ be non-degenerate sesquilinear forms on L, M respectively.
+claim h_s36_prf_1228336 :
+  forall K, forall addK mulK:set -> set -> set,
+  forall star:set -> set,
+  forall L M, forall addL smulL addM smulM:set -> set -> set,
+  forall f g:set -> set -> set, forall u:set -> set,
+    field_involution K addK mulK star ->
+    finite_dimensional_vector_space K addK mulK L addL smulL ->
+    finite_dimensional_vector_space K addK mulK M addM smulM ->
+    nondegenerate_sesquilinear_form K addK mulK star L addL smulL f ->
+    nondegenerate_sesquilinear_form K addK mulK star M addM smulM g ->
+    module_homomorphism K addK mulK L addL smulL M addM smulM u ->
+    module_homomorphism K addK mulK M addM smulM L addL smulL
+      (fun y => adjoint_homomorphism K addK mulK L M f g u y)
+    /\ (forall x :e L, forall y :e M,
+      f x (adjoint_homomorphism K addK mulK L M f g u y) = g (u x) y)
+    /\ forall v:set -> set,
+      (forall x :e L, forall y :e M, f x (v y) = g (u x) y) ->
+      v = (fun y => adjoint_homomorphism K addK mulK L M f g u y).
+admit.
 //GOD1PRF:1228489 Let $u: \mathrm{L} \rightarrow \mathrm{M}$ be a homomorphism, and consider the expression
+claim h_s36_prf_1228489 :
+  forall K, forall addK mulK:set -> set -> set,
+  forall star:set -> set,
+  forall L M, forall addL smulL addM smulM:set -> set -> set,
+  forall f g:set -> set -> set, forall u:set -> set,
+    field_involution K addK mulK star ->
+    finite_dimensional_vector_space K addK mulK L addL smulL ->
+    finite_dimensional_vector_space K addK mulK M addM smulM ->
+    nondegenerate_sesquilinear_form K addK mulK star L addL smulL f ->
+    nondegenerate_sesquilinear_form K addK mulK star M addM smulM g ->
+    module_homomorphism K addK mulK L addL smulL M addM smulM u ->
+    module_homomorphism K addK mulK M addM smulM L addL smulL
+      (fun y => adjoint_homomorphism K addK mulK L M f g u y)
+    /\ (forall x :e L, forall y :e M,
+      f x (adjoint_homomorphism K addK mulK L M f g u y) = g (u x) y)
+    /\ forall v:set -> set,
+      (forall x :e L, forall y :e M, f x (v y) = g (u x) y) ->
+      v = (fun y => adjoint_homomorphism K addK mulK L M f g u y).
+admit.
 //GOD1PRF:1228643 For a given $y \in \mathrm{M}$, this is a linear form in $x \in \mathrm{~L}$, and hence Theorem $1 d$ ) shows that for each $y \in \mathrm{M}$ there exists a unique $y^{\prime} \in \mathrm{L}$ such that
+claim h_s36_prf_1228643 :
+  forall K, forall addK mulK:set -> set -> set,
+  forall star:set -> set,
+  forall L M, forall addL smulL addM smulM:set -> set -> set,
+  forall f g:set -> set -> set, forall u:set -> set,
+    field_involution K addK mulK star ->
+    finite_dimensional_vector_space K addK mulK L addL smulL ->
+    finite_dimensional_vector_space K addK mulK M addM smulM ->
+    nondegenerate_sesquilinear_form K addK mulK star L addL smulL f ->
+    nondegenerate_sesquilinear_form K addK mulK star M addM smulM g ->
+    module_homomorphism K addK mulK L addL smulL M addM smulM u ->
+    module_homomorphism K addK mulK M addM smulM L addL smulL
+      (fun y => adjoint_homomorphism K addK mulK L M f g u y)
+    /\ (forall x :e L, forall y :e M,
+      f x (adjoint_homomorphism K addK mulK L M f g u y) = g (u x) y)
+    /\ forall v:set -> set,
+      (forall x :e L, forall y :e M, f x (v y) = g (u x) y) ->
+      v = (fun y => adjoint_homomorphism K addK mulK L M f g u y).
+admit.
+claim h_s36_ref_1228643_god1_s36_theorem1_nondegenerate_form_characterizations :
+  forall K, forall addK mulK:set -> set -> set,
+  forall star:set -> set,
+  forall L, forall addL smul:set -> set -> set,
+  forall n :e omega, forall a:set -> set,
+  forall f:set -> set -> set,
+    field_involution K addK mulK star ->
+    module_basis K addK mulK L addL smul n a ->
+    sesquilinear_form K addK mulK star L addL smul f ->
+    let A := sesquilinear_form_matrix K n a f in
+    (nondegenerate_sesquilinear_form K addK mulK star L addL smul f
+      <-> forall x :e L,
+      (forall y :e L, f x y = ring_zero K addK) -> x = module_zero L addL)
+    /\ ((forall x :e L,
+      (forall y :e L, f x y = ring_zero K addK) -> x = module_zero L addL)
+      <-> invertible_matrix K addK mulK n A)
+    /\ (invertible_matrix K addK mulK n A
+      <-> bij L (commutative_module_dual K addK mulK L addL smul)
+        (fun y => sesquilinear_dual_map K L f y)).
+apply god1_s36_theorem1_nondegenerate_form_characterizations.
 //GOD1PRF:1228893 for all $x \in \mathrm{~L}$. Putting $y^{\prime}=u^{*}(y)$ we have a mapping
+claim h_s36_prf_1228893 :
+  forall K, forall addK mulK:set -> set -> set,
+  forall star:set -> set,
+  forall L M, forall addL smulL addM smulM:set -> set -> set,
+  forall f g:set -> set -> set, forall u:set -> set,
+    field_involution K addK mulK star ->
+    finite_dimensional_vector_space K addK mulK L addL smulL ->
+    finite_dimensional_vector_space K addK mulK M addM smulM ->
+    nondegenerate_sesquilinear_form K addK mulK star L addL smulL f ->
+    nondegenerate_sesquilinear_form K addK mulK star M addM smulM g ->
+    module_homomorphism K addK mulK L addL smulL M addM smulM u ->
+    module_homomorphism K addK mulK M addM smulM L addL smulL
+      (fun y => adjoint_homomorphism K addK mulK L M f g u y)
+    /\ (forall x :e L, forall y :e M,
+      f x (adjoint_homomorphism K addK mulK L M f g u y) = g (u x) y)
+    /\ forall v:set -> set,
+      (forall x :e L, forall y :e M, f x (v y) = g (u x) y) ->
+      v = (fun y => adjoint_homomorphism K addK mulK L M f g u y).
+admit.
 //GOD1PRF:1229202 The mapping $u^{*}$ is linear, like $u$. For if $y, z \in \mathrm{M}$ we have
+claim h_s36_prf_1229202 :
+  forall K, forall addK mulK:set -> set -> set,
+  forall star:set -> set,
+  forall L M, forall addL smulL addM smulM:set -> set -> set,
+  forall f g:set -> set -> set, forall u:set -> set,
+    field_involution K addK mulK star ->
+    finite_dimensional_vector_space K addK mulK L addL smulL ->
+    finite_dimensional_vector_space K addK mulK M addM smulM ->
+    nondegenerate_sesquilinear_form K addK mulK star L addL smulL f ->
+    nondegenerate_sesquilinear_form K addK mulK star M addM smulM g ->
+    module_homomorphism K addK mulK L addL smulL M addM smulM u ->
+    module_homomorphism K addK mulK M addM smulM L addL smulL
+      (fun y => adjoint_homomorphism K addK mulK L M f g u y)
+    /\ (forall x :e L, forall y :e M,
+      f x (adjoint_homomorphism K addK mulK L M f g u y) = g (u x) y)
+    /\ forall v:set -> set,
+      (forall x :e L, forall y :e M, f x (v y) = g (u x) y) ->
+      v = (fun y => adjoint_homomorphism K addK mulK L M f g u y).
+admit.
 //GOD1PRF:1229478 from which it follows that
+claim h_s36_prf_1229478 :
+  forall K, forall addK mulK:set -> set -> set,
+  forall star:set -> set,
+  forall L M, forall addL smulL addM smulM:set -> set -> set,
+  forall f g:set -> set -> set, forall u:set -> set,
+    field_involution K addK mulK star ->
+    finite_dimensional_vector_space K addK mulK L addL smulL ->
+    finite_dimensional_vector_space K addK mulK M addM smulM ->
+    nondegenerate_sesquilinear_form K addK mulK star L addL smulL f ->
+    nondegenerate_sesquilinear_form K addK mulK star M addM smulM g ->
+    module_homomorphism K addK mulK L addL smulL M addM smulM u ->
+    module_homomorphism K addK mulK M addM smulM L addL smulL
+      (fun y => adjoint_homomorphism K addK mulK L M f g u y)
+    /\ (forall x :e L, forall y :e M,
+      f x (adjoint_homomorphism K addK mulK L M f g u y) = g (u x) y)
+    /\ forall v:set -> set,
+      (forall x :e L, forall y :e M, f x (v y) = g (u x) y) ->
+      v = (fun y => adjoint_homomorphism K addK mulK L M f g u y).
+admit.
 //GOD1PRF:1229544 also we have
+claim h_s36_prf_1229544 :
+  forall K, forall addK mulK:set -> set -> set,
+  forall star:set -> set,
+  forall L M, forall addL smulL addM smulM:set -> set -> set,
+  forall f g:set -> set -> set, forall u:set -> set,
+    field_involution K addK mulK star ->
+    finite_dimensional_vector_space K addK mulK L addL smulL ->
+    finite_dimensional_vector_space K addK mulK M addM smulM ->
+    nondegenerate_sesquilinear_form K addK mulK star L addL smulL f ->
+    nondegenerate_sesquilinear_form K addK mulK star M addM smulM g ->
+    module_homomorphism K addK mulK L addL smulL M addM smulM u ->
+    module_homomorphism K addK mulK M addM smulM L addL smulL
+      (fun y => adjoint_homomorphism K addK mulK L M f g u y)
+    /\ (forall x :e L, forall y :e M,
+      f x (adjoint_homomorphism K addK mulK L M f g u y) = g (u x) y)
+    /\ forall v:set -> set,
+      (forall x :e L, forall y :e M, f x (v y) = g (u x) y) ->
+      v = (fun y => adjoint_homomorphism K addK mulK L M f g u y).
+admit.
 //GOD1PRF:1229713 from which it follows that
+claim h_s36_prf_1229713 :
+  forall K, forall addK mulK:set -> set -> set,
+  forall star:set -> set,
+  forall L M, forall addL smulL addM smulM:set -> set -> set,
+  forall f g:set -> set -> set, forall u:set -> set,
+    field_involution K addK mulK star ->
+    finite_dimensional_vector_space K addK mulK L addL smulL ->
+    finite_dimensional_vector_space K addK mulK M addM smulM ->
+    nondegenerate_sesquilinear_form K addK mulK star L addL smulL f ->
+    nondegenerate_sesquilinear_form K addK mulK star M addM smulM g ->
+    module_homomorphism K addK mulK L addL smulL M addM smulM u ->
+    module_homomorphism K addK mulK M addM smulM L addL smulL
+      (fun y => adjoint_homomorphism K addK mulK L M f g u y)
+    /\ (forall x :e L, forall y :e M,
+      f x (adjoint_homomorphism K addK mulK L M f g u y) = g (u x) y)
+    /\ forall v:set -> set,
+      (forall x :e L, forall y :e M, f x (v y) = g (u x) y) ->
+      v = (fun y => adjoint_homomorphism K addK mulK L M f g u y).
+admit.
 //GOD1PRF:1229790 This proves our assertion. The homomorphism
+claim h_s36_prf_1229790 :
+  forall K, forall addK mulK:set -> set -> set,
+  forall star:set -> set,
+  forall L M, forall addL smulL addM smulM:set -> set -> set,
+  forall f g:set -> set -> set, forall u:set -> set,
+    field_involution K addK mulK star ->
+    finite_dimensional_vector_space K addK mulK L addL smulL ->
+    finite_dimensional_vector_space K addK mulK M addM smulM ->
+    nondegenerate_sesquilinear_form K addK mulK star L addL smulL f ->
+    nondegenerate_sesquilinear_form K addK mulK star M addM smulM g ->
+    module_homomorphism K addK mulK L addL smulL M addM smulM u ->
+    module_homomorphism K addK mulK M addM smulM L addL smulL
+      (fun y => adjoint_homomorphism K addK mulK L M f g u y)
+    /\ (forall x :e L, forall y :e M,
+      f x (adjoint_homomorphism K addK mulK L M f g u y) = g (u x) y)
+    /\ forall v:set -> set,
+      (forall x :e L, forall y :e M, f x (v y) = g (u x) y) ->
+      v = (fun y => adjoint_homomorphism K addK mulK L M f g u y).
+admit.
 Admitted.
 
 Theorem god1_matrix_adjoint_calculation_rules :
@@ -56964,7 +59417,75 @@ let r.
 assume hr hInvolution.
 apply andI.
 //GOD1PRF:1232514 The rules of calculation for adjoint matrices are analogous to those for transposed matrices: to be precise, we have
+claim h_s36_prf_1232514 :
+  forall K, forall add mul:set -> set -> set, forall star:set -> set,
+  forall p q r :e omega,
+    field_involution K add mul star ->
+    (forall A B :e matrix_space K p q,
+      matrix_adjoint K star p q (matrix_addition K add p q A B)
+      = matrix_addition K add q p
+        (matrix_adjoint K star p q A) (matrix_adjoint K star p q B))
+    /\ (forall A :e matrix_space K p q, forall scalar :e K,
+      matrix_adjoint K star p q (matrix_left_scalar K mul p q scalar A)
+      = matrix_left_scalar K mul q p (star scalar)
+        (matrix_adjoint K star p q A))
+    /\ (forall A :e matrix_space K p q,
+      forall B :e matrix_space K q r,
+      matrix_adjoint K star p r
+        (matrix_multiplication K add mul p q r A B)
+      = matrix_multiplication K add mul r q p
+        (matrix_adjoint K star q r B) (matrix_adjoint K star p q A))
+    /\ (forall A :e matrix_space K p q,
+      matrix_adjoint K star q p (matrix_adjoint K star p q A) = A)
+    /\ matrix_adjoint K star p p (unit_matrix K add mul p)
+      = unit_matrix K add mul p.
+admit.
 //GOD1PRF:1232908 These are obtained from the corresponding results for transposed matrices (§ 16, Theorem 4) by transforming them with the automorphism $\lambda \rightarrow \lambda^{*}$ of K .
+claim h_s36_prf_1232908 :
+  forall K, forall add mul:set -> set -> set, forall star:set -> set,
+  forall p q r :e omega,
+    field_involution K add mul star ->
+    (forall A B :e matrix_space K p q,
+      matrix_adjoint K star p q (matrix_addition K add p q A B)
+      = matrix_addition K add q p
+        (matrix_adjoint K star p q A) (matrix_adjoint K star p q B))
+    /\ (forall A :e matrix_space K p q, forall scalar :e K,
+      matrix_adjoint K star p q (matrix_left_scalar K mul p q scalar A)
+      = matrix_left_scalar K mul q p (star scalar)
+        (matrix_adjoint K star p q A))
+    /\ (forall A :e matrix_space K p q,
+      forall B :e matrix_space K q r,
+      matrix_adjoint K star p r
+        (matrix_multiplication K add mul p q r A B)
+      = matrix_multiplication K add mul r q p
+        (matrix_adjoint K star q r B) (matrix_adjoint K star p q A))
+    /\ (forall A :e matrix_space K p q,
+      matrix_adjoint K star q p (matrix_adjoint K star p q A) = A)
+    /\ matrix_adjoint K star p p (unit_matrix K add mul p)
+      = unit_matrix K add mul p.
+admit.
+claim h_s36_ref_1232908_god1_s16_theorem4_matrix_transpose_laws :
+  forall K, forall add mul:set -> set -> set,
+  forall p q r :e omega,
+    ring K add mul ->
+    (forall A B :e matrix_space K p q,
+      matrix_transpose K p q (matrix_addition K add p q A B)
+      = matrix_addition K add q p
+        (matrix_transpose K p q A) (matrix_transpose K p q B))
+    /\ (forall A :e matrix_space K p q,
+        forall B :e matrix_space K q r,
+      matrix_transpose K p r
+        (matrix_multiplication K add mul p q r A B)
+      = matrix_multiplication
+        K add (opposite_ring_multiplication mul) r q p
+        (matrix_transpose K q r B) (matrix_transpose K p q A))
+    /\ (forall A :e square_matrix_ring K p,
+      (invertible_matrix K add mul p A
+      <-> invertible_matrix K add (opposite_ring_multiplication mul) p
+        (matrix_transpose K p p A)))
+    /\ forall A :e matrix_space K p q,
+      matrix_transpose K q p (matrix_transpose K p q A) = A.
+apply god1_s16_theorem4_matrix_transpose_laws.
 Admitted.
 
 Theorem god1_adjoint_homomorphism_calculation_rules :
@@ -57002,13 +59523,283 @@ assume hNondegenerateF hNondegenerateG hNondegenerateH.
 assume hHermitianF hHermitianG hHermitianH hU hV.
 apply andI.
 //GOD1PRF:1233301 for all scalars $\lambda, \mu$. Again, if $\mathrm{L}, \mathrm{M}$ and N are three finite-dimensional vector spaces over K, endowed with non-degenerate sesquilinear forms $f, g, h$ respectively, and if $u: \mathrm{L} \rightarrow \mathrm{M}$ and $v: \mathrm{M} \rightarrow \mathrm{N}$ are homomorphisms, then
+claim h_s36_prf_1233301 :
+  forall K, forall addK mulK:set -> set -> set, forall star:set -> set,
+  forall L M N,
+  forall addL smulL addM smulM addN smulN:set -> set -> set,
+  forall f g h:set -> set -> set,
+  forall u v:set -> set,
+    field_involution K addK mulK star ->
+    finite_dimensional_vector_space K addK mulK L addL smulL ->
+    finite_dimensional_vector_space K addK mulK M addM smulM ->
+    finite_dimensional_vector_space K addK mulK N addN smulN ->
+    nondegenerate_sesquilinear_form
+      K addK mulK star L addL smulL f ->
+    nondegenerate_sesquilinear_form
+      K addK mulK star M addM smulM g ->
+    nondegenerate_sesquilinear_form
+      K addK mulK star N addN smulN h ->
+    hermitian_form K addK mulK star L addL smulL f ->
+    hermitian_form K addK mulK star M addM smulM g ->
+    hermitian_form K addK mulK star N addN smulN h ->
+    module_homomorphism K addK mulK L addL smulL M addM smulM u ->
+    module_homomorphism K addK mulK M addM smulM N addN smulN v ->
+    (fun z:set => adjoint_homomorphism K addK mulK L N f h
+      (fun x:set => v (u x)) z)
+      = (fun z:set => adjoint_homomorphism K addK mulK L M f g u
+        (adjoint_homomorphism K addK mulK M N g h v z))
+    /\ (fun x:set => adjoint_homomorphism K addK mulK M L g f
+      (fun y:set => adjoint_homomorphism K addK mulK L M f g u y) x)
+      = (fun x:set => u x).
+admit.
 //GOD1PRF:1233651 For if we write $w=v \circ u$, we have
+claim h_s36_prf_1233651 :
+  forall K, forall addK mulK:set -> set -> set, forall star:set -> set,
+  forall L M N,
+  forall addL smulL addM smulM addN smulN:set -> set -> set,
+  forall f g h:set -> set -> set,
+  forall u v:set -> set,
+    field_involution K addK mulK star ->
+    finite_dimensional_vector_space K addK mulK L addL smulL ->
+    finite_dimensional_vector_space K addK mulK M addM smulM ->
+    finite_dimensional_vector_space K addK mulK N addN smulN ->
+    nondegenerate_sesquilinear_form
+      K addK mulK star L addL smulL f ->
+    nondegenerate_sesquilinear_form
+      K addK mulK star M addM smulM g ->
+    nondegenerate_sesquilinear_form
+      K addK mulK star N addN smulN h ->
+    hermitian_form K addK mulK star L addL smulL f ->
+    hermitian_form K addK mulK star M addM smulM g ->
+    hermitian_form K addK mulK star N addN smulN h ->
+    module_homomorphism K addK mulK L addL smulL M addM smulM u ->
+    module_homomorphism K addK mulK M addM smulM N addN smulN v ->
+    (fun z:set => adjoint_homomorphism K addK mulK L N f h
+      (fun x:set => v (u x)) z)
+      = (fun z:set => adjoint_homomorphism K addK mulK L M f g u
+        (adjoint_homomorphism K addK mulK M N g h v z))
+    /\ (fun x:set => adjoint_homomorphism K addK mulK M L g f
+      (fun y:set => adjoint_homomorphism K addK mulK L M f g u y) x)
+      = (fun x:set => u x).
+admit.
 //GOD1PRF:1233823 from which the result follows.\\
+claim h_s36_prf_1233823 :
+  forall K, forall addK mulK:set -> set -> set, forall star:set -> set,
+  forall L M N,
+  forall addL smulL addM smulM addN smulN:set -> set -> set,
+  forall f g h:set -> set -> set,
+  forall u v:set -> set,
+    field_involution K addK mulK star ->
+    finite_dimensional_vector_space K addK mulK L addL smulL ->
+    finite_dimensional_vector_space K addK mulK M addM smulM ->
+    finite_dimensional_vector_space K addK mulK N addN smulN ->
+    nondegenerate_sesquilinear_form
+      K addK mulK star L addL smulL f ->
+    nondegenerate_sesquilinear_form
+      K addK mulK star M addM smulM g ->
+    nondegenerate_sesquilinear_form
+      K addK mulK star N addN smulN h ->
+    hermitian_form K addK mulK star L addL smulL f ->
+    hermitian_form K addK mulK star M addM smulM g ->
+    hermitian_form K addK mulK star N addN smulN h ->
+    module_homomorphism K addK mulK L addL smulL M addM smulM u ->
+    module_homomorphism K addK mulK M addM smulM N addN smulN v ->
+    (fun z:set => adjoint_homomorphism K addK mulK L N f h
+      (fun x:set => v (u x)) z)
+      = (fun z:set => adjoint_homomorphism K addK mulK L M f g u
+        (adjoint_homomorphism K addK mulK M N g h v z))
+    /\ (fun x:set => adjoint_homomorphism K addK mulK M L g f
+      (fun y:set => adjoint_homomorphism K addK mulK L M f g u y) x)
+      = (fun x:set => u x).
+admit.
 //GOD1PRF:1233856 The "obvious" formula
+claim h_s36_prf_1233856 :
+  forall K, forall addK mulK:set -> set -> set, forall star:set -> set,
+  forall L M N,
+  forall addL smulL addM smulM addN smulN:set -> set -> set,
+  forall f g h:set -> set -> set,
+  forall u v:set -> set,
+    field_involution K addK mulK star ->
+    finite_dimensional_vector_space K addK mulK L addL smulL ->
+    finite_dimensional_vector_space K addK mulK M addM smulM ->
+    finite_dimensional_vector_space K addK mulK N addN smulN ->
+    nondegenerate_sesquilinear_form
+      K addK mulK star L addL smulL f ->
+    nondegenerate_sesquilinear_form
+      K addK mulK star M addM smulM g ->
+    nondegenerate_sesquilinear_form
+      K addK mulK star N addN smulN h ->
+    hermitian_form K addK mulK star L addL smulL f ->
+    hermitian_form K addK mulK star M addM smulM g ->
+    hermitian_form K addK mulK star N addN smulN h ->
+    module_homomorphism K addK mulK L addL smulL M addM smulM u ->
+    module_homomorphism K addK mulK M addM smulM N addN smulN v ->
+    (fun z:set => adjoint_homomorphism K addK mulK L N f h
+      (fun x:set => v (u x)) z)
+      = (fun z:set => adjoint_homomorphism K addK mulK L M f g u
+        (adjoint_homomorphism K addK mulK M N g h v z))
+    /\ (fun x:set => adjoint_homomorphism K addK mulK M L g f
+      (fun y:set => adjoint_homomorphism K addK mulK L M f g u y) x)
+      = (fun x:set => u x).
+admit.
 //GOD1PRF:1233912 where $u$ is a homomorphism of L into M , is not true unless $f$ and $g$ are hermitian. For if we write $v$ for $u^{*}$, the adjoint of this homomorphism of M into L is given by the relation derived from (17) by replacing $f, g, u$ by $g, f, v$ respectively, that is to say by the relation
+claim h_s36_prf_1233912 :
+  forall K, forall addK mulK:set -> set -> set, forall star:set -> set,
+  forall L M N,
+  forall addL smulL addM smulM addN smulN:set -> set -> set,
+  forall f g h:set -> set -> set,
+  forall u v:set -> set,
+    field_involution K addK mulK star ->
+    finite_dimensional_vector_space K addK mulK L addL smulL ->
+    finite_dimensional_vector_space K addK mulK M addM smulM ->
+    finite_dimensional_vector_space K addK mulK N addN smulN ->
+    nondegenerate_sesquilinear_form
+      K addK mulK star L addL smulL f ->
+    nondegenerate_sesquilinear_form
+      K addK mulK star M addM smulM g ->
+    nondegenerate_sesquilinear_form
+      K addK mulK star N addN smulN h ->
+    hermitian_form K addK mulK star L addL smulL f ->
+    hermitian_form K addK mulK star M addM smulM g ->
+    hermitian_form K addK mulK star N addN smulN h ->
+    module_homomorphism K addK mulK L addL smulL M addM smulM u ->
+    module_homomorphism K addK mulK M addM smulM N addN smulN v ->
+    (fun z:set => adjoint_homomorphism K addK mulK L N f h
+      (fun x:set => v (u x)) z)
+      = (fun z:set => adjoint_homomorphism K addK mulK L M f g u
+        (adjoint_homomorphism K addK mulK M N g h v z))
+    /\ (fun x:set => adjoint_homomorphism K addK mulK M L g f
+      (fun y:set => adjoint_homomorphism K addK mulK L M f g u y) x)
+      = (fun x:set => u x).
+admit.
+claim h_s36_ref_1233912_god1_adjoint_homomorphism_exists_is_linear_and_unique :
+  forall K, forall addK mulK:set -> set -> set,
+  forall star:set -> set,
+  forall L M, forall addL smulL addM smulM:set -> set -> set,
+  forall f g:set -> set -> set, forall u:set -> set,
+    field_involution K addK mulK star ->
+    finite_dimensional_vector_space K addK mulK L addL smulL ->
+    finite_dimensional_vector_space K addK mulK M addM smulM ->
+    nondegenerate_sesquilinear_form K addK mulK star L addL smulL f ->
+    nondegenerate_sesquilinear_form K addK mulK star M addM smulM g ->
+    module_homomorphism K addK mulK L addL smulL M addM smulM u ->
+    module_homomorphism K addK mulK M addM smulM L addL smulL
+      (fun y => adjoint_homomorphism K addK mulK L M f g u y)
+    /\ (forall x :e L, forall y :e M,
+      f x (adjoint_homomorphism K addK mulK L M f g u y) = g (u x) y)
+    /\ forall v:set -> set,
+      (forall x :e L, forall y :e M, f x (v y) = g (u x) y) ->
+      v = (fun y => adjoint_homomorphism K addK mulK L M f g u y).
+apply god1_adjoint_homomorphism_exists_is_linear_and_unique.
 //GOD1PRF:1234249 if $f$ is hermitian, the right-hand side of this relation is equal to
+claim h_s36_prf_1234249 :
+  forall K, forall addK mulK:set -> set -> set, forall star:set -> set,
+  forall L M N,
+  forall addL smulL addM smulM addN smulN:set -> set -> set,
+  forall f g h:set -> set -> set,
+  forall u v:set -> set,
+    field_involution K addK mulK star ->
+    finite_dimensional_vector_space K addK mulK L addL smulL ->
+    finite_dimensional_vector_space K addK mulK M addM smulM ->
+    finite_dimensional_vector_space K addK mulK N addN smulN ->
+    nondegenerate_sesquilinear_form
+      K addK mulK star L addL smulL f ->
+    nondegenerate_sesquilinear_form
+      K addK mulK star M addM smulM g ->
+    nondegenerate_sesquilinear_form
+      K addK mulK star N addN smulN h ->
+    hermitian_form K addK mulK star L addL smulL f ->
+    hermitian_form K addK mulK star M addM smulM g ->
+    hermitian_form K addK mulK star N addN smulN h ->
+    module_homomorphism K addK mulK L addL smulL M addM smulM u ->
+    module_homomorphism K addK mulK M addM smulM N addN smulN v ->
+    (fun z:set => adjoint_homomorphism K addK mulK L N f h
+      (fun x:set => v (u x)) z)
+      = (fun z:set => adjoint_homomorphism K addK mulK L M f g u
+        (adjoint_homomorphism K addK mulK M N g h v z))
+    /\ (fun x:set => adjoint_homomorphism K addK mulK M L g f
+      (fun y:set => adjoint_homomorphism K addK mulK L M f g u y) x)
+      = (fun x:set => u x).
+admit.
 //GOD1PRF:1234387 by (17); if $g$ also is hermitian, then we have
+claim h_s36_prf_1234387 :
+  forall K, forall addK mulK:set -> set -> set, forall star:set -> set,
+  forall L M N,
+  forall addL smulL addM smulM addN smulN:set -> set -> set,
+  forall f g h:set -> set -> set,
+  forall u v:set -> set,
+    field_involution K addK mulK star ->
+    finite_dimensional_vector_space K addK mulK L addL smulL ->
+    finite_dimensional_vector_space K addK mulK M addM smulM ->
+    finite_dimensional_vector_space K addK mulK N addN smulN ->
+    nondegenerate_sesquilinear_form
+      K addK mulK star L addL smulL f ->
+    nondegenerate_sesquilinear_form
+      K addK mulK star M addM smulM g ->
+    nondegenerate_sesquilinear_form
+      K addK mulK star N addN smulN h ->
+    hermitian_form K addK mulK star L addL smulL f ->
+    hermitian_form K addK mulK star M addM smulM g ->
+    hermitian_form K addK mulK star N addN smulN h ->
+    module_homomorphism K addK mulK L addL smulL M addM smulM u ->
+    module_homomorphism K addK mulK M addM smulM N addN smulN v ->
+    (fun z:set => adjoint_homomorphism K addK mulK L N f h
+      (fun x:set => v (u x)) z)
+      = (fun z:set => adjoint_homomorphism K addK mulK L M f g u
+        (adjoint_homomorphism K addK mulK M N g h v z))
+    /\ (fun x:set => adjoint_homomorphism K addK mulK M L g f
+      (fun y:set => adjoint_homomorphism K addK mulK L M f g u y) x)
+      = (fun x:set => u x).
+admit.
+claim h_s36_ref_1234387_god1_adjoint_homomorphism_exists_is_linear_and_unique :
+  forall K, forall addK mulK:set -> set -> set,
+  forall star:set -> set,
+  forall L M, forall addL smulL addM smulM:set -> set -> set,
+  forall f g:set -> set -> set, forall u:set -> set,
+    field_involution K addK mulK star ->
+    finite_dimensional_vector_space K addK mulK L addL smulL ->
+    finite_dimensional_vector_space K addK mulK M addM smulM ->
+    nondegenerate_sesquilinear_form K addK mulK star L addL smulL f ->
+    nondegenerate_sesquilinear_form K addK mulK star M addM smulM g ->
+    module_homomorphism K addK mulK L addL smulL M addM smulM u ->
+    module_homomorphism K addK mulK M addM smulM L addL smulL
+      (fun y => adjoint_homomorphism K addK mulK L M f g u y)
+    /\ (forall x :e L, forall y :e M,
+      f x (adjoint_homomorphism K addK mulK L M f g u y) = g (u x) y)
+    /\ forall v:set -> set,
+      (forall x :e L, forall y :e M, f x (v y) = g (u x) y) ->
+      v = (fun y => adjoint_homomorphism K addK mulK L M f g u y).
+apply god1_adjoint_homomorphism_exists_is_linear_and_unique.
 //GOD1PRF:1234480 so that $u=v^{*}=\left(u^{*}\right)^{*}$, as asserted.
+claim h_s36_prf_1234480 :
+  forall K, forall addK mulK:set -> set -> set, forall star:set -> set,
+  forall L M N,
+  forall addL smulL addM smulM addN smulN:set -> set -> set,
+  forall f g h:set -> set -> set,
+  forall u v:set -> set,
+    field_involution K addK mulK star ->
+    finite_dimensional_vector_space K addK mulK L addL smulL ->
+    finite_dimensional_vector_space K addK mulK M addM smulM ->
+    finite_dimensional_vector_space K addK mulK N addN smulN ->
+    nondegenerate_sesquilinear_form
+      K addK mulK star L addL smulL f ->
+    nondegenerate_sesquilinear_form
+      K addK mulK star M addM smulM g ->
+    nondegenerate_sesquilinear_form
+      K addK mulK star N addN smulN h ->
+    hermitian_form K addK mulK star L addL smulL f ->
+    hermitian_form K addK mulK star M addM smulM g ->
+    hermitian_form K addK mulK star N addN smulN h ->
+    module_homomorphism K addK mulK L addL smulL M addM smulM u ->
+    module_homomorphism K addK mulK M addM smulM N addN smulN v ->
+    (fun z:set => adjoint_homomorphism K addK mulK L N f h
+      (fun x:set => v (u x)) z)
+      = (fun z:set => adjoint_homomorphism K addK mulK L M f g u
+        (adjoint_homomorphism K addK mulK M N g h v z))
+    /\ (fun x:set => adjoint_homomorphism K addK mulK M L g f
+      (fun y:set => adjoint_homomorphism K addK mulK L M f g u y) x)
+      = (fun x:set => u x).
+admit.
 Admitted.
 
 //GOD1:1234612 hermitian_orthogonal : "#10 and #11 are orthogonal relative to #9" | $#10\perp #11$
@@ -57037,9 +59828,90 @@ Theorem god1_s36_theorem2_double_orthogonal_complement :
 let K addK mulK star L addL smul f M.
 assume hInvolution hFinite hHermitian hNondegenerate hSubspace.
 //GOD1PRF:1236444 theorem 2. Let $f$ be a non-degenerate hermitian form on a finite-dimensional vector space L over K . Then
+claim h_s36_prf_1236444 :
+  forall K, forall addK mulK:set -> set -> set, forall star:set -> set,
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set, forall M,
+    field_involution K addK mulK star ->
+    finite_dimensional_vector_space K addK mulK L addL smul ->
+    hermitian_form K addK mulK star L addL smul f ->
+    nondegenerate_sesquilinear_form K addK mulK star L addL smul f ->
+    vector_subspace K addK mulK L addL smul M ->
+    hermitian_orthogonal_complement K addK L f
+      (hermitian_orthogonal_complement K addK L f M) = M.
+admit.
 //GOD1PRF:1236592 for every vector subspace $M$ of $L$.\\
+claim h_s36_prf_1236592 :
+  forall K, forall addK mulK:set -> set -> set, forall star:set -> set,
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set, forall M,
+    field_involution K addK mulK star ->
+    finite_dimensional_vector_space K addK mulK L addL smul ->
+    hermitian_form K addK mulK star L addL smul f ->
+    nondegenerate_sesquilinear_form K addK mulK star L addL smul f ->
+    vector_subspace K addK mulK L addL smul M ->
+    hermitian_orthogonal_complement K addK L f
+      (hermitian_orthogonal_complement K addK L f M) = M.
+admit.
 //GOD1PRF:1236632 In view of (18) it is sufficient to prove that every $z \in\left(M^{\perp}\right)^{\perp}$ belongs to $M$, and for this it is enough (§ 19, Theorem 3) to show that if a linear form $u$ on L vanishes on M , then $u(z)=0$. Now, by Theorem $1 d$ ), we may write
+claim h_s36_prf_1236632 :
+  forall K, forall addK mulK:set -> set -> set, forall star:set -> set,
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set, forall M,
+    field_involution K addK mulK star ->
+    finite_dimensional_vector_space K addK mulK L addL smul ->
+    hermitian_form K addK mulK star L addL smul f ->
+    nondegenerate_sesquilinear_form K addK mulK star L addL smul f ->
+    vector_subspace K addK mulK L addL smul M ->
+    hermitian_orthogonal_complement K addK L f
+      (hermitian_orthogonal_complement K addK L f M) = M.
+admit.
+claim h_s36_ref_1236632_god1_s19_theorem3_double_annihilator_membership :
+  forall K, forall addK mulK:set -> set -> set,
+  forall L, forall addL smulR:set -> set -> set, forall M,
+    finite_dimensional_right_vector_space K addK mulK L addL smulR ->
+    submodule
+      K addK (opposite_ring_multiplication mulK)
+      L addL (fun scalar x => smulR x scalar) M ->
+    forall x :e L,
+      (x :e M <->
+        forall f :e right_subspace_annihilator
+          K addK mulK L addL smulR M,
+          f x = ring_zero K addK).
+apply god1_s19_theorem3_double_annihilator_membership.
+claim h_s36_ref_1236632_god1_s36_theorem1_nondegenerate_form_characterizations :
+  forall K, forall addK mulK:set -> set -> set,
+  forall star:set -> set,
+  forall L, forall addL smul:set -> set -> set,
+  forall n :e omega, forall a:set -> set,
+  forall f:set -> set -> set,
+    field_involution K addK mulK star ->
+    module_basis K addK mulK L addL smul n a ->
+    sesquilinear_form K addK mulK star L addL smul f ->
+    let A := sesquilinear_form_matrix K n a f in
+    (nondegenerate_sesquilinear_form K addK mulK star L addL smul f
+      <-> forall x :e L,
+      (forall y :e L, f x y = ring_zero K addK) -> x = module_zero L addL)
+    /\ ((forall x :e L,
+      (forall y :e L, f x y = ring_zero K addK) -> x = module_zero L addL)
+      <-> invertible_matrix K addK mulK n A)
+    /\ (invertible_matrix K addK mulK n A
+      <-> bij L (commutative_module_dual K addK mulK L addL smul)
+        (fun y => sesquilinear_dual_map K L f y)).
+apply god1_s36_theorem1_nondegenerate_form_characterizations.
 //GOD1PRF:1236913 for some $y \in \mathrm{~L}$. The hypothesis that $u$ is zero on M means that $y \in \mathrm{M}^{\perp}$, and the fact that $z$ is orthogonal to $\mathrm{M}^{\perp}$ then shows that $f(z, y)=0$, i.e. $u(z)=0$.\\
+claim h_s36_prf_1236913 :
+  forall K, forall addK mulK:set -> set -> set, forall star:set -> set,
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set, forall M,
+    field_involution K addK mulK star ->
+    finite_dimensional_vector_space K addK mulK L addL smul ->
+    hermitian_form K addK mulK star L addL smul f ->
+    nondegenerate_sesquilinear_form K addK mulK star L addL smul f ->
+    vector_subspace K addK mulK L addL smul M ->
+    hermitian_orthogonal_complement K addK L f
+      (hermitian_orthogonal_complement K addK L f M) = M.
+admit.
 Admitted.
 
 Theorem god1_s36_theorem3_orthogonal_complement_sum_and_intersection :
@@ -57064,10 +59936,141 @@ let K addK mulK star L addL smul f M N.
 assume hInvolution hFinite hHermitian hNondegenerate hM hN.
 apply andI.
 //GOD1PRF:1237125 theorem 3. Let $\mathrm{M}, \mathrm{N}$ be vector subspaces of L . Under the hypotheses of Theorem 2 we have
+claim h_s36_prf_1237125 :
+  forall K, forall addK mulK:set -> set -> set, forall star:set -> set,
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set, forall M N,
+    field_involution K addK mulK star ->
+    finite_dimensional_vector_space K addK mulK L addL smul ->
+    hermitian_form K addK mulK star L addL smul f ->
+    nondegenerate_sesquilinear_form K addK mulK star L addL smul f ->
+    vector_subspace K addK mulK L addL smul M ->
+    vector_subspace K addK mulK L addL smul N ->
+    hermitian_orthogonal_complement K addK L f
+      (submodule_sum K addK mulK L addL smul M N)
+      = (hermitian_orthogonal_complement K addK L f M
+        :/\: hermitian_orthogonal_complement K addK L f N)
+    /\ hermitian_orthogonal_complement K addK L f (M :/\: N)
+      = submodule_sum K addK mulK L addL smul
+        (hermitian_orthogonal_complement K addK L f M)
+        (hermitian_orthogonal_complement K addK L f N).
+admit.
+claim h_s36_ref_1237125_god1_s36_theorem2_double_orthogonal_complement :
+  forall K, forall addK mulK:set -> set -> set, forall star:set -> set,
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set, forall M,
+    field_involution K addK mulK star ->
+    finite_dimensional_vector_space K addK mulK L addL smul ->
+    hermitian_form K addK mulK star L addL smul f ->
+    nondegenerate_sesquilinear_form K addK mulK star L addL smul f ->
+    vector_subspace K addK mulK L addL smul M ->
+    hermitian_orthogonal_complement K addK L f
+      (hermitian_orthogonal_complement K addK L f M) = M.
+apply god1_s36_theorem2_double_orthogonal_complement.
 //GOD1PRF:1237327 Since $\mathrm{M}+\mathrm{N}$ consists of all sums $x+y$ with $x \in \mathrm{M}$ and $y \in \mathrm{~N}$, and since
+claim h_s36_prf_1237327 :
+  forall K, forall addK mulK:set -> set -> set, forall star:set -> set,
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set, forall M N,
+    field_involution K addK mulK star ->
+    finite_dimensional_vector_space K addK mulK L addL smul ->
+    hermitian_form K addK mulK star L addL smul f ->
+    nondegenerate_sesquilinear_form K addK mulK star L addL smul f ->
+    vector_subspace K addK mulK L addL smul M ->
+    vector_subspace K addK mulK L addL smul N ->
+    hermitian_orthogonal_complement K addK L f
+      (submodule_sum K addK mulK L addL smul M N)
+      = (hermitian_orthogonal_complement K addK L f M
+        :/\: hermitian_orthogonal_complement K addK L f N)
+    /\ hermitian_orthogonal_complement K addK L f (M :/\: N)
+      = submodule_sum K addK mulK L addL smul
+        (hermitian_orthogonal_complement K addK L f M)
+        (hermitian_orthogonal_complement K addK L f N).
+admit.
 //GOD1PRF:1237478 the first formula is immediate. For the second, we replace M and N by $\mathrm{M}^{\perp}$ and $\mathrm{N}^{\perp}$ in the first, and we then have
+claim h_s36_prf_1237478 :
+  forall K, forall addK mulK:set -> set -> set, forall star:set -> set,
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set, forall M N,
+    field_involution K addK mulK star ->
+    finite_dimensional_vector_space K addK mulK L addL smul ->
+    hermitian_form K addK mulK star L addL smul f ->
+    nondegenerate_sesquilinear_form K addK mulK star L addL smul f ->
+    vector_subspace K addK mulK L addL smul M ->
+    vector_subspace K addK mulK L addL smul N ->
+    hermitian_orthogonal_complement K addK L f
+      (submodule_sum K addK mulK L addL smul M N)
+      = (hermitian_orthogonal_complement K addK L f M
+        :/\: hermitian_orthogonal_complement K addK L f N)
+    /\ hermitian_orthogonal_complement K addK L f (M :/\: N)
+      = submodule_sum K addK mulK L addL smul
+        (hermitian_orthogonal_complement K addK L f M)
+        (hermitian_orthogonal_complement K addK L f N).
+admit.
 //GOD1PRF:1237749 by Theorem 2; hence
+claim h_s36_prf_1237749 :
+  forall K, forall addK mulK:set -> set -> set, forall star:set -> set,
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set, forall M N,
+    field_involution K addK mulK star ->
+    finite_dimensional_vector_space K addK mulK L addL smul ->
+    hermitian_form K addK mulK star L addL smul f ->
+    nondegenerate_sesquilinear_form K addK mulK star L addL smul f ->
+    vector_subspace K addK mulK L addL smul M ->
+    vector_subspace K addK mulK L addL smul N ->
+    hermitian_orthogonal_complement K addK L f
+      (submodule_sum K addK mulK L addL smul M N)
+      = (hermitian_orthogonal_complement K addK L f M
+        :/\: hermitian_orthogonal_complement K addK L f N)
+    /\ hermitian_orthogonal_complement K addK L f (M :/\: N)
+      = submodule_sum K addK mulK L addL smul
+        (hermitian_orthogonal_complement K addK L f M)
+        (hermitian_orthogonal_complement K addK L f N).
+admit.
+claim h_s36_ref_1237749_god1_s36_theorem2_double_orthogonal_complement :
+  forall K, forall addK mulK:set -> set -> set, forall star:set -> set,
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set, forall M,
+    field_involution K addK mulK star ->
+    finite_dimensional_vector_space K addK mulK L addL smul ->
+    hermitian_form K addK mulK star L addL smul f ->
+    nondegenerate_sesquilinear_form K addK mulK star L addL smul f ->
+    vector_subspace K addK mulK L addL smul M ->
+    hermitian_orthogonal_complement K addK L f
+      (hermitian_orthogonal_complement K addK L f M) = M.
+apply god1_s36_theorem2_double_orthogonal_complement.
 //GOD1PRF:1237878 by Theorem 2 again.\\
+claim h_s36_prf_1237878 :
+  forall K, forall addK mulK:set -> set -> set, forall star:set -> set,
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set, forall M N,
+    field_involution K addK mulK star ->
+    finite_dimensional_vector_space K addK mulK L addL smul ->
+    hermitian_form K addK mulK star L addL smul f ->
+    nondegenerate_sesquilinear_form K addK mulK star L addL smul f ->
+    vector_subspace K addK mulK L addL smul M ->
+    vector_subspace K addK mulK L addL smul N ->
+    hermitian_orthogonal_complement K addK L f
+      (submodule_sum K addK mulK L addL smul M N)
+      = (hermitian_orthogonal_complement K addK L f M
+        :/\: hermitian_orthogonal_complement K addK L f N)
+    /\ hermitian_orthogonal_complement K addK L f (M :/\: N)
+      = submodule_sum K addK mulK L addL smul
+        (hermitian_orthogonal_complement K addK L f M)
+        (hermitian_orthogonal_complement K addK L f N).
+admit.
+claim h_s36_ref_1237878_god1_s36_theorem2_double_orthogonal_complement :
+  forall K, forall addK mulK:set -> set -> set, forall star:set -> set,
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set, forall M,
+    field_involution K addK mulK star ->
+    finite_dimensional_vector_space K addK mulK L addL smul ->
+    hermitian_form K addK mulK star L addL smul f ->
+    nondegenerate_sesquilinear_form K addK mulK star L addL smul f ->
+    vector_subspace K addK mulK L addL smul M ->
+    hermitian_orthogonal_complement K addK L f
+      (hermitian_orthogonal_complement K addK L f M) = M.
+apply god1_s36_theorem2_double_orthogonal_complement.
 Admitted.
 
 Theorem god1_s36_theorem4_dimension_of_orthogonal_complement :
@@ -57087,10 +60090,119 @@ Theorem god1_s36_theorem4_dimension_of_orthogonal_complement :
 let K addK mulK star L addL smul f M.
 assume hInvolution hFinite hHermitian hNondegenerate hSubspace.
 //GOD1PRF:1237900 theorem 4. Let $f$ be a non-degenerate hermitian form on a finite-dimensional vector space L over K . Then
+claim h_s36_prf_1237900 :
+  forall K, forall addK mulK:set -> set -> set, forall star:set -> set,
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set, forall M,
+    field_involution K addK mulK star ->
+    finite_dimensional_vector_space K addK mulK L addL smul ->
+    hermitian_form K addK mulK star L addL smul f ->
+    nondegenerate_sesquilinear_form K addK mulK star L addL smul f ->
+    vector_subspace K addK mulK L addL smul M ->
+    add_SNo
+      (module_dimension K addK mulK M addL smul)
+      (module_dimension K addK mulK
+        (hermitian_orthogonal_complement K addK L f M) addL smul)
+    = module_dimension K addK mulK L addL smul.
+admit.
 //GOD1PRF:1238127 for every vector subspace $M$ of $L$.\\
+claim h_s36_prf_1238127 :
+  forall K, forall addK mulK:set -> set -> set, forall star:set -> set,
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set, forall M,
+    field_involution K addK mulK star ->
+    finite_dimensional_vector_space K addK mulK L addL smul ->
+    hermitian_form K addK mulK star L addL smul f ->
+    nondegenerate_sesquilinear_form K addK mulK star L addL smul f ->
+    vector_subspace K addK mulK L addL smul M ->
+    add_SNo
+      (module_dimension K addK mulK M addL smul)
+      (module_dimension K addK mulK
+        (hermitian_orthogonal_complement K addK L f M) addL smul)
+    = module_dimension K addK mulK L addL smul.
+admit.
 //GOD1PRF:1238167 Let $\mathrm{M}^{0}$ denote the annihilator of M in the dual $\mathrm{L}^{*}$ of L , i.e. $\mathrm{M}^{0}$ is the set of all linear forms $u$ on $L$ such that
+claim h_s36_prf_1238167 :
+  forall K, forall addK mulK:set -> set -> set, forall star:set -> set,
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set, forall M,
+    field_involution K addK mulK star ->
+    finite_dimensional_vector_space K addK mulK L addL smul ->
+    hermitian_form K addK mulK star L addL smul f ->
+    nondegenerate_sesquilinear_form K addK mulK star L addL smul f ->
+    vector_subspace K addK mulK L addL smul M ->
+    add_SNo
+      (module_dimension K addK mulK M addL smul)
+      (module_dimension K addK mulK
+        (hermitian_orthogonal_complement K addK L f M) addL smul)
+    = module_dimension K addK mulK L addL smul.
+admit.
 //GOD1PRF:1238421 Then (§ 19, Theorem 9) we have
+claim h_s36_prf_1238421 :
+  forall K, forall addK mulK:set -> set -> set, forall star:set -> set,
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set, forall M,
+    field_involution K addK mulK star ->
+    finite_dimensional_vector_space K addK mulK L addL smul ->
+    hermitian_form K addK mulK star L addL smul f ->
+    nondegenerate_sesquilinear_form K addK mulK star L addL smul f ->
+    vector_subspace K addK mulK L addL smul M ->
+    add_SNo
+      (module_dimension K addK mulK M addL smul)
+      (module_dimension K addK mulK
+        (hermitian_orthogonal_complement K addK L f M) addL smul)
+    = module_dimension K addK mulK L addL smul.
+admit.
+claim h_s36_ref_1238421_god1_s19_theorem9_dimension_of_annihilator :
+  forall K, forall addK mulK:set -> set -> set,
+  forall L, forall addL smulR:set -> set -> set, forall M,
+    finite_dimensional_right_vector_space K addK mulK L addL smulR ->
+    submodule
+      K addK (opposite_ring_multiplication mulK)
+      L addL (fun scalar x => smulR x scalar) M ->
+    right_vector_dimension K addK mulK M addL smulR
+    + module_dimension K addK mulK
+      (right_subspace_annihilator K addK mulK L addL smulR M)
+      (right_module_dual_addition L addK)
+      (right_module_dual_left_scalar L mulK)
+    = right_vector_dimension K addK mulK L addL smulR.
+apply god1_s19_theorem9_dimension_of_annihilator.
 //GOD1PRF:1238571 Hence we have only to show that $\mathrm{M}^{0}$ and $\mathrm{M}^{\perp}$ have the same dimension. Now, if we are given a linear form $u$ on L , there exists a unique $y \in \mathrm{~L}$ (Theorem 1) such that $u(x)=f(x, y)$ for all $x \in \mathrm{~L}$, and clearly the relation (19) is equivalent to $y \in \mathrm{M}^{\perp}$. It follows that the mapping $\hat{f}$ of section 2 maps $\mathrm{M}^{\perp}$ onto $\mathrm{M}^{0}$, and consequently there exists a semi-linear bijective mapping of $\mathrm{M}^{\perp}$ onto $\mathrm{M}^{0}$. Hence these two vector spaces have the same dimension.\\
+claim h_s36_prf_1238571 :
+  forall K, forall addK mulK:set -> set -> set, forall star:set -> set,
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set, forall M,
+    field_involution K addK mulK star ->
+    finite_dimensional_vector_space K addK mulK L addL smul ->
+    hermitian_form K addK mulK star L addL smul f ->
+    nondegenerate_sesquilinear_form K addK mulK star L addL smul f ->
+    vector_subspace K addK mulK L addL smul M ->
+    add_SNo
+      (module_dimension K addK mulK M addL smul)
+      (module_dimension K addK mulK
+        (hermitian_orthogonal_complement K addK L f M) addL smul)
+    = module_dimension K addK mulK L addL smul.
+admit.
+claim h_s36_ref_1238571_god1_s36_theorem1_nondegenerate_form_characterizations :
+  forall K, forall addK mulK:set -> set -> set,
+  forall star:set -> set,
+  forall L, forall addL smul:set -> set -> set,
+  forall n :e omega, forall a:set -> set,
+  forall f:set -> set -> set,
+    field_involution K addK mulK star ->
+    module_basis K addK mulK L addL smul n a ->
+    sesquilinear_form K addK mulK star L addL smul f ->
+    let A := sesquilinear_form_matrix K n a f in
+    (nondegenerate_sesquilinear_form K addK mulK star L addL smul f
+      <-> forall x :e L,
+      (forall y :e L, f x y = ring_zero K addK) -> x = module_zero L addL)
+    /\ ((forall x :e L,
+      (forall y :e L, f x y = ring_zero K addK) -> x = module_zero L addL)
+      <-> invertible_matrix K addK mulK n A)
+    /\ (invertible_matrix K addK mulK n A
+      <-> bij L (commutative_module_dual K addK mulK L addL smul)
+        (fun y => sesquilinear_dual_map K L f y)).
+apply god1_s36_theorem1_nondegenerate_form_characterizations.
 Admitted.
 
 //GOD1:1242481 isotropic_subspace : "#10 is isotropic relative to the hermitian form #9" | $#10\cap #10^\perp\ne0$
@@ -57143,17 +60255,309 @@ let K addK mulK star L addL smul f M.
 assume hInvolution hFinite hHermitian hSubspace.
 apply andI.
 //GOD1PRF:1239174 theorem 5. Let $f$ be a hermitian form on a vector space L of finite dimension over K , and let M be a subspace of L . Then the following properties are equivalent :\\
+claim h_s36_prf_1239174 :
+  forall K, forall addK mulK:set -> set -> set, forall star:set -> set,
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set, forall M,
+    field_involution K addK mulK star ->
+    finite_dimensional_vector_space K addK mulK L addL smul ->
+    hermitian_form K addK mulK star L addL smul f ->
+    vector_subspace K addK mulK L addL smul M ->
+    ((M :/\: hermitian_orthogonal_complement K addK L f M
+        = {module_zero L addL})
+    <-> nondegenerate_sesquilinear_form K addK mulK star M addL smul f)
+    /\ (nondegenerate_sesquilinear_form K addK mulK star M addL smul f
+      <-> direct_sum_decomposition K addK mulK L addL smul 2
+        (fun i => if i = 0 then M
+          else hermitian_orthogonal_complement K addK L f M))
+    /\ (nondegenerate_sesquilinear_form K addK mulK star L addL smul f ->
+      (submodule_sum K addK mulK L addL smul M
+        (hermitian_orthogonal_complement K addK L f M) = L
+      <-> M :/\: hermitian_orthogonal_complement K addK L f M
+        = {module_zero L addL})).
+admit.
 //GOD1PRF:1239342 a) $\mathrm{M} \cap \mathrm{M}^{\perp}=\{0\}$;\\
+claim h_s36_prf_1239342 :
+  forall K, forall addK mulK:set -> set -> set, forall star:set -> set,
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set, forall M,
+    field_involution K addK mulK star ->
+    finite_dimensional_vector_space K addK mulK L addL smul ->
+    hermitian_form K addK mulK star L addL smul f ->
+    vector_subspace K addK mulK L addL smul M ->
+    ((M :/\: hermitian_orthogonal_complement K addK L f M
+        = {module_zero L addL})
+    <-> nondegenerate_sesquilinear_form K addK mulK star M addL smul f)
+    /\ (nondegenerate_sesquilinear_form K addK mulK star M addL smul f
+      <-> direct_sum_decomposition K addK mulK L addL smul 2
+        (fun i => if i = 0 then M
+          else hermitian_orthogonal_complement K addK L f M))
+    /\ (nondegenerate_sesquilinear_form K addK mulK star L addL smul f ->
+      (submodule_sum K addK mulK L addL smul M
+        (hermitian_orthogonal_complement K addK L f M) = L
+      <-> M :/\: hermitian_orthogonal_complement K addK L f M
+        = {module_zero L addL})).
+admit.
 //GOD1PRF:1239391 b) The restriction of $f$ to M is a non-degenerate hermitian form on M ;\\
+claim h_s36_prf_1239391 :
+  forall K, forall addK mulK:set -> set -> set, forall star:set -> set,
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set, forall M,
+    field_involution K addK mulK star ->
+    finite_dimensional_vector_space K addK mulK L addL smul ->
+    hermitian_form K addK mulK star L addL smul f ->
+    vector_subspace K addK mulK L addL smul M ->
+    ((M :/\: hermitian_orthogonal_complement K addK L f M
+        = {module_zero L addL})
+    <-> nondegenerate_sesquilinear_form K addK mulK star M addL smul f)
+    /\ (nondegenerate_sesquilinear_form K addK mulK star M addL smul f
+      <-> direct_sum_decomposition K addK mulK L addL smul 2
+        (fun i => if i = 0 then M
+          else hermitian_orthogonal_complement K addK L f M))
+    /\ (nondegenerate_sesquilinear_form K addK mulK star L addL smul f ->
+      (submodule_sum K addK mulK L addL smul M
+        (hermitian_orthogonal_complement K addK L f M) = L
+      <-> M :/\: hermitian_orthogonal_complement K addK L f M
+        = {module_zero L addL})).
+admit.
 //GOD1PRF:1239466 c) L is the direct sum of M and $\mathrm{M}^{\perp}$, i.e. every $x \in \mathrm{~L}$ can be written uniquely in the form
+claim h_s36_prf_1239466 :
+  forall K, forall addK mulK:set -> set -> set, forall star:set -> set,
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set, forall M,
+    field_involution K addK mulK star ->
+    finite_dimensional_vector_space K addK mulK L addL smul ->
+    hermitian_form K addK mulK star L addL smul f ->
+    vector_subspace K addK mulK L addL smul M ->
+    ((M :/\: hermitian_orthogonal_complement K addK L f M
+        = {module_zero L addL})
+    <-> nondegenerate_sesquilinear_form K addK mulK star M addL smul f)
+    /\ (nondegenerate_sesquilinear_form K addK mulK star M addL smul f
+      <-> direct_sum_decomposition K addK mulK L addL smul 2
+        (fun i => if i = 0 then M
+          else hermitian_orthogonal_complement K addK L f M))
+    /\ (nondegenerate_sesquilinear_form K addK mulK star L addL smul f ->
+      (submodule_sum K addK mulK L addL smul M
+        (hermitian_orthogonal_complement K addK L f M) = L
+      <-> M :/\: hermitian_orthogonal_complement K addK L f M
+        = {module_zero L addL})).
+admit.
 //GOD1PRF:1239698 If moreover $f$ is non-degenerate, these conditions are equivalent to the following:\\
+claim h_s36_prf_1239698 :
+  forall K, forall addK mulK:set -> set -> set, forall star:set -> set,
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set, forall M,
+    field_involution K addK mulK star ->
+    finite_dimensional_vector_space K addK mulK L addL smul ->
+    hermitian_form K addK mulK star L addL smul f ->
+    vector_subspace K addK mulK L addL smul M ->
+    ((M :/\: hermitian_orthogonal_complement K addK L f M
+        = {module_zero L addL})
+    <-> nondegenerate_sesquilinear_form K addK mulK star M addL smul f)
+    /\ (nondegenerate_sesquilinear_form K addK mulK star M addL smul f
+      <-> direct_sum_decomposition K addK mulK L addL smul 2
+        (fun i => if i = 0 then M
+          else hermitian_orthogonal_complement K addK L f M))
+    /\ (nondegenerate_sesquilinear_form K addK mulK star L addL smul f ->
+      (submodule_sum K addK mulK L addL smul M
+        (hermitian_orthogonal_complement K addK L f M) = L
+      <-> M :/\: hermitian_orthogonal_complement K addK L f M
+        = {module_zero L addL})).
+admit.
 //GOD1PRF:1239785 d) L is the sum of M and $\mathrm{M}^{\perp}$, i.e., every $x \in \mathrm{~L}$ can be written in at least one way in the form
+claim h_s36_prf_1239785 :
+  forall K, forall addK mulK:set -> set -> set, forall star:set -> set,
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set, forall M,
+    field_involution K addK mulK star ->
+    finite_dimensional_vector_space K addK mulK L addL smul ->
+    hermitian_form K addK mulK star L addL smul f ->
+    vector_subspace K addK mulK L addL smul M ->
+    ((M :/\: hermitian_orthogonal_complement K addK L f M
+        = {module_zero L addL})
+    <-> nondegenerate_sesquilinear_form K addK mulK star M addL smul f)
+    /\ (nondegenerate_sesquilinear_form K addK mulK star M addL smul f
+      <-> direct_sum_decomposition K addK mulK L addL smul 2
+        (fun i => if i = 0 then M
+          else hermitian_orthogonal_complement K addK L f M))
+    /\ (nondegenerate_sesquilinear_form K addK mulK star L addL smul f ->
+      (submodule_sum K addK mulK L addL smul M
+        (hermitian_orthogonal_complement K addK L f M) = L
+      <-> M :/\: hermitian_orthogonal_complement K addK L f M
+        = {module_zero L addL})).
+admit.
 //GOD1PRF:1240022 We remark first that the vectors $x \in \mathrm{M} \cap \mathrm{M}^{\perp}$ are the $x \in \mathrm{M}$ which satisfy
+claim h_s36_prf_1240022 :
+  forall K, forall addK mulK:set -> set -> set, forall star:set -> set,
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set, forall M,
+    field_involution K addK mulK star ->
+    finite_dimensional_vector_space K addK mulK L addL smul ->
+    hermitian_form K addK mulK star L addL smul f ->
+    vector_subspace K addK mulK L addL smul M ->
+    ((M :/\: hermitian_orthogonal_complement K addK L f M
+        = {module_zero L addL})
+    <-> nondegenerate_sesquilinear_form K addK mulK star M addL smul f)
+    /\ (nondegenerate_sesquilinear_form K addK mulK star M addL smul f
+      <-> direct_sum_decomposition K addK mulK L addL smul 2
+        (fun i => if i = 0 then M
+          else hermitian_orthogonal_complement K addK L f M))
+    /\ (nondegenerate_sesquilinear_form K addK mulK star L addL smul f ->
+      (submodule_sum K addK mulK L addL smul M
+        (hermitian_orthogonal_complement K addK L f M) = L
+      <-> M :/\: hermitian_orthogonal_complement K addK L f M
+        = {module_zero L addL})).
+admit.
 //GOD1PRF:1240189 from this the equivalence of $a$ ) and $b$ ) is clear. It is no less obvious that $c$ ) implies $a$ ). Hence, to show that $a$ ), $b$ ) and $c$ ) are all equivalent, it is enough to show that $b$ ) implies c). Since also $c$ ) is the conjunction of $a$ ) and $d$ ) (§ 17, Theorem 1) and since we have already shown that $b$ ) implies $a$ ), it is enough to show that $b$ ) implies $d$ ).
+claim h_s36_prf_1240189 :
+  forall K, forall addK mulK:set -> set -> set, forall star:set -> set,
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set, forall M,
+    field_involution K addK mulK star ->
+    finite_dimensional_vector_space K addK mulK L addL smul ->
+    hermitian_form K addK mulK star L addL smul f ->
+    vector_subspace K addK mulK L addL smul M ->
+    ((M :/\: hermitian_orthogonal_complement K addK L f M
+        = {module_zero L addL})
+    <-> nondegenerate_sesquilinear_form K addK mulK star M addL smul f)
+    /\ (nondegenerate_sesquilinear_form K addK mulK star M addL smul f
+      <-> direct_sum_decomposition K addK mulK L addL smul 2
+        (fun i => if i = 0 then M
+          else hermitian_orthogonal_complement K addK L f M))
+    /\ (nondegenerate_sesquilinear_form K addK mulK star L addL smul f ->
+      (submodule_sum K addK mulK L addL smul M
+        (hermitian_orthogonal_complement K addK L f M) = L
+      <-> M :/\: hermitian_orthogonal_complement K addK L f M
+        = {module_zero L addL})).
+admit.
+claim h_s36_ref_1240189_god1_s17_theorem1_two_submodules_independent_iff_trivial_intersection :
+  forall K, forall addK mulK:set -> set -> set,
+  forall L, forall addL smul:set -> set -> set, forall M N,
+    submodule K addK mulK L addL smul M ->
+    submodule K addK mulK L addL smul N ->
+    (linearly_independent_submodules K addK mulK L addL smul 2
+      (fun i => if i = 0 then M else N)
+    <-> {x :e M|x :e N} = {module_zero L addL}).
+apply god1_s17_theorem1_two_submodules_independent_iff_trivial_intersection.
 //GOD1PRF:1240579 Let $x \in \mathrm{~L}$, and consider the function $u$ on M defined by
+claim h_s36_prf_1240579 :
+  forall K, forall addK mulK:set -> set -> set, forall star:set -> set,
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set, forall M,
+    field_involution K addK mulK star ->
+    finite_dimensional_vector_space K addK mulK L addL smul ->
+    hermitian_form K addK mulK star L addL smul f ->
+    vector_subspace K addK mulK L addL smul M ->
+    ((M :/\: hermitian_orthogonal_complement K addK L f M
+        = {module_zero L addL})
+    <-> nondegenerate_sesquilinear_form K addK mulK star M addL smul f)
+    /\ (nondegenerate_sesquilinear_form K addK mulK star M addL smul f
+      <-> direct_sum_decomposition K addK mulK L addL smul 2
+        (fun i => if i = 0 then M
+          else hermitian_orthogonal_complement K addK L f M))
+    /\ (nondegenerate_sesquilinear_form K addK mulK star L addL smul f ->
+      (submodule_sum K addK mulK L addL smul M
+        (hermitian_orthogonal_complement K addK L f M) = L
+      <-> M :/\: hermitian_orthogonal_complement K addK L f M
+        = {module_zero L addL})).
+admit.
 //GOD1PRF:1241014 for all $y \in \mathrm{M}$, and therefore $x-x^{\prime} \in \mathrm{M}^{\perp}$. Since $x^{\prime} \in \mathrm{M}$ it follows that $x \in \mathrm{M}+\mathrm{M}^{\perp}$, and hence $\mathrm{L}=\mathrm{M}+\mathrm{M}^{\perp}$, which is $\left.d\right)$.
+claim h_s36_prf_1241014 :
+  forall K, forall addK mulK:set -> set -> set, forall star:set -> set,
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set, forall M,
+    field_involution K addK mulK star ->
+    finite_dimensional_vector_space K addK mulK L addL smul ->
+    hermitian_form K addK mulK star L addL smul f ->
+    vector_subspace K addK mulK L addL smul M ->
+    ((M :/\: hermitian_orthogonal_complement K addK L f M
+        = {module_zero L addL})
+    <-> nondegenerate_sesquilinear_form K addK mulK star M addL smul f)
+    /\ (nondegenerate_sesquilinear_form K addK mulK star M addL smul f
+      <-> direct_sum_decomposition K addK mulK L addL smul 2
+        (fun i => if i = 0 then M
+          else hermitian_orthogonal_complement K addK L f M))
+    /\ (nondegenerate_sesquilinear_form K addK mulK star L addL smul f ->
+      (submodule_sum K addK mulK L addL smul M
+        (hermitian_orthogonal_complement K addK L f M) = L
+      <-> M :/\: hermitian_orthogonal_complement K addK L f M
+        = {module_zero L addL})).
+admit.
 //GOD1PRF:1241266 Now suppose that $f$ is non-degenerate and that $d$ ) is true. By Corollary 2 of Theorem 13 in § 19 we have
+claim h_s36_prf_1241266 :
+  forall K, forall addK mulK:set -> set -> set, forall star:set -> set,
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set, forall M,
+    field_involution K addK mulK star ->
+    finite_dimensional_vector_space K addK mulK L addL smul ->
+    hermitian_form K addK mulK star L addL smul f ->
+    vector_subspace K addK mulK L addL smul M ->
+    ((M :/\: hermitian_orthogonal_complement K addK L f M
+        = {module_zero L addL})
+    <-> nondegenerate_sesquilinear_form K addK mulK star M addL smul f)
+    /\ (nondegenerate_sesquilinear_form K addK mulK star M addL smul f
+      <-> direct_sum_decomposition K addK mulK L addL smul 2
+        (fun i => if i = 0 then M
+          else hermitian_orthogonal_complement K addK L f M))
+    /\ (nondegenerate_sesquilinear_form K addK mulK star L addL smul f ->
+      (submodule_sum K addK mulK L addL smul M
+        (hermitian_orthogonal_complement K addK L f M) = L
+      <-> M :/\: hermitian_orthogonal_complement K addK L f M
+        = {module_zero L addL})).
+admit.
+claim h_s36_ref_1241266_god1_s19_theorem13_corollary2_dimension_of_sum :
+  forall K, forall addK mulK:set -> set -> set,
+  forall M, forall addM smulR:set -> set -> set, forall E F,
+    finite_dimensional_right_vector_space K addK mulK M addM smulR ->
+    submodule K addK (opposite_ring_multiplication mulK)
+      M addM (fun scalar x => smulR x scalar) E ->
+    submodule K addK (opposite_ring_multiplication mulK)
+      M addM (fun scalar x => smulR x scalar) F ->
+    right_vector_dimension K addK mulK
+      (submodule_sum
+        K addK (opposite_ring_multiplication mulK)
+        M addM (fun scalar x => smulR x scalar) E F) addM smulR
+    + right_vector_dimension K addK mulK {x :e E|x :e F} addM smulR
+    = right_vector_dimension K addK mulK E addM smulR
+      + right_vector_dimension K addK mulK F addM smulR.
+apply god1_s19_theorem13_corollary2_dimension_of_sum.
 //GOD1PRF:1241538 and by hypothesis the left-hand side is equal to $\operatorname{dim}(\mathrm{L})$. Hence Theorem 4 shows that $\operatorname{dim}\left(\mathbf{M} \cap \mathbf{M}^{\perp}\right)=0$. Thus $d$ ) implies $a$ ), and the theorem is proved.
+claim h_s36_prf_1241538 :
+  forall K, forall addK mulK:set -> set -> set, forall star:set -> set,
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set, forall M,
+    field_involution K addK mulK star ->
+    finite_dimensional_vector_space K addK mulK L addL smul ->
+    hermitian_form K addK mulK star L addL smul f ->
+    vector_subspace K addK mulK L addL smul M ->
+    ((M :/\: hermitian_orthogonal_complement K addK L f M
+        = {module_zero L addL})
+    <-> nondegenerate_sesquilinear_form K addK mulK star M addL smul f)
+    /\ (nondegenerate_sesquilinear_form K addK mulK star M addL smul f
+      <-> direct_sum_decomposition K addK mulK L addL smul 2
+        (fun i => if i = 0 then M
+          else hermitian_orthogonal_complement K addK L f M))
+    /\ (nondegenerate_sesquilinear_form K addK mulK star L addL smul f ->
+      (submodule_sum K addK mulK L addL smul M
+        (hermitian_orthogonal_complement K addK L f M) = L
+      <-> M :/\: hermitian_orthogonal_complement K addK L f M
+        = {module_zero L addL})).
+admit.
+claim h_s36_ref_1241538_god1_s36_theorem4_dimension_of_orthogonal_complement :
+  forall K, forall addK mulK:set -> set -> set, forall star:set -> set,
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set, forall M,
+    field_involution K addK mulK star ->
+    finite_dimensional_vector_space K addK mulK L addL smul ->
+    hermitian_form K addK mulK star L addL smul f ->
+    nondegenerate_sesquilinear_form K addK mulK star L addL smul f ->
+    vector_subspace K addK mulK L addL smul M ->
+    add_SNo
+      (module_dimension K addK mulK M addL smul)
+      (module_dimension K addK mulK
+        (hermitian_orthogonal_complement K addK L f M) addL smul)
+    = module_dimension K addK mulK L addL smul.
+apply god1_s36_theorem4_dimension_of_orthogonal_complement.
 Admitted.
 
 Theorem god1_s36_theorem5_corollary_no_isotropic_vectors :
@@ -57173,11 +60577,137 @@ let K addK mulK star L addL smul f.
 assume hInvolution hFinite hHermitian.
 apply iffI.
 //GOD1PRF:1245008 corollary to theorem 5. Let $f$ be a hermitian form on a vector space L of finite dimension over K . Then the following properties are equivalent:\\
+claim h_s36_prf_1245008 :
+  forall K, forall addK mulK:set -> set -> set, forall star:set -> set,
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set,
+    field_involution K addK mulK star ->
+    finite_dimensional_vector_space K addK mulK L addL smul ->
+    hermitian_form K addK mulK star L addL smul f ->
+    ((forall x :e L, f x x = ring_zero K addK -> x = module_zero L addL)
+    <-> forall M,
+      vector_subspace K addK mulK L addL smul M ->
+      direct_sum_decomposition K addK mulK L addL smul 2
+        (fun i => if i = 0 then M
+          else hermitian_orthogonal_complement K addK L f M)).
+admit.
+claim h_s36_ref_1245008_god1_s36_theorem5_nonisotropic_subspace_characterizations :
+  forall K, forall addK mulK:set -> set -> set, forall star:set -> set,
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set, forall M,
+    field_involution K addK mulK star ->
+    finite_dimensional_vector_space K addK mulK L addL smul ->
+    hermitian_form K addK mulK star L addL smul f ->
+    vector_subspace K addK mulK L addL smul M ->
+    ((M :/\: hermitian_orthogonal_complement K addK L f M
+        = {module_zero L addL})
+    <-> nondegenerate_sesquilinear_form K addK mulK star M addL smul f)
+    /\ (nondegenerate_sesquilinear_form K addK mulK star M addL smul f
+      <-> direct_sum_decomposition K addK mulK L addL smul 2
+        (fun i => if i = 0 then M
+          else hermitian_orthogonal_complement K addK L f M))
+    /\ (nondegenerate_sesquilinear_form K addK mulK star L addL smul f ->
+      (submodule_sum K addK mulK L addL smul M
+        (hermitian_orthogonal_complement K addK L f M) = L
+      <-> M :/\: hermitian_orthogonal_complement K addK L f M
+        = {module_zero L addL})).
+apply god1_s36_theorem5_nonisotropic_subspace_characterizations.
 //GOD1PRF:1245157 a) If $x \in \mathrm{~L}$, the relation $f(x, x)=0$ implies $x=0$ (in other words, $f$ has no non-zero isotropic vectors);\\
+claim h_s36_prf_1245157 :
+  forall K, forall addK mulK:set -> set -> set, forall star:set -> set,
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set,
+    field_involution K addK mulK star ->
+    finite_dimensional_vector_space K addK mulK L addL smul ->
+    hermitian_form K addK mulK star L addL smul f ->
+    ((forall x :e L, f x x = ring_zero K addK -> x = module_zero L addL)
+    <-> forall M,
+      vector_subspace K addK mulK L addL smul M ->
+      direct_sum_decomposition K addK mulK L addL smul 2
+        (fun i => if i = 0 then M
+          else hermitian_orthogonal_complement K addK L f M)).
+admit.
 //GOD1PRF:1245282 b) For every vector subspace M of L we have
+claim h_s36_prf_1245282 :
+  forall K, forall addK mulK:set -> set -> set, forall star:set -> set,
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set,
+    field_involution K addK mulK star ->
+    finite_dimensional_vector_space K addK mulK L addL smul ->
+    hermitian_form K addK mulK star L addL smul f ->
+    ((forall x :e L, f x x = ring_zero K addK -> x = module_zero L addL)
+    <-> forall M,
+      vector_subspace K addK mulK L addL smul M ->
+      direct_sum_decomposition K addK mulK L addL smul 2
+        (fun i => if i = 0 then M
+          else hermitian_orthogonal_complement K addK L f M)).
+admit.
 //GOD1PRF:1245384 It is clear that if $M$ is any vector subspace of $L$, the subspace $M \cap M^{\perp}$ consists of isotropic vectors ; hence $a$ ) implies that
+claim h_s36_prf_1245384 :
+  forall K, forall addK mulK:set -> set -> set, forall star:set -> set,
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set,
+    field_involution K addK mulK star ->
+    finite_dimensional_vector_space K addK mulK L addL smul ->
+    hermitian_form K addK mulK star L addL smul f ->
+    ((forall x :e L, f x x = ring_zero K addK -> x = module_zero L addL)
+    <-> forall M,
+      vector_subspace K addK mulK L addL smul M ->
+      direct_sum_decomposition K addK mulK L addL smul 2
+        (fun i => if i = 0 then M
+          else hermitian_orthogonal_complement K addK L f M)).
+admit.
 //GOD1PRF:1245577 and therefore implies $b$ ), by Theorem 5. That conversely $b$ ) implies $a$ ) follows from the fact that
+claim h_s36_prf_1245577 :
+  forall K, forall addK mulK:set -> set -> set, forall star:set -> set,
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set,
+    field_involution K addK mulK star ->
+    finite_dimensional_vector_space K addK mulK L addL smul ->
+    hermitian_form K addK mulK star L addL smul f ->
+    ((forall x :e L, f x x = ring_zero K addK -> x = module_zero L addL)
+    <-> forall M,
+      vector_subspace K addK mulK L addL smul M ->
+      direct_sum_decomposition K addK mulK L addL smul 2
+        (fun i => if i = 0 then M
+          else hermitian_orthogonal_complement K addK L f M)).
+admit.
+claim h_s36_ref_1245577_god1_s36_theorem5_nonisotropic_subspace_characterizations :
+  forall K, forall addK mulK:set -> set -> set, forall star:set -> set,
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set, forall M,
+    field_involution K addK mulK star ->
+    finite_dimensional_vector_space K addK mulK L addL smul ->
+    hermitian_form K addK mulK star L addL smul f ->
+    vector_subspace K addK mulK L addL smul M ->
+    ((M :/\: hermitian_orthogonal_complement K addK L f M
+        = {module_zero L addL})
+    <-> nondegenerate_sesquilinear_form K addK mulK star M addL smul f)
+    /\ (nondegenerate_sesquilinear_form K addK mulK star M addL smul f
+      <-> direct_sum_decomposition K addK mulK L addL smul 2
+        (fun i => if i = 0 then M
+          else hermitian_orthogonal_complement K addK L f M))
+    /\ (nondegenerate_sesquilinear_form K addK mulK star L addL smul f ->
+      (submodule_sum K addK mulK L addL smul M
+        (hermitian_orthogonal_complement K addK L f M) = L
+      <-> M :/\: hermitian_orthogonal_complement K addK L f M
+        = {module_zero L addL})).
+apply god1_s36_theorem5_nonisotropic_subspace_characterizations.
 //GOD1PRF:1245732 for every one-dimensional subspace $M$ of $L$.
+claim h_s36_prf_1245732 :
+  forall K, forall addK mulK:set -> set -> set, forall star:set -> set,
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set,
+    field_involution K addK mulK star ->
+    finite_dimensional_vector_space K addK mulK L addL smul ->
+    hermitian_form K addK mulK star L addL smul f ->
+    ((forall x :e L, f x x = ring_zero K addK -> x = module_zero L addL)
+    <-> forall M,
+      vector_subspace K addK mulK L addL smul M ->
+      direct_sum_decomposition K addK mulK L addL smul 2
+        (fun i => if i = 0 then M
+          else hermitian_orthogonal_complement K addK L f M)).
+admit.
 Admitted.
 
 Theorem god1_orthogonal_projection_characterization :
@@ -57200,9 +60730,105 @@ assume hx.
 let y.
 apply iffI.
 //GOD1PRF:1242765 hence, by Theorem 5, we have
+claim h_s36_prf_1242765 :
+  forall K, forall addK mulK:set -> set -> set, forall star:set -> set,
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set, forall M,
+    field_involution K addK mulK star ->
+    finite_dimensional_vector_space K addK mulK L addL smul ->
+    hermitian_form K addK mulK star L addL smul f ->
+    vector_subspace K addK mulK L addL smul M ->
+    nondegenerate_sesquilinear_form K addK mulK star M addL smul f ->
+    forall x :e L, forall y,
+      (y = orthogonal_projection K addK L addL M f x
+      <-> y :e M /\ forall z :e M,
+        f (addL x (module_negation L addL y)) z = ring_zero K addK).
+admit.
+claim h_s36_ref_1242765_god1_s36_theorem5_nonisotropic_subspace_characterizations :
+  forall K, forall addK mulK:set -> set -> set, forall star:set -> set,
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set, forall M,
+    field_involution K addK mulK star ->
+    finite_dimensional_vector_space K addK mulK L addL smul ->
+    hermitian_form K addK mulK star L addL smul f ->
+    vector_subspace K addK mulK L addL smul M ->
+    ((M :/\: hermitian_orthogonal_complement K addK L f M
+        = {module_zero L addL})
+    <-> nondegenerate_sesquilinear_form K addK mulK star M addL smul f)
+    /\ (nondegenerate_sesquilinear_form K addK mulK star M addL smul f
+      <-> direct_sum_decomposition K addK mulK L addL smul 2
+        (fun i => if i = 0 then M
+          else hermitian_orthogonal_complement K addK L f M))
+    /\ (nondegenerate_sesquilinear_form K addK mulK star L addL smul f ->
+      (submodule_sum K addK mulK L addL smul M
+        (hermitian_orthogonal_complement K addK L f M) = L
+      <-> M :/\: hermitian_orthogonal_complement K addK L f M
+        = {module_zero L addL})).
+apply god1_s36_theorem5_nonisotropic_subspace_characterizations.
 //GOD1PRF:1242879 if and only if M is non-isotropic. In this case, section 4 of § 17 shows that there exists a unique endomorphism $p_{M}$ of the vector space $L$ which satisfies the following conditions:
+claim h_s36_prf_1242879 :
+  forall K, forall addK mulK:set -> set -> set, forall star:set -> set,
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set, forall M,
+    field_involution K addK mulK star ->
+    finite_dimensional_vector_space K addK mulK L addL smul ->
+    hermitian_form K addK mulK star L addL smul f ->
+    vector_subspace K addK mulK L addL smul M ->
+    nondegenerate_sesquilinear_form K addK mulK star M addL smul f ->
+    forall x :e L, forall y,
+      (y = orthogonal_projection K addK L addL M f x
+      <-> y :e M /\ forall z :e M,
+        f (addL x (module_negation L addL y)) z = ring_zero K addK).
+admit.
+claim h_s36_ref_1242879_god1_direct_sum_projections_are_orthogonal_and_sum_to_identity :
+  forall K, forall addK mulK:set -> set -> set,
+  forall L, forall addL smul:set -> set -> set,
+  forall I, forall M:set -> set,
+    direct_sum_decomposition K addK mulK L addL smul I M ->
+    (forall i :e I,
+      module_projection K addK mulK L addL smul
+        (direct_sum_projection L addL I M i)
+      /\ module_homomorphism_image L
+        (direct_sum_projection L addL I M i) = M i)
+    /\ (forall i j :e I, forall x :e L,
+      direct_sum_projection L addL I M j
+        (direct_sum_projection L addL I M i x)
+      = if i = j then direct_sum_projection L addL I M i x
+        else module_zero L addL)
+    /\ forall x :e L,
+      module_finitely_supported_sum L addL I
+        (fun i => direct_sum_projection L addL I M i x) = x.
+apply god1_direct_sum_projections_are_orthogonal_and_sum_to_identity.
 //GOD1PRF:1243264 For each $x \in \mathrm{~L}$ we have
+claim h_s36_prf_1243264 :
+  forall K, forall addK mulK:set -> set -> set, forall star:set -> set,
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set, forall M,
+    field_involution K addK mulK star ->
+    finite_dimensional_vector_space K addK mulK L addL smul ->
+    hermitian_form K addK mulK star L addL smul f ->
+    vector_subspace K addK mulK L addL smul M ->
+    nondegenerate_sesquilinear_form K addK mulK star M addL smul f ->
+    forall x :e L, forall y,
+      (y = orthogonal_projection K addK L addL M f x
+      <-> y :e M /\ forall z :e M,
+        f (addL x (module_negation L addL y)) z = ring_zero K addK).
+admit.
 //GOD1PRF:1243378 and this relation characterizes $p_{\mathrm{M}}$ : more precisely, $p_{\mathrm{M}}(x)$ is the unique element of M , such that $x-p_{\mathrm{M}}(x)$ is orthogonal to M . The vector $p_{\mathrm{M}}(x)$ is called the orthogonal projection of $x$ on M , and the endomorphism $p_{\mathrm{M}}$ is called the orthogonal projection onto M.
+claim h_s36_prf_1243378 :
+  forall K, forall addK mulK:set -> set -> set, forall star:set -> set,
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set, forall M,
+    field_involution K addK mulK star ->
+    finite_dimensional_vector_space K addK mulK L addL smul ->
+    hermitian_form K addK mulK star L addL smul f ->
+    vector_subspace K addK mulK L addL smul M ->
+    nondegenerate_sesquilinear_form K addK mulK star M addL smul f ->
+    forall x :e L, forall y,
+      (y = orthogonal_projection K addK L addL M f x
+      <-> y :e M /\ forall z :e M,
+        f (addL x (module_negation L addL y)) z = ring_zero K addK).
+admit.
 Admitted.
 
 Theorem god1_orthogonal_projection_onto_nonisotropic_line :
@@ -57222,8 +60848,44 @@ assume ha hInvolution hHermitian hNonisotropic.
 let x.
 assume hx.
 //GOD1PRF:1244537 Coming back to the general case, let $a$ be a non-isotropic vector with respect to $f$. Then the orthogonal projection of any $x \in \mathrm{~L}$ on the line M generated by $a$ is given by the formula
+claim h_s36_prf_1244537 :
+  forall K, forall addK mulK:set -> set -> set, forall star:set -> set,
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set, forall a :e L,
+    field_involution K addK mulK star ->
+    hermitian_form K addK mulK star L addL smul f ->
+    f a a <> ring_zero K addK ->
+    let M := {smul scalar a|scalar :e K} in
+    forall x :e L,
+      orthogonal_projection K addK L addL M f x
+      = smul (mulK (f x a) (ring_inverse K addK mulK (f a a))) a.
+admit.
 //GOD1PRF:1244792 for the vector on the right certainly belongs to M , and we have
+claim h_s36_prf_1244792 :
+  forall K, forall addK mulK:set -> set -> set, forall star:set -> set,
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set, forall a :e L,
+    field_involution K addK mulK star ->
+    hermitian_form K addK mulK star L addL smul f ->
+    f a a <> ring_zero K addK ->
+    let M := {smul scalar a|scalar :e K} in
+    forall x :e L,
+      orthogonal_projection K addK L addL M f x
+      = smul (mulK (f x a) (ring_inverse K addK mulK (f a a))) a.
+admit.
 //GOD1PRF:1244945 which shows that $x-p_{\mathrm{M}}(x)$ is orthogonal to $a$.\\
+claim h_s36_prf_1244945 :
+  forall K, forall addK mulK:set -> set -> set, forall star:set -> set,
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set, forall a :e L,
+    field_involution K addK mulK star ->
+    hermitian_form K addK mulK star L addL smul f ->
+    f a a <> ring_zero K addK ->
+    let M := {smul scalar a|scalar :e K} in
+    forall x :e L,
+      orthogonal_projection K addK L addL M f x
+      = smul (mulK (f x a) (ring_inverse K addK mulK (f a a))) a.
+admit.
 Admitted.
 
 Theorem god1_algebraically_closed_symmetric_form_has_isotropic_vector :
@@ -57238,9 +60900,49 @@ Theorem god1_algebraically_closed_symmetric_form_has_isotropic_vector :
 let K addK mulK L addL smul f.
 assume hClosed hSymmetric hFinite hDimension.
 //GOD1PRF:1245780 Remark 4. Suppose that K is algebraically closed and that $\lambda^{*}=\lambda$ for all $\lambda \in \mathrm{K}$. If $f$ is a hermitian form (i.e., in this situation a symmetric bilinear form) and if L is of dimension $\geqslant 2$, then there always exist non-zero isotropic vectors relative to $f$.
+claim h_s36_prf_1245780 :
+  forall K, forall addK mulK:set -> set -> set,
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set,
+    algebraically_closed_field K addK mulK ->
+    symmetric_bilinear_form K addK mulK L addL smul f ->
+    finite_dimensional_vector_space K addK mulK L addL smul ->
+    2 c= module_dimension K addK mulK L addL smul ->
+    exists x :e L, x <> module_zero L addL /\ f x x = ring_zero K addK.
+admit.
 //GOD1PRF:1246082 For since $\operatorname{dim}(\mathrm{L}) \geqslant 2$ we can choose two linearly independent vectors $a, b$ in L . If $\lambda \in \mathrm{K}$, we have
+claim h_s36_prf_1246082 :
+  forall K, forall addK mulK:set -> set -> set,
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set,
+    algebraically_closed_field K addK mulK ->
+    symmetric_bilinear_form K addK mulK L addL smul f ->
+    finite_dimensional_vector_space K addK mulK L addL smul ->
+    2 c= module_dimension K addK mulK L addL smul ->
+    exists x :e L, x <> module_zero L addL /\ f x x = ring_zero K addK.
+admit.
 //GOD1PRF:1246319 if $a$ is isotropic, there is nothing to prove; if not, the $\lambda \in \mathrm{K}$ for which $\lambda a+b$ is isotropic\\
+claim h_s36_prf_1246319 :
+  forall K, forall addK mulK:set -> set -> set,
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set,
+    algebraically_closed_field K addK mulK ->
+    symmetric_bilinear_form K addK mulK L addL smul f ->
+    finite_dimensional_vector_space K addK mulK L addL smul ->
+    2 c= module_dimension K addK mulK L addL smul ->
+    exists x :e L, x <> module_zero L addL /\ f x x = ring_zero K addK.
+admit.
 //GOD1PRF:1246443 are the roots of an equation of the second degree. Since $\mathbf{K}$ is by hypothesis algebraically closed, this equation has at least one root, and the isotropic vector $\lambda a+b$ corresponding to this root is not zero because $a, b$ are linearly independent.
+claim h_s36_prf_1246443 :
+  forall K, forall addK mulK:set -> set -> set,
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set,
+    algebraically_closed_field K addK mulK ->
+    symmetric_bilinear_form K addK mulK L addL smul f ->
+    finite_dimensional_vector_space K addK mulK L addL smul ->
+    2 c= module_dimension K addK mulK L addL smul ->
+    exists x :e L, x <> module_zero L addL /\ f x x = ring_zero K addK.
+admit.
 Admitted.
 
 //GOD1:1246801 orthogonal_basis_for_form : "the basis #11 is orthogonal relative to form #9" | $#11\text{ is orthogonal for }#9$
@@ -57265,9 +60967,74 @@ Theorem god1_s36_theorem6_orthogonal_basis_exists :
 let K addK mulK star L addL smul f.
 assume hInvolution hFinite hHermitian hCharacteristic.
 //GOD1PRF:1247534 THEOREM 6. Let $f$ be a hermitian form on a finite-dimensional vector space over K . If the characteristic of K is $\neq 2$, then there exists a basis of L which is orthogonal relative to $f$.
+claim h_s36_prf_1247534 :
+  forall K, forall addK mulK:set -> set -> set, forall star:set -> set,
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set,
+    field_involution K addK mulK star ->
+    finite_dimensional_vector_space K addK mulK L addL smul ->
+    hermitian_form K addK mulK star L addL smul f ->
+    field_characteristic K addK mulK <> 2 ->
+    exists n :e omega, exists a:set -> set,
+      orthogonal_basis_for_form K addK mulK L addL smul f n a.
+admit.
 //GOD1PRF:1247728 The theorem is trivial if $f=0$, so we shall suppose that $f \neq 0$. Since there is nothing to prove if $\operatorname{dim}(\mathrm{L})=1$, we shall argue by induction on $n=\operatorname{dim}(\mathrm{L})$.
+claim h_s36_prf_1247728 :
+  forall K, forall addK mulK:set -> set -> set, forall star:set -> set,
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set,
+    field_involution K addK mulK star ->
+    finite_dimensional_vector_space K addK mulK L addL smul ->
+    hermitian_form K addK mulK star L addL smul f ->
+    field_characteristic K addK mulK <> 2 ->
+    exists n :e omega, exists a:set -> set,
+      orthogonal_basis_for_form K addK mulK L addL smul f n a.
+admit.
 //GOD1PRF:1247937 Suppose that we have found a vector $a_{1} \in \mathrm{~L}$ which is non-isotropic with respect to $f$. Then, by Theorem 5, L is the direct sum of the line generated by $a_{1}$ and the hyperplane $\mathrm{L}^{\prime}$ orthogonal to this line. Since $\operatorname{dim}\left(\mathrm{L}^{\prime}\right)=n-1$, the inductive hypothesis shows that $\mathrm{L}^{\prime}$ has a basis $\left(a_{2}, \ldots, a_{n}\right)$ which is orthogonal with respect to the restriction $f^{\prime}$ of $f$ to $\mathrm{L}^{\prime}$. It is then obvious that $\left(a_{1}, \ldots, a_{n}\right)$ is a basis of L which is orthogonal relative to $f$.
+claim h_s36_prf_1247937 :
+  forall K, forall addK mulK:set -> set -> set, forall star:set -> set,
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set,
+    field_involution K addK mulK star ->
+    finite_dimensional_vector_space K addK mulK L addL smul ->
+    hermitian_form K addK mulK star L addL smul f ->
+    field_characteristic K addK mulK <> 2 ->
+    exists n :e omega, exists a:set -> set,
+      orthogonal_basis_for_form K addK mulK L addL smul f n a.
+admit.
+claim h_s36_ref_1247937_god1_s36_theorem5_nonisotropic_subspace_characterizations :
+  forall K, forall addK mulK:set -> set -> set, forall star:set -> set,
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set, forall M,
+    field_involution K addK mulK star ->
+    finite_dimensional_vector_space K addK mulK L addL smul ->
+    hermitian_form K addK mulK star L addL smul f ->
+    vector_subspace K addK mulK L addL smul M ->
+    ((M :/\: hermitian_orthogonal_complement K addK L f M
+        = {module_zero L addL})
+    <-> nondegenerate_sesquilinear_form K addK mulK star M addL smul f)
+    /\ (nondegenerate_sesquilinear_form K addK mulK star M addL smul f
+      <-> direct_sum_decomposition K addK mulK L addL smul 2
+        (fun i => if i = 0 then M
+          else hermitian_orthogonal_complement K addK L f M))
+    /\ (nondegenerate_sesquilinear_form K addK mulK star L addL smul f ->
+      (submodule_sum K addK mulK L addL smul M
+        (hermitian_orthogonal_complement K addK L f M) = L
+      <-> M :/\: hermitian_orthogonal_complement K addK L f M
+        = {module_zero L addL})).
+apply god1_s36_theorem5_nonisotropic_subspace_characterizations.
 //GOD1PRF:1248562 Hence to complete the proof we must establish the following result:\\
+claim h_s36_prf_1248562 :
+  forall K, forall addK mulK:set -> set -> set, forall star:set -> set,
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set,
+    field_involution K addK mulK star ->
+    finite_dimensional_vector_space K addK mulK L addL smul ->
+    hermitian_form K addK mulK star L addL smul f ->
+    field_characteristic K addK mulK <> 2 ->
+    exists n :e omega, exists a:set -> set,
+      orthogonal_basis_for_form K addK mulK L addL smul f n a.
+admit.
 Admitted.
 
 Theorem god1_s36_theorem6_lemma_nonzero_form_has_nonisotropic_vector :
@@ -57282,12 +61049,82 @@ Theorem god1_s36_theorem6_lemma_nonzero_form_has_nonisotropic_vector :
 let K addK mulK star L addL smul f.
 assume hInvolution hHermitian hCharacteristic hNonzero.
 //GOD1PRF:1248632 lemma. Let $f$ be a hermitian form on a vector space L over K , and suppose that the characteristic of K is $\neq 2$. If $f$ is not zero, then there exist vectors in L which are nonisotropic relative to f.
+claim h_s36_prf_1248632 :
+  forall K, forall addK mulK:set -> set -> set, forall star:set -> set,
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set,
+    field_involution K addK mulK star ->
+    hermitian_form K addK mulK star L addL smul f ->
+    field_characteristic K addK mulK <> 2 ->
+    (exists x y :e L, f x y <> ring_zero K addK) ->
+    exists x :e L, f x x <> ring_zero K addK.
+admit.
 //GOD1PRF:1248839 In other words, if $f \neq 0$ and if $f(x, x)=0$ for all $x \in \mathrm{~L}$, then K is of characteristic 2.\\
+claim h_s36_prf_1248839 :
+  forall K, forall addK mulK:set -> set -> set, forall star:set -> set,
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set,
+    field_involution K addK mulK star ->
+    hermitian_form K addK mulK star L addL smul f ->
+    field_characteristic K addK mulK <> 2 ->
+    (exists x y :e L, f x y <> ring_zero K addK) ->
+    exists x :e L, f x x <> ring_zero K addK.
+admit.
 //GOD1PRF:1248950 Suppose then that $f(x, x)=0$ for all $x \in \mathrm{~L}$. Then the relation
+claim h_s36_prf_1248950 :
+  forall K, forall addK mulK:set -> set -> set, forall star:set -> set,
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set,
+    field_involution K addK mulK star ->
+    hermitian_form K addK mulK star L addL smul f ->
+    field_characteristic K addK mulK <> 2 ->
+    (exists x y :e L, f x y <> ring_zero K addK) ->
+    exists x :e L, f x x <> ring_zero K addK.
+admit.
 //GOD1PRF:1249083 shows that
+claim h_s36_prf_1249083 :
+  forall K, forall addK mulK:set -> set -> set, forall star:set -> set,
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set,
+    field_involution K addK mulK star ->
+    hermitian_form K addK mulK star L addL smul f ->
+    field_characteristic K addK mulK <> 2 ->
+    (exists x y :e L, f x y <> ring_zero K addK) ->
+    exists x :e L, f x x <> ring_zero K addK.
+admit.
 //GOD1PRF:1249124 for all $x, y \in \mathrm{~L}$. Replacing $x$ by $t x$, where $t \in \mathrm{~K}$, we see that the scalar $u=f(x, y)$ satisfies
+claim h_s36_prf_1249124 :
+  forall K, forall addK mulK:set -> set -> set, forall star:set -> set,
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set,
+    field_involution K addK mulK star ->
+    hermitian_form K addK mulK star L addL smul f ->
+    field_characteristic K addK mulK <> 2 ->
+    (exists x y :e L, f x y <> ring_zero K addK) ->
+    exists x :e L, f x x <> ring_zero K addK.
+admit.
 //GOD1PRF:1249320 If $f \neq 0$ we can choose $x$ and $y$ such that $u \neq 0$, and then taking $t=u^{-1}$ we get
+claim h_s36_prf_1249320 :
+  forall K, forall addK mulK:set -> set -> set, forall star:set -> set,
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set,
+    field_involution K addK mulK star ->
+    hermitian_form K addK mulK star L addL smul f ->
+    field_characteristic K addK mulK <> 2 ->
+    (exists x y :e L, f x y <> ring_zero K addK) ->
+    exists x :e L, f x x <> ring_zero K addK.
+admit.
 //GOD1PRF:1249439 which shows that the characteristic of K is 2 .\\
+claim h_s36_prf_1249439 :
+  forall K, forall addK mulK:set -> set -> set, forall star:set -> set,
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set,
+    field_involution K addK mulK star ->
+    hermitian_form K addK mulK star L addL smul f ->
+    field_characteristic K addK mulK <> 2 ->
+    (exists x y :e L, f x y <> ring_zero K addK) ->
+    exists x :e L, f x x <> ring_zero K addK.
+admit.
 Admitted.
 
 Theorem god1_s36_theorem6_corollary1_algebraically_closed_symmetric_form :
@@ -57312,12 +61149,162 @@ assume hn.
 let f.
 assume hClosed hCharacteristic hFinite hDimension hSymmetric.
 //GOD1PRF:1249848 COROLLARY 1. Let $f$ be a symmetric bilinear form on a vector space L of finite dimension $n$ over K. Suppose that K is algebraically closed and of characteristic $\neq 2$ (for example, $\mathrm{K}=\mathrm{C})$. Then there exists a basis of L such that the expression of $f$ with respect to this basis is
+claim h_s36_prf_1249848 :
+  forall K, forall addK mulK:set -> set -> set,
+  forall L, forall addL smul:set -> set -> set,
+  forall n :e omega, forall f:set -> set -> set,
+    algebraically_closed_field K addK mulK ->
+    field_characteristic K addK mulK <> 2 ->
+    finite_dimensional_vector_space K addK mulK L addL smul ->
+    module_dimension K addK mulK L addL smul = n ->
+    symmetric_bilinear_form K addK mulK L addL smul f ->
+    exists r :e ordsucc n, exists a:set -> set,
+      module_basis K addK mulK L addL smul n a
+      /\ (forall i j :e n,
+        f (a i) (a j)
+        = if i = j /\ i :e r then ring_one K mulK else ring_zero K addK)
+      /\ (nondegenerate_sesquilinear_form
+        K addK mulK (fun x => x) L addL smul f <-> r = n).
+admit.
 //GOD1PRF:1250210 where $r \leqslant n$. For $f$ to be non-degenerate it is necessary and sufficient that $r=n$.\\
+claim h_s36_prf_1250210 :
+  forall K, forall addK mulK:set -> set -> set,
+  forall L, forall addL smul:set -> set -> set,
+  forall n :e omega, forall f:set -> set -> set,
+    algebraically_closed_field K addK mulK ->
+    field_characteristic K addK mulK <> 2 ->
+    finite_dimensional_vector_space K addK mulK L addL smul ->
+    module_dimension K addK mulK L addL smul = n ->
+    symmetric_bilinear_form K addK mulK L addL smul f ->
+    exists r :e ordsucc n, exists a:set -> set,
+      module_basis K addK mulK L addL smul n a
+      /\ (forall i j :e n,
+        f (a i) (a j)
+        = if i = j /\ i :e r then ring_one K mulK else ring_zero K addK)
+      /\ (nondegenerate_sesquilinear_form
+        K addK mulK (fun x => x) L addL smul f <-> r = n).
+admit.
 //GOD1PRF:1250307 Choose a basis $\left(b_{i}\right)_{1 \leqslant i \leqslant n}$ which is orthogonal with respect to $f$. We may suppose with no loss of generality that
+claim h_s36_prf_1250307 :
+  forall K, forall addK mulK:set -> set -> set,
+  forall L, forall addL smul:set -> set -> set,
+  forall n :e omega, forall f:set -> set -> set,
+    algebraically_closed_field K addK mulK ->
+    field_characteristic K addK mulK <> 2 ->
+    finite_dimensional_vector_space K addK mulK L addL smul ->
+    module_dimension K addK mulK L addL smul = n ->
+    symmetric_bilinear_form K addK mulK L addL smul f ->
+    exists r :e ordsucc n, exists a:set -> set,
+      module_basis K addK mulK L addL smul n a
+      /\ (forall i j :e n,
+        f (a i) (a j)
+        = if i = j /\ i :e r then ring_one K mulK else ring_zero K addK)
+      /\ (nondegenerate_sesquilinear_form
+        K addK mulK (fun x => x) L addL smul f <-> r = n).
+admit.
+claim h_s36_ref_1250307_god1_s36_theorem6_orthogonal_basis_exists :
+  forall K, forall addK mulK:set -> set -> set, forall star:set -> set,
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set,
+    field_involution K addK mulK star ->
+    finite_dimensional_vector_space K addK mulK L addL smul ->
+    hermitian_form K addK mulK star L addL smul f ->
+    field_characteristic K addK mulK <> 2 ->
+    exists n :e omega, exists a:set -> set,
+      orthogonal_basis_for_form K addK mulK L addL smul f n a.
+apply god1_s36_theorem6_orthogonal_basis_exists.
 //GOD1PRF:1250662 Since K is algebraically closed there exist elements $\lambda_{i} \in \mathrm{~K}(1 \leqslant i \leqslant r)$ such that
+claim h_s36_prf_1250662 :
+  forall K, forall addK mulK:set -> set -> set,
+  forall L, forall addL smul:set -> set -> set,
+  forall n :e omega, forall f:set -> set -> set,
+    algebraically_closed_field K addK mulK ->
+    field_characteristic K addK mulK <> 2 ->
+    finite_dimensional_vector_space K addK mulK L addL smul ->
+    module_dimension K addK mulK L addL smul = n ->
+    symmetric_bilinear_form K addK mulK L addL smul f ->
+    exists r :e ordsucc n, exists a:set -> set,
+      module_basis K addK mulK L addL smul n a
+      /\ (forall i j :e n,
+        f (a i) (a j)
+        = if i = j /\ i :e r then ring_one K mulK else ring_zero K addK)
+      /\ (nondegenerate_sesquilinear_form
+        K addK mulK (fun x => x) L addL smul f <-> r = n).
+admit.
 //GOD1PRF:1250876 and this means, since $f$ is bilinear, that the vectors $a_{i}=\lambda_{i} b_{i}$ satisfy
+claim h_s36_prf_1250876 :
+  forall K, forall addK mulK:set -> set -> set,
+  forall L, forall addL smul:set -> set -> set,
+  forall n :e omega, forall f:set -> set -> set,
+    algebraically_closed_field K addK mulK ->
+    field_characteristic K addK mulK <> 2 ->
+    finite_dimensional_vector_space K addK mulK L addL smul ->
+    module_dimension K addK mulK L addL smul = n ->
+    symmetric_bilinear_form K addK mulK L addL smul f ->
+    exists r :e ordsucc n, exists a:set -> set,
+      module_basis K addK mulK L addL smul n a
+      /\ (forall i j :e n,
+        f (a i) (a j)
+        = if i = j /\ i :e r then ring_one K mulK else ring_zero K addK)
+      /\ (nondegenerate_sesquilinear_form
+        K addK mulK (fun x => x) L addL smul f <-> r = n).
+admit.
 //GOD1PRF:1251051 The basis $\left(a_{1}, \ldots, a_{r}, b_{r+1}, \ldots, b_{n}\right)$ then satisfies the conditions stated.\\
+claim h_s36_prf_1251051 :
+  forall K, forall addK mulK:set -> set -> set,
+  forall L, forall addL smul:set -> set -> set,
+  forall n :e omega, forall f:set -> set -> set,
+    algebraically_closed_field K addK mulK ->
+    field_characteristic K addK mulK <> 2 ->
+    finite_dimensional_vector_space K addK mulK L addL smul ->
+    module_dimension K addK mulK L addL smul = n ->
+    symmetric_bilinear_form K addK mulK L addL smul f ->
+    exists r :e ordsucc n, exists a:set -> set,
+      module_basis K addK mulK L addL smul n a
+      /\ (forall i j :e n,
+        f (a i) (a j)
+        = if i = j /\ i :e r then ring_one K mulK else ring_zero K addK)
+      /\ (nondegenerate_sesquilinear_form
+        K addK mulK (fun x => x) L addL smul f <-> r = n).
+admit.
 //GOD1PRF:1251161 If $r<n$, it is clear that $b_{n}$ is orthogonal to $b_{1}, \ldots, b_{n}$ and hence to every vector $x \in \mathrm{~L}$, and therefore $f$ is degenerate ; hence $r=n$ if $f$ is non-degenerate. If conversely $r=n$ then the matrix of $f$ with respect to the basis just constructed is the unit matrix, hence is invertible, and therefore $f$ is non-degenerate.
+claim h_s36_prf_1251161 :
+  forall K, forall addK mulK:set -> set -> set,
+  forall L, forall addL smul:set -> set -> set,
+  forall n :e omega, forall f:set -> set -> set,
+    algebraically_closed_field K addK mulK ->
+    field_characteristic K addK mulK <> 2 ->
+    finite_dimensional_vector_space K addK mulK L addL smul ->
+    module_dimension K addK mulK L addL smul = n ->
+    symmetric_bilinear_form K addK mulK L addL smul f ->
+    exists r :e ordsucc n, exists a:set -> set,
+      module_basis K addK mulK L addL smul n a
+      /\ (forall i j :e n,
+        f (a i) (a j)
+        = if i = j /\ i :e r then ring_one K mulK else ring_zero K addK)
+      /\ (nondegenerate_sesquilinear_form
+        K addK mulK (fun x => x) L addL smul f <-> r = n).
+admit.
+Admitted.
+
+(** Formal matrix criterion recorded in Remark 6 after Corollary 1. **)
+Theorem god1_s36_remark6_diagonal_inertia_nondegenerate_interface :
+  forall n p q :e omega,
+  forall A :e square_matrix_ring real n,
+    add_SNo p q c= n ->
+    (forall i j :e n, matrix_entry A i j
+      = if i <> j then 0 else if i :e p then 1
+        else if i :e add_SNo p q then minus_SNo 1 else 0) ->
+    (invertible_matrix real add_SNo mul_SNo n A <-> add_SNo p q = n).
+let n.
+assume hn.
+let p.
+assume hp.
+let q.
+assume hq.
+let A.
+assume hA hBound hEntries.
+apply iffI.
 Admitted.
 
 Theorem god1_s36_theorem6_corollary2_real_symmetric_inertia_form :
@@ -57343,10 +61330,138 @@ assume hn.
 let f.
 assume hFinite hDimension hSymmetric.
 //GOD1PRF:1251767 COROLLARY 2. Let $f$ be a symmetric bilinear form on a real vector space L of finite dimension $n$. Then there exist integers $p$ and $q$ such that $p+q \leqslant n$, and a basis of L such that the expression for frelative to this basis is
+claim h_s36_prf_1251767 :
+  forall L, forall addL smul:set -> set -> set,
+  forall n :e omega, forall f:set -> set -> set,
+    finite_dimensional_vector_space real add_SNo mul_SNo L addL smul ->
+    module_dimension real add_SNo mul_SNo L addL smul = n ->
+    symmetric_bilinear_form real add_SNo mul_SNo L addL smul f ->
+    exists p q :e ordsucc n, exists a:set -> set,
+      add_SNo p q c= n
+      /\ module_basis real add_SNo mul_SNo L addL smul n a
+      /\ (forall i j :e n,
+        f (a i) (a j)
+        = if i <> j then 0
+          else if i :e p then 1
+          else if i :e add_SNo p q then minus_SNo 1 else 0)
+      /\ (nondegenerate_sesquilinear_form
+        real add_SNo mul_SNo (fun x => x) L addL smul f
+        <-> add_SNo p q = n).
+admit.
 //GOD1PRF:1252115 and $f$ is non-degenerate if and only if $p+q=n$.
+claim h_s36_prf_1252115 :
+  forall L, forall addL smul:set -> set -> set,
+  forall n :e omega, forall f:set -> set -> set,
+    finite_dimensional_vector_space real add_SNo mul_SNo L addL smul ->
+    module_dimension real add_SNo mul_SNo L addL smul = n ->
+    symmetric_bilinear_form real add_SNo mul_SNo L addL smul f ->
+    exists p q :e ordsucc n, exists a:set -> set,
+      add_SNo p q c= n
+      /\ module_basis real add_SNo mul_SNo L addL smul n a
+      /\ (forall i j :e n,
+        f (a i) (a j)
+        = if i <> j then 0
+          else if i :e p then 1
+          else if i :e add_SNo p q then minus_SNo 1 else 0)
+      /\ (nondegenerate_sesquilinear_form
+        real add_SNo mul_SNo (fun x => x) L addL smul f
+        <-> add_SNo p q = n).
+admit.
 //GOD1PRF:1252166 The proof is analogous to that of Corollary 1. Choose a basis of L which is orthogonal with respect to $f$; we may suppose that
+claim h_s36_prf_1252166 :
+  forall L, forall addL smul:set -> set -> set,
+  forall n :e omega, forall f:set -> set -> set,
+    finite_dimensional_vector_space real add_SNo mul_SNo L addL smul ->
+    module_dimension real add_SNo mul_SNo L addL smul = n ->
+    symmetric_bilinear_form real add_SNo mul_SNo L addL smul f ->
+    exists p q :e ordsucc n, exists a:set -> set,
+      add_SNo p q c= n
+      /\ module_basis real add_SNo mul_SNo L addL smul n a
+      /\ (forall i j :e n,
+        f (a i) (a j)
+        = if i <> j then 0
+          else if i :e p then 1
+          else if i :e add_SNo p q then minus_SNo 1 else 0)
+      /\ (nondegenerate_sesquilinear_form
+        real add_SNo mul_SNo (fun x => x) L addL smul f
+        <-> add_SNo p q = n).
+admit.
+claim h_s36_ref_1252166_god1_s36_theorem6_corollary1_algebraically_closed_symmetric_form :
+  forall K, forall addK mulK:set -> set -> set,
+  forall L, forall addL smul:set -> set -> set,
+  forall n :e omega, forall f:set -> set -> set,
+    algebraically_closed_field K addK mulK ->
+    field_characteristic K addK mulK <> 2 ->
+    finite_dimensional_vector_space K addK mulK L addL smul ->
+    module_dimension K addK mulK L addL smul = n ->
+    symmetric_bilinear_form K addK mulK L addL smul f ->
+    exists r :e ordsucc n, exists a:set -> set,
+      module_basis K addK mulK L addL smul n a
+      /\ (forall i j :e n,
+        f (a i) (a j)
+        = if i = j /\ i :e r then ring_one K mulK else ring_zero K addK)
+      /\ (nondegenerate_sesquilinear_form
+        K addK mulK (fun x => x) L addL smul f <-> r = n).
+apply god1_s36_theorem6_corollary1_algebraically_closed_symmetric_form.
 //GOD1PRF:1252563 By taking
+claim h_s36_prf_1252563 :
+  forall L, forall addL smul:set -> set -> set,
+  forall n :e omega, forall f:set -> set -> set,
+    finite_dimensional_vector_space real add_SNo mul_SNo L addL smul ->
+    module_dimension real add_SNo mul_SNo L addL smul = n ->
+    symmetric_bilinear_form real add_SNo mul_SNo L addL smul f ->
+    exists p q :e ordsucc n, exists a:set -> set,
+      add_SNo p q c= n
+      /\ module_basis real add_SNo mul_SNo L addL smul n a
+      /\ (forall i j :e n,
+        f (a i) (a j)
+        = if i <> j then 0
+          else if i :e p then 1
+          else if i :e add_SNo p q then minus_SNo 1 else 0)
+      /\ (nondegenerate_sesquilinear_form
+        real add_SNo mul_SNo (fun x => x) L addL smul f
+        <-> add_SNo p q = n).
+admit.
 //GOD1PRF:1252855 we obtain a basis ( $a_{1}, \ldots, a_{n}$ ) of L satisfying the conditions stated. The fact that $f$ is non-degenerate if and only if $p+q=n$ follows from Remark 6.
+claim h_s36_prf_1252855 :
+  forall L, forall addL smul:set -> set -> set,
+  forall n :e omega, forall f:set -> set -> set,
+    finite_dimensional_vector_space real add_SNo mul_SNo L addL smul ->
+    module_dimension real add_SNo mul_SNo L addL smul = n ->
+    symmetric_bilinear_form real add_SNo mul_SNo L addL smul f ->
+    exists p q :e ordsucc n, exists a:set -> set,
+      add_SNo p q c= n
+      /\ module_basis real add_SNo mul_SNo L addL smul n a
+      /\ (forall i j :e n,
+        f (a i) (a j)
+        = if i <> j then 0
+          else if i :e p then 1
+          else if i :e add_SNo p q then minus_SNo 1 else 0)
+      /\ (nondegenerate_sesquilinear_form
+        real add_SNo mul_SNo (fun x => x) L addL smul f
+        <-> add_SNo p q = n).
+admit.
+claim h_s36_ref_1252855_god1_s36_remark6_diagonal_inertia_nondegenerate_interface :
+  forall n p q :e omega,
+  forall A :e square_matrix_ring real n,
+    add_SNo p q c= n ->
+    (forall i j :e n, matrix_entry A i j
+      = if i <> j then 0 else if i :e p then 1
+        else if i :e add_SNo p q then minus_SNo 1 else 0) ->
+    (invertible_matrix real add_SNo mul_SNo n A <-> add_SNo p q = n).
+apply god1_s36_remark6_diagonal_inertia_nondegenerate_interface.
+Admitted.
+
+(** Formal §36.1 formula (4): hermitian diagonal values are real. **)
+Theorem god1_s36_section1_hermitian_diagonal_values_are_real_interface :
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set,
+    hermitian_form complex add_CSNo mul_CSNo conj_CSNo L addL smul f ->
+    forall x :e L, exists r :e real, f x x = r.
+let L addL smul f.
+assume hHermitian.
+let x.
+assume hx.
 Admitted.
 
 Theorem god1_s36_theorem6_corollary3_complex_hermitian_inertia_form :
@@ -57372,8 +61487,86 @@ assume hn.
 let f.
 assume hFinite hDimension hHermitian.
 //GOD1PRF:1253022 COROLLARY 3. Let $f$ be a hermitian form on a complex vector space L of finite dimension $n$. Then there exist integers $p, q$ such that $p+q \leqslant n$, and a basis of L such that the expression for f relative to this basis is
+claim h_s36_prf_1253022 :
+  forall L, forall addL smul:set -> set -> set,
+  forall n :e omega, forall f:set -> set -> set,
+    finite_dimensional_vector_space complex add_CSNo mul_CSNo L addL smul ->
+    module_dimension complex add_CSNo mul_CSNo L addL smul = n ->
+    hermitian_form complex add_CSNo mul_CSNo conj_CSNo L addL smul f ->
+    exists p q :e ordsucc n, exists a:set -> set,
+      add_SNo p q c= n
+      /\ module_basis complex add_CSNo mul_CSNo L addL smul n a
+      /\ (forall i j :e n,
+        f (a i) (a j)
+        = if i <> j then 0
+          else if i :e p then 1
+          else if i :e add_SNo p q then minus_SNo 1 else 0)
+      /\ (nondegenerate_sesquilinear_form
+        complex add_CSNo mul_CSNo conj_CSNo L addL smul f
+        <-> add_SNo p q = n).
+admit.
 //GOD1PRF:1253384 and $f$ is non-degenerate if and only if $p+q=n$.\\
+claim h_s36_prf_1253384 :
+  forall L, forall addL smul:set -> set -> set,
+  forall n :e omega, forall f:set -> set -> set,
+    finite_dimensional_vector_space complex add_CSNo mul_CSNo L addL smul ->
+    module_dimension complex add_CSNo mul_CSNo L addL smul = n ->
+    hermitian_form complex add_CSNo mul_CSNo conj_CSNo L addL smul f ->
+    exists p q :e ordsucc n, exists a:set -> set,
+      add_SNo p q c= n
+      /\ module_basis complex add_CSNo mul_CSNo L addL smul n a
+      /\ (forall i j :e n,
+        f (a i) (a j)
+        = if i <> j then 0
+          else if i :e p then 1
+          else if i :e add_SNo p q then minus_SNo 1 else 0)
+      /\ (nondegenerate_sesquilinear_form
+        complex add_CSNo mul_CSNo conj_CSNo L addL smul f
+        <-> add_SNo p q = n).
+admit.
 //GOD1PRF:1253436 The proof is the same as that of Corollary 2, having regard to the fact that $f(x, x)$ is real for all $x \in \mathrm{~L}$ (section 1 , formula (4)).
+claim h_s36_prf_1253436 :
+  forall L, forall addL smul:set -> set -> set,
+  forall n :e omega, forall f:set -> set -> set,
+    finite_dimensional_vector_space complex add_CSNo mul_CSNo L addL smul ->
+    module_dimension complex add_CSNo mul_CSNo L addL smul = n ->
+    hermitian_form complex add_CSNo mul_CSNo conj_CSNo L addL smul f ->
+    exists p q :e ordsucc n, exists a:set -> set,
+      add_SNo p q c= n
+      /\ module_basis complex add_CSNo mul_CSNo L addL smul n a
+      /\ (forall i j :e n,
+        f (a i) (a j)
+        = if i <> j then 0
+          else if i :e p then 1
+          else if i :e add_SNo p q then minus_SNo 1 else 0)
+      /\ (nondegenerate_sesquilinear_form
+        complex add_CSNo mul_CSNo conj_CSNo L addL smul f
+        <-> add_SNo p q = n).
+admit.
+claim h_s36_ref_1253436_god1_s36_theorem6_corollary2_real_symmetric_inertia_form :
+  forall L, forall addL smul:set -> set -> set,
+  forall n :e omega, forall f:set -> set -> set,
+    finite_dimensional_vector_space real add_SNo mul_SNo L addL smul ->
+    module_dimension real add_SNo mul_SNo L addL smul = n ->
+    symmetric_bilinear_form real add_SNo mul_SNo L addL smul f ->
+    exists p q :e ordsucc n, exists a:set -> set,
+      add_SNo p q c= n
+      /\ module_basis real add_SNo mul_SNo L addL smul n a
+      /\ (forall i j :e n,
+        f (a i) (a j)
+        = if i <> j then 0
+          else if i :e p then 1
+          else if i :e add_SNo p q then minus_SNo 1 else 0)
+      /\ (nondegenerate_sesquilinear_form
+        real add_SNo mul_SNo (fun x => x) L addL smul f
+        <-> add_SNo p q = n).
+apply god1_s36_theorem6_corollary2_real_symmetric_inertia_form.
+claim h_s36_ref_1253436_god1_s36_section1_hermitian_diagonal_values_are_real_interface :
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set,
+    hermitian_form complex add_CSNo mul_CSNo conj_CSNo L addL smul f ->
+    forall x :e L, exists r :e real, f x x = r.
+apply god1_s36_section1_hermitian_diagonal_values_are_real_interface.
 Admitted.
 
 //GOD1:1253795 orthonormal_basis_for_form : "the basis #11 is orthonormal relative to form #9" | $#11\text{ is orthonormal for }#9$
@@ -57431,9 +61624,91 @@ Theorem god1_s36_theorem7_real_and_complex_orthonormal_basis_criterion :
     <-> positive_definite_hermitian_form complex add_CSNo L addL f)).
 apply andI.
 //GOD1PRF:1254638 We shall now consider the real orthogonal and complex hermitian cases. If $f$ admits an orthonormal basis, then for each $x \in \mathrm{~L}$ we have
+claim h_s36_prf_1254638 :
+  (forall L, forall addL smul:set -> set -> set,
+    forall f:set -> set -> set,
+    finite_dimensional_vector_space real add_SNo mul_SNo L addL smul ->
+    symmetric_bilinear_form real add_SNo mul_SNo L addL smul f ->
+    ((exists n :e omega, exists a:set -> set,
+      orthonormal_basis_for_form real add_SNo mul_SNo L addL smul f n a)
+    <-> positive_definite_hermitian_form real add_SNo L addL f))
+  /\ (forall L, forall addL smul:set -> set -> set,
+    forall f:set -> set -> set,
+    finite_dimensional_vector_space complex add_CSNo mul_CSNo L addL smul ->
+    hermitian_form complex add_CSNo mul_CSNo conj_CSNo L addL smul f ->
+    ((exists n :e omega, exists a:set -> set,
+      orthonormal_basis_for_form complex add_CSNo mul_CSNo L addL smul f n a)
+    <-> positive_definite_hermitian_form complex add_CSNo L addL f)).
+admit.
 //GOD1PRF:1254878 and consequently
+claim h_s36_prf_1254878 :
+  (forall L, forall addL smul:set -> set -> set,
+    forall f:set -> set -> set,
+    finite_dimensional_vector_space real add_SNo mul_SNo L addL smul ->
+    symmetric_bilinear_form real add_SNo mul_SNo L addL smul f ->
+    ((exists n :e omega, exists a:set -> set,
+      orthonormal_basis_for_form real add_SNo mul_SNo L addL smul f n a)
+    <-> positive_definite_hermitian_form real add_SNo L addL f))
+  /\ (forall L, forall addL smul:set -> set -> set,
+    forall f:set -> set -> set,
+    finite_dimensional_vector_space complex add_CSNo mul_CSNo L addL smul ->
+    hermitian_form complex add_CSNo mul_CSNo conj_CSNo L addL smul f ->
+    ((exists n :e omega, exists a:set -> set,
+      orthonormal_basis_for_form complex add_CSNo mul_CSNo L addL smul f n a)
+    <-> positive_definite_hermitian_form complex add_CSNo L addL f)).
+admit.
 //GOD1PRF:1254966 A form which satisfies this condition (in either the real orthogonal case or the complex hermitian case: in either case $f(x, x)$ is always real) is said to be positive definite. Conversely, if $f$ is positive definite, the proof of Corollary 2 of Theorem 6 shows that $p=n$ and consequently that L has an orthonormal basis relative to $f$. Hence:
+claim h_s36_prf_1254966 :
+  (forall L, forall addL smul:set -> set -> set,
+    forall f:set -> set -> set,
+    finite_dimensional_vector_space real add_SNo mul_SNo L addL smul ->
+    symmetric_bilinear_form real add_SNo mul_SNo L addL smul f ->
+    ((exists n :e omega, exists a:set -> set,
+      orthonormal_basis_for_form real add_SNo mul_SNo L addL smul f n a)
+    <-> positive_definite_hermitian_form real add_SNo L addL f))
+  /\ (forall L, forall addL smul:set -> set -> set,
+    forall f:set -> set -> set,
+    finite_dimensional_vector_space complex add_CSNo mul_CSNo L addL smul ->
+    hermitian_form complex add_CSNo mul_CSNo conj_CSNo L addL smul f ->
+    ((exists n :e omega, exists a:set -> set,
+      orthonormal_basis_for_form complex add_CSNo mul_CSNo L addL smul f n a)
+    <-> positive_definite_hermitian_form complex add_CSNo L addL f)).
+admit.
+claim h_s36_ref_1254966_god1_s36_theorem6_corollary2_real_symmetric_inertia_form :
+  forall L, forall addL smul:set -> set -> set,
+  forall n :e omega, forall f:set -> set -> set,
+    finite_dimensional_vector_space real add_SNo mul_SNo L addL smul ->
+    module_dimension real add_SNo mul_SNo L addL smul = n ->
+    symmetric_bilinear_form real add_SNo mul_SNo L addL smul f ->
+    exists p q :e ordsucc n, exists a:set -> set,
+      add_SNo p q c= n
+      /\ module_basis real add_SNo mul_SNo L addL smul n a
+      /\ (forall i j :e n,
+        f (a i) (a j)
+        = if i <> j then 0
+          else if i :e p then 1
+          else if i :e add_SNo p q then minus_SNo 1 else 0)
+      /\ (nondegenerate_sesquilinear_form
+        real add_SNo mul_SNo (fun x => x) L addL smul f
+        <-> add_SNo p q = n).
+apply god1_s36_theorem6_corollary2_real_symmetric_inertia_form.
 //GOD1PRF:1255315 THEOREM 7. Let L be a real (resp. complex) vector space of finite dimension and let $f$ be a symmetric bilinear form (resp. hermitian sesquilinear form) on L . Then L has an orthonormal basis relative to $f$ if and only if $f$ is positive definite.
+claim h_s36_prf_1255315 :
+  (forall L, forall addL smul:set -> set -> set,
+    forall f:set -> set -> set,
+    finite_dimensional_vector_space real add_SNo mul_SNo L addL smul ->
+    symmetric_bilinear_form real add_SNo mul_SNo L addL smul f ->
+    ((exists n :e omega, exists a:set -> set,
+      orthonormal_basis_for_form real add_SNo mul_SNo L addL smul f n a)
+    <-> positive_definite_hermitian_form real add_SNo L addL f))
+  /\ (forall L, forall addL smul:set -> set -> set,
+    forall f:set -> set -> set,
+    finite_dimensional_vector_space complex add_CSNo mul_CSNo L addL smul ->
+    hermitian_form complex add_CSNo mul_CSNo conj_CSNo L addL smul f ->
+    ((exists n :e omega, exists a:set -> set,
+      orthonormal_basis_for_form complex add_CSNo mul_CSNo L addL smul f n a)
+    <-> positive_definite_hermitian_form complex add_CSNo L addL f)).
+admit.
 Admitted.
 
 //GOD1:1257575 hermitian_form_automorphism : "#10 is an automorphism of hermitian form #9" | $#10\in\operatorname{GL}(#9)$
@@ -57506,7 +61781,23 @@ assume hn.
 let A.
 assume hA hField hOrthogonal.
 //GOD1PRF:1260134 Such a matrix is said to be orthogonal. Observe that this relation implies that
+claim h_s36_prf_1260134 :
+  forall K, forall add mul:set -> set -> set,
+  forall n :e omega, forall A :e square_matrix_ring K n,
+    field K add mul -> orthogonal_matrix K add mul n A ->
+    matrix_determinant K add mul n A = ring_one K mul
+    \/ matrix_determinant K add mul n A
+      = ring_negation K add (ring_one K mul).
+admit.
 //GOD1PRF:1260356 and consequently that
+claim h_s36_prf_1260356 :
+  forall K, forall add mul:set -> set -> set,
+  forall n :e omega, forall A :e square_matrix_ring K n,
+    field K add mul -> orthogonal_matrix K add mul n A ->
+    matrix_determinant K add mul n A = ring_one K mul
+    \/ matrix_determinant K add mul n A
+      = ring_negation K add (ring_one K mul).
+admit.
 Admitted.
 
 Theorem god1_automorphisms_of_hermitian_form_form_group :
@@ -57520,10 +61811,107 @@ Theorem god1_automorphisms_of_hermitian_form_form_group :
 let K addK mulK L addL smul f.
 assume hGeneralLinearGroup.
 //GOD1PRF:1257816 Since we have
+claim h_s36_prf_1257816 :
+  forall K, forall addK mulK:set -> set -> set,
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set,
+    group (module_general_linear_group K addK mulK L addL smul)
+      (module_endomorphism_composition L) ->
+    group (hermitian_form_automorphism_group K addK mulK L addL smul f)
+      (module_endomorphism_composition L).
+admit.
 //GOD1PRF:1257881 where $u^{*}$ is the adjoint of $u$ with respect to $f$ (section 3 ), it follows that the automorphisms of $f$ are precisely the automorphisms $u$ of L which satisfy the condition
+claim h_s36_prf_1257881 :
+  forall K, forall addK mulK:set -> set -> set,
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set,
+    group (module_general_linear_group K addK mulK L addL smul)
+      (module_endomorphism_composition L) ->
+    group (hermitian_form_automorphism_group K addK mulK L addL smul f)
+      (module_endomorphism_composition L).
+admit.
+claim h_s36_ref_1257881_god1_adjoint_homomorphism_exists_is_linear_and_unique :
+  forall K, forall addK mulK:set -> set -> set,
+  forall star:set -> set,
+  forall L M, forall addL smulL addM smulM:set -> set -> set,
+  forall f g:set -> set -> set, forall u:set -> set,
+    field_involution K addK mulK star ->
+    finite_dimensional_vector_space K addK mulK L addL smulL ->
+    finite_dimensional_vector_space K addK mulK M addM smulM ->
+    nondegenerate_sesquilinear_form K addK mulK star L addL smulL f ->
+    nondegenerate_sesquilinear_form K addK mulK star M addM smulM g ->
+    module_homomorphism K addK mulK L addL smulL M addM smulM u ->
+    module_homomorphism K addK mulK M addM smulM L addL smulL
+      (fun y => adjoint_homomorphism K addK mulK L M f g u y)
+    /\ (forall x :e L, forall y :e M,
+      f x (adjoint_homomorphism K addK mulK L M f g u y) = g (u x) y)
+    /\ forall v:set -> set,
+      (forall x :e L, forall y :e M, f x (v y) = g (u x) y) ->
+      v = (fun y => adjoint_homomorphism K addK mulK L M f g u y).
+apply god1_adjoint_homomorphism_exists_is_linear_and_unique.
 //GOD1PRF:1258099 where as usual $j_{\mathrm{L}}$ denotes the identity automorphism of L . From this and from the formulae
+claim h_s36_prf_1258099 :
+  forall K, forall addK mulK:set -> set -> set,
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set,
+    group (module_general_linear_group K addK mulK L addL smul)
+      (module_endomorphism_composition L) ->
+    group (hermitian_form_automorphism_group K addK mulK L addL smul f)
+      (module_endomorphism_composition L).
+admit.
 //GOD1PRF:1258354 we deduce immediately that the automorphisms of $f$ form a subgroup of the group $\mathrm{GL}(\mathrm{L})$ of all automorphisms of L . This subgroup is denoted by
+claim h_s36_prf_1258354 :
+  forall K, forall addK mulK:set -> set -> set,
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set,
+    group (module_general_linear_group K addK mulK L addL smul)
+      (module_endomorphism_composition L) ->
+    group (hermitian_form_automorphism_group K addK mulK L addL smul f)
+      (module_endomorphism_composition L).
+admit.
 //GOD1PRF:1258540 and is called the group of automorphisms of $f$.\\
+claim h_s36_prf_1258540 :
+  forall K, forall addK mulK:set -> set -> set,
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set,
+    group (module_general_linear_group K addK mulK L addL smul)
+      (module_endomorphism_composition L) ->
+    group (hermitian_form_automorphism_group K addK mulK L addL smul f)
+      (module_endomorphism_composition L).
+admit.
+Admitted.
+
+//GOD1:1262950 normal_endomorphism : "the endomorphism #10 is normal relative to form #9" | $#10^*#10=#10#10^*$
+Definition normal_endomorphism :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  (set -> set -> set) -> (set -> set) -> prop :=
+  fun K addK mulK L addL smul f u =>
+    module_endomorphism K addK mulK L addL smul u
+    /\ module_endomorphism_composition L
+      (fun x :e L => adjoint_homomorphism K addK mulK L L f f u x)
+      (fun x :e L => u x)
+      = module_endomorphism_composition L
+        (fun x :e L => u x)
+        (fun x :e L => adjoint_homomorphism K addK mulK L L f f u x).
+
+Theorem god1_s36_theorem9_normal_spectral_theorem_forward_interface :
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set, forall u:set -> set,
+    finite_dimensional_vector_space complex add_CSNo mul_CSNo L addL smul ->
+    hermitian_form complex add_CSNo mul_CSNo conj_CSNo L addL smul f ->
+    nondegenerate_sesquilinear_form complex add_CSNo mul_CSNo conj_CSNo
+      L addL smul f ->
+    positive_definite_hermitian_form complex add_CSNo L addL f ->
+    normal_endomorphism complex add_CSNo mul_CSNo L addL smul f u ->
+    exists n :e omega, exists a:set -> set,
+      orthonormal_basis_for_form complex add_CSNo mul_CSNo
+        L addL smul f n a
+      /\ forall i :e n,
+        endomorphism_eigenvector complex add_CSNo mul_CSNo
+          L addL smul u (a i).
+let L addL smul f u.
+assume hFinite hHermitian hNondegenerate hPositive hNormal.
 Admitted.
 
 Theorem god1_s36_theorem8_unitary_automorphism_spectral_theorem :
@@ -57543,25 +61931,148 @@ Theorem god1_s36_theorem8_unitary_automorphism_spectral_theorem :
 let L addL smul f u.
 assume hFinite hHermitian hPositive hAutomorphism.
 //GOD1PRF:1262407 We shall prove the following theorem:\\
+claim h_s36_prf_1262407 :
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set, forall u:set -> set,
+    finite_dimensional_vector_space complex add_CSNo mul_CSNo L addL smul ->
+    hermitian_form complex add_CSNo mul_CSNo conj_CSNo L addL smul f ->
+    positive_definite_hermitian_form complex add_CSNo L addL f ->
+    hermitian_form_automorphism complex add_CSNo mul_CSNo
+      L addL smul f u ->
+    exists n :e omega, exists a:set -> set,
+      orthonormal_basis_for_form complex add_CSNo mul_CSNo
+        L addL smul f n a
+      /\ forall i :e n,
+        endomorphism_eigenvector complex add_CSNo mul_CSNo
+          L addL smul u (a i).
+admit.
 //GOD1PRF:1262447 theorem 8. Let L be a finite-dimensional complex vector space, let $f$ be a positive definite hermitian form on L , and let $u$ be an automorphism of $f$. Then there exist eigenvectors of $u$ which form an orthonormal basis of L with respect to $f$.
+claim h_s36_prf_1262447 :
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set, forall u:set -> set,
+    finite_dimensional_vector_space complex add_CSNo mul_CSNo L addL smul ->
+    hermitian_form complex add_CSNo mul_CSNo conj_CSNo L addL smul f ->
+    positive_definite_hermitian_form complex add_CSNo L addL f ->
+    hermitian_form_automorphism complex add_CSNo mul_CSNo
+      L addL smul f u ->
+    exists n :e omega, exists a:set -> set,
+      orthonormal_basis_for_form complex add_CSNo mul_CSNo
+        L addL smul f n a
+      /\ forall i :e n,
+        endomorphism_eigenvector complex add_CSNo mul_CSNo
+          L addL smul u (a i).
+admit.
 //GOD1PRF:1262698 In general, if $u$ is an endomorphism of L , we denote its adjoint relative to $f$ by $u^{*}$. Then the automorphisms of $f$ are characterized by the relation
+claim h_s36_prf_1262698 :
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set, forall u:set -> set,
+    finite_dimensional_vector_space complex add_CSNo mul_CSNo L addL smul ->
+    hermitian_form complex add_CSNo mul_CSNo conj_CSNo L addL smul f ->
+    positive_definite_hermitian_form complex add_CSNo L addL f ->
+    hermitian_form_automorphism complex add_CSNo mul_CSNo
+      L addL smul f u ->
+    exists n :e omega, exists a:set -> set,
+      orthonormal_basis_for_form complex add_CSNo mul_CSNo
+        L addL smul f n a
+      /\ forall i :e n,
+        endomorphism_eigenvector complex add_CSNo mul_CSNo
+          L addL smul u (a i).
+admit.
 //GOD1PRF:1262878 and therefore satisfy the condition
+claim h_s36_prf_1262878 :
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set, forall u:set -> set,
+    finite_dimensional_vector_space complex add_CSNo mul_CSNo L addL smul ->
+    hermitian_form complex add_CSNo mul_CSNo conj_CSNo L addL smul f ->
+    positive_definite_hermitian_form complex add_CSNo L addL f ->
+    hermitian_form_automorphism complex add_CSNo mul_CSNo
+      L addL smul f u ->
+    exists n :e omega, exists a:set -> set,
+      orthonormal_basis_for_form complex add_CSNo mul_CSNo
+        L addL smul f n a
+      /\ forall i :e n,
+        endomorphism_eigenvector complex add_CSNo mul_CSNo
+          L addL smul u (a i).
+admit.
 //GOD1PRF:1262950 An endomorphism $u$ of L which satisfies this condition is said to be normal (with respect to $f$ ). Then Theorem 8 is clearly a particular case of the following result:\\
+claim h_s36_prf_1262950 :
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set, forall u:set -> set,
+    finite_dimensional_vector_space complex add_CSNo mul_CSNo L addL smul ->
+    hermitian_form complex add_CSNo mul_CSNo conj_CSNo L addL smul f ->
+    positive_definite_hermitian_form complex add_CSNo L addL f ->
+    hermitian_form_automorphism complex add_CSNo mul_CSNo
+      L addL smul f u ->
+    exists n :e omega, exists a:set -> set,
+      orthonormal_basis_for_form complex add_CSNo mul_CSNo
+        L addL smul f n a
+      /\ forall i :e n,
+        endomorphism_eigenvector complex add_CSNo mul_CSNo
+          L addL smul u (a i).
+admit.
+claim h_s36_ref_1262950_god1_s36_theorem9_normal_spectral_theorem_forward_interface :
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set, forall u:set -> set,
+    finite_dimensional_vector_space complex add_CSNo mul_CSNo L addL smul ->
+    hermitian_form complex add_CSNo mul_CSNo conj_CSNo L addL smul f ->
+    nondegenerate_sesquilinear_form complex add_CSNo mul_CSNo conj_CSNo
+      L addL smul f ->
+    positive_definite_hermitian_form complex add_CSNo L addL f ->
+    normal_endomorphism complex add_CSNo mul_CSNo L addL smul f u ->
+    exists n :e omega, exists a:set -> set,
+      orthonormal_basis_for_form complex add_CSNo mul_CSNo
+        L addL smul f n a
+      /\ forall i :e n,
+        endomorphism_eigenvector complex add_CSNo mul_CSNo
+          L addL smul u (a i).
+apply god1_s36_theorem9_normal_spectral_theorem_forward_interface.
 Admitted.
 
-//GOD1:1262950 normal_endomorphism : "the endomorphism #10 is normal relative to form #9" | $#10^*#10=#10#10^*$
-Definition normal_endomorphism :
-  set -> (set -> set -> set) -> (set -> set -> set) ->
-  set -> (set -> set -> set) -> (set -> set -> set) ->
-  (set -> set -> set) -> (set -> set) -> prop :=
-  fun K addK mulK L addL smul f u =>
-    module_endomorphism K addK mulK L addL smul u
-    /\ module_endomorphism_composition L
-      (fun x :e L => adjoint_homomorphism K addK mulK L L f f u x)
-      (fun x :e L => u x)
-      = module_endomorphism_composition L
-        (fun x :e L => u x)
-        (fun x :e L => adjoint_homomorphism K addK mulK L L f f u x).
+Theorem god1_s36_theorem9_lemma2_adjoint_on_eigenvectors_forward_interface :
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set, forall u:set -> set,
+  forall lambda :e complex,
+    finite_dimensional_vector_space complex add_CSNo mul_CSNo L addL smul ->
+    hermitian_form complex add_CSNo mul_CSNo conj_CSNo L addL smul f ->
+    positive_definite_hermitian_form complex add_CSNo L addL f ->
+    normal_endomorphism complex add_CSNo mul_CSNo L addL smul f u ->
+    endomorphism_eigenvalue complex add_CSNo mul_CSNo L addL smul u lambda ->
+    forall x :e L,
+      (u x = smul lambda x
+      <-> adjoint_homomorphism complex add_CSNo mul_CSNo L L f f u x
+        = smul (conj_CSNo lambda) x).
+let L addL smul f u.
+let lambda.
+assume hlambda hFinite hHermitian hPositive hNormal hEigenvalue.
+let x.
+assume hx.
+apply iffI.
+Admitted.
+
+Theorem god1_s36_theorem9_lemma3_distinct_eigenspaces_orthogonal_forward_interface :
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set, forall u:set -> set,
+  forall lambda mu :e complex,
+    finite_dimensional_vector_space complex add_CSNo mul_CSNo L addL smul ->
+    hermitian_form complex add_CSNo mul_CSNo conj_CSNo L addL smul f ->
+    positive_definite_hermitian_form complex add_CSNo L addL f ->
+    normal_endomorphism complex add_CSNo mul_CSNo L addL smul f u ->
+    lambda <> mu ->
+    forall x :e endomorphism_eigenspace
+      complex add_CSNo mul_CSNo L addL smul u lambda,
+    forall y :e endomorphism_eigenspace
+      complex add_CSNo mul_CSNo L addL smul u mu,
+      f x y = ring_zero complex add_CSNo.
+let L addL smul f u.
+let lambda.
+assume hlambda.
+let mu.
+assume hmu hFinite hHermitian hPositive hNormal hDistinct.
+let x.
+assume hx.
+let y.
+assume hy.
+Admitted.
 
 Theorem god1_s36_theorem9_normal_spectral_theorem :
   forall L, forall addL smul:set -> set -> set,
@@ -57581,11 +62092,194 @@ Theorem god1_s36_theorem9_normal_spectral_theorem :
 let L addL smul f u.
 assume hFinite hHermitian hNondegenerate hPositive hNormal.
 //GOD1PRF:1263122 theorem 9. Let L be a finite-dimensional complex vector space, let $f$ be a positivedefinite hermitian form on L , and let $u$ be an endomorphism of L which is normal, relative to $f$. Then there exists a basis of L , consisting of eigenvectors of $u$, which is orthonormal relative to $f$.
+claim h_s36_prf_1263122 :
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set, forall u:set -> set,
+    finite_dimensional_vector_space complex add_CSNo mul_CSNo L addL smul ->
+    hermitian_form complex add_CSNo mul_CSNo conj_CSNo L addL smul f ->
+    nondegenerate_sesquilinear_form complex add_CSNo mul_CSNo conj_CSNo
+      L addL smul f ->
+    positive_definite_hermitian_form complex add_CSNo L addL f ->
+    normal_endomorphism complex add_CSNo mul_CSNo L addL smul f u ->
+    exists n :e omega, exists a:set -> set,
+      orthonormal_basis_for_form complex add_CSNo mul_CSNo
+        L addL smul f n a
+      /\ forall i :e n,
+        endomorphism_eigenvector complex add_CSNo mul_CSNo
+          L addL smul u (a i).
+admit.
 //GOD1PRF:1263414 The proof of this theorem depends on several lemmas.\\
+claim h_s36_prf_1263414 :
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set, forall u:set -> set,
+    finite_dimensional_vector_space complex add_CSNo mul_CSNo L addL smul ->
+    hermitian_form complex add_CSNo mul_CSNo conj_CSNo L addL smul f ->
+    nondegenerate_sesquilinear_form complex add_CSNo mul_CSNo conj_CSNo
+      L addL smul f ->
+    positive_definite_hermitian_form complex add_CSNo L addL f ->
+    normal_endomorphism complex add_CSNo mul_CSNo L addL smul f u ->
+    exists n :e omega, exists a:set -> set,
+      orthonormal_basis_for_form complex add_CSNo mul_CSNo
+        L addL smul f n a
+      /\ forall i :e n,
+        endomorphism_eigenvector complex add_CSNo mul_CSNo
+          L addL smul u (a i).
+admit.
 //GOD1PRF:1265783 For the proof of Theorem 9, consider the subspace
+claim h_s36_prf_1265783 :
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set, forall u:set -> set,
+    finite_dimensional_vector_space complex add_CSNo mul_CSNo L addL smul ->
+    hermitian_form complex add_CSNo mul_CSNo conj_CSNo L addL smul f ->
+    nondegenerate_sesquilinear_form complex add_CSNo mul_CSNo conj_CSNo
+      L addL smul f ->
+    positive_definite_hermitian_form complex add_CSNo L addL f ->
+    normal_endomorphism complex add_CSNo mul_CSNo L addL smul f u ->
+    exists n :e omega, exists a:set -> set,
+      orthonormal_basis_for_form complex add_CSNo mul_CSNo
+        L addL smul f n a
+      /\ forall i :e n,
+        endomorphism_eigenvector complex add_CSNo mul_CSNo
+          L addL smul u (a i).
+admit.
 //GOD1PRF:1265889 of L generated by the eigenvectors of $u$. By Lemma 2, M is stable under $u$ and $u^{*}$, and therefore so is $\mathrm{M}^{\perp}$; if $\mathrm{M}^{\perp} \neq\{0\}$, then $u$ has at least one eigenvector in $\mathrm{M}^{\perp}$, so that $\mathrm{M} \cap \mathrm{M}^{\perp} \neq\{0\}$, contrary to the fact that $f$ is positive definite. Hence $\mathrm{M}^{\perp}=\{0\}$, and since L is the direct sum of M and $\mathrm{M}^{\perp}$ (Corollary to Theorem 5) we have $\mathrm{L}=\mathrm{M}$. Thus L is the sum of the $\mathrm{L}_{i}$, and indeed the direct sum by § 34, Theorem 4.
+claim h_s36_prf_1265889 :
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set, forall u:set -> set,
+    finite_dimensional_vector_space complex add_CSNo mul_CSNo L addL smul ->
+    hermitian_form complex add_CSNo mul_CSNo conj_CSNo L addL smul f ->
+    nondegenerate_sesquilinear_form complex add_CSNo mul_CSNo conj_CSNo
+      L addL smul f ->
+    positive_definite_hermitian_form complex add_CSNo L addL f ->
+    normal_endomorphism complex add_CSNo mul_CSNo L addL smul f u ->
+    exists n :e omega, exists a:set -> set,
+      orthonormal_basis_for_form complex add_CSNo mul_CSNo
+        L addL smul f n a
+      /\ forall i :e n,
+        endomorphism_eigenvector complex add_CSNo mul_CSNo
+          L addL smul u (a i).
+admit.
+claim h_s36_ref_1265889_god1_s36_theorem9_lemma2_adjoint_on_eigenvectors_forward_interface :
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set, forall u:set -> set,
+  forall lambda :e complex,
+    finite_dimensional_vector_space complex add_CSNo mul_CSNo L addL smul ->
+    hermitian_form complex add_CSNo mul_CSNo conj_CSNo L addL smul f ->
+    positive_definite_hermitian_form complex add_CSNo L addL f ->
+    normal_endomorphism complex add_CSNo mul_CSNo L addL smul f u ->
+    endomorphism_eigenvalue complex add_CSNo mul_CSNo L addL smul u lambda ->
+    forall x :e L,
+      (u x = smul lambda x
+      <-> adjoint_homomorphism complex add_CSNo mul_CSNo L L f f u x
+        = smul (conj_CSNo lambda) x).
+apply god1_s36_theorem9_lemma2_adjoint_on_eigenvectors_forward_interface.
+claim h_s36_ref_1265889_god1_s36_theorem5_corollary_no_isotropic_vectors :
+  forall K, forall addK mulK:set -> set -> set, forall star:set -> set,
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set,
+    field_involution K addK mulK star ->
+    finite_dimensional_vector_space K addK mulK L addL smul ->
+    hermitian_form K addK mulK star L addL smul f ->
+    ((forall x :e L, f x x = ring_zero K addK -> x = module_zero L addL)
+    <-> forall M,
+      vector_subspace K addK mulK L addL smul M ->
+      direct_sum_decomposition K addK mulK L addL smul 2
+        (fun i => if i = 0 then M
+          else hermitian_orthogonal_complement K addK L f M)).
+apply god1_s36_theorem5_corollary_no_isotropic_vectors.
+claim h_s36_ref_1265889_god1_s34_theorem4_distinct_eigenvectors_are_independent :
+  forall K, forall addK mulK:set -> set -> set,
+  forall E, forall addE smul:set -> set -> set,
+  forall n :e omega, forall u:set -> set,
+  forall x :e E :^: n, forall lambda :e K :^: n,
+    field K addK mulK ->
+    module_endomorphism K addK mulK E addE smul u ->
+    (forall i :e n,
+      x i <> module_zero E addE /\ u (x i) = smul (lambda i) (x i)) ->
+    (forall i j :e n, i <> j -> lambda i <> lambda j) ->
+    linearly_independent_family K addK mulK E addE smul n
+      (fun i => x i).
+apply god1_s34_theorem4_distinct_eigenvectors_are_independent.
 //GOD1PRF:1266470 Hence, by virtue of Lemma 3, in order to construct an orthonormal basis of L consisting of eigenvectors of $u$, it is enough to construct in each $L_{i}$ a basis which is orthonormal with respect to the restriction of $f$ to $\mathrm{L}_{i}$, and this is possible by Theorem 7 because of the obvious fact that the restriction of a positive definite form to a subspace is still positive definite.
+claim h_s36_prf_1266470 :
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set, forall u:set -> set,
+    finite_dimensional_vector_space complex add_CSNo mul_CSNo L addL smul ->
+    hermitian_form complex add_CSNo mul_CSNo conj_CSNo L addL smul f ->
+    nondegenerate_sesquilinear_form complex add_CSNo mul_CSNo conj_CSNo
+      L addL smul f ->
+    positive_definite_hermitian_form complex add_CSNo L addL f ->
+    normal_endomorphism complex add_CSNo mul_CSNo L addL smul f u ->
+    exists n :e omega, exists a:set -> set,
+      orthonormal_basis_for_form complex add_CSNo mul_CSNo
+        L addL smul f n a
+      /\ forall i :e n,
+        endomorphism_eigenvector complex add_CSNo mul_CSNo
+          L addL smul u (a i).
+admit.
+claim h_s36_ref_1266470_god1_s36_theorem9_lemma3_distinct_eigenspaces_orthogonal :
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set, forall u:set -> set,
+  forall lambda mu :e complex,
+    finite_dimensional_vector_space complex add_CSNo mul_CSNo L addL smul ->
+    hermitian_form complex add_CSNo mul_CSNo conj_CSNo L addL smul f ->
+    positive_definite_hermitian_form complex add_CSNo L addL f ->
+    normal_endomorphism complex add_CSNo mul_CSNo L addL smul f u ->
+    lambda <> mu ->
+    forall x :e endomorphism_eigenspace
+      complex add_CSNo mul_CSNo L addL smul u lambda,
+    forall y :e endomorphism_eigenspace
+      complex add_CSNo mul_CSNo L addL smul u mu,
+      f x y = ring_zero complex add_CSNo.
+apply god1_s36_theorem9_lemma3_distinct_eigenspaces_orthogonal_forward_interface.
+claim h_s36_ref_1266470_god1_s36_theorem7_real_and_complex_orthonormal_basis_criterion :
+  (forall L, forall addL smul:set -> set -> set,
+    forall f:set -> set -> set,
+    finite_dimensional_vector_space real add_SNo mul_SNo L addL smul ->
+    symmetric_bilinear_form real add_SNo mul_SNo L addL smul f ->
+    ((exists n :e omega, exists a:set -> set,
+      orthonormal_basis_for_form real add_SNo mul_SNo L addL smul f n a)
+    <-> positive_definite_hermitian_form real add_SNo L addL f))
+  /\ (forall L, forall addL smul:set -> set -> set,
+    forall f:set -> set -> set,
+    finite_dimensional_vector_space complex add_CSNo mul_CSNo L addL smul ->
+    hermitian_form complex add_CSNo mul_CSNo conj_CSNo L addL smul f ->
+    ((exists n :e omega, exists a:set -> set,
+      orthonormal_basis_for_form complex add_CSNo mul_CSNo L addL smul f n a)
+    <-> positive_definite_hermitian_form complex add_CSNo L addL f)).
+apply god1_s36_theorem7_real_and_complex_orthonormal_basis_criterion.
 //GOD1PRF:1266867 This completes the proofs of Theorems 8 and 9.\\
+claim h_s36_prf_1266867 :
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set, forall u:set -> set,
+    finite_dimensional_vector_space complex add_CSNo mul_CSNo L addL smul ->
+    hermitian_form complex add_CSNo mul_CSNo conj_CSNo L addL smul f ->
+    nondegenerate_sesquilinear_form complex add_CSNo mul_CSNo conj_CSNo
+      L addL smul f ->
+    positive_definite_hermitian_form complex add_CSNo L addL f ->
+    normal_endomorphism complex add_CSNo mul_CSNo L addL smul f u ->
+    exists n :e omega, exists a:set -> set,
+      orthonormal_basis_for_form complex add_CSNo mul_CSNo
+        L addL smul f n a
+      /\ forall i :e n,
+        endomorphism_eigenvector complex add_CSNo mul_CSNo
+          L addL smul u (a i).
+admit.
+claim h_s36_ref_1266867_god1_s36_theorem8_unitary_automorphism_spectral_theorem :
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set, forall u:set -> set,
+    finite_dimensional_vector_space complex add_CSNo mul_CSNo L addL smul ->
+    hermitian_form complex add_CSNo mul_CSNo conj_CSNo L addL smul f ->
+    positive_definite_hermitian_form complex add_CSNo L addL f ->
+    hermitian_form_automorphism complex add_CSNo mul_CSNo
+      L addL smul f u ->
+    exists n :e omega, exists a:set -> set,
+      orthonormal_basis_for_form complex add_CSNo mul_CSNo
+        L addL smul f n a
+      /\ forall i :e n,
+        endomorphism_eigenvector complex add_CSNo mul_CSNo
+          L addL smul u (a i).
+apply god1_s36_theorem8_unitary_automorphism_spectral_theorem.
 Admitted.
 
 Theorem god1_s36_theorem9_lemma1_normal_kernel_equals_adjoint_kernel :
@@ -57601,9 +62295,53 @@ Theorem god1_s36_theorem9_lemma1_normal_kernel_equals_adjoint_kernel :
 let L addL smul f u.
 assume hFinite hHermitian hPositive hNormal.
 //GOD1PRF:1263469 lemma 1. Suppose that $u$ is normal. Then, for each $x \in \mathrm{~L}$, the relation $u(x)=0$ implies that $u^{*}(x)=0$ : in other words, we have
+claim h_s36_prf_1263469 :
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set, forall u:set -> set,
+    finite_dimensional_vector_space complex add_CSNo mul_CSNo L addL smul ->
+    hermitian_form complex add_CSNo mul_CSNo conj_CSNo L addL smul f ->
+    positive_definite_hermitian_form complex add_CSNo L addL f ->
+    normal_endomorphism complex add_CSNo mul_CSNo L addL smul f u ->
+    {x :e L|u x = module_zero L addL}
+    = {x :e L|adjoint_homomorphism complex add_CSNo mul_CSNo
+        L L f f u x = module_zero L addL}.
+admit.
 //GOD1PRF:1263683 For any $x, y \in \mathrm{~L}$ we have
+claim h_s36_prf_1263683 :
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set, forall u:set -> set,
+    finite_dimensional_vector_space complex add_CSNo mul_CSNo L addL smul ->
+    hermitian_form complex add_CSNo mul_CSNo conj_CSNo L addL smul f ->
+    positive_definite_hermitian_form complex add_CSNo L addL f ->
+    normal_endomorphism complex add_CSNo mul_CSNo L addL smul f u ->
+    {x :e L|u x = module_zero L addL}
+    = {x :e L|adjoint_homomorphism complex add_CSNo mul_CSNo
+        L L f f u x = module_zero L addL}.
+admit.
 //GOD1PRF:1263845 and therefore
+claim h_s36_prf_1263845 :
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set, forall u:set -> set,
+    finite_dimensional_vector_space complex add_CSNo mul_CSNo L addL smul ->
+    hermitian_form complex add_CSNo mul_CSNo conj_CSNo L addL smul f ->
+    positive_definite_hermitian_form complex add_CSNo L addL f ->
+    normal_endomorphism complex add_CSNo mul_CSNo L addL smul f u ->
+    {x :e L|u x = module_zero L addL}
+    = {x :e L|adjoint_homomorphism complex add_CSNo mul_CSNo
+        L L f f u x = module_zero L addL}.
+admit.
 //GOD1PRF:1263914 If $u(x)=0$, it follows that the right-hand side is zero, and hence that $u^{*}(x)=0$ because $f$ is positive definite.\\
+claim h_s36_prf_1263914 :
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set, forall u:set -> set,
+    finite_dimensional_vector_space complex add_CSNo mul_CSNo L addL smul ->
+    hermitian_form complex add_CSNo mul_CSNo conj_CSNo L addL smul f ->
+    positive_definite_hermitian_form complex add_CSNo L addL f ->
+    normal_endomorphism complex add_CSNo mul_CSNo L addL smul f u ->
+    {x :e L|u x = module_zero L addL}
+    = {x :e L|adjoint_homomorphism complex add_CSNo mul_CSNo
+        L L f f u x = module_zero L addL}.
+admit.
 Admitted.
 
 Theorem god1_s36_theorem9_lemma2_adjoint_on_eigenvectors :
@@ -57626,8 +62364,61 @@ let x.
 assume hx.
 apply iffI.
 //GOD1PRF:1264036 lemma 2. Suppose that $u$ is normal, and let $\lambda$ be an eigenvalue of $u$. Then $\bar{\lambda}$ is an eigenvalue of $u^{*}$, and for any $x \in \mathrm{~L}$ the relation
+claim h_s36_prf_1264036 :
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set, forall u:set -> set,
+  forall lambda :e complex,
+    finite_dimensional_vector_space complex add_CSNo mul_CSNo L addL smul ->
+    hermitian_form complex add_CSNo mul_CSNo conj_CSNo L addL smul f ->
+    positive_definite_hermitian_form complex add_CSNo L addL f ->
+    normal_endomorphism complex add_CSNo mul_CSNo L addL smul f u ->
+    endomorphism_eigenvalue complex add_CSNo mul_CSNo L addL smul u lambda ->
+    forall x :e L,
+      (u x = smul lambda x
+      <-> adjoint_homomorphism complex add_CSNo mul_CSNo L L f f u x
+        = smul (conj_CSNo lambda) x).
+admit.
 //GOD1PRF:1264234 is equivalent to the relation
+claim h_s36_prf_1264234 :
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set, forall u:set -> set,
+  forall lambda :e complex,
+    finite_dimensional_vector_space complex add_CSNo mul_CSNo L addL smul ->
+    hermitian_form complex add_CSNo mul_CSNo conj_CSNo L addL smul f ->
+    positive_definite_hermitian_form complex add_CSNo L addL f ->
+    normal_endomorphism complex add_CSNo mul_CSNo L addL smul f u ->
+    endomorphism_eigenvalue complex add_CSNo mul_CSNo L addL smul u lambda ->
+    forall x :e L,
+      (u x = smul lambda x
+      <-> adjoint_homomorphism complex add_CSNo mul_CSNo L L f f u x
+        = smul (conj_CSNo lambda) x).
+admit.
 //GOD1PRF:1264299 Put $v=u-\lambda . j_{\mathrm{L}}$. Since $\lambda$ commutes with every endomorphism of L , a trivial calculation shows that $v$ is normal. Since $v^{*}=u^{*}-\bar{\lambda} . j_{\mathrm{L}}$, Lemma 2 follows from Lemma 1 applied to $v$.
+claim h_s36_prf_1264299 :
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set, forall u:set -> set,
+  forall lambda :e complex,
+    finite_dimensional_vector_space complex add_CSNo mul_CSNo L addL smul ->
+    hermitian_form complex add_CSNo mul_CSNo conj_CSNo L addL smul f ->
+    positive_definite_hermitian_form complex add_CSNo L addL f ->
+    normal_endomorphism complex add_CSNo mul_CSNo L addL smul f u ->
+    endomorphism_eigenvalue complex add_CSNo mul_CSNo L addL smul u lambda ->
+    forall x :e L,
+      (u x = smul lambda x
+      <-> adjoint_homomorphism complex add_CSNo mul_CSNo L L f f u x
+        = smul (conj_CSNo lambda) x).
+admit.
+claim h_s36_ref_1264299_god1_s36_theorem9_lemma1_normal_kernel_equals_adjoint_kernel :
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set, forall u:set -> set,
+    finite_dimensional_vector_space complex add_CSNo mul_CSNo L addL smul ->
+    hermitian_form complex add_CSNo mul_CSNo conj_CSNo L addL smul f ->
+    positive_definite_hermitian_form complex add_CSNo L addL f ->
+    normal_endomorphism complex add_CSNo mul_CSNo L addL smul f u ->
+    {x :e L|u x = module_zero L addL}
+    = {x :e L|adjoint_homomorphism complex add_CSNo mul_CSNo
+        L L f f u x = module_zero L addL}.
+apply god1_s36_theorem9_lemma1_normal_kernel_equals_adjoint_kernel.
 Admitted.
 
 Theorem god1_s36_theorem9_lemma3_distinct_eigenspaces_orthogonal :
@@ -57654,9 +62445,83 @@ assume hx.
 let y.
 assume hy.
 //GOD1PRF:1264537 In what follows we shall denote by $\lambda_{i}, \ldots, \lambda_{r}$ the distinct eigenvalues of $u$, and by $\mathrm{L}_{i}(1 \leqslant i \leqslant r)$ the subspace of L consisting of all solutions of
+claim h_s36_prf_1264537 :
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set, forall u:set -> set,
+  forall lambda mu :e complex,
+    finite_dimensional_vector_space complex add_CSNo mul_CSNo L addL smul ->
+    hermitian_form complex add_CSNo mul_CSNo conj_CSNo L addL smul f ->
+    positive_definite_hermitian_form complex add_CSNo L addL f ->
+    normal_endomorphism complex add_CSNo mul_CSNo L addL smul f u ->
+    lambda <> mu ->
+    forall x :e endomorphism_eigenspace
+      complex add_CSNo mul_CSNo L addL smul u lambda,
+    forall y :e endomorphism_eigenspace
+      complex add_CSNo mul_CSNo L addL smul u mu,
+      f x y = ring_zero complex add_CSNo.
+admit.
 //GOD1PRF:1264767 lemma 3. Suppose that $u$ is normal. Then the eigenspaces $\mathrm{L}_{1}, \ldots, \mathrm{~L}_{r}$ are pairwise orthogonal with respect to f.
+claim h_s36_prf_1264767 :
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set, forall u:set -> set,
+  forall lambda mu :e complex,
+    finite_dimensional_vector_space complex add_CSNo mul_CSNo L addL smul ->
+    hermitian_form complex add_CSNo mul_CSNo conj_CSNo L addL smul f ->
+    positive_definite_hermitian_form complex add_CSNo L addL f ->
+    normal_endomorphism complex add_CSNo mul_CSNo L addL smul f u ->
+    lambda <> mu ->
+    forall x :e endomorphism_eigenspace
+      complex add_CSNo mul_CSNo L addL smul u lambda,
+    forall y :e endomorphism_eigenspace
+      complex add_CSNo mul_CSNo L addL smul u mu,
+      f x y = ring_zero complex add_CSNo.
+admit.
 //GOD1PRF:1264911 Let $x \in \mathrm{~L}_{i}, y \in \mathrm{~L}_{j}$. Then, by Lemma 2,
+claim h_s36_prf_1264911 :
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set, forall u:set -> set,
+  forall lambda mu :e complex,
+    finite_dimensional_vector_space complex add_CSNo mul_CSNo L addL smul ->
+    hermitian_form complex add_CSNo mul_CSNo conj_CSNo L addL smul f ->
+    positive_definite_hermitian_form complex add_CSNo L addL f ->
+    normal_endomorphism complex add_CSNo mul_CSNo L addL smul f u ->
+    lambda <> mu ->
+    forall x :e endomorphism_eigenspace
+      complex add_CSNo mul_CSNo L addL smul u lambda,
+    forall y :e endomorphism_eigenspace
+      complex add_CSNo mul_CSNo L addL smul u mu,
+      f x y = ring_zero complex add_CSNo.
+admit.
+claim h_s36_ref_1264911_god1_s36_theorem9_lemma2_adjoint_on_eigenvectors :
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set, forall u:set -> set,
+  forall lambda :e complex,
+    finite_dimensional_vector_space complex add_CSNo mul_CSNo L addL smul ->
+    hermitian_form complex add_CSNo mul_CSNo conj_CSNo L addL smul f ->
+    positive_definite_hermitian_form complex add_CSNo L addL f ->
+    normal_endomorphism complex add_CSNo mul_CSNo L addL smul f u ->
+    endomorphism_eigenvalue complex add_CSNo mul_CSNo L addL smul u lambda ->
+    forall x :e L,
+      (u x = smul lambda x
+      <-> adjoint_homomorphism complex add_CSNo mul_CSNo L L f f u x
+        = smul (conj_CSNo lambda) x).
+apply god1_s36_theorem9_lemma2_adjoint_on_eigenvectors.
 //GOD1PRF:1265105 and since $\lambda_{i} \neq \lambda_{j}$ when $i \neq j$ it follows that $f(x, y)=0$ whenever $i \neq j$.\\
+claim h_s36_prf_1265105 :
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set, forall u:set -> set,
+  forall lambda mu :e complex,
+    finite_dimensional_vector_space complex add_CSNo mul_CSNo L addL smul ->
+    hermitian_form complex add_CSNo mul_CSNo conj_CSNo L addL smul f ->
+    positive_definite_hermitian_form complex add_CSNo L addL f ->
+    normal_endomorphism complex add_CSNo mul_CSNo L addL smul f u ->
+    lambda <> mu ->
+    forall x :e endomorphism_eigenspace
+      complex add_CSNo mul_CSNo L addL smul u lambda,
+    forall y :e endomorphism_eigenspace
+      complex add_CSNo mul_CSNo L addL smul u mu,
+      f x y = ring_zero complex add_CSNo.
+admit.
 Admitted.
 
 Theorem god1_s36_theorem9_lemma4_stability_of_orthogonal_complement :
@@ -57675,8 +62540,41 @@ let x.
 assume hx.
 apply andI.
 //GOD1PRF:1265213 lemma 4. Let M be a subspace of L which is stable under $u$ and under $u^{*}$. Then the orthogonal complement $\mathrm{M}^{\perp}$ of M relative to $f$ is also stable under both $u$ and $u^{*}$.
+claim h_s36_prf_1265213 :
+  forall K, forall addK mulK:set -> set -> set,
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set, forall u ustar:set -> set, forall M,
+    vector_subspace K addK mulK L addL smul M ->
+    (forall x :e M, u x :e M /\ ustar x :e M) ->
+    (forall x y :e L, f (u x) y = f x (ustar y)) ->
+    forall x :e hermitian_orthogonal_complement K addK L f M,
+      u x :e hermitian_orthogonal_complement K addK L f M
+      /\ ustar x :e hermitian_orthogonal_complement K addK L f M.
+admit.
 //GOD1PRF:1265409 It is enough to show that, if $x \in \mathrm{~L}$, the relation $f(x, y)=0$ for all $y \in \mathrm{M}$ implies the same property for $u(x)$ and $u^{*}(x)$. Now we have
+claim h_s36_prf_1265409 :
+  forall K, forall addK mulK:set -> set -> set,
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set, forall u ustar:set -> set, forall M,
+    vector_subspace K addK mulK L addL smul M ->
+    (forall x :e M, u x :e M /\ ustar x :e M) ->
+    (forall x y :e L, f (u x) y = f x (ustar y)) ->
+    forall x :e hermitian_orthogonal_complement K addK L f M,
+      u x :e hermitian_orthogonal_complement K addK L f M
+      /\ ustar x :e hermitian_orthogonal_complement K addK L f M.
+admit.
 //GOD1PRF:1265623 and since by hypothesis the relation $y \in \mathbf{M}$ implies that $u^{*}(y) \in \mathbf{M}$, the first point is clear. The proof of the second is the same.
+claim h_s36_prf_1265623 :
+  forall K, forall addK mulK:set -> set -> set,
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set, forall u ustar:set -> set, forall M,
+    vector_subspace K addK mulK L addL smul M ->
+    (forall x :e M, u x :e M /\ ustar x :e M) ->
+    (forall x y :e L, f (u x) y = f x (ustar y)) ->
+    forall x :e hermitian_orthogonal_complement K addK L f M,
+      u x :e hermitian_orthogonal_complement K addK L f M
+      /\ ustar x :e hermitian_orthogonal_complement K addK L f M.
+admit.
 Admitted.
 
 //GOD1:1269561 normal_matrix : "the complex square matrix #5 is normal" | $#5^*#5=#5#5^*$
@@ -57689,6 +62587,25 @@ Definition normal_matrix :
       (matrix_adjoint K star n n A) A
       = matrix_multiplication K add mul n n n A
         (matrix_adjoint K star n n A).
+
+(** Formal §36.7 change-of-orthonormal-basis calculation. **)
+Theorem god1_s36_section7_transition_between_orthonormal_bases_is_unitary_interface :
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set, forall n :e omega,
+  forall a b:set -> set,
+    orthonormal_basis_for_form complex add_CSNo mul_CSNo
+      L addL smul f n a ->
+    orthonormal_basis_for_form complex add_CSNo mul_CSNo
+      L addL smul f n b ->
+    unitary_matrix complex add_CSNo mul_CSNo conj_CSNo n
+      (transition_matrix complex add_CSNo mul_CSNo L addL
+        (fun x scalar => smul scalar x) n a b).
+let L addL smul f.
+let n.
+assume hn.
+let a b.
+assume hA hB.
+Admitted.
 
 Theorem god1_s36_theorem9_corollary_normal_matrix_unitary_diagonalization :
   forall n :e omega, forall A :e square_matrix_ring complex n,
@@ -57710,15 +62627,236 @@ assume hn.
 let A.
 assume hA hNormal.
 //GOD1PRF:1267443 These results can be reinterpreted in the language of matrices. Let us take $\mathrm{L}=\mathbf{C}^{n}$ and
+claim h_s36_prf_1267443 :
+  forall n :e omega, forall A :e square_matrix_ring complex n,
+    normal_matrix complex add_CSNo mul_CSNo conj_CSNo n A ->
+    exists U D :e square_matrix_ring complex n,
+      unitary_matrix complex add_CSNo mul_CSNo conj_CSNo n U
+      /\ diagonal_matrix complex add_CSNo n D
+      /\ A = matrix_multiplication complex add_CSNo mul_CSNo n n n
+        (matrix_multiplication complex add_CSNo mul_CSNo n n n U D)
+        (matrix_inverse complex add_CSNo mul_CSNo n U)
+      /\ (unitary_matrix complex add_CSNo mul_CSNo conj_CSNo n A
+        <-> forall i :e n,
+          mul_CSNo (matrix_entry D i i) (conj_CSNo (matrix_entry D i i)) = 1)
+      /\ (hermitian_matrix complex add_CSNo conj_CSNo n A
+        <-> forall i :e n,
+          conj_CSNo (matrix_entry D i i) = matrix_entry D i i).
+admit.
 //GOD1PRF:1267605 by virtue of Theorem 7, this involves no loss in generality. Let A be the matrix of $u$ with respect to the canonical basis, and let $U$ be the matrix of transition from the canonical basis to an orthonormal basis consisting of eigenvectors of $u$. Then the matrix of $u$ with respect to the latter basis is $\mathrm{U}^{-1} \mathrm{AU}$ (§ 15, Corollary to Theorem 2), so that
+claim h_s36_prf_1267605 :
+  forall n :e omega, forall A :e square_matrix_ring complex n,
+    normal_matrix complex add_CSNo mul_CSNo conj_CSNo n A ->
+    exists U D :e square_matrix_ring complex n,
+      unitary_matrix complex add_CSNo mul_CSNo conj_CSNo n U
+      /\ diagonal_matrix complex add_CSNo n D
+      /\ A = matrix_multiplication complex add_CSNo mul_CSNo n n n
+        (matrix_multiplication complex add_CSNo mul_CSNo n n n U D)
+        (matrix_inverse complex add_CSNo mul_CSNo n U)
+      /\ (unitary_matrix complex add_CSNo mul_CSNo conj_CSNo n A
+        <-> forall i :e n,
+          mul_CSNo (matrix_entry D i i) (conj_CSNo (matrix_entry D i i)) = 1)
+      /\ (hermitian_matrix complex add_CSNo conj_CSNo n A
+        <-> forall i :e n,
+          conj_CSNo (matrix_entry D i i) = matrix_entry D i i).
+admit.
+claim h_s36_ref_1267605_god1_s36_theorem7_real_and_complex_orthonormal_basis_criterion :
+  (forall L, forall addL smul:set -> set -> set,
+    forall f:set -> set -> set,
+    finite_dimensional_vector_space real add_SNo mul_SNo L addL smul ->
+    symmetric_bilinear_form real add_SNo mul_SNo L addL smul f ->
+    ((exists n :e omega, exists a:set -> set,
+      orthonormal_basis_for_form real add_SNo mul_SNo L addL smul f n a)
+    <-> positive_definite_hermitian_form real add_SNo L addL f))
+  /\ (forall L, forall addL smul:set -> set -> set,
+    forall f:set -> set -> set,
+    finite_dimensional_vector_space complex add_CSNo mul_CSNo L addL smul ->
+    hermitian_form complex add_CSNo mul_CSNo conj_CSNo L addL smul f ->
+    ((exists n :e omega, exists a:set -> set,
+      orthonormal_basis_for_form complex add_CSNo mul_CSNo L addL smul f n a)
+    <-> positive_definite_hermitian_form complex add_CSNo L addL f)).
+apply god1_s36_theorem7_real_and_complex_orthonormal_basis_criterion.
+claim h_s36_ref_1267605_god1_s15_corollary_similar_matrices_of_endomorphism :
+  forall K, forall addK mulK:set -> set -> set,
+  forall M, forall addM smulR:set -> set -> set,
+  forall n :e omega, forall a1 a2:set -> set, forall f:set -> set,
+    right_module_basis K addK mulK M addM smulR n a1 ->
+    right_module_basis K addK mulK M addM smulR n a2 ->
+    right_module_homomorphism K addK mulK M addM smulR M addM smulR f ->
+    matrix_of_right_linear_map
+      K addK mulK M addM smulR M addM smulR n n a2 a2 f
+    = matrix_multiplication K addK mulK n n n
+      (transition_matrix K addK mulK M addM smulR n a1 a2)
+      (matrix_multiplication K addK mulK n n n
+        (matrix_of_right_linear_map
+          K addK mulK M addM smulR M addM smulR n n a1 a1 f)
+        (matrix_inverse K addK mulK n
+          (transition_matrix K addK mulK M addM smulR n a1 a2))).
+apply god1_s15_corollary_similar_matrices_of_endomorphism.
 //GOD1PRF:1268022 where D is a diagonal matrix. But since U is the matrix of transition from the canonical basis (which is orthonormal with respect to $f$ ) to another orthonormal basis, the matrix U is unitary, as we saw in section 7. Therefore:\\
+claim h_s36_prf_1268022 :
+  forall n :e omega, forall A :e square_matrix_ring complex n,
+    normal_matrix complex add_CSNo mul_CSNo conj_CSNo n A ->
+    exists U D :e square_matrix_ring complex n,
+      unitary_matrix complex add_CSNo mul_CSNo conj_CSNo n U
+      /\ diagonal_matrix complex add_CSNo n D
+      /\ A = matrix_multiplication complex add_CSNo mul_CSNo n n n
+        (matrix_multiplication complex add_CSNo mul_CSNo n n n U D)
+        (matrix_inverse complex add_CSNo mul_CSNo n U)
+      /\ (unitary_matrix complex add_CSNo mul_CSNo conj_CSNo n A
+        <-> forall i :e n,
+          mul_CSNo (matrix_entry D i i) (conj_CSNo (matrix_entry D i i)) = 1)
+      /\ (hermitian_matrix complex add_CSNo conj_CSNo n A
+        <-> forall i :e n,
+          conj_CSNo (matrix_entry D i i) = matrix_entry D i i).
+admit.
+claim h_s36_ref_1268022_god1_s36_section7_transition_between_orthonormal_bases_is_unitary_interface :
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set, forall n :e omega,
+  forall a b:set -> set,
+    orthonormal_basis_for_form complex add_CSNo mul_CSNo
+      L addL smul f n a ->
+    orthonormal_basis_for_form complex add_CSNo mul_CSNo
+      L addL smul f n b ->
+    unitary_matrix complex add_CSNo mul_CSNo conj_CSNo n
+      (transition_matrix complex add_CSNo mul_CSNo L addL
+        (fun x scalar => smul scalar x) n a b).
+apply god1_s36_section7_transition_between_orthonormal_bases_is_unitary_interface.
 //GOD1PRF:1268253 corollary to theorem 9. Let A be a square matrix of order $n$ with complex coefficients such that
+claim h_s36_prf_1268253 :
+  forall n :e omega, forall A :e square_matrix_ring complex n,
+    normal_matrix complex add_CSNo mul_CSNo conj_CSNo n A ->
+    exists U D :e square_matrix_ring complex n,
+      unitary_matrix complex add_CSNo mul_CSNo conj_CSNo n U
+      /\ diagonal_matrix complex add_CSNo n D
+      /\ A = matrix_multiplication complex add_CSNo mul_CSNo n n n
+        (matrix_multiplication complex add_CSNo mul_CSNo n n n U D)
+        (matrix_inverse complex add_CSNo mul_CSNo n U)
+      /\ (unitary_matrix complex add_CSNo mul_CSNo conj_CSNo n A
+        <-> forall i :e n,
+          mul_CSNo (matrix_entry D i i) (conj_CSNo (matrix_entry D i i)) = 1)
+      /\ (hermitian_matrix complex add_CSNo conj_CSNo n A
+        <-> forall i :e n,
+          conj_CSNo (matrix_entry D i i) = matrix_entry D i i).
+admit.
+claim h_s36_ref_1268253_god1_s36_theorem9_normal_spectral_theorem :
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set, forall u:set -> set,
+    finite_dimensional_vector_space complex add_CSNo mul_CSNo L addL smul ->
+    hermitian_form complex add_CSNo mul_CSNo conj_CSNo L addL smul f ->
+    nondegenerate_sesquilinear_form complex add_CSNo mul_CSNo conj_CSNo
+      L addL smul f ->
+    positive_definite_hermitian_form complex add_CSNo L addL f ->
+    normal_endomorphism complex add_CSNo mul_CSNo L addL smul f u ->
+    exists n :e omega, exists a:set -> set,
+      orthonormal_basis_for_form complex add_CSNo mul_CSNo
+        L addL smul f n a
+      /\ forall i :e n,
+        endomorphism_eigenvector complex add_CSNo mul_CSNo
+          L addL smul u (a i).
+apply god1_s36_theorem9_normal_spectral_theorem.
 //GOD1PRF:1268404 Then there exists a complex unitary matrix U of order $n$ and a diagonal matrix D of order $n$ such that
+claim h_s36_prf_1268404 :
+  forall n :e omega, forall A :e square_matrix_ring complex n,
+    normal_matrix complex add_CSNo mul_CSNo conj_CSNo n A ->
+    exists U D :e square_matrix_ring complex n,
+      unitary_matrix complex add_CSNo mul_CSNo conj_CSNo n U
+      /\ diagonal_matrix complex add_CSNo n D
+      /\ A = matrix_multiplication complex add_CSNo mul_CSNo n n n
+        (matrix_multiplication complex add_CSNo mul_CSNo n n n U D)
+        (matrix_inverse complex add_CSNo mul_CSNo n U)
+      /\ (unitary_matrix complex add_CSNo mul_CSNo conj_CSNo n A
+        <-> forall i :e n,
+          mul_CSNo (matrix_entry D i i) (conj_CSNo (matrix_entry D i i)) = 1)
+      /\ (hermitian_matrix complex add_CSNo conj_CSNo n A
+        <-> forall i :e n,
+          conj_CSNo (matrix_entry D i i) = matrix_entry D i i).
+admit.
 //GOD1PRF:1268546 For A to be unitary (resp. hermitian) it is necessary and sufficient that the diagonal elements of D should all be of absolute value 1 (resp. should all be real).
+claim h_s36_prf_1268546 :
+  forall n :e omega, forall A :e square_matrix_ring complex n,
+    normal_matrix complex add_CSNo mul_CSNo conj_CSNo n A ->
+    exists U D :e square_matrix_ring complex n,
+      unitary_matrix complex add_CSNo mul_CSNo conj_CSNo n U
+      /\ diagonal_matrix complex add_CSNo n D
+      /\ A = matrix_multiplication complex add_CSNo mul_CSNo n n n
+        (matrix_multiplication complex add_CSNo mul_CSNo n n n U D)
+        (matrix_inverse complex add_CSNo mul_CSNo n U)
+      /\ (unitary_matrix complex add_CSNo mul_CSNo conj_CSNo n A
+        <-> forall i :e n,
+          mul_CSNo (matrix_entry D i i) (conj_CSNo (matrix_entry D i i)) = 1)
+      /\ (hermitian_matrix complex add_CSNo conj_CSNo n A
+        <-> forall i :e n,
+          conj_CSNo (matrix_entry D i i) = matrix_entry D i i).
+admit.
 //GOD1PRF:1268710 For the last assertion, observe that $\mathrm{A}=\mathrm{UDU}^{-1}$ implies that
+claim h_s36_prf_1268710 :
+  forall n :e omega, forall A :e square_matrix_ring complex n,
+    normal_matrix complex add_CSNo mul_CSNo conj_CSNo n A ->
+    exists U D :e square_matrix_ring complex n,
+      unitary_matrix complex add_CSNo mul_CSNo conj_CSNo n U
+      /\ diagonal_matrix complex add_CSNo n D
+      /\ A = matrix_multiplication complex add_CSNo mul_CSNo n n n
+        (matrix_multiplication complex add_CSNo mul_CSNo n n n U D)
+        (matrix_inverse complex add_CSNo mul_CSNo n U)
+      /\ (unitary_matrix complex add_CSNo mul_CSNo conj_CSNo n A
+        <-> forall i :e n,
+          mul_CSNo (matrix_entry D i i) (conj_CSNo (matrix_entry D i i)) = 1)
+      /\ (hermitian_matrix complex add_CSNo conj_CSNo n A
+        <-> forall i :e n,
+          conj_CSNo (matrix_entry D i i) = matrix_entry D i i).
+admit.
 //GOD1PRF:1268873 where $\bar{D}$ is the complex conjugate of $D$; for $A$ to be hermitian it is therefore necessary and sufficient that
+claim h_s36_prf_1268873 :
+  forall n :e omega, forall A :e square_matrix_ring complex n,
+    normal_matrix complex add_CSNo mul_CSNo conj_CSNo n A ->
+    exists U D :e square_matrix_ring complex n,
+      unitary_matrix complex add_CSNo mul_CSNo conj_CSNo n U
+      /\ diagonal_matrix complex add_CSNo n D
+      /\ A = matrix_multiplication complex add_CSNo mul_CSNo n n n
+        (matrix_multiplication complex add_CSNo mul_CSNo n n n U D)
+        (matrix_inverse complex add_CSNo mul_CSNo n U)
+      /\ (unitary_matrix complex add_CSNo mul_CSNo conj_CSNo n A
+        <-> forall i :e n,
+          mul_CSNo (matrix_entry D i i) (conj_CSNo (matrix_entry D i i)) = 1)
+      /\ (hermitian_matrix complex add_CSNo conj_CSNo n A
+        <-> forall i :e n,
+          conj_CSNo (matrix_entry D i i) = matrix_entry D i i).
+admit.
 //GOD1PRF:1269067 i.e., that $\mathrm{D}=\overline{\mathrm{D}}$, and hence that D is real; and for A to be unitary it is necessary and sufficient that
+claim h_s36_prf_1269067 :
+  forall n :e omega, forall A :e square_matrix_ring complex n,
+    normal_matrix complex add_CSNo mul_CSNo conj_CSNo n A ->
+    exists U D :e square_matrix_ring complex n,
+      unitary_matrix complex add_CSNo mul_CSNo conj_CSNo n U
+      /\ diagonal_matrix complex add_CSNo n D
+      /\ A = matrix_multiplication complex add_CSNo mul_CSNo n n n
+        (matrix_multiplication complex add_CSNo mul_CSNo n n n U D)
+        (matrix_inverse complex add_CSNo mul_CSNo n U)
+      /\ (unitary_matrix complex add_CSNo mul_CSNo conj_CSNo n A
+        <-> forall i :e n,
+          mul_CSNo (matrix_entry D i i) (conj_CSNo (matrix_entry D i i)) = 1)
+      /\ (hermitian_matrix complex add_CSNo conj_CSNo n A
+        <-> forall i :e n,
+          conj_CSNo (matrix_entry D i i) = matrix_entry D i i).
+admit.
 //GOD1PRF:1269345 i.e., that $\overline{\mathrm{D}} \mathrm{D}=1_{n}$, and hence that the diagonal elements of D have absolute value equal to 1 .
+claim h_s36_prf_1269345 :
+  forall n :e omega, forall A :e square_matrix_ring complex n,
+    normal_matrix complex add_CSNo mul_CSNo conj_CSNo n A ->
+    exists U D :e square_matrix_ring complex n,
+      unitary_matrix complex add_CSNo mul_CSNo conj_CSNo n U
+      /\ diagonal_matrix complex add_CSNo n D
+      /\ A = matrix_multiplication complex add_CSNo mul_CSNo n n n
+        (matrix_multiplication complex add_CSNo mul_CSNo n n n U D)
+        (matrix_inverse complex add_CSNo mul_CSNo n U)
+      /\ (unitary_matrix complex add_CSNo mul_CSNo conj_CSNo n A
+        <-> forall i :e n,
+          mul_CSNo (matrix_entry D i i) (conj_CSNo (matrix_entry D i i)) = 1)
+      /\ (hermitian_matrix complex add_CSNo conj_CSNo n A
+        <-> forall i :e n,
+          conj_CSNo (matrix_entry D i i) = matrix_entry D i i).
+admit.
 Admitted.
 
 Theorem god1_unitary_automorphism_eigenvalues_have_modulus_one :
@@ -57734,8 +62872,52 @@ let L addL smul f u.
 let lambda.
 assume hlambda hHermitian hPositive hAutomorphism hEigenvalue.
 //GOD1PRF:1266916 When $u$ is an automorphism of $f$, Lemma 2 shows that
+claim h_s36_prf_1266916 :
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set, forall u:set -> set, forall lambda :e complex,
+    hermitian_form complex add_CSNo mul_CSNo conj_CSNo L addL smul f ->
+    positive_definite_hermitian_form complex add_CSNo L addL f ->
+    hermitian_form_automorphism complex add_CSNo mul_CSNo
+      L addL smul f u ->
+    endomorphism_eigenvalue complex add_CSNo mul_CSNo L addL smul u lambda ->
+    mul_CSNo lambda (conj_CSNo lambda) = 1.
+admit.
+claim h_s36_ref_1266916_god1_s36_theorem9_lemma2_adjoint_on_eigenvectors :
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set, forall u:set -> set,
+  forall lambda :e complex,
+    finite_dimensional_vector_space complex add_CSNo mul_CSNo L addL smul ->
+    hermitian_form complex add_CSNo mul_CSNo conj_CSNo L addL smul f ->
+    positive_definite_hermitian_form complex add_CSNo L addL f ->
+    normal_endomorphism complex add_CSNo mul_CSNo L addL smul f u ->
+    endomorphism_eigenvalue complex add_CSNo mul_CSNo L addL smul u lambda ->
+    forall x :e L,
+      (u x = smul lambda x
+      <-> adjoint_homomorphism complex add_CSNo mul_CSNo L L f f u x
+        = smul (conj_CSNo lambda) x).
+apply god1_s36_theorem9_lemma2_adjoint_on_eigenvectors.
 //GOD1PRF:1267053 from which it follows that every eigenvalue $\lambda$ of $u$ satisfies
+claim h_s36_prf_1267053 :
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set, forall u:set -> set, forall lambda :e complex,
+    hermitian_form complex add_CSNo mul_CSNo conj_CSNo L addL smul f ->
+    positive_definite_hermitian_form complex add_CSNo L addL f ->
+    hermitian_form_automorphism complex add_CSNo mul_CSNo
+      L addL smul f u ->
+    endomorphism_eigenvalue complex add_CSNo mul_CSNo L addL smul u lambda ->
+    mul_CSNo lambda (conj_CSNo lambda) = 1.
+admit.
 //GOD1PRF:1267159 or in other words is a complex number of absolute value 1.\\
+claim h_s36_prf_1267159 :
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set, forall u:set -> set, forall lambda :e complex,
+    hermitian_form complex add_CSNo mul_CSNo conj_CSNo L addL smul f ->
+    positive_definite_hermitian_form complex add_CSNo L addL f ->
+    hermitian_form_automorphism complex add_CSNo mul_CSNo
+      L addL smul f u ->
+    endomorphism_eigenvalue complex add_CSNo mul_CSNo L addL smul u lambda ->
+    mul_CSNo lambda (conj_CSNo lambda) = 1.
+admit.
 Admitted.
 
 //GOD1:1267220 self_adjoint_endomorphism : "the endomorphism #10 is self-adjoint relative to form #9" | $#10^*=#10$
@@ -57760,8 +62942,52 @@ let L addL smul f u.
 let lambda.
 assume hlambda hFinite hHermitian hPositive hSelfAdjoint hEigenvalue.
 //GOD1PRF:1267220 Another important particular case is that of a self-adjoint endomorphism $u$, i.e., satisfying
+claim h_s36_prf_1267220 :
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set, forall u:set -> set, forall lambda :e complex,
+    finite_dimensional_vector_space complex add_CSNo mul_CSNo L addL smul ->
+    hermitian_form complex add_CSNo mul_CSNo conj_CSNo L addL smul f ->
+    positive_definite_hermitian_form complex add_CSNo L addL f ->
+    self_adjoint_endomorphism complex add_CSNo mul_CSNo L addL smul f u ->
+    endomorphism_eigenvalue complex add_CSNo mul_CSNo L addL smul u lambda ->
+    conj_CSNo lambda = lambda.
+admit.
 //GOD1PRF:1267333 Lemma 2 then shows that
+claim h_s36_prf_1267333 :
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set, forall u:set -> set, forall lambda :e complex,
+    finite_dimensional_vector_space complex add_CSNo mul_CSNo L addL smul ->
+    hermitian_form complex add_CSNo mul_CSNo conj_CSNo L addL smul f ->
+    positive_definite_hermitian_form complex add_CSNo L addL f ->
+    self_adjoint_endomorphism complex add_CSNo mul_CSNo L addL smul f u ->
+    endomorphism_eigenvalue complex add_CSNo mul_CSNo L addL smul u lambda ->
+    conj_CSNo lambda = lambda.
+admit.
+claim h_s36_ref_1267333_god1_s36_theorem9_lemma2_adjoint_on_eigenvectors :
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set, forall u:set -> set,
+  forall lambda :e complex,
+    finite_dimensional_vector_space complex add_CSNo mul_CSNo L addL smul ->
+    hermitian_form complex add_CSNo mul_CSNo conj_CSNo L addL smul f ->
+    positive_definite_hermitian_form complex add_CSNo L addL f ->
+    normal_endomorphism complex add_CSNo mul_CSNo L addL smul f u ->
+    endomorphism_eigenvalue complex add_CSNo mul_CSNo L addL smul u lambda ->
+    forall x :e L,
+      (u x = smul lambda x
+      <-> adjoint_homomorphism complex add_CSNo mul_CSNo L L f f u x
+        = smul (conj_CSNo lambda) x).
+apply god1_s36_theorem9_lemma2_adjoint_on_eigenvectors.
 //GOD1PRF:1267388 in other words that every eigenvalue of $u$ is real.\\
+claim h_s36_prf_1267388 :
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set, forall u:set -> set, forall lambda :e complex,
+    finite_dimensional_vector_space complex add_CSNo mul_CSNo L addL smul ->
+    hermitian_form complex add_CSNo mul_CSNo conj_CSNo L addL smul f ->
+    positive_definite_hermitian_form complex add_CSNo L addL f ->
+    self_adjoint_endomorphism complex add_CSNo mul_CSNo L addL smul f u ->
+    endomorphism_eigenvalue complex add_CSNo mul_CSNo L addL smul u lambda ->
+    conj_CSNo lambda = lambda.
+admit.
 Admitted.
 
 Theorem god1_s36_theorem10_real_self_adjoint_spectral_theorem :
@@ -57781,8 +63007,150 @@ Theorem god1_s36_theorem10_real_self_adjoint_spectral_theorem :
 let L addL smul f u.
 assume hFinite hSymmetric hNondegenerate hPositive hEndomorphism hSelfAdjoint.
 //GOD1PRF:1269794 theorem 10. Let L be a finite-dimensional real vector space, $f$ a positive definite symmetric bilinear form on L , and $u$ an endomorphism of L which is self-adjoint with respect to $f$. Then there exists a basis of L which is orthonormal with respect to $f$ and consists of eigenvectors of $u$.
+claim h_s36_prf_1269794 :
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set, forall u:set -> set,
+    finite_dimensional_vector_space real add_SNo mul_SNo L addL smul ->
+    symmetric_bilinear_form real add_SNo mul_SNo L addL smul f ->
+    nondegenerate_sesquilinear_form real add_SNo mul_SNo (fun x => x)
+      L addL smul f ->
+    positive_definite_hermitian_form real add_SNo L addL f ->
+    module_endomorphism real add_SNo mul_SNo L addL smul u ->
+    self_adjoint_endomorphism real add_SNo mul_SNo L addL smul f u ->
+    exists n :e omega, exists a:set -> set,
+      orthonormal_basis_for_form real add_SNo mul_SNo L addL smul f n a
+      /\ forall i :e n,
+        endomorphism_eigenvector real add_SNo mul_SNo L addL smul u (a i).
+admit.
 //GOD1PRF:1270092 The proof follows that of Theorem 9. Lemmas 1 and 2 are here trivial because $u=u^{*}$, and Lemmas 3 and 4 are still valid, the proofs being unaltered. As before, we form the subspace M of L generated by the eigenvectors of $u$, and the essential thing to be proved is that $\mathrm{M}=\mathrm{L}$, i.e., (Corollary to Theorem 5) that $\mathrm{M}^{\perp}=\{0\}$. For this it is sufficient, as before, to show that every non-zero subspace N of L which is stable under $u$ contains at least one eigenvector of $u$. Replacing $f$ by its restriction to N (which is again symmetric and positive definite) and $u$ by its restriction to N (which is again self-adjoint, relative to the restriction of $f$ to N ), we are finally reduced to proving that, under the hypotheses stated, $u$ has at least one eigenvector in L , i.e., has at least one real eigenvector.
+claim h_s36_prf_1270092 :
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set, forall u:set -> set,
+    finite_dimensional_vector_space real add_SNo mul_SNo L addL smul ->
+    symmetric_bilinear_form real add_SNo mul_SNo L addL smul f ->
+    nondegenerate_sesquilinear_form real add_SNo mul_SNo (fun x => x)
+      L addL smul f ->
+    positive_definite_hermitian_form real add_SNo L addL f ->
+    module_endomorphism real add_SNo mul_SNo L addL smul u ->
+    self_adjoint_endomorphism real add_SNo mul_SNo L addL smul f u ->
+    exists n :e omega, exists a:set -> set,
+      orthonormal_basis_for_form real add_SNo mul_SNo L addL smul f n a
+      /\ forall i :e n,
+        endomorphism_eigenvector real add_SNo mul_SNo L addL smul u (a i).
+admit.
+claim h_s36_ref_1270092_god1_s36_theorem9_lemma1_normal_kernel_equals_adjoint_kernel :
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set, forall u:set -> set,
+    finite_dimensional_vector_space complex add_CSNo mul_CSNo L addL smul ->
+    hermitian_form complex add_CSNo mul_CSNo conj_CSNo L addL smul f ->
+    positive_definite_hermitian_form complex add_CSNo L addL f ->
+    normal_endomorphism complex add_CSNo mul_CSNo L addL smul f u ->
+    {x :e L|u x = module_zero L addL}
+    = {x :e L|adjoint_homomorphism complex add_CSNo mul_CSNo
+        L L f f u x = module_zero L addL}.
+apply god1_s36_theorem9_lemma1_normal_kernel_equals_adjoint_kernel.
+claim h_s36_ref_1270092_god1_s36_theorem9_lemma2_adjoint_on_eigenvectors :
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set, forall u:set -> set,
+  forall lambda :e complex,
+    finite_dimensional_vector_space complex add_CSNo mul_CSNo L addL smul ->
+    hermitian_form complex add_CSNo mul_CSNo conj_CSNo L addL smul f ->
+    positive_definite_hermitian_form complex add_CSNo L addL f ->
+    normal_endomorphism complex add_CSNo mul_CSNo L addL smul f u ->
+    endomorphism_eigenvalue complex add_CSNo mul_CSNo L addL smul u lambda ->
+    forall x :e L,
+      (u x = smul lambda x
+      <-> adjoint_homomorphism complex add_CSNo mul_CSNo L L f f u x
+        = smul (conj_CSNo lambda) x).
+apply god1_s36_theorem9_lemma2_adjoint_on_eigenvectors.
+claim h_s36_ref_1270092_god1_s36_theorem9_lemma3_distinct_eigenspaces_orthogonal :
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set, forall u:set -> set,
+  forall lambda mu :e complex,
+    finite_dimensional_vector_space complex add_CSNo mul_CSNo L addL smul ->
+    hermitian_form complex add_CSNo mul_CSNo conj_CSNo L addL smul f ->
+    positive_definite_hermitian_form complex add_CSNo L addL f ->
+    normal_endomorphism complex add_CSNo mul_CSNo L addL smul f u ->
+    lambda <> mu ->
+    forall x :e endomorphism_eigenspace
+      complex add_CSNo mul_CSNo L addL smul u lambda,
+    forall y :e endomorphism_eigenspace
+      complex add_CSNo mul_CSNo L addL smul u mu,
+      f x y = ring_zero complex add_CSNo.
+apply god1_s36_theorem9_lemma3_distinct_eigenspaces_orthogonal.
+claim h_s36_ref_1270092_god1_s36_theorem9_lemma4_stability_of_orthogonal_complement :
+  forall K, forall addK mulK:set -> set -> set,
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set, forall u ustar:set -> set, forall M,
+    vector_subspace K addK mulK L addL smul M ->
+    (forall x :e M, u x :e M /\ ustar x :e M) ->
+    (forall x y :e L, f (u x) y = f x (ustar y)) ->
+    forall x :e hermitian_orthogonal_complement K addK L f M,
+      u x :e hermitian_orthogonal_complement K addK L f M
+      /\ ustar x :e hermitian_orthogonal_complement K addK L f M.
+apply god1_s36_theorem9_lemma4_stability_of_orthogonal_complement.
+claim h_s36_ref_1270092_god1_s36_theorem5_corollary_no_isotropic_vectors :
+  forall K, forall addK mulK:set -> set -> set, forall star:set -> set,
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set,
+    field_involution K addK mulK star ->
+    finite_dimensional_vector_space K addK mulK L addL smul ->
+    hermitian_form K addK mulK star L addL smul f ->
+    ((forall x :e L, f x x = ring_zero K addK -> x = module_zero L addL)
+    <-> forall M,
+      vector_subspace K addK mulK L addL smul M ->
+      direct_sum_decomposition K addK mulK L addL smul 2
+        (fun i => if i = 0 then M
+          else hermitian_orthogonal_complement K addK L f M)).
+apply god1_s36_theorem5_corollary_no_isotropic_vectors.
 //GOD1PRF:1270948 Now let $\left(a_{i}\right)$ be a basis of L which is orthonormal relative to $f$ (Theorem 7). The matrix A of $u$ relative to this basis is real symmetric, from the calculations of section 3, and its eigenvalues are therefore all real (Corollary to Theorem 9). Since the eigenvalues of $u$ are those of A , the proof is complete.
+claim h_s36_prf_1270948 :
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set, forall u:set -> set,
+    finite_dimensional_vector_space real add_SNo mul_SNo L addL smul ->
+    symmetric_bilinear_form real add_SNo mul_SNo L addL smul f ->
+    nondegenerate_sesquilinear_form real add_SNo mul_SNo (fun x => x)
+      L addL smul f ->
+    positive_definite_hermitian_form real add_SNo L addL f ->
+    module_endomorphism real add_SNo mul_SNo L addL smul u ->
+    self_adjoint_endomorphism real add_SNo mul_SNo L addL smul f u ->
+    exists n :e omega, exists a:set -> set,
+      orthonormal_basis_for_form real add_SNo mul_SNo L addL smul f n a
+      /\ forall i :e n,
+        endomorphism_eigenvector real add_SNo mul_SNo L addL smul u (a i).
+admit.
+claim h_s36_ref_1270948_god1_s36_theorem7_real_and_complex_orthonormal_basis_criterion :
+  (forall L, forall addL smul:set -> set -> set,
+    forall f:set -> set -> set,
+    finite_dimensional_vector_space real add_SNo mul_SNo L addL smul ->
+    symmetric_bilinear_form real add_SNo mul_SNo L addL smul f ->
+    ((exists n :e omega, exists a:set -> set,
+      orthonormal_basis_for_form real add_SNo mul_SNo L addL smul f n a)
+    <-> positive_definite_hermitian_form real add_SNo L addL f))
+  /\ (forall L, forall addL smul:set -> set -> set,
+    forall f:set -> set -> set,
+    finite_dimensional_vector_space complex add_CSNo mul_CSNo L addL smul ->
+    hermitian_form complex add_CSNo mul_CSNo conj_CSNo L addL smul f ->
+    ((exists n :e omega, exists a:set -> set,
+      orthonormal_basis_for_form complex add_CSNo mul_CSNo L addL smul f n a)
+    <-> positive_definite_hermitian_form complex add_CSNo L addL f)).
+apply god1_s36_theorem7_real_and_complex_orthonormal_basis_criterion.
+claim h_s36_ref_1270948_god1_s36_theorem9_corollary_normal_matrix_unitary_diagonalization :
+  forall n :e omega, forall A :e square_matrix_ring complex n,
+    normal_matrix complex add_CSNo mul_CSNo conj_CSNo n A ->
+    exists U D :e square_matrix_ring complex n,
+      unitary_matrix complex add_CSNo mul_CSNo conj_CSNo n U
+      /\ diagonal_matrix complex add_CSNo n D
+      /\ A = matrix_multiplication complex add_CSNo mul_CSNo n n n
+        (matrix_multiplication complex add_CSNo mul_CSNo n n n U D)
+        (matrix_inverse complex add_CSNo mul_CSNo n U)
+      /\ (unitary_matrix complex add_CSNo mul_CSNo conj_CSNo n A
+        <-> forall i :e n,
+          mul_CSNo (matrix_entry D i i) (conj_CSNo (matrix_entry D i i)) = 1)
+      /\ (hermitian_matrix complex add_CSNo conj_CSNo n A
+        <-> forall i :e n,
+          conj_CSNo (matrix_entry D i i) = matrix_entry D i i).
+apply god1_s36_theorem9_corollary_normal_matrix_unitary_diagonalization.
 Admitted.
 
 Theorem god1_s36_theorem10_corollary_real_symmetric_spectral_theorem :
@@ -57799,8 +63167,53 @@ assume hn.
 let A.
 assume hA hSymmetric.
 //GOD1PRF:1271280 COROLLARY. Let A be a real symmetric matrix. Then there exists a real orthogonal matrix U and a real diagonal matrix D such that
+claim h_s36_prf_1271280 :
+  forall n :e omega, forall A :e square_matrix_ring real n,
+    symmetric_matrix real n A ->
+    exists U D :e square_matrix_ring real n,
+      orthogonal_matrix real add_SNo mul_SNo n U
+      /\ diagonal_matrix real add_SNo n D
+      /\ A = matrix_multiplication real add_SNo mul_SNo n n n
+        (matrix_multiplication real add_SNo mul_SNo n n n U D)
+        (matrix_inverse real add_SNo mul_SNo n U).
+admit.
 //GOD1PRF:1271448 For this we consider the bilinear form
+claim h_s36_prf_1271448 :
+  forall n :e omega, forall A :e square_matrix_ring real n,
+    symmetric_matrix real n A ->
+    exists U D :e square_matrix_ring real n,
+      orthogonal_matrix real add_SNo mul_SNo n U
+      /\ diagonal_matrix real add_SNo n D
+      /\ A = matrix_multiplication real add_SNo mul_SNo n n n
+        (matrix_multiplication real add_SNo mul_SNo n n n U D)
+        (matrix_inverse real add_SNo mul_SNo n U).
+admit.
 //GOD1PRF:1271535 on $\mathbf{R}^{n}$, and the endomorphism $u$ whose matrix is A with respect to the canonical basis; $u$ is self-adjoint with respect to $f$, and we may take U to be the matrix of transition from the canonical basis of $\mathbf{R}^{n}$ to a basis consisting of eigenvectors of $u$ and orthonormal relative to $f$.
+claim h_s36_prf_1271535 :
+  forall n :e omega, forall A :e square_matrix_ring real n,
+    symmetric_matrix real n A ->
+    exists U D :e square_matrix_ring real n,
+      orthogonal_matrix real add_SNo mul_SNo n U
+      /\ diagonal_matrix real add_SNo n D
+      /\ A = matrix_multiplication real add_SNo mul_SNo n n n
+        (matrix_multiplication real add_SNo mul_SNo n n n U D)
+        (matrix_inverse real add_SNo mul_SNo n U).
+admit.
+claim h_s36_ref_1271535_god1_s36_theorem10_real_self_adjoint_spectral_theorem :
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set, forall u:set -> set,
+    finite_dimensional_vector_space real add_SNo mul_SNo L addL smul ->
+    symmetric_bilinear_form real add_SNo mul_SNo L addL smul f ->
+    nondegenerate_sesquilinear_form real add_SNo mul_SNo (fun x => x)
+      L addL smul f ->
+    positive_definite_hermitian_form real add_SNo L addL f ->
+    module_endomorphism real add_SNo mul_SNo L addL smul u ->
+    self_adjoint_endomorphism real add_SNo mul_SNo L addL smul f u ->
+    exists n :e omega, exists a:set -> set,
+      orthonormal_basis_for_form real add_SNo mul_SNo L addL smul f n a
+      /\ forall i :e n,
+        endomorphism_eigenvector real add_SNo mul_SNo L addL smul u (a i).
+apply god1_s36_theorem10_real_self_adjoint_spectral_theorem.
 Admitted.
 
 //GOD1:1273609 definite_hermitian_form : "the real or complex hermitian form #9 is definite" | $#9\text{ is definite}$
@@ -57825,21 +63238,155 @@ Theorem god1_definite_iff_no_nonzero_isotropic_vectors :
     <-> forall x :e L, f x x = 0 -> x = module_zero L addL)).
 apply andI.
 //GOD1PRF:1273609 In the real orthogonal and complex hermitian cases, a hermitian form $f$ on a vector space $L$ is said to be definite if it is either positive definite or negative definite, that is to say if, for all $x \in \mathrm{~L}, f(x, x)$ remains of the same sign and vanishes only when $x=0$.
+claim h_s36_prf_1273609 :
+  (forall L, forall addL smul:set -> set -> set,
+    forall f:set -> set -> set,
+    symmetric_bilinear_form real add_SNo mul_SNo L addL smul f ->
+    (definite_hermitian_form real add_SNo L addL f
+    <-> forall x :e L, f x x = 0 -> x = module_zero L addL))
+  /\ (forall L, forall addL smul:set -> set -> set,
+    forall f:set -> set -> set,
+    hermitian_form complex add_CSNo mul_CSNo conj_CSNo L addL smul f ->
+    (definite_hermitian_form complex add_CSNo L addL f
+    <-> forall x :e L, f x x = 0 -> x = module_zero L addL)).
+admit.
 //GOD1PRF:1273895 A definite form clearly admits no non-zero isotropic vector. In fact, this property characterizes definite forms : in other words, for fo be definite it is necessary and sufficient that the relation $f(x, x)=0$ implies $x=0$.
+claim h_s36_prf_1273895 :
+  (forall L, forall addL smul:set -> set -> set,
+    forall f:set -> set -> set,
+    symmetric_bilinear_form real add_SNo mul_SNo L addL smul f ->
+    (definite_hermitian_form real add_SNo L addL f
+    <-> forall x :e L, f x x = 0 -> x = module_zero L addL))
+  /\ (forall L, forall addL smul:set -> set -> set,
+    forall f:set -> set -> set,
+    hermitian_form complex add_CSNo mul_CSNo conj_CSNo L addL smul f ->
+    (definite_hermitian_form complex add_CSNo L addL f
+    <-> forall x :e L, f x x = 0 -> x = module_zero L addL)).
+admit.
 //GOD1PRF:1274122 Equivalently, a form which is not definite always admits non-zero isotropic vectors. For because $f$ is not definite, there exist non-zero vectors $a, b \in \mathrm{~L}$ such that
+claim h_s36_prf_1274122 :
+  (forall L, forall addL smul:set -> set -> set,
+    forall f:set -> set -> set,
+    symmetric_bilinear_form real add_SNo mul_SNo L addL smul f ->
+    (definite_hermitian_form real add_SNo L addL f
+    <-> forall x :e L, f x x = 0 -> x = module_zero L addL))
+  /\ (forall L, forall addL smul:set -> set -> set,
+    forall f:set -> set -> set,
+    hermitian_form complex add_CSNo mul_CSNo conj_CSNo L addL smul f ->
+    (definite_hermitian_form complex add_CSNo L addL f
+    <-> forall x :e L, f x x = 0 -> x = module_zero L addL)).
+admit.
 //GOD1PRF:1274357 and since there is nothing to be proved if $a$ or $b$ should be isotropic, we may as well suppose that
+claim h_s36_prf_1274357 :
+  (forall L, forall addL smul:set -> set -> set,
+    forall f:set -> set -> set,
+    symmetric_bilinear_form real add_SNo mul_SNo L addL smul f ->
+    (definite_hermitian_form real add_SNo L addL f
+    <-> forall x :e L, f x x = 0 -> x = module_zero L addL))
+  /\ (forall L, forall addL smul:set -> set -> set,
+    forall f:set -> set -> set,
+    hermitian_form complex add_CSNo mul_CSNo conj_CSNo L addL smul f ->
+    (definite_hermitian_form complex add_CSNo L addL f
+    <-> forall x :e L, f x x = 0 -> x = module_zero L addL)).
+admit.
 //GOD1PRF:1274495 We shall show that there exists a scalar $\lambda$ such that $x=\lambda a+b$ is isotropic and nonzero. The latter point is obvious, because if $\lambda a+b=0$ we have
+claim h_s36_prf_1274495 :
+  (forall L, forall addL smul:set -> set -> set,
+    forall f:set -> set -> set,
+    symmetric_bilinear_form real add_SNo mul_SNo L addL smul f ->
+    (definite_hermitian_form real add_SNo L addL f
+    <-> forall x :e L, f x x = 0 -> x = module_zero L addL))
+  /\ (forall L, forall addL smul:set -> set -> set,
+    forall f:set -> set -> set,
+    hermitian_form complex add_CSNo mul_CSNo conj_CSNo L addL smul f ->
+    (definite_hermitian_form complex add_CSNo L addL f
+    <-> forall x :e L, f x x = 0 -> x = module_zero L addL)).
+admit.
 //GOD1PRF:1274725 so that $f(b, b)$ and $f(a, a)$ have the same sign, contrary to hypothesis. Hence it remains to show that there exists a scalar $\lambda$ such that
+claim h_s36_prf_1274725 :
+  (forall L, forall addL smul:set -> set -> set,
+    forall f:set -> set -> set,
+    symmetric_bilinear_form real add_SNo mul_SNo L addL smul f ->
+    (definite_hermitian_form real add_SNo L addL f
+    <-> forall x :e L, f x x = 0 -> x = module_zero L addL))
+  /\ (forall L, forall addL smul:set -> set -> set,
+    forall f:set -> set -> set,
+    hermitian_form complex add_CSNo mul_CSNo conj_CSNo L addL smul f ->
+    (definite_hermitian_form complex add_CSNo L addL f
+    <-> forall x :e L, f x x = 0 -> x = module_zero L addL)).
+admit.
 //GOD1PRF:1275087 where we have put
+claim h_s36_prf_1275087 :
+  (forall L, forall addL smul:set -> set -> set,
+    forall f:set -> set -> set,
+    symmetric_bilinear_form real add_SNo mul_SNo L addL smul f ->
+    (definite_hermitian_form real add_SNo L addL f
+    <-> forall x :e L, f x x = 0 -> x = module_zero L addL))
+  /\ (forall L, forall addL smul:set -> set -> set,
+    forall f:set -> set -> set,
+    hermitian_form complex add_CSNo mul_CSNo conj_CSNo L addL smul f ->
+    (definite_hermitian_form complex add_CSNo L addL f
+    <-> forall x :e L, f x x = 0 -> x = module_zero L addL)).
+admit.
 //GOD1PRF:1275470 (compare with the process of "completing the square" in a quadratic equation); hence the equation in $\lambda$
+claim h_s36_prf_1275470 :
+  (forall L, forall addL smul:set -> set -> set,
+    forall f:set -> set -> set,
+    symmetric_bilinear_form real add_SNo mul_SNo L addL smul f ->
+    (definite_hermitian_form real add_SNo L addL f
+    <-> forall x :e L, f x x = 0 -> x = module_zero L addL))
+  /\ (forall L, forall addL smul:set -> set -> set,
+    forall f:set -> set -> set,
+    hermitian_form complex add_CSNo mul_CSNo conj_CSNo L addL smul f ->
+    (definite_hermitian_form complex add_CSNo L addL f
+    <-> forall x :e L, f x x = 0 -> x = module_zero L addL)).
+admit.
 //GOD1PRF:1275649 has a solution in the ground-field $\mathbf{K}$ (which is $\mathbf{R}$ in the real orthogonal case, $\mathbf{C}$ in the complex hermitian case) if and only if
+claim h_s36_prf_1275649 :
+  (forall L, forall addL smul:set -> set -> set,
+    forall f:set -> set -> set,
+    symmetric_bilinear_form real add_SNo mul_SNo L addL smul f ->
+    (definite_hermitian_form real add_SNo L addL f
+    <-> forall x :e L, f x x = 0 -> x = module_zero L addL))
+  /\ (forall L, forall addL smul:set -> set -> set,
+    forall f:set -> set -> set,
+    hermitian_form complex add_CSNo mul_CSNo conj_CSNo L addL smul f ->
+    (definite_hermitian_form complex add_CSNo L addL f
+    <-> forall x :e L, f x x = 0 -> x = module_zero L addL)).
+admit.
 //GOD1PRF:1275842 Since $u=f(a, a)>0$ and $w=f(b, b)<0$, this condition is satisfied, and the proof of the assertion is complete.
+claim h_s36_prf_1275842 :
+  (forall L, forall addL smul:set -> set -> set,
+    forall f:set -> set -> set,
+    symmetric_bilinear_form real add_SNo mul_SNo L addL smul f ->
+    (definite_hermitian_form real add_SNo L addL f
+    <-> forall x :e L, f x x = 0 -> x = module_zero L addL))
+  /\ (forall L, forall addL smul:set -> set -> set,
+    forall f:set -> set -> set,
+    hermitian_form complex add_CSNo mul_CSNo conj_CSNo L addL smul f ->
+    (definite_hermitian_form complex add_CSNo L addL f
+    <-> forall x :e L, f x x = 0 -> x = module_zero L addL)).
+admit.
 Admitted.
 
 //GOD1:1276396 hermitian_form_norm : "the seminorm induced by the positive hermitian form #9" | $\|#10\|=\sqrt{#9(#10,#10)}$
 Definition hermitian_form_norm :
   set -> (set -> set -> set) -> set -> set :=
   fun L f x => sqrt_SNo_nonneg (CSNo_Re (f x x)).
+
+(** Formal completion-of-the-square consequence recalled from §36.9. **)
+Theorem god1_s36_section9_completion_square_inequality_interface :
+  forall u v w :e real,
+    SNoLt 0 u ->
+    SNoLe 0 (add_SNo (mul_SNo u w) (minus_SNo (mul_SNo v v))) ->
+    SNoLe (mul_SNo v v) (mul_SNo u w).
+let u.
+assume hu.
+let v.
+assume hv.
+let w.
+assume hw hPositive hDifference.
+Admitted.
 
 Theorem god1_s36_theorem11_cauchy_schwarz :
   (forall L, forall addL smul:set -> set -> set,
@@ -57861,15 +63408,211 @@ Theorem god1_s36_theorem11_cauchy_schwarz :
         /\ SNoLe lhs rhs).
 apply andI.
 //GOD1PRF:1276353 We shall end this chapter with a result which is extremely useful in Analysis, in spite of its simplicity:\\
+claim h_s36_prf_1276353 :
+  (forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set,
+    symmetric_bilinear_form real add_SNo mul_SNo L addL smul f ->
+    positive_semidefinite_hermitian_form real L addL f ->
+    forall x y :e L,
+      SNoLe
+        (mul_SNo (f x y) (f x y))
+        (mul_SNo (f x x) (f y y)))
+  /\ (forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set,
+    hermitian_form complex add_CSNo mul_CSNo conj_CSNo L addL smul f ->
+    positive_semidefinite_hermitian_form complex L addL f ->
+    forall x y :e L,
+      exists lhs rhs :e real,
+        lhs = mul_CSNo (f x y) (conj_CSNo (f x y))
+        /\ rhs = mul_CSNo (f x x) (f y y)
+        /\ SNoLe lhs rhs).
+admit.
 //GOD1PRF:1276462 theorem 11 (Cauchy-Schwarz). Let L be a real (resp. complex) vector space and let $f$ be a symmetric bilinear (resp. hermitian sesquilinear) form on L. Suppose that
+claim h_s36_prf_1276462 :
+  (forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set,
+    symmetric_bilinear_form real add_SNo mul_SNo L addL smul f ->
+    positive_semidefinite_hermitian_form real L addL f ->
+    forall x y :e L,
+      SNoLe
+        (mul_SNo (f x y) (f x y))
+        (mul_SNo (f x x) (f y y)))
+  /\ (forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set,
+    hermitian_form complex add_CSNo mul_CSNo conj_CSNo L addL smul f ->
+    positive_semidefinite_hermitian_form complex L addL f ->
+    forall x y :e L,
+      exists lhs rhs :e real,
+        lhs = mul_CSNo (f x y) (conj_CSNo (f x y))
+        /\ rhs = mul_CSNo (f x x) (f y y)
+        /\ SNoLe lhs rhs).
+admit.
 //GOD1PRF:1276699 Then
+claim h_s36_prf_1276699 :
+  (forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set,
+    symmetric_bilinear_form real add_SNo mul_SNo L addL smul f ->
+    positive_semidefinite_hermitian_form real L addL f ->
+    forall x y :e L,
+      SNoLe
+        (mul_SNo (f x y) (f x y))
+        (mul_SNo (f x x) (f y y)))
+  /\ (forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set,
+    hermitian_form complex add_CSNo mul_CSNo conj_CSNo L addL smul f ->
+    positive_semidefinite_hermitian_form complex L addL f ->
+    forall x y :e L,
+      exists lhs rhs :e real,
+        lhs = mul_CSNo (f x y) (conj_CSNo (f x y))
+        /\ rhs = mul_CSNo (f x x) (f y y)
+        /\ SNoLe lhs rhs).
+admit.
 //GOD1PRF:1276752 for all $x, y \in \mathrm{~L}$.\\
+claim h_s36_prf_1276752 :
+  (forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set,
+    symmetric_bilinear_form real add_SNo mul_SNo L addL smul f ->
+    positive_semidefinite_hermitian_form real L addL f ->
+    forall x y :e L,
+      SNoLe
+        (mul_SNo (f x y) (f x y))
+        (mul_SNo (f x x) (f y y)))
+  /\ (forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set,
+    hermitian_form complex add_CSNo mul_CSNo conj_CSNo L addL smul f ->
+    positive_semidefinite_hermitian_form complex L addL f ->
+    forall x y :e L,
+      exists lhs rhs :e real,
+        lhs = mul_CSNo (f x y) (conj_CSNo (f x y))
+        /\ rhs = mul_CSNo (f x x) (f y y)
+        /\ SNoLe lhs rhs).
+admit.
 //GOD1PRF:1276786 If $\lambda$ is any scalar, the expression
+claim h_s36_prf_1276786 :
+  (forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set,
+    symmetric_bilinear_form real add_SNo mul_SNo L addL smul f ->
+    positive_semidefinite_hermitian_form real L addL f ->
+    forall x y :e L,
+      SNoLe
+        (mul_SNo (f x y) (f x y))
+        (mul_SNo (f x x) (f y y)))
+  /\ (forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set,
+    hermitian_form complex add_CSNo mul_CSNo conj_CSNo L addL smul f ->
+    positive_semidefinite_hermitian_form complex L addL f ->
+    forall x y :e L,
+      exists lhs rhs :e real,
+        lhs = mul_CSNo (f x y) (conj_CSNo (f x y))
+        /\ rhs = mul_CSNo (f x x) (f y y)
+        /\ SNoLe lhs rhs).
+admit.
 //GOD1PRF:1277021 is positive or zero ; from this and the fact that $u$ and $w$ are $\geqslant 0$ we have to deduce that
+claim h_s36_prf_1277021 :
+  (forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set,
+    symmetric_bilinear_form real add_SNo mul_SNo L addL smul f ->
+    positive_semidefinite_hermitian_form real L addL f ->
+    forall x y :e L,
+      SNoLe
+        (mul_SNo (f x y) (f x y))
+        (mul_SNo (f x x) (f y y)))
+  /\ (forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set,
+    hermitian_form complex add_CSNo mul_CSNo conj_CSNo L addL smul f ->
+    positive_semidefinite_hermitian_form complex L addL f ->
+    forall x y :e L,
+      exists lhs rhs :e real,
+        lhs = mul_CSNo (f x y) (conj_CSNo (f x y))
+        /\ rhs = mul_CSNo (f x x) (f y y)
+        /\ SNoLe lhs rhs).
+admit.
 //GOD1PRF:1277158 If $u=0$, it is clear that the expression (21) cannot remain $\geqslant 0$ for all values of $\lambda$ unless $v=0$ (for if $v \neq 0$ we can choose $\lambda$ so that $v \lambda$ takes any preassigned value), so that the inequality to be proved is obvious in this case. If $u \neq 0$, let us express that (21) is $\geqslant 0$ when
+claim h_s36_prf_1277158 :
+  (forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set,
+    symmetric_bilinear_form real add_SNo mul_SNo L addL smul f ->
+    positive_semidefinite_hermitian_form real L addL f ->
+    forall x y :e L,
+      SNoLe
+        (mul_SNo (f x y) (f x y))
+        (mul_SNo (f x x) (f y y)))
+  /\ (forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set,
+    hermitian_form complex add_CSNo mul_CSNo conj_CSNo L addL smul f ->
+    positive_semidefinite_hermitian_form complex L addL f ->
+    forall x y :e L,
+      exists lhs rhs :e real,
+        lhs = mul_CSNo (f x y) (conj_CSNo (f x y))
+        /\ rhs = mul_CSNo (f x x) (f y y)
+        /\ SNoLe lhs rhs).
+admit.
 //GOD1PRF:1277521 for this choice of $\lambda$, the value of (21) is
+claim h_s36_prf_1277521 :
+  (forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set,
+    symmetric_bilinear_form real add_SNo mul_SNo L addL smul f ->
+    positive_semidefinite_hermitian_form real L addL f ->
+    forall x y :e L,
+      SNoLe
+        (mul_SNo (f x y) (f x y))
+        (mul_SNo (f x x) (f y y)))
+  /\ (forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set,
+    hermitian_form complex add_CSNo mul_CSNo conj_CSNo L addL smul f ->
+    positive_semidefinite_hermitian_form complex L addL f ->
+    forall x y :e L,
+      exists lhs rhs :e real,
+        lhs = mul_CSNo (f x y) (conj_CSNo (f x y))
+        /\ rhs = mul_CSNo (f x x) (f y y)
+        /\ SNoLe lhs rhs).
+admit.
 //GOD1PRF:1277603 (cf. the calculation in section 9); since $u>0$, we have therefore
+claim h_s36_prf_1277603 :
+  (forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set,
+    symmetric_bilinear_form real add_SNo mul_SNo L addL smul f ->
+    positive_semidefinite_hermitian_form real L addL f ->
+    forall x y :e L,
+      SNoLe
+        (mul_SNo (f x y) (f x y))
+        (mul_SNo (f x x) (f y y)))
+  /\ (forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set,
+    hermitian_form complex add_CSNo mul_CSNo conj_CSNo L addL smul f ->
+    positive_semidefinite_hermitian_form complex L addL f ->
+    forall x y :e L,
+      exists lhs rhs :e real,
+        lhs = mul_CSNo (f x y) (conj_CSNo (f x y))
+        /\ rhs = mul_CSNo (f x x) (f y y)
+        /\ SNoLe lhs rhs).
+admit.
+claim h_s36_ref_1277603_god1_s36_section9_completion_square_inequality_interface :
+  forall u v w :e real,
+    SNoLt 0 u ->
+    SNoLe 0 (add_SNo (mul_SNo u w) (minus_SNo (mul_SNo v v))) ->
+    SNoLe (mul_SNo v v) (mul_SNo u w).
+apply god1_s36_section9_completion_square_inequality_interface.
 //GOD1PRF:1277702 as required.\\
+claim h_s36_prf_1277702 :
+  (forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set,
+    symmetric_bilinear_form real add_SNo mul_SNo L addL smul f ->
+    positive_semidefinite_hermitian_form real L addL f ->
+    forall x y :e L,
+      SNoLe
+        (mul_SNo (f x y) (f x y))
+        (mul_SNo (f x x) (f y y)))
+  /\ (forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set,
+    hermitian_form complex add_CSNo mul_CSNo conj_CSNo L addL smul f ->
+    positive_semidefinite_hermitian_form complex L addL f ->
+    forall x y :e L,
+      exists lhs rhs :e real,
+        lhs = mul_CSNo (f x y) (conj_CSNo (f x y))
+        /\ rhs = mul_CSNo (f x x) (f y y)
+        /\ SNoLe lhs rhs).
+admit.
 Admitted.
 
 Theorem god1_s36_theorem11_corollary1_positive_nondegenerate_iff_definite :
@@ -57889,7 +63632,58 @@ Theorem god1_s36_theorem11_corollary1_positive_nondegenerate_iff_definite :
     <-> positive_definite_hermitian_form complex add_CSNo L addL f)).
 apply andI.
 //GOD1PRF:1277717 corollary 1. Suppose that $f(x, x) \geqslant 0$ for all $x$. Then $f$ is non-degenerate if and only if $f$ is positive definite.
+claim h_s36_prf_1277717 :
+  (forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set,
+    symmetric_bilinear_form real add_SNo mul_SNo L addL smul f ->
+    positive_semidefinite_hermitian_form real L addL f ->
+    (nondegenerate_sesquilinear_form
+      real add_SNo mul_SNo (fun x => x) L addL smul f
+    <-> positive_definite_hermitian_form real add_SNo L addL f))
+  /\ (forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set,
+    hermitian_form complex add_CSNo mul_CSNo conj_CSNo L addL smul f ->
+    positive_semidefinite_hermitian_form complex L addL f ->
+    (nondegenerate_sesquilinear_form
+      complex add_CSNo mul_CSNo conj_CSNo L addL smul f
+    <-> positive_definite_hermitian_form complex add_CSNo L addL f)).
+admit.
 //GOD1PRF:1277847 For Theorem 11 shows that the relation $f(x, x)=0$ implies that $f(x, y)=0$ for all $y \in \mathrm{~L}$, and hence that $x=0$ if $f$ is non-degenerate.
+claim h_s36_prf_1277847 :
+  (forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set,
+    symmetric_bilinear_form real add_SNo mul_SNo L addL smul f ->
+    positive_semidefinite_hermitian_form real L addL f ->
+    (nondegenerate_sesquilinear_form
+      real add_SNo mul_SNo (fun x => x) L addL smul f
+    <-> positive_definite_hermitian_form real add_SNo L addL f))
+  /\ (forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set,
+    hermitian_form complex add_CSNo mul_CSNo conj_CSNo L addL smul f ->
+    positive_semidefinite_hermitian_form complex L addL f ->
+    (nondegenerate_sesquilinear_form
+      complex add_CSNo mul_CSNo conj_CSNo L addL smul f
+    <-> positive_definite_hermitian_form complex add_CSNo L addL f)).
+admit.
+claim h_s36_ref_1277847_god1_s36_theorem11_cauchy_schwarz :
+  (forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set,
+    symmetric_bilinear_form real add_SNo mul_SNo L addL smul f ->
+    positive_semidefinite_hermitian_form real L addL f ->
+    forall x y :e L,
+      SNoLe
+        (mul_SNo (f x y) (f x y))
+        (mul_SNo (f x x) (f y y)))
+  /\ (forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set,
+    hermitian_form complex add_CSNo mul_CSNo conj_CSNo L addL smul f ->
+    positive_semidefinite_hermitian_form complex L addL f ->
+    forall x y :e L,
+      exists lhs rhs :e real,
+        lhs = mul_CSNo (f x y) (conj_CSNo (f x y))
+        /\ rhs = mul_CSNo (f x x) (f y y)
+        /\ SNoLe lhs rhs).
+apply god1_s36_theorem11_cauchy_schwarz.
 Admitted.
 
 Theorem god1_s36_theorem11_corollary2_triangle_inequality :
@@ -57909,12 +63703,143 @@ Theorem god1_s36_theorem11_corollary2_triangle_inequality :
         (add_SNo (hermitian_form_norm L f x) (hermitian_form_norm L f y))).
 apply andI.
 //GOD1PRF:1279175 corollary 2. Suppose that $f(x, x) \geqslant 0$ for all $x \in \mathrm{~L}$, and put
+claim h_s36_prf_1279175 :
+  (forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set,
+    symmetric_bilinear_form real add_SNo mul_SNo L addL smul f ->
+    positive_semidefinite_hermitian_form real L addL f ->
+    forall x y :e L,
+      SNoLe (hermitian_form_norm L f (addL x y))
+        (add_SNo (hermitian_form_norm L f x) (hermitian_form_norm L f y)))
+  /\ (forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set,
+    hermitian_form complex add_CSNo mul_CSNo conj_CSNo L addL smul f ->
+    positive_semidefinite_hermitian_form complex L addL f ->
+    forall x y :e L,
+      SNoLe (hermitian_form_norm L f (addL x y))
+        (add_SNo (hermitian_form_norm L f x) (hermitian_form_norm L f y))).
+admit.
 //GOD1PRF:1279291 Then
+claim h_s36_prf_1279291 :
+  (forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set,
+    symmetric_bilinear_form real add_SNo mul_SNo L addL smul f ->
+    positive_semidefinite_hermitian_form real L addL f ->
+    forall x y :e L,
+      SNoLe (hermitian_form_norm L f (addL x y))
+        (add_SNo (hermitian_form_norm L f x) (hermitian_form_norm L f y)))
+  /\ (forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set,
+    hermitian_form complex add_CSNo mul_CSNo conj_CSNo L addL smul f ->
+    positive_semidefinite_hermitian_form complex L addL f ->
+    forall x y :e L,
+      SNoLe (hermitian_form_norm L f (addL x y))
+        (add_SNo (hermitian_form_norm L f x) (hermitian_form_norm L f y))).
+admit.
 //GOD1PRF:1279333 for all $x, y \in \mathrm{~L}$.
+claim h_s36_prf_1279333 :
+  (forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set,
+    symmetric_bilinear_form real add_SNo mul_SNo L addL smul f ->
+    positive_semidefinite_hermitian_form real L addL f ->
+    forall x y :e L,
+      SNoLe (hermitian_form_norm L f (addL x y))
+        (add_SNo (hermitian_form_norm L f x) (hermitian_form_norm L f y)))
+  /\ (forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set,
+    hermitian_form complex add_CSNo mul_CSNo conj_CSNo L addL smul f ->
+    positive_semidefinite_hermitian_form complex L addL f ->
+    forall x y :e L,
+      SNoLe (hermitian_form_norm L f (addL x y))
+        (add_SNo (hermitian_form_norm L f x) (hermitian_form_norm L f y))).
+admit.
 //GOD1PRF:1279366 For we have
+claim h_s36_prf_1279366 :
+  (forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set,
+    symmetric_bilinear_form real add_SNo mul_SNo L addL smul f ->
+    positive_semidefinite_hermitian_form real L addL f ->
+    forall x y :e L,
+      SNoLe (hermitian_form_norm L f (addL x y))
+        (add_SNo (hermitian_form_norm L f x) (hermitian_form_norm L f y)))
+  /\ (forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set,
+    hermitian_form complex add_CSNo mul_CSNo conj_CSNo L addL smul f ->
+    positive_semidefinite_hermitian_form complex L addL f ->
+    forall x y :e L,
+      SNoLe (hermitian_form_norm L f (addL x y))
+        (add_SNo (hermitian_form_norm L f x) (hermitian_form_norm L f y))).
+admit.
 //GOD1PRF:1279543 since the Cauchy-Schwarz inequality may be written in the form
+claim h_s36_prf_1279543 :
+  (forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set,
+    symmetric_bilinear_form real add_SNo mul_SNo L addL smul f ->
+    positive_semidefinite_hermitian_form real L addL f ->
+    forall x y :e L,
+      SNoLe (hermitian_form_norm L f (addL x y))
+        (add_SNo (hermitian_form_norm L f x) (hermitian_form_norm L f y)))
+  /\ (forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set,
+    hermitian_form complex add_CSNo mul_CSNo conj_CSNo L addL smul f ->
+    positive_semidefinite_hermitian_form complex L addL f ->
+    forall x y :e L,
+      SNoLe (hermitian_form_norm L f (addL x y))
+        (add_SNo (hermitian_form_norm L f x) (hermitian_form_norm L f y))).
+admit.
+claim h_s36_ref_1279543_god1_s36_theorem11_cauchy_schwarz :
+  (forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set,
+    symmetric_bilinear_form real add_SNo mul_SNo L addL smul f ->
+    positive_semidefinite_hermitian_form real L addL f ->
+    forall x y :e L,
+      SNoLe
+        (mul_SNo (f x y) (f x y))
+        (mul_SNo (f x x) (f y y)))
+  /\ (forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set,
+    hermitian_form complex add_CSNo mul_CSNo conj_CSNo L addL smul f ->
+    positive_semidefinite_hermitian_form complex L addL f ->
+    forall x y :e L,
+      exists lhs rhs :e real,
+        lhs = mul_CSNo (f x y) (conj_CSNo (f x y))
+        /\ rhs = mul_CSNo (f x x) (f y y)
+        /\ SNoLe lhs rhs).
+apply god1_s36_theorem11_cauchy_schwarz.
 //GOD1PRF:1279651 it follows a fortiori that
+claim h_s36_prf_1279651 :
+  (forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set,
+    symmetric_bilinear_form real add_SNo mul_SNo L addL smul f ->
+    positive_semidefinite_hermitian_form real L addL f ->
+    forall x y :e L,
+      SNoLe (hermitian_form_norm L f (addL x y))
+        (add_SNo (hermitian_form_norm L f x) (hermitian_form_norm L f y)))
+  /\ (forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set,
+    hermitian_form complex add_CSNo mul_CSNo conj_CSNo L addL smul f ->
+    positive_semidefinite_hermitian_form complex L addL f ->
+    forall x y :e L,
+      SNoLe (hermitian_form_norm L f (addL x y))
+        (add_SNo (hermitian_form_norm L f x) (hermitian_form_norm L f y))).
+admit.
 //GOD1PRF:1279740 and therefore
+claim h_s36_prf_1279740 :
+  (forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set,
+    symmetric_bilinear_form real add_SNo mul_SNo L addL smul f ->
+    positive_semidefinite_hermitian_form real L addL f ->
+    forall x y :e L,
+      SNoLe (hermitian_form_norm L f (addL x y))
+        (add_SNo (hermitian_form_norm L f x) (hermitian_form_norm L f y)))
+  /\ (forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set,
+    hermitian_form complex add_CSNo mul_CSNo conj_CSNo L addL smul f ->
+    positive_semidefinite_hermitian_form complex L addL f ->
+    forall x y :e L,
+      SNoLe (hermitian_form_norm L f (addL x y))
+        (add_SNo (hermitian_form_norm L f x) (hermitian_form_norm L f y))).
+admit.
 Admitted.
 
 Theorem god1_s36_theorem11_corollary3_triangle_side_inequalities :
@@ -57935,7 +63860,41 @@ let z.
 assume hz.
 apply andI.
 //GOD1PRF:1279879 In the case of the ordinary scalar product $(x \mid y)$, it is clear that $\|x\|$ is just the length of the vector $x$. Hence in this case Corollary 2 gives the following result:\\
+claim h_s36_prf_1279879 :
+  forall n :e omega, forall x y z :e Rn n,
+    SNoLe (Rn_dist n x y)
+      (add_SNo (Rn_dist n x z) (Rn_dist n z y))
+    /\ SNoLe (Rn_dist n y z)
+      (add_SNo (Rn_dist n y x) (Rn_dist n x z))
+    /\ SNoLe (Rn_dist n z x)
+      (add_SNo (Rn_dist n z y) (Rn_dist n y x)).
+admit.
+claim h_s36_ref_1279879_god1_s36_theorem11_corollary2_triangle_inequality :
+  (forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set,
+    symmetric_bilinear_form real add_SNo mul_SNo L addL smul f ->
+    positive_semidefinite_hermitian_form real L addL f ->
+    forall x y :e L,
+      SNoLe (hermitian_form_norm L f (addL x y))
+        (add_SNo (hermitian_form_norm L f x) (hermitian_form_norm L f y)))
+  /\ (forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set,
+    hermitian_form complex add_CSNo mul_CSNo conj_CSNo L addL smul f ->
+    positive_semidefinite_hermitian_form complex L addL f ->
+    forall x y :e L,
+      SNoLe (hermitian_form_norm L f (addL x y))
+        (add_SNo (hermitian_form_norm L f x) (hermitian_form_norm L f y))).
+apply god1_s36_theorem11_corollary2_triangle_inequality.
 //GOD1PRF:1280060 corollary 3. In a triangle, the length of each side is less than or equal to the sum of the lengths of the other two sides.\\
+claim h_s36_prf_1280060 :
+  forall n :e omega, forall x y z :e Rn n,
+    SNoLe (Rn_dist n x y)
+      (add_SNo (Rn_dist n x z) (Rn_dist n z y))
+    /\ SNoLe (Rn_dist n y z)
+      (add_SNo (Rn_dist n y x) (Rn_dist n x z))
+    /\ SNoLe (Rn_dist n z x)
+      (add_SNo (Rn_dist n z y) (Rn_dist n y x)).
+admit.
 Admitted.
 
 
