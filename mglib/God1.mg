@@ -74078,6 +74078,402 @@ exact (andI
   h_s9_conjugate_sum_product h_s9_norm_multiplicative_conclusion).
 Qed.
 
+Theorem god1_quadratic_norm_of_embedding :
+  forall K, forall add mul:set -> set -> set, forall d :e K,
+    ring K add mul -> forall x :e K,
+      quadratic_norm K add mul d (quadratic_extension_embedding K add x)
+      = mul x x.
+let K add mul d.
+assume hd hK.
+let x.
+assume hx.
+claim hG : group K add.
+exact (god1_ring_additive_group K add mul hK).
+claim hzero : ring_zero K add :e K.
+exact (god1_group_identity_in K add hG).
+claim hxx : mul x x :e K.
+exact (god1_ring_multiplicative_law K add mul hK x hx x hx).
+claim hzz : mul (ring_zero K add) (ring_zero K add) = ring_zero K add.
+exact (god1_ring_zero_multiplication_left K add mul hK
+  (ring_zero K add) hzero).
+claim hdzz :
+  mul d (mul (ring_zero K add) (ring_zero K add)) = ring_zero K add.
+exact (eq_i_tra
+  (mul d (mul (ring_zero K add) (ring_zero K add)))
+  (mul d (ring_zero K add)) (ring_zero K add)
+  (f_eq_i (fun q => mul d q)
+    (mul (ring_zero K add) (ring_zero K add)) (ring_zero K add) hzz)
+  (god1_ring_zero_multiplication_right K add mul hK d hd)).
+claim hnegzero :
+  ring_negation K add (ring_zero K add) = ring_zero K add.
+exact (god1_group_inverse_identity K add hG).
+claim hraw :
+  add (mul x x)
+    (ring_negation K add
+      (mul d (mul (ring_zero K add) (ring_zero K add))))
+  = mul x x.
+exact (eq_i_tra
+  (add (mul x x)
+    (ring_negation K add
+      (mul d (mul (ring_zero K add) (ring_zero K add)))))
+  (add (mul x x) (ring_zero K add)) (mul x x)
+  (f_eq_i (fun q => add (mul x x) q)
+    (ring_negation K add
+      (mul d (mul (ring_zero K add) (ring_zero K add))))
+    (ring_zero K add)
+    (eq_i_tra
+      (ring_negation K add
+        (mul d (mul (ring_zero K add) (ring_zero K add))))
+      (ring_negation K add (ring_zero K add)) (ring_zero K add)
+      (f_eq_i (fun q => ring_negation K add q)
+        (mul d (mul (ring_zero K add) (ring_zero K add)))
+        (ring_zero K add) hdzz) hnegzero))
+  (andEL
+    (add (mul x x) (ring_zero K add) = mul x x)
+    (add (ring_zero K add) (mul x x) = mul x x)
+    ((andER
+      (ring_zero K add :e K)
+      (forall q :e K,
+        add q (ring_zero K add) = q
+        /\ add (ring_zero K add) q = q)
+      (god1_group_identity_specification K add hG))
+      (mul x x) hxx))).
+exact (eq_i_tra
+  (quadratic_norm K add mul d (quadratic_extension_embedding K add x))
+  (add (mul x x)
+    (ring_negation K add
+      (mul d (mul (ring_zero K add) (ring_zero K add)))))
+  (mul x x)
+  (god1_binary_operation_congruence add
+    (mul ((quadratic_extension_embedding K add x) 0)
+      ((quadratic_extension_embedding K add x) 0))
+    (mul x x)
+    (ring_negation K add
+      (mul d (mul ((quadratic_extension_embedding K add x) 1)
+        ((quadratic_extension_embedding K add x) 1))))
+    (ring_negation K add
+      (mul d (mul (ring_zero K add) (ring_zero K add))))
+    (god1_binary_operation_congruence mul
+      ((quadratic_extension_embedding K add x) 0) x
+      ((quadratic_extension_embedding K add x) 0) x
+      (tuple_2_0_eq x (ring_zero K add))
+      (tuple_2_0_eq x (ring_zero K add)))
+    (f_eq_i (fun q => ring_negation K add (mul d q))
+      (mul ((quadratic_extension_embedding K add x) 1)
+        ((quadratic_extension_embedding K add x) 1))
+      (mul (ring_zero K add) (ring_zero K add))
+      (god1_binary_operation_congruence mul
+        ((quadratic_extension_embedding K add x) 1) (ring_zero K add)
+        ((quadratic_extension_embedding K add x) 1) (ring_zero K add)
+        (tuple_2_1_eq x (ring_zero K add))
+        (tuple_2_1_eq x (ring_zero K add)))))
+  hraw).
+Qed.
+
+Theorem god1_quadratic_norm_one :
+  forall K, forall add mul:set -> set -> set, forall d :e K,
+    commutative_ring K add mul ->
+      quadratic_norm K add mul d
+        (ring_one (quadratic_extension K)
+          (quadratic_extension_multiplication K add mul d))
+      = ring_one K mul.
+let K add mul d.
+assume hd hK.
+claim hring : ring K add mul.
+exact (andEL (ring K add mul) (commutative_on K mul) hK).
+claim hone : ring_one K mul :e K.
+exact (andEL
+  (ring_one K mul :e K)
+  (forall q :e K,
+    mul q (ring_one K mul) = q
+    /\ mul (ring_one K mul) q = q)
+  (god1_ring_multiplicative_identity_specification K add mul hring)).
+exact (eq_i_tra
+  (quadratic_norm K add mul d
+    (ring_one (quadratic_extension K)
+      (quadratic_extension_multiplication K add mul d)))
+  (quadratic_norm K add mul d
+    (quadratic_extension_embedding K add (ring_one K mul)))
+  (ring_one K mul)
+  (f_eq_i (quadratic_norm K add mul d)
+    (ring_one (quadratic_extension K)
+      (quadratic_extension_multiplication K add mul d))
+    (quadratic_extension_embedding K add (ring_one K mul))
+    (eq_sym
+      (quadratic_extension_embedding K add (ring_one K mul))
+      (ring_one (quadratic_extension K)
+        (quadratic_extension_multiplication K add mul d))
+      (god1_quadratic_extension_ring_one K add mul d hd hK)))
+  (eq_i_tra
+    (quadratic_norm K add mul d
+      (quadratic_extension_embedding K add (ring_one K mul)))
+    (mul (ring_one K mul) (ring_one K mul)) (ring_one K mul)
+    (god1_quadratic_norm_of_embedding K add mul d hd hring
+      (ring_one K mul) hone)
+    (andEL
+      (mul (ring_one K mul) (ring_one K mul) = ring_one K mul)
+      (mul (ring_one K mul) (ring_one K mul) = ring_one K mul)
+      ((andER
+        (ring_one K mul :e K)
+        (forall q :e K,
+          mul q (ring_one K mul) = q
+          /\ mul (ring_one K mul) q = q)
+        (god1_ring_multiplicative_identity_specification K add mul hring))
+        (ring_one K mul) hone)))).
+Qed.
+
+Theorem god1_quadratic_norm_unit_candidate_reflection :
+  forall K, forall add mul:set -> set -> set, forall d :e K,
+    commutative_ring K add mul -> forall z :e quadratic_extension K,
+    ring_unit K add mul (quadratic_norm K add mul d z) ->
+    reflection
+      (quadratic_extension K)
+      (quadratic_extension_multiplication K add mul d)
+      (ring_one (quadratic_extension K)
+        (quadratic_extension_multiplication K add mul d)) z
+      (quadratic_extension_multiplication K add mul d
+        (quadratic_extension_embedding K add
+          (ring_inverse K add mul (quadratic_norm K add mul d z)))
+        (quadratic_conjugate K add z)).
+let K add mul d.
+assume hd hK.
+let z.
+assume hz hunit.
+claim hring : ring K add mul.
+exact (andEL (ring K add mul) (commutative_on K mul) hK).
+claim hEcomm : commutative_ring
+  (quadratic_extension K)
+  (quadratic_extension_addition K add)
+  (quadratic_extension_multiplication K add mul d).
+exact (god1_quadratic_extension_is_commutative_ring K add mul d hd hK).
+claim hE : ring
+  (quadratic_extension K)
+  (quadratic_extension_addition K add)
+  (quadratic_extension_multiplication K add mul d).
+exact (andEL
+  (ring (quadratic_extension K)
+    (quadratic_extension_addition K add)
+    (quadratic_extension_multiplication K add mul d))
+  (commutative_on (quadratic_extension K)
+    (quadratic_extension_multiplication K add mul d)) hEcomm).
+claim hEM : law_of_composition (quadratic_extension K)
+  (quadratic_extension_multiplication K add mul d).
+exact (god1_ring_multiplicative_law
+  (quadratic_extension K)
+  (quadratic_extension_addition K add)
+  (quadratic_extension_multiplication K add mul d) hE).
+claim hEcommul : commutative_on (quadratic_extension K)
+  (quadratic_extension_multiplication K add mul d).
+exact (andER
+  (ring (quadratic_extension K)
+    (quadratic_extension_addition K add)
+    (quadratic_extension_multiplication K add mul d))
+  (commutative_on (quadratic_extension K)
+    (quadratic_extension_multiplication K add mul d)) hEcomm).
+claim hN : quadratic_norm K add mul d z :e K.
+exact (god1_quadratic_norm_member K add mul d hd hring z hz).
+claim hinv : ring_inverse K add mul (quadratic_norm K add mul d z) :e K.
+exact (andEL
+  (ring_inverse K add mul (quadratic_norm K add mul d z) :e K)
+  (mul (ring_inverse K add mul (quadratic_norm K add mul d z))
+    (quadratic_norm K add mul d z) = ring_one K mul)
+  (andEL
+    (ring_inverse K add mul (quadratic_norm K add mul d z) :e K
+      /\ mul (ring_inverse K add mul (quadratic_norm K add mul d z))
+        (quadratic_norm K add mul d z) = ring_one K mul)
+    (mul (quadratic_norm K add mul d z)
+      (ring_inverse K add mul (quadratic_norm K add mul d z))
+      = ring_one K mul)
+    (god1_ring_inverse_specification K add mul
+      (quadratic_norm K add mul d z) hunit))).
+claim hinvN :
+  mul (ring_inverse K add mul (quadratic_norm K add mul d z))
+    (quadratic_norm K add mul d z) = ring_one K mul.
+exact (andER
+  (ring_inverse K add mul (quadratic_norm K add mul d z) :e K)
+  (mul (ring_inverse K add mul (quadratic_norm K add mul d z))
+    (quadratic_norm K add mul d z) = ring_one K mul)
+  (andEL
+    (ring_inverse K add mul (quadratic_norm K add mul d z) :e K
+      /\ mul (ring_inverse K add mul (quadratic_norm K add mul d z))
+        (quadratic_norm K add mul d z) = ring_one K mul)
+    (mul (quadratic_norm K add mul d z)
+      (ring_inverse K add mul (quadratic_norm K add mul d z))
+      = ring_one K mul)
+    (god1_ring_inverse_specification K add mul
+      (quadratic_norm K add mul d z) hunit))).
+claim hconj : quadratic_conjugate K add z :e quadratic_extension K.
+exact (god1_quadratic_conjugate_member K add mul hring z hz).
+claim hembInv : quadratic_extension_embedding K add
+  (ring_inverse K add mul (quadratic_norm K add mul d z))
+  :e quadratic_extension K.
+exact (god1_quadratic_extension_embedding_member K add mul hring
+  (ring_inverse K add mul (quadratic_norm K add mul d z)) hinv).
+claim hembN : quadratic_extension_embedding K add
+  (quadratic_norm K add mul d z) :e quadratic_extension K.
+exact (god1_quadratic_extension_embedding_member K add mul hring
+  (quadratic_norm K add mul d z) hN).
+claim hcandidate :
+  quadratic_extension_multiplication K add mul d
+    (quadratic_extension_embedding K add
+      (ring_inverse K add mul (quadratic_norm K add mul d z)))
+    (quadratic_conjugate K add z) :e quadratic_extension K.
+exact (hEM
+  (quadratic_extension_embedding K add
+    (ring_inverse K add mul (quadratic_norm K add mul d z))) hembInv
+  (quadratic_conjugate K add z) hconj).
+claim hcandidateLeft :
+  quadratic_extension_multiplication K add mul d
+    (quadratic_extension_multiplication K add mul d
+      (quadratic_extension_embedding K add
+        (ring_inverse K add mul (quadratic_norm K add mul d z)))
+      (quadratic_conjugate K add z)) z
+  = ring_one (quadratic_extension K)
+    (quadratic_extension_multiplication K add mul d).
+exact (eq_i_tra
+  (quadratic_extension_multiplication K add mul d
+    (quadratic_extension_multiplication K add mul d
+      (quadratic_extension_embedding K add
+        (ring_inverse K add mul (quadratic_norm K add mul d z)))
+      (quadratic_conjugate K add z)) z)
+  (quadratic_extension_multiplication K add mul d
+    (quadratic_extension_embedding K add
+      (ring_inverse K add mul (quadratic_norm K add mul d z)))
+    (quadratic_extension_multiplication K add mul d
+      (quadratic_conjugate K add z) z))
+  (ring_one (quadratic_extension K)
+    (quadratic_extension_multiplication K add mul d))
+  (god1_ring_multiplicative_associative_reverse
+    (quadratic_extension K)
+    (quadratic_extension_addition K add)
+    (quadratic_extension_multiplication K add mul d) hE
+    (quadratic_extension_embedding K add
+      (ring_inverse K add mul (quadratic_norm K add mul d z))) hembInv
+    (quadratic_conjugate K add z) hconj z hz)
+  (eq_i_tra
+    (quadratic_extension_multiplication K add mul d
+      (quadratic_extension_embedding K add
+        (ring_inverse K add mul (quadratic_norm K add mul d z)))
+      (quadratic_extension_multiplication K add mul d
+        (quadratic_conjugate K add z) z))
+    (quadratic_extension_multiplication K add mul d
+      (quadratic_extension_embedding K add
+        (ring_inverse K add mul (quadratic_norm K add mul d z)))
+      (quadratic_extension_embedding K add (quadratic_norm K add mul d z)))
+    (ring_one (quadratic_extension K)
+      (quadratic_extension_multiplication K add mul d))
+    (f_eq_i
+      (fun q => quadratic_extension_multiplication K add mul d
+        (quadratic_extension_embedding K add
+          (ring_inverse K add mul (quadratic_norm K add mul d z))) q)
+      (quadratic_extension_multiplication K add mul d
+        (quadratic_conjugate K add z) z)
+      (quadratic_extension_embedding K add (quadratic_norm K add mul d z))
+      (eq_i_tra
+        (quadratic_extension_multiplication K add mul d
+          (quadratic_conjugate K add z) z)
+        (quadratic_extension_multiplication K add mul d
+          z (quadratic_conjugate K add z))
+        (quadratic_extension_embedding K add (quadratic_norm K add mul d z))
+        (hEcommul (quadratic_conjugate K add z) hconj z hz)
+        (god1_quadratic_norm_as_product_with_conjugate
+          K add mul d hd hK z hz)))
+    (eq_i_tra
+      (quadratic_extension_multiplication K add mul d
+        (quadratic_extension_embedding K add
+          (ring_inverse K add mul (quadratic_norm K add mul d z)))
+        (quadratic_extension_embedding K add (quadratic_norm K add mul d z)))
+      (quadratic_extension_embedding K add
+        (mul (ring_inverse K add mul (quadratic_norm K add mul d z))
+          (quadratic_norm K add mul d z)))
+      (ring_one (quadratic_extension K)
+        (quadratic_extension_multiplication K add mul d))
+      (eq_sym
+        (quadratic_extension_embedding K add
+          (mul (ring_inverse K add mul (quadratic_norm K add mul d z))
+            (quadratic_norm K add mul d z)))
+        (quadratic_extension_multiplication K add mul d
+          (quadratic_extension_embedding K add
+            (ring_inverse K add mul (quadratic_norm K add mul d z)))
+          (quadratic_extension_embedding K add (quadratic_norm K add mul d z)))
+        (god1_quadratic_extension_embedding_preserves_multiplication
+          K add mul d hd hring
+          (ring_inverse K add mul (quadratic_norm K add mul d z)) hinv
+          (quadratic_norm K add mul d z) hN))
+      (eq_i_tra
+        (quadratic_extension_embedding K add
+          (mul (ring_inverse K add mul (quadratic_norm K add mul d z))
+            (quadratic_norm K add mul d z)))
+        (quadratic_extension_embedding K add (ring_one K mul))
+        (ring_one (quadratic_extension K)
+          (quadratic_extension_multiplication K add mul d))
+        (f_eq_i (quadratic_extension_embedding K add)
+          (mul (ring_inverse K add mul (quadratic_norm K add mul d z))
+            (quadratic_norm K add mul d z))
+          (ring_one K mul) hinvN)
+        (god1_quadratic_extension_ring_one K add mul d hd hK))))).
+claim hcandidateRight :
+  quadratic_extension_multiplication K add mul d z
+    (quadratic_extension_multiplication K add mul d
+      (quadratic_extension_embedding K add
+        (ring_inverse K add mul (quadratic_norm K add mul d z)))
+      (quadratic_conjugate K add z))
+  = ring_one (quadratic_extension K)
+    (quadratic_extension_multiplication K add mul d).
+exact (eq_i_tra
+  (quadratic_extension_multiplication K add mul d z
+    (quadratic_extension_multiplication K add mul d
+      (quadratic_extension_embedding K add
+        (ring_inverse K add mul (quadratic_norm K add mul d z)))
+      (quadratic_conjugate K add z)))
+  (quadratic_extension_multiplication K add mul d
+    (quadratic_extension_multiplication K add mul d
+      (quadratic_extension_embedding K add
+        (ring_inverse K add mul (quadratic_norm K add mul d z)))
+      (quadratic_conjugate K add z)) z)
+  (ring_one (quadratic_extension K)
+    (quadratic_extension_multiplication K add mul d))
+  (hEcommul z hz
+    (quadratic_extension_multiplication K add mul d
+      (quadratic_extension_embedding K add
+        (ring_inverse K add mul (quadratic_norm K add mul d z)))
+      (quadratic_conjugate K add z)) hcandidate)
+  hcandidateLeft).
+exact (andI
+  (quadratic_extension_multiplication K add mul d
+      (quadratic_extension_embedding K add
+        (ring_inverse K add mul (quadratic_norm K add mul d z)))
+      (quadratic_conjugate K add z) :e quadratic_extension K
+    /\ quadratic_extension_multiplication K add mul d
+      (quadratic_extension_multiplication K add mul d
+        (quadratic_extension_embedding K add
+          (ring_inverse K add mul (quadratic_norm K add mul d z)))
+        (quadratic_conjugate K add z)) z
+      = ring_one (quadratic_extension K)
+        (quadratic_extension_multiplication K add mul d))
+  (quadratic_extension_multiplication K add mul d z
+    (quadratic_extension_multiplication K add mul d
+      (quadratic_extension_embedding K add
+        (ring_inverse K add mul (quadratic_norm K add mul d z)))
+      (quadratic_conjugate K add z))
+    = ring_one (quadratic_extension K)
+      (quadratic_extension_multiplication K add mul d))
+  (andI
+    (quadratic_extension_multiplication K add mul d
+      (quadratic_extension_embedding K add
+        (ring_inverse K add mul (quadratic_norm K add mul d z)))
+      (quadratic_conjugate K add z) :e quadratic_extension K)
+    (quadratic_extension_multiplication K add mul d
+      (quadratic_extension_multiplication K add mul d
+        (quadratic_extension_embedding K add
+          (ring_inverse K add mul (quadratic_norm K add mul d z)))
+        (quadratic_conjugate K add z)) z
+      = ring_one (quadratic_extension K)
+        (quadratic_extension_multiplication K add mul d))
+    hcandidate hcandidateLeft)
+  hcandidateRight).
+Qed.
+
 Theorem god1_s9_theorem1_units_in_quadratic_extension :
   forall K, forall add mul:set -> set -> set, forall d :e K,
     commutative_ring K add mul ->
@@ -74102,7 +74498,6 @@ let K add mul d.
 assume hd hK.
 let z.
 assume hz.
-apply andI.
 //GOD1PRF:167440 Suppose that $z$ is a unit.
 claim h_s9_t1_forward_assumption :
   ring_unit
@@ -74110,7 +74505,16 @@ claim h_s9_t1_forward_assumption :
     (quadratic_extension_addition K add)
     (quadratic_extension_multiplication K add mul d) z ->
   z :e quadratic_extension K.
-admit.
+exact (fun hunit => andEL
+  (z :e quadratic_extension K)
+  (exists y :e quadratic_extension K,
+    quadratic_extension_multiplication K add mul d y z
+      = ring_one (quadratic_extension K)
+        (quadratic_extension_multiplication K add mul d)
+    /\ quadratic_extension_multiplication K add mul d z y
+      = ring_one (quadratic_extension K)
+        (quadratic_extension_multiplication K add mul d))
+  hunit).
 //GOD1PRF:167468 Then the relation $z^{-1} \cdot z=1$, bearing in mind (12) and (13), gives
 claim h_s9_t1_norm_inverse_product :
   ring_unit
@@ -74119,7 +74523,206 @@ claim h_s9_t1_norm_inverse_product :
     (quadratic_extension_multiplication K add mul d) z ->
   exists u :e K,
     mul u (quadratic_norm K add mul d z) = ring_one K mul.
-admit.
+assume hunitE.
+claim hEring : ring
+  (quadratic_extension K)
+  (quadratic_extension_addition K add)
+  (quadratic_extension_multiplication K add mul d).
+exact (andEL
+  (ring (quadratic_extension K)
+    (quadratic_extension_addition K add)
+    (quadratic_extension_multiplication K add mul d))
+  (commutative_on (quadratic_extension K)
+    (quadratic_extension_multiplication K add mul d))
+  (god1_quadratic_extension_is_commutative_ring K add mul d hd hK)).
+claim href : reflection
+  (quadratic_extension K)
+  (quadratic_extension_multiplication K add mul d)
+  (ring_one (quadratic_extension K)
+    (quadratic_extension_multiplication K add mul d)) z
+  (ring_inverse
+    (quadratic_extension K)
+    (quadratic_extension_addition K add)
+    (quadratic_extension_multiplication K add mul d) z).
+exact (god1_ring_inverse_specification
+  (quadratic_extension K)
+  (quadratic_extension_addition K add)
+  (quadratic_extension_multiplication K add mul d) z hunitE).
+claim hinvMember :
+  ring_inverse
+    (quadratic_extension K)
+    (quadratic_extension_addition K add)
+    (quadratic_extension_multiplication K add mul d) z
+  :e quadratic_extension K.
+exact (andEL
+  (ring_inverse
+      (quadratic_extension K)
+      (quadratic_extension_addition K add)
+      (quadratic_extension_multiplication K add mul d) z
+      :e quadratic_extension K)
+  (quadratic_extension_multiplication K add mul d
+    (ring_inverse
+      (quadratic_extension K)
+      (quadratic_extension_addition K add)
+      (quadratic_extension_multiplication K add mul d) z) z
+    = ring_one (quadratic_extension K)
+      (quadratic_extension_multiplication K add mul d))
+  (andEL
+    (ring_inverse
+        (quadratic_extension K)
+        (quadratic_extension_addition K add)
+        (quadratic_extension_multiplication K add mul d) z
+        :e quadratic_extension K
+      /\ quadratic_extension_multiplication K add mul d
+        (ring_inverse
+          (quadratic_extension K)
+          (quadratic_extension_addition K add)
+          (quadratic_extension_multiplication K add mul d) z) z
+        = ring_one (quadratic_extension K)
+          (quadratic_extension_multiplication K add mul d))
+    (quadratic_extension_multiplication K add mul d z
+      (ring_inverse
+        (quadratic_extension K)
+        (quadratic_extension_addition K add)
+        (quadratic_extension_multiplication K add mul d) z)
+      = ring_one (quadratic_extension K)
+        (quadratic_extension_multiplication K add mul d)) href)).
+claim hinvProduct :
+  quadratic_extension_multiplication K add mul d
+    (ring_inverse
+      (quadratic_extension K)
+      (quadratic_extension_addition K add)
+      (quadratic_extension_multiplication K add mul d) z) z
+  = ring_one (quadratic_extension K)
+    (quadratic_extension_multiplication K add mul d).
+exact (andER
+  (ring_inverse
+      (quadratic_extension K)
+      (quadratic_extension_addition K add)
+      (quadratic_extension_multiplication K add mul d) z
+      :e quadratic_extension K)
+  (quadratic_extension_multiplication K add mul d
+    (ring_inverse
+      (quadratic_extension K)
+      (quadratic_extension_addition K add)
+      (quadratic_extension_multiplication K add mul d) z) z
+    = ring_one (quadratic_extension K)
+      (quadratic_extension_multiplication K add mul d))
+  (andEL
+    (ring_inverse
+        (quadratic_extension K)
+        (quadratic_extension_addition K add)
+        (quadratic_extension_multiplication K add mul d) z
+        :e quadratic_extension K
+      /\ quadratic_extension_multiplication K add mul d
+        (ring_inverse
+          (quadratic_extension K)
+          (quadratic_extension_addition K add)
+          (quadratic_extension_multiplication K add mul d) z) z
+        = ring_one (quadratic_extension K)
+          (quadratic_extension_multiplication K add mul d))
+    (quadratic_extension_multiplication K add mul d z
+      (ring_inverse
+        (quadratic_extension K)
+        (quadratic_extension_addition K add)
+        (quadratic_extension_multiplication K add mul d) z)
+      = ring_one (quadratic_extension K)
+        (quadratic_extension_multiplication K add mul d)) href)).
+claim hu : quadratic_norm K add mul d
+  (ring_inverse
+    (quadratic_extension K)
+    (quadratic_extension_addition K add)
+    (quadratic_extension_multiplication K add mul d) z) :e K.
+exact (god1_quadratic_norm_member K add mul d hd
+  (andEL (ring K add mul) (commutative_on K mul) hK)
+  (ring_inverse
+    (quadratic_extension K)
+    (quadratic_extension_addition K add)
+    (quadratic_extension_multiplication K add mul d) z) hinvMember).
+claim hproductNorm :
+  mul
+    (quadratic_norm K add mul d
+      (ring_inverse
+        (quadratic_extension K)
+        (quadratic_extension_addition K add)
+        (quadratic_extension_multiplication K add mul d) z))
+    (quadratic_norm K add mul d z) = ring_one K mul.
+exact (eq_i_tra
+  (mul
+    (quadratic_norm K add mul d
+      (ring_inverse
+        (quadratic_extension K)
+        (quadratic_extension_addition K add)
+        (quadratic_extension_multiplication K add mul d) z))
+    (quadratic_norm K add mul d z))
+  (quadratic_norm K add mul d
+    (quadratic_extension_multiplication K add mul d
+      (ring_inverse
+        (quadratic_extension K)
+        (quadratic_extension_addition K add)
+        (quadratic_extension_multiplication K add mul d) z) z))
+  (ring_one K mul)
+  (eq_sym
+    (quadratic_norm K add mul d
+      (quadratic_extension_multiplication K add mul d
+        (ring_inverse
+          (quadratic_extension K)
+          (quadratic_extension_addition K add)
+          (quadratic_extension_multiplication K add mul d) z) z))
+    (mul
+      (quadratic_norm K add mul d
+        (ring_inverse
+          (quadratic_extension K)
+          (quadratic_extension_addition K add)
+          (quadratic_extension_multiplication K add mul d) z))
+      (quadratic_norm K add mul d z))
+    (god1_quadratic_norm_multiplicative K add mul d hd hK
+      (ring_inverse
+        (quadratic_extension K)
+        (quadratic_extension_addition K add)
+        (quadratic_extension_multiplication K add mul d) z) hinvMember z hz))
+  (eq_i_tra
+    (quadratic_norm K add mul d
+      (quadratic_extension_multiplication K add mul d
+        (ring_inverse
+          (quadratic_extension K)
+          (quadratic_extension_addition K add)
+          (quadratic_extension_multiplication K add mul d) z) z))
+    (quadratic_norm K add mul d
+      (ring_one (quadratic_extension K)
+        (quadratic_extension_multiplication K add mul d)))
+    (ring_one K mul)
+    (f_eq_i (quadratic_norm K add mul d)
+      (quadratic_extension_multiplication K add mul d
+        (ring_inverse
+          (quadratic_extension K)
+          (quadratic_extension_addition K add)
+          (quadratic_extension_multiplication K add mul d) z) z)
+      (ring_one (quadratic_extension K)
+        (quadratic_extension_multiplication K add mul d)) hinvProduct)
+    (god1_quadratic_norm_one K add mul d hd hK))).
+exact (ex_intro
+  (fun u => u :e K
+    /\ mul u (quadratic_norm K add mul d z) = ring_one K mul)
+  (quadratic_norm K add mul d
+    (ring_inverse
+      (quadratic_extension K)
+      (quadratic_extension_addition K add)
+      (quadratic_extension_multiplication K add mul d) z))
+  (andI
+    (quadratic_norm K add mul d
+      (ring_inverse
+        (quadratic_extension K)
+        (quadratic_extension_addition K add)
+        (quadratic_extension_multiplication K add mul d) z) :e K)
+    (mul
+      (quadratic_norm K add mul d
+        (ring_inverse
+          (quadratic_extension K)
+          (quadratic_extension_addition K add)
+          (quadratic_extension_multiplication K add mul d) z))
+      (quadratic_norm K add mul d z) = ring_one K mul)
+    hu hproductNorm)).
 //GOD1PRF:167603 and therefore $\mathrm{N}(z)$ is a unit in K .
 claim h_s9_t1_forward_norm_unit :
   ring_unit
@@ -74127,12 +74730,65 @@ claim h_s9_t1_forward_norm_unit :
     (quadratic_extension_addition K add)
     (quadratic_extension_multiplication K add mul d) z ->
   ring_unit K add mul (quadratic_norm K add mul d z).
-admit.
+assume hunitE.
+claim hN : quadratic_norm K add mul d z :e K.
+exact (god1_quadratic_norm_member K add mul d hd
+  (andEL (ring K add mul) (commutative_on K mul) hK) z hz).
+claim hexists : exists u :e K,
+  mul u (quadratic_norm K add mul d z) = ring_one K mul.
+exact (h_s9_t1_norm_inverse_product hunitE).
+apply (exandE_i
+  (fun u => u :e K)
+  (fun u => mul u (quadratic_norm K add mul d z) = ring_one K mul)
+  hexists).
+let u.
+assume hu hleft.
+claim hright :
+  mul (quadratic_norm K add mul d z) u = ring_one K mul.
+exact (eq_i_tra
+  (mul (quadratic_norm K add mul d z) u)
+  (mul u (quadratic_norm K add mul d z)) (ring_one K mul)
+  ((andER (ring K add mul) (commutative_on K mul) hK)
+    (quadratic_norm K add mul d z) hN u hu) hleft).
+exact (andI
+  (quadratic_norm K add mul d z :e K)
+  (exists v :e K,
+    mul v (quadratic_norm K add mul d z) = ring_one K mul
+    /\ mul (quadratic_norm K add mul d z) v = ring_one K mul)
+  hN
+  (ex_intro
+    (fun v => v :e K
+      /\ (mul v (quadratic_norm K add mul d z) = ring_one K mul
+        /\ mul (quadratic_norm K add mul d z) v = ring_one K mul))
+    u
+    (andI
+      (u :e K)
+      (mul u (quadratic_norm K add mul d z) = ring_one K mul
+        /\ mul (quadratic_norm K add mul d z) u = ring_one K mul)
+      hu (andI
+        (mul u (quadratic_norm K add mul d z) = ring_one K mul)
+        (mul (quadratic_norm K add mul d z) u = ring_one K mul)
+        hleft hright)))).
 //GOD1PRF:167652 Conversely, suppose that $\mathrm{N}(z)$ is a unit in K .
 claim h_s9_t1_reverse_assumption :
   ring_unit K add mul (quadratic_norm K add mul d z) ->
   ring_inverse K add mul (quadratic_norm K add mul d z) :e K.
-admit.
+exact (fun hunit => andEL
+  (ring_inverse K add mul (quadratic_norm K add mul d z) :e K)
+  (mul
+    (ring_inverse K add mul (quadratic_norm K add mul d z))
+    (quadratic_norm K add mul d z) = ring_one K mul)
+  (andEL
+    (ring_inverse K add mul (quadratic_norm K add mul d z) :e K
+      /\ mul
+        (ring_inverse K add mul (quadratic_norm K add mul d z))
+        (quadratic_norm K add mul d z) = ring_one K mul)
+    (mul
+      (quadratic_norm K add mul d z)
+      (ring_inverse K add mul (quadratic_norm K add mul d z))
+      = ring_one K mul)
+    (god1_ring_inverse_specification K add mul
+      (quadratic_norm K add mul d z) hunit))).
 //GOD1PRF:167710 Then the relation
 claim h_s9_t1_candidate_inverse :
   ring_unit K add mul (quadratic_norm K add mul d z) ->
@@ -74141,7 +74797,18 @@ claim h_s9_t1_candidate_inverse :
       (ring_inverse K add mul (quadratic_norm K add mul d z)))
     (quadratic_conjugate K add z)
   :e quadratic_extension K.
-admit.
+exact (fun hunit =>
+  god1_quadratic_extension_multiplication_law K add mul d hd
+    (andEL (ring K add mul) (commutative_on K mul) hK)
+    (quadratic_extension_embedding K add
+      (ring_inverse K add mul (quadratic_norm K add mul d z)))
+    (god1_quadratic_extension_embedding_member K add mul
+      (andEL (ring K add mul) (commutative_on K mul) hK)
+      (ring_inverse K add mul (quadratic_norm K add mul d z))
+      (h_s9_t1_reverse_assumption hunit))
+    (quadratic_conjugate K add z)
+    (god1_quadratic_conjugate_member K add mul
+      (andEL (ring K add mul) (commutative_on K mul) hK) z hz)).
 //GOD1PRF:167760 implies that
 claim h_s9_t1_candidate_reflection :
   ring_unit K add mul (quadratic_norm K add mul d z) ->
@@ -74154,7 +74821,8 @@ claim h_s9_t1_candidate_reflection :
       (quadratic_extension_embedding K add
         (ring_inverse K add mul (quadratic_norm K add mul d z)))
       (quadratic_conjugate K add z)).
-admit.
+exact (god1_quadratic_norm_unit_candidate_reflection
+  K add mul d hd hK z hz).
 //GOD1PRF:167825 and this shows that $z$ is a unit in $\mathrm{K}[\sqrt{d}]$ and that its inverse is given by (14).
 claim h_s9_t1_reverse_and_formula :
   ring_unit K add mul (quadratic_norm K add mul d z) ->
@@ -74170,7 +74838,223 @@ claim h_s9_t1_reverse_and_formula :
     (quadratic_extension_embedding K add
       (ring_inverse K add mul (quadratic_norm K add mul d z)))
     (quadratic_conjugate K add z).
-admit.
+assume hunit.
+claim hreflection :
+  reflection
+    (quadratic_extension K)
+    (quadratic_extension_multiplication K add mul d)
+    (ring_one (quadratic_extension K)
+      (quadratic_extension_multiplication K add mul d)) z
+    (quadratic_extension_multiplication K add mul d
+      (quadratic_extension_embedding K add
+        (ring_inverse K add mul (quadratic_norm K add mul d z)))
+      (quadratic_conjugate K add z)).
+exact (h_s9_t1_candidate_reflection hunit).
+claim hcandidateMember :
+  quadratic_extension_multiplication K add mul d
+    (quadratic_extension_embedding K add
+      (ring_inverse K add mul (quadratic_norm K add mul d z)))
+    (quadratic_conjugate K add z) :e quadratic_extension K.
+exact (andEL
+  (quadratic_extension_multiplication K add mul d
+      (quadratic_extension_embedding K add
+        (ring_inverse K add mul (quadratic_norm K add mul d z)))
+      (quadratic_conjugate K add z) :e quadratic_extension K)
+  (quadratic_extension_multiplication K add mul d
+    (quadratic_extension_multiplication K add mul d
+      (quadratic_extension_embedding K add
+        (ring_inverse K add mul (quadratic_norm K add mul d z)))
+      (quadratic_conjugate K add z)) z
+    = ring_one (quadratic_extension K)
+      (quadratic_extension_multiplication K add mul d))
+  (andEL
+    (quadratic_extension_multiplication K add mul d
+        (quadratic_extension_embedding K add
+          (ring_inverse K add mul (quadratic_norm K add mul d z)))
+        (quadratic_conjugate K add z) :e quadratic_extension K
+      /\ quadratic_extension_multiplication K add mul d
+        (quadratic_extension_multiplication K add mul d
+          (quadratic_extension_embedding K add
+            (ring_inverse K add mul (quadratic_norm K add mul d z)))
+          (quadratic_conjugate K add z)) z
+        = ring_one (quadratic_extension K)
+          (quadratic_extension_multiplication K add mul d))
+    (quadratic_extension_multiplication K add mul d z
+      (quadratic_extension_multiplication K add mul d
+        (quadratic_extension_embedding K add
+          (ring_inverse K add mul (quadratic_norm K add mul d z)))
+        (quadratic_conjugate K add z))
+      = ring_one (quadratic_extension K)
+        (quadratic_extension_multiplication K add mul d)) hreflection)).
+claim hreflexible : reflexible
+  (quadratic_extension K)
+  (quadratic_extension_multiplication K add mul d)
+  (ring_one (quadratic_extension K)
+    (quadratic_extension_multiplication K add mul d)) z.
+exact (andI
+  (z :e quadratic_extension K)
+  (exists r :e quadratic_extension K,
+    reflection (quadratic_extension K)
+      (quadratic_extension_multiplication K add mul d)
+      (ring_one (quadratic_extension K)
+        (quadratic_extension_multiplication K add mul d)) z r)
+  hz
+  (ex_intro
+    (fun r => r :e quadratic_extension K
+      /\ reflection (quadratic_extension K)
+        (quadratic_extension_multiplication K add mul d)
+        (ring_one (quadratic_extension K)
+          (quadratic_extension_multiplication K add mul d)) z r)
+    (quadratic_extension_multiplication K add mul d
+      (quadratic_extension_embedding K add
+        (ring_inverse K add mul (quadratic_norm K add mul d z)))
+      (quadratic_conjugate K add z))
+    (andI
+      (quadratic_extension_multiplication K add mul d
+        (quadratic_extension_embedding K add
+          (ring_inverse K add mul (quadratic_norm K add mul d z)))
+        (quadratic_conjugate K add z) :e quadratic_extension K)
+      (reflection (quadratic_extension K)
+        (quadratic_extension_multiplication K add mul d)
+        (ring_one (quadratic_extension K)
+          (quadratic_extension_multiplication K add mul d)) z
+        (quadratic_extension_multiplication K add mul d
+          (quadratic_extension_embedding K add
+            (ring_inverse K add mul (quadratic_norm K add mul d z)))
+          (quadratic_conjugate K add z)))
+      hcandidateMember hreflection))).
+claim hunitE : ring_unit
+  (quadratic_extension K)
+  (quadratic_extension_addition K add)
+  (quadratic_extension_multiplication K add mul d) z.
+exact (god1_reflexible_to_ring_unit
+  (quadratic_extension K)
+  (quadratic_extension_addition K add)
+  (quadratic_extension_multiplication K add mul d) z hreflexible).
+claim hstandard : reflection
+  (quadratic_extension K)
+  (quadratic_extension_multiplication K add mul d)
+  (ring_one (quadratic_extension K)
+    (quadratic_extension_multiplication K add mul d)) z
+  (ring_inverse
+    (quadratic_extension K)
+    (quadratic_extension_addition K add)
+    (quadratic_extension_multiplication K add mul d) z).
+exact (god1_ring_inverse_specification
+  (quadratic_extension K)
+  (quadratic_extension_addition K add)
+  (quadratic_extension_multiplication K add mul d) z hunitE).
+claim hinverseFormula :
+  ring_inverse
+    (quadratic_extension K)
+    (quadratic_extension_addition K add)
+    (quadratic_extension_multiplication K add mul d) z
+  = quadratic_extension_multiplication K add mul d
+    (quadratic_extension_embedding K add
+      (ring_inverse K add mul (quadratic_norm K add mul d z)))
+    (quadratic_conjugate K add z).
+exact (god1_s6_left_and_right_reflections_equal
+  (quadratic_extension K)
+  (quadratic_extension_multiplication K add mul d)
+  (ring_one (quadratic_extension K)
+    (quadratic_extension_multiplication K add mul d)) z
+  (ring_inverse
+    (quadratic_extension K)
+    (quadratic_extension_addition K add)
+    (quadratic_extension_multiplication K add mul d) z)
+  (quadratic_extension_multiplication K add mul d
+    (quadratic_extension_embedding K add
+      (ring_inverse K add mul (quadratic_norm K add mul d z)))
+    (quadratic_conjugate K add z))
+  (god1_ring_multiplicative_associative
+    (quadratic_extension K)
+    (quadratic_extension_addition K add)
+    (quadratic_extension_multiplication K add mul d)
+    (andEL
+      (ring (quadratic_extension K)
+        (quadratic_extension_addition K add)
+        (quadratic_extension_multiplication K add mul d))
+      (commutative_on (quadratic_extension K)
+        (quadratic_extension_multiplication K add mul d))
+      (god1_quadratic_extension_is_commutative_ring K add mul d hd hK)))
+  (god1_ring_multiplicative_identity_specification
+    (quadratic_extension K)
+    (quadratic_extension_addition K add)
+    (quadratic_extension_multiplication K add mul d)
+    (andEL
+      (ring (quadratic_extension K)
+        (quadratic_extension_addition K add)
+        (quadratic_extension_multiplication K add mul d))
+      (commutative_on (quadratic_extension K)
+        (quadratic_extension_multiplication K add mul d))
+      (god1_quadratic_extension_is_commutative_ring K add mul d hd hK)))
+  hz
+  (andEL
+    (ring_inverse
+        (quadratic_extension K)
+        (quadratic_extension_addition K add)
+        (quadratic_extension_multiplication K add mul d) z
+        :e quadratic_extension K
+      /\ quadratic_extension_multiplication K add mul d
+        (ring_inverse
+          (quadratic_extension K)
+          (quadratic_extension_addition K add)
+          (quadratic_extension_multiplication K add mul d) z) z
+        = ring_one (quadratic_extension K)
+          (quadratic_extension_multiplication K add mul d))
+    (quadratic_extension_multiplication K add mul d z
+      (ring_inverse
+        (quadratic_extension K)
+        (quadratic_extension_addition K add)
+        (quadratic_extension_multiplication K add mul d) z)
+      = ring_one (quadratic_extension K)
+        (quadratic_extension_multiplication K add mul d)) hstandard)
+  (andI
+    (quadratic_extension_multiplication K add mul d
+      (quadratic_extension_embedding K add
+        (ring_inverse K add mul (quadratic_norm K add mul d z)))
+      (quadratic_conjugate K add z) :e quadratic_extension K)
+    (quadratic_extension_multiplication K add mul d z
+      (quadratic_extension_multiplication K add mul d
+        (quadratic_extension_embedding K add
+          (ring_inverse K add mul (quadratic_norm K add mul d z)))
+        (quadratic_conjugate K add z))
+      = ring_one (quadratic_extension K)
+        (quadratic_extension_multiplication K add mul d))
+    hcandidateMember
+    (andER
+      (quadratic_extension_multiplication K add mul d
+          (quadratic_extension_embedding K add
+            (ring_inverse K add mul (quadratic_norm K add mul d z)))
+          (quadratic_conjugate K add z) :e quadratic_extension K
+        /\ quadratic_extension_multiplication K add mul d
+          (quadratic_extension_multiplication K add mul d
+            (quadratic_extension_embedding K add
+              (ring_inverse K add mul (quadratic_norm K add mul d z)))
+            (quadratic_conjugate K add z)) z
+          = ring_one (quadratic_extension K)
+            (quadratic_extension_multiplication K add mul d))
+      (quadratic_extension_multiplication K add mul d z
+        (quadratic_extension_multiplication K add mul d
+          (quadratic_extension_embedding K add
+            (ring_inverse K add mul (quadratic_norm K add mul d z)))
+          (quadratic_conjugate K add z))
+        = ring_one (quadratic_extension K)
+          (quadratic_extension_multiplication K add mul d)) hreflection))).
+exact (andI
+  (ring_unit
+    (quadratic_extension K)
+    (quadratic_extension_addition K add)
+    (quadratic_extension_multiplication K add mul d) z)
+  (ring_inverse
+    (quadratic_extension K)
+    (quadratic_extension_addition K add)
+    (quadratic_extension_multiplication K add mul d) z
+    = quadratic_extension_multiplication K add mul d
+      (quadratic_extension_embedding K add
+        (ring_inverse K add mul (quadratic_norm K add mul d z)))
+      (quadratic_conjugate K add z))
+  hunitE hinverseFormula).
 //GOD1PRF:167924 Q.E.D.
 claim h_s9_t1_book_conclusion :
   ring_unit
@@ -74178,8 +75062,58 @@ claim h_s9_t1_book_conclusion :
     (quadratic_extension_addition K add)
     (quadratic_extension_multiplication K add mul d) z
   <-> ring_unit K add mul (quadratic_norm K add mul d z).
-admit.
-Admitted.
+exact (iffI
+  (ring_unit
+    (quadratic_extension K)
+    (quadratic_extension_addition K add)
+    (quadratic_extension_multiplication K add mul d) z)
+  (ring_unit K add mul (quadratic_norm K add mul d z))
+  h_s9_t1_forward_norm_unit
+  (fun hunit => andEL
+    (ring_unit
+      (quadratic_extension K)
+      (quadratic_extension_addition K add)
+      (quadratic_extension_multiplication K add mul d) z)
+    (ring_inverse
+      (quadratic_extension K)
+      (quadratic_extension_addition K add)
+      (quadratic_extension_multiplication K add mul d) z
+      = quadratic_extension_multiplication K add mul d
+        (quadratic_extension_embedding K add
+          (ring_inverse K add mul (quadratic_norm K add mul d z)))
+        (quadratic_conjugate K add z))
+    (h_s9_t1_reverse_and_formula hunit))).
+exact (andI
+  (ring_unit
+      (quadratic_extension K)
+      (quadratic_extension_addition K add)
+      (quadratic_extension_multiplication K add mul d) z
+    <-> ring_unit K add mul (quadratic_norm K add mul d z))
+  (ring_unit K add mul (quadratic_norm K add mul d z) ->
+    ring_inverse
+      (quadratic_extension K)
+      (quadratic_extension_addition K add)
+      (quadratic_extension_multiplication K add mul d) z
+    = quadratic_extension_multiplication K add mul d
+      (quadratic_extension_embedding K add
+        (ring_inverse K add mul (quadratic_norm K add mul d z)))
+      (quadratic_conjugate K add z))
+  h_s9_t1_book_conclusion
+  (fun hunit => andER
+    (ring_unit
+      (quadratic_extension K)
+      (quadratic_extension_addition K add)
+      (quadratic_extension_multiplication K add mul d) z)
+    (ring_inverse
+      (quadratic_extension K)
+      (quadratic_extension_addition K add)
+      (quadratic_extension_multiplication K add mul d) z
+      = quadratic_extension_multiplication K add mul d
+        (quadratic_extension_embedding K add
+          (ring_inverse K add mul (quadratic_norm K add mul d z)))
+        (quadratic_conjugate K add z))
+    (h_s9_t1_reverse_and_formula hunit))).
+Qed.
 
 Theorem god1_s9_theorem2_quadratic_extension_field_iff_nonsquare :
   forall K, forall add mul:set -> set -> set,
