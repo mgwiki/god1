@@ -58492,13 +58492,19 @@ Definition ring_nat_power :
 
 //GOD1:118004 finite_cardinality : "the number of elements of the finite set #1" | $\operatorname{Card}(#1)$
 Definition finite_cardinality : set -> set :=
-  fun X => Eps_i (fun n => n :e omega /\ equip X n).
+  fun X =>
+    if X :e omega
+    then X
+    else Eps_i (fun n => n :e omega /\ equip X n).
 
 //GOD1:118004 finite_enumeration : "an enumeration of the finite set #1" | $\operatorname{enum}(#1)$
 Definition finite_enumeration : set -> set :=
-  fun X => Eps_i (fun f =>
-    f :e X :^: finite_cardinality X
-    /\ bij (finite_cardinality X) X (fun i => f i)).
+  fun X =>
+    if X :e omega
+    then (fun i :e X => i)
+    else Eps_i (fun f =>
+      f :e X :^: finite_cardinality X
+      /\ bij (finite_cardinality X) X (fun i => f i)).
 
 //GOD1:118004 ring_finite_sum : "the sum of the family #5 indexed by the finite set #4" | $\sum_{i\in #4}#5_i$
 Definition ring_finite_sum :
@@ -58528,6 +58534,714 @@ Definition binomial_coefficient : set -> set -> set :=
 Definition ring_nat_multiple :
   set -> (set -> set -> set) -> set -> set -> set :=
   fun K add n x => group_nat_power K add x n.
+
+Theorem god1_finite_cardinality_natural :
+  forall n :e omega, finite_cardinality n = n.
+let n.
+assume hn.
+exact (If_i_1 (n :e omega) n
+  (Eps_i (fun m => m :e omega /\ equip n m)) hn).
+Qed.
+
+Theorem god1_finite_cardinality_specification :
+  forall X, finite X ->
+    finite_cardinality X :e omega
+    /\ equip X (finite_cardinality X).
+let X.
+assume hfin.
+apply (orE
+  (X :e omega) (X /:e omega)
+  (xm (X :e omega))
+  (finite_cardinality X :e omega
+    /\ equip X (finite_cardinality X))).
+- assume hXomega.
+  claim hcard : finite_cardinality X = X.
+  exact (god1_finite_cardinality_natural X hXomega).
+  exact (andI
+    (finite_cardinality X :e omega)
+    (equip X (finite_cardinality X))
+    (mem_eq_substL omega X (finite_cardinality X) hcard hXomega)
+    (god1_equip_codomain_eq_subst X X (finite_cardinality X)
+      (eq_sym (finite_cardinality X) X hcard)
+      (equip_ref X))).
+- assume hXnotomega.
+  claim heps :
+    Eps_i (fun n => n :e omega /\ equip X n) :e omega
+    /\ equip X (Eps_i (fun n => n :e omega /\ equip X n)).
+  exact (Eps_i_ex (fun n => n :e omega /\ equip X n) hfin).
+  claim hcard : finite_cardinality X
+    = Eps_i (fun n => n :e omega /\ equip X n).
+  exact (If_i_0 (X :e omega) X
+    (Eps_i (fun n => n :e omega /\ equip X n)) hXnotomega).
+  exact (andI
+    (finite_cardinality X :e omega)
+    (equip X (finite_cardinality X))
+    (mem_eq_substL omega
+      (Eps_i (fun n => n :e omega /\ equip X n))
+      (finite_cardinality X) hcard
+      (andEL
+        (Eps_i (fun n => n :e omega /\ equip X n) :e omega)
+        (equip X (Eps_i (fun n => n :e omega /\ equip X n)))
+        heps))
+    (god1_equip_codomain_eq_subst X
+      (Eps_i (fun n => n :e omega /\ equip X n))
+      (finite_cardinality X)
+      (eq_sym
+        (finite_cardinality X)
+        (Eps_i (fun n => n :e omega /\ equip X n)) hcard)
+      (andER
+        (Eps_i (fun n => n :e omega /\ equip X n) :e omega)
+        (equip X (Eps_i (fun n => n :e omega /\ equip X n)))
+        heps))).
+Qed.
+
+Theorem god1_finite_enumeration_natural_eval :
+  forall n :e omega, forall i :e n,
+    finite_enumeration n i = i.
+let n.
+assume hn.
+let i.
+assume hi.
+claim henum : finite_enumeration n = (fun j :e n => j).
+exact (If_i_1 (n :e omega)
+  (fun j :e n => j)
+  (Eps_i (fun f =>
+    f :e n :^: finite_cardinality n
+    /\ bij (finite_cardinality n) n (fun j => f j))) hn).
+exact (eq_i_tra
+  (finite_enumeration n i)
+  ((fun j :e n => j) i) i
+  (f_eq_i (fun f:set => f i)
+    (finite_enumeration n) (fun j :e n => j) henum)
+  (beta n (fun j => j) i hi)).
+Qed.
+
+Theorem god1_power_of_natural_finite :
+  forall n :e omega, finite (Power n).
+let n.
+assume hn.
+claim hexpomega : exp_nat 2 n :e omega.
+exact (nat_p_omega (exp_nat 2 n)
+  (exp_nat_p 2 nat_2 n (omega_nat_p n hn))).
+exact (ex_intro
+  (fun m => m :e omega /\ equip (Power n) m)
+  (exp_nat 2 n)
+  (andI
+    (exp_nat 2 n :e omega)
+    (equip (Power n) (exp_nat 2 n))
+    hexpomega
+    (equip_finite_Power n (omega_nat_p n hn) n (equip_ref n)))).
+Qed.
+
+Theorem god1_binomial_subset_family_finite :
+  forall n :e omega, forall p,
+    finite {A :e Power n|equip A p}.
+let n.
+assume hn.
+let p.
+apply (Subq_finite (Power n)
+  (god1_power_of_natural_finite n hn)
+  {A :e Power n|equip A p}).
+let A.
+assume hA.
+exact (SepE1 (Power n) (fun B => equip B p) A hA).
+Qed.
+
+Theorem god1_binomial_coefficient_natural :
+  forall n p :e omega, binomial_coefficient n p :e omega.
+let n.
+assume hn.
+let p.
+assume hp.
+exact (andEL
+  (finite_cardinality {A :e Power n|equip A p} :e omega)
+  (equip {A :e Power n|equip A p}
+    (finite_cardinality {A :e Power n|equip A p}))
+  (god1_finite_cardinality_specification
+    {A :e Power n|equip A p}
+    (god1_binomial_subset_family_finite n hn p))).
+Qed.
+
+Theorem god1_ring_nat_power_zero :
+  forall K, forall add mul:set -> set -> set, forall x,
+    ring_nat_power K add mul x 0 = ring_one K mul.
+let K add mul x.
+exact (nat_primrec_0
+  (ring_one K mul) (fun i r => mul r x)).
+Qed.
+
+Theorem god1_ring_nat_power_successor :
+  forall K, forall add mul:set -> set -> set, forall x n,
+    nat_p n ->
+    ring_nat_power K add mul x (ordsucc n)
+      = mul (ring_nat_power K add mul x n) x.
+let K add mul x n.
+assume hn.
+exact (nat_primrec_S
+  (ring_one K mul) (fun i r => mul r x) n hn).
+Qed.
+
+Theorem god1_ring_nat_power_in :
+  forall K, forall add mul:set -> set -> set,
+    ring K add mul -> forall x :e K, forall n :e omega,
+      ring_nat_power K add mul x n :e K.
+let K add mul.
+assume hK.
+let x.
+assume hx.
+let n.
+assume hn.
+claim hone : ring_one K mul :e K.
+exact (andEL
+  (ring_one K mul :e K)
+  (forall z :e K,
+    mul z (ring_one K mul) = z /\ mul (ring_one K mul) z = z)
+  (god1_ring_multiplicative_identity_specification K add mul hK)).
+exact (nat_ind
+  (fun m => ring_nat_power K add mul x m :e K)
+  (mem_eq_substL K
+    (ring_one K mul) (ring_nat_power K add mul x 0)
+    (god1_ring_nat_power_zero K add mul x) hone)
+  (fun m hm hind =>
+    mem_eq_substL K
+      (mul (ring_nat_power K add mul x m) x)
+      (ring_nat_power K add mul x (ordsucc m))
+      (god1_ring_nat_power_successor K add mul x m hm)
+      (god1_ring_multiplicative_law K add mul hK
+        (ring_nat_power K add mul x m) hind x hx))
+  n (omega_nat_p n hn)).
+Qed.
+
+Theorem god1_ring_nat_multiple_in :
+  forall K, forall add mul:set -> set -> set,
+    ring K add mul -> forall n :e omega, forall x :e K,
+      ring_nat_multiple K add n x :e K.
+let K add mul.
+assume hK.
+let n.
+assume hn.
+let x.
+assume hx.
+exact (god1_group_nat_power_in K add x
+  (god1_ring_additive_group K add mul hK) hx
+  n (omega_nat_p n hn)).
+Qed.
+
+Theorem god1_ring_finite_sum_natural :
+  forall K, forall add:set -> set -> set,
+  forall n :e omega, forall f:set -> set,
+    ring_finite_sum K add n f = group_word_product K add f n.
+let K add.
+let n.
+assume hn.
+let f.
+claim hcard : finite_cardinality n = n.
+exact (god1_finite_cardinality_natural n hn).
+apply (eq_i_tra
+  (ring_finite_sum K add n f)
+  (group_word_product K add
+    (fun i => f (finite_enumeration n i)) n)
+  (group_word_product K add f n)).
+- exact (f_eq_i
+    (fun q:set => group_word_product K add
+      (fun i => f (finite_enumeration n i)) q)
+    (finite_cardinality n) n hcard).
+- apply (god1_group_word_product_congr K add
+    (fun i => f (finite_enumeration n i)) f
+    n (omega_nat_p n hn)).
+  let i.
+  assume hi.
+  exact (f_eq_i f (finite_enumeration n i) i
+    (god1_finite_enumeration_natural_eval n hn i hi)).
+Qed.
+
+Theorem god1_ring_finite_sum_natural_successor :
+  forall K, forall add:set -> set -> set,
+  forall n :e omega, forall f:set -> set,
+    ring_finite_sum K add (ordsucc n) f
+      = add (ring_finite_sum K add n f) (f n).
+let K add.
+let n.
+assume hn.
+let f.
+apply (eq_i_tra
+  (ring_finite_sum K add (ordsucc n) f)
+  (group_word_product K add f (ordsucc n))
+  (add (ring_finite_sum K add n f) (f n))).
+- exact (god1_ring_finite_sum_natural
+    K add (ordsucc n) (omega_ordsucc n hn) f).
+- exact (eq_i_tra
+    (group_word_product K add f (ordsucc n))
+    (add (group_word_product K add f n) (f n))
+    (add (ring_finite_sum K add n f) (f n))
+    (god1_group_word_product_successor K add f n
+      (omega_nat_p n hn))
+    (f_eq_i (fun z:set => add z (f n))
+      (group_word_product K add f n)
+      (ring_finite_sum K add n f)
+      (eq_sym
+        (ring_finite_sum K add n f)
+        (group_word_product K add f n)
+      (god1_ring_finite_sum_natural K add n hn f)))).
+Qed.
+
+Theorem god1_positive_natural_successor_union :
+  forall r :e omega, 0 :e r -> r = ordsucc (Union r).
+let r.
+assume hr hpos.
+apply (orE
+  (r = 0)
+  (exists s, nat_p s /\ r = ordsucc s)
+  (nat_inv r (omega_nat_p r hr))
+  (r = ordsucc (Union r))).
+- assume hrzero.
+  exact (FalseE
+    (In_irref 0 (mem_eq_set_subst r 0 0 hrzero hpos))
+    (r = ordsucc (Union r))).
+- assume hsucc.
+  apply (exandE_i
+    (fun s => nat_p s)
+    (fun s => r = ordsucc s) hsucc).
+  let s.
+  assume hs hrs.
+  claim hunion : Union r = s.
+  exact (eq_i_tra
+    (Union r) (Union (ordsucc s)) s
+    (f_eq_i Union r (ordsucc s) hrs)
+    (Union_ordsucc_eq s hs)).
+  exact (eq_i_tra r (ordsucc s) (ordsucc (Union r)) hrs
+    (f_eq_i ordsucc s (Union r)
+      (eq_sym (Union r) s hunion))).
+Qed.
+
+Theorem god1_setminus_singleton_readd :
+  forall A x, x :e A -> (A :\: {x}) :\/: {x} = A.
+let A x.
+assume hx.
+apply set_ext.
+- let z.
+  assume hz.
+  apply (binunionE' (A :\: {x}) {x} z (z :e A)).
+  - exact (fun hzleft => setminusE1 A {x} z hzleft).
+  - assume hzsing.
+    exact (mem_eq_substL A x z (SingE x z hzsing) hx).
+  - exact hz.
+- let z.
+  assume hz.
+  apply (orE (z = x) (z <> x) (xm (z = x))
+    (z :e (A :\: {x}) :\/: {x})).
+  - assume hzx.
+    exact (binunionI2 (A :\: {x}) {x} z
+      (mem_eq_substL {x} x z hzx (SingI x))).
+  - assume hzx.
+    apply (binunionI1 (A :\: {x}) {x} z).
+    apply (setminusI A {x} z hz).
+    assume hzsing.
+    exact (hzx (SingE x z hzsing)).
+Qed.
+
+Theorem god1_adjoin_remove_singleton :
+  forall A x, x /:e A -> (A :\/: {x}) :\: {x} = A.
+let A x.
+assume hxA.
+apply set_ext.
+- let z.
+  assume hz.
+  claim hzunion : z :e A :\/: {x}.
+  exact (setminusE1 (A :\/: {x}) {x} z hz).
+  claim hznx : z /:e {x}.
+  exact (setminusE2 (A :\/: {x}) {x} z hz).
+  apply (binunionE' A {x} z (z :e A)).
+  - exact (fun hzA => hzA).
+  - assume hzsing.
+    exact (FalseE (hznx hzsing) (z :e A)).
+  - exact hzunion.
+- let z.
+  assume hz.
+  apply (setminusI (A :\/: {x}) {x} z
+    (binunionI1 A {x} z hz)).
+  assume hzsing.
+  exact (hxA (mem_eq_substL A z x
+    (eq_sym z x (SingE x z hzsing)) hz)).
+Qed.
+
+Theorem god1_remove_new_point_subset :
+  forall n, forall A :e Power (ordsucc n),
+    A :\: {n} c= n.
+let n.
+let A.
+assume hA.
+let z.
+assume hz.
+claim hzA : z :e A.
+exact (setminusE1 A {n} z hz).
+claim hzsucc : z :e ordsucc n.
+exact ((PowerE (ordsucc n) A hA) z hzA).
+apply (orE (z :e n) (z = n)
+  (ordsuccE n z hzsucc) (z :e n)).
+- exact (fun hzn => hzn).
+- assume hzn.
+  claim hzsing : z :e {n}.
+  exact (mem_eq_substL {n} n z hzn (SingI n)).
+  exact (FalseE ((setminusE2 A {n} z hz) hzsing) (z :e n)).
+Qed.
+
+Theorem god1_subset_adjoin_new_point_power :
+  forall n, forall C :e Power n,
+    C :\/: {n} :e Power (ordsucc n).
+let n.
+let C.
+assume hC.
+apply (PowerI (ordsucc n) (C :\/: {n})).
+let z.
+assume hz.
+apply (binunionE' C {n} z (z :e ordsucc n)).
+- assume hzC.
+  exact (ordsuccI1 n z ((PowerE n C hC) z hzC)).
+- assume hzsing.
+  exact (mem_eq_substL (ordsucc n) n z
+    (SingE n z hzsing) (ordsuccI2 n)).
+- exact hz.
+Qed.
+
+Theorem god1_binomial_containing_new_point_bijection :
+  forall n :e omega, forall r :e omega, 0 :e r ->
+    bij
+      {A :e {B :e Power (ordsucc n)|equip B r}|n :e A}
+      {C :e Power n|equip C (Union r)}
+      (fun A => A :\: {n}).
+let n.
+assume hn.
+let r.
+assume hr hpos.
+claim hrsucc : r = ordsucc (Union r).
+exact (god1_positive_natural_successor_union r hr hpos).
+apply (bijI
+  {A :e {B :e Power (ordsucc n)|equip B r}|n :e A}
+  {C :e Power n|equip C (Union r)}
+  (fun A => A :\: {n})).
+- let A.
+  assume hA.
+  claim hAbig : A :e {B :e Power (ordsucc n)|equip B r}.
+  exact (SepE1
+    {B :e Power (ordsucc n)|equip B r}
+    (fun B => n :e B) A hA).
+  claim hnA : n :e A.
+  exact (SepE2
+    {B :e Power (ordsucc n)|equip B r}
+    (fun B => n :e B) A hA).
+  claim hApower : A :e Power (ordsucc n).
+  exact (SepE1 (Power (ordsucc n)) (fun B => equip B r) A hAbig).
+  claim hAequip : equip A r.
+  exact (SepE2 (Power (ordsucc n)) (fun B => equip B r) A hAbig).
+  claim hremoveSub : A :\: {n} c= n.
+  exact (god1_remove_new_point_subset n A hApower).
+  claim hAequipSucc : equip A (ordsucc (Union r)).
+  exact (god1_equip_codomain_eq_subst A r
+    (ordsucc (Union r)) hrsucc hAequip).
+  exact (SepI (Power n) (fun C => equip C (Union r))
+    (A :\: {n})
+    (PowerI n (A :\: {n}) hremoveSub)
+    (equip_ordsucc_remove1 A (Union r) n hnA hAequipSucc)).
+- let A.
+  assume hA.
+  let B.
+  assume hB hremove.
+  claim hnA : n :e A.
+  exact (SepE2
+    {C :e Power (ordsucc n)|equip C r}
+    (fun C => n :e C) A hA).
+  claim hnB : n :e B.
+  exact (SepE2
+    {C :e Power (ordsucc n)|equip C r}
+    (fun C => n :e C) B hB).
+  exact (eq_i_tra A
+    ((A :\: {n}) :\/: {n})
+    B
+    (eq_sym ((A :\: {n}) :\/: {n}) A
+      (god1_setminus_singleton_readd A n hnA))
+    (eq_i_tra
+      ((A :\: {n}) :\/: {n})
+      ((B :\: {n}) :\/: {n})
+      B
+      (f_eq_i (fun C:set => C :\/: {n})
+        (A :\: {n}) (B :\: {n}) hremove)
+      (god1_setminus_singleton_readd B n hnB))).
+- let C.
+  assume hC.
+  claim hCpower : C :e Power n.
+  exact (SepE1 (Power n) (fun D => equip D (Union r)) C hC).
+  claim hCequip : equip C (Union r).
+  exact (SepE2 (Power n) (fun D => equip D (Union r)) C hC).
+  claim hnC : n /:e C.
+  assume hnCin.
+  exact (In_irref n ((PowerE n C hCpower) n hnCin)).
+  claim hAdjoinPower : C :\/: {n} :e Power (ordsucc n).
+  exact (god1_subset_adjoin_new_point_power n C hCpower).
+  claim hAdjoinEquipSucc :
+    equip (C :\/: {n}) (ordsucc (Union r)).
+  exact (equip_sym (ordsucc (Union r)) (C :\/: {n})
+    (equip_adjoin_ordsucc (Union r) C n hnC
+      (equip_sym C (Union r) hCequip))).
+  claim hAdjoinEquip : equip (C :\/: {n}) r.
+  exact (god1_equip_codomain_eq_subst
+    (C :\/: {n}) (ordsucc (Union r)) r
+    (eq_sym r (ordsucc (Union r)) hrsucc)
+    hAdjoinEquipSucc).
+  claim hAdjoinBig :
+    C :\/: {n} :e {B :e Power (ordsucc n)|equip B r}.
+  exact (SepI (Power (ordsucc n)) (fun B => equip B r)
+    (C :\/: {n}) hAdjoinPower hAdjoinEquip).
+  witness (C :\/: {n}).
+  exact (andI
+    (C :\/: {n}
+      :e {A :e {B :e Power (ordsucc n)|equip B r}|n :e A})
+    ((C :\/: {n}) :\: {n} = C)
+    (SepI
+      {B :e Power (ordsucc n)|equip B r}
+      (fun A => n :e A)
+      (C :\/: {n}) hAdjoinBig
+      (binunionI2 C {n} n (SingI n)))
+    (god1_adjoin_remove_singleton C n hnC)).
+Qed.
+
+Theorem god1_subset_successor_without_new_point :
+  forall n A, A c= ordsucc n -> n /:e A -> A c= n.
+let n A.
+assume hA hnA.
+let z.
+assume hz.
+apply (orE (z :e n) (z = n)
+  (ordsuccE n z (hA z hz)) (z :e n)).
+- exact (fun hzn => hzn).
+- assume hzn.
+  exact (FalseE (hnA (mem_eq_substL A z n
+    (eq_sym z n hzn) hz)) (z :e n)).
+Qed.
+
+Theorem god1_binomial_family_split :
+  forall n r,
+    {A :e Power (ordsucc n)|equip A r}
+    = {A :e Power n|equip A r}
+      :\/: {A :e {B :e Power (ordsucc n)|equip B r}|n :e A}.
+let n r.
+apply set_ext.
+- let A.
+  assume hA.
+  apply (orE (n :e A) (n /:e A) (xm (n :e A))
+    (A :e {B :e Power n|equip B r}
+      :\/: {B :e {C :e Power (ordsucc n)|equip C r}|n :e B})).
+  - assume hnA.
+    exact (binunionI2
+      {B :e Power n|equip B r}
+      {B :e {C :e Power (ordsucc n)|equip C r}|n :e B}
+      A
+      (SepI
+        {C :e Power (ordsucc n)|equip C r}
+        (fun B => n :e B) A hA hnA)).
+  - assume hnA.
+    claim hApower : A :e Power (ordsucc n).
+    exact (SepE1 (Power (ordsucc n)) (fun B => equip B r) A hA).
+    claim hAequip : equip A r.
+    exact (SepE2 (Power (ordsucc n)) (fun B => equip B r) A hA).
+    exact (binunionI1
+      {B :e Power n|equip B r}
+      {B :e {C :e Power (ordsucc n)|equip C r}|n :e B}
+      A
+      (SepI (Power n) (fun B => equip B r) A
+        (PowerI n A
+          (god1_subset_successor_without_new_point n A
+            (PowerE (ordsucc n) A hApower) hnA))
+        hAequip)).
+- let A.
+  assume hA.
+  apply (binunionE'
+    {B :e Power n|equip B r}
+    {B :e {C :e Power (ordsucc n)|equip C r}|n :e B}
+    A (A :e {B :e Power (ordsucc n)|equip B r})).
+  - assume hAsmall.
+    claim hApower : A :e Power n.
+    exact (SepE1 (Power n) (fun B => equip B r) A hAsmall).
+    exact (SepI (Power (ordsucc n)) (fun B => equip B r) A
+      (PowerI (ordsucc n) A
+        (fun z hz =>
+          ordsuccI1 n z ((PowerE n A hApower) z hz)))
+      (SepE2 (Power n) (fun B => equip B r) A hAsmall)).
+  - assume hAcontains.
+    exact (SepE1
+      {C :e Power (ordsucc n)|equip C r}
+      (fun B => n :e B) A hAcontains).
+  - exact hA.
+Qed.
+
+Theorem god1_binomial_pascal_interior :
+  forall n :e omega, forall r :e n, 0 :e r ->
+    add_nat
+      (binomial_coefficient n r)
+      (binomial_coefficient n (Union r))
+    = binomial_coefficient (ordsucc n) r.
+let n.
+assume hn.
+let r.
+assume hr hpos.
+claim hromega : r :e omega.
+exact (omega_TransSet n hn r hr).
+claim hrsucc : r = ordsucc (Union r).
+exact (god1_positive_natural_successor_union r hromega hpos).
+claim hUnionomega : Union r :e omega.
+exact (omega_TransSet r hromega (Union r)
+  (mem_eq_set_subst (ordsucc (Union r)) r (Union r)
+    (eq_sym r (ordsucc (Union r)) hrsucc)
+    (ordsuccI2 (Union r)))).
+claim hcoeffR : binomial_coefficient n r :e omega.
+exact (god1_binomial_coefficient_natural n hn r hromega).
+claim hcoeffU : binomial_coefficient n (Union r) :e omega.
+exact (god1_binomial_coefficient_natural
+  n hn (Union r) hUnionomega).
+claim hcoeffBig : binomial_coefficient (ordsucc n) r :e omega.
+exact (god1_binomial_coefficient_natural
+  (ordsucc n) (omega_ordsucc n hn) r hromega).
+claim hsmallFinite : finite {A :e Power n|equip A r}.
+exact (god1_binomial_subset_family_finite n hn r).
+claim hsmallUFinite : finite {A :e Power n|equip A (Union r)}.
+exact (god1_binomial_subset_family_finite n hn (Union r)).
+claim hbigFinite :
+  finite {A :e Power (ordsucc n)|equip A r}.
+exact (god1_binomial_subset_family_finite
+  (ordsucc n) (omega_ordsucc n hn) r).
+claim hcontainFinite :
+  finite {A :e {B :e Power (ordsucc n)|equip B r}|n :e A}.
+apply (Subq_finite
+  {B :e Power (ordsucc n)|equip B r} hbigFinite
+  {A :e {B :e Power (ordsucc n)|equip B r}|n :e A}).
+let A.
+assume hA.
+exact (SepE1
+  {B :e Power (ordsucc n)|equip B r}
+  (fun B => n :e B) A hA).
+claim hsmallEquip :
+  equip {A :e Power n|equip A r} (binomial_coefficient n r).
+exact (andER
+  (finite_cardinality {A :e Power n|equip A r} :e omega)
+  (equip {A :e Power n|equip A r}
+    (finite_cardinality {A :e Power n|equip A r}))
+  (god1_finite_cardinality_specification
+    {A :e Power n|equip A r} hsmallFinite)).
+claim hsmallUEquip :
+  equip {A :e Power n|equip A (Union r)}
+    (binomial_coefficient n (Union r)).
+exact (andER
+  (finite_cardinality {A :e Power n|equip A (Union r)} :e omega)
+  (equip {A :e Power n|equip A (Union r)}
+    (finite_cardinality {A :e Power n|equip A (Union r)}))
+  (god1_finite_cardinality_specification
+    {A :e Power n|equip A (Union r)} hsmallUFinite)).
+claim hbigEquip :
+  equip {A :e Power (ordsucc n)|equip A r}
+    (binomial_coefficient (ordsucc n) r).
+exact (andER
+  (finite_cardinality
+    {A :e Power (ordsucc n)|equip A r} :e omega)
+  (equip {A :e Power (ordsucc n)|equip A r}
+    (finite_cardinality
+      {A :e Power (ordsucc n)|equip A r}))
+  (god1_finite_cardinality_specification
+    {A :e Power (ordsucc n)|equip A r} hbigFinite)).
+claim hcontainSmallU :
+  equip
+    {A :e {B :e Power (ordsucc n)|equip B r}|n :e A}
+    {C :e Power n|equip C (Union r)}.
+apply (ex_intro_setfun
+  (fun f =>
+    bij
+      {A :e {B :e Power (ordsucc n)|equip B r}|n :e A}
+      {C :e Power n|equip C (Union r)} f)
+  (fun A => A :\: {n})).
+exact (god1_binomial_containing_new_point_bijection
+  n hn r hromega hpos).
+claim hcontainEquip :
+  equip
+    {A :e {B :e Power (ordsucc n)|equip B r}|n :e A}
+    (binomial_coefficient n (Union r)).
+exact (equip_tra
+  {A :e {B :e Power (ordsucc n)|equip B r}|n :e A}
+  {C :e Power n|equip C (Union r)}
+  (binomial_coefficient n (Union r))
+  hcontainSmallU hsmallUEquip).
+claim hdisjoint :
+  forall A :e {B :e {C :e Power (ordsucc n)|equip C r}|n :e B},
+    A /:e {B :e Power n|equip B r}.
+let A.
+assume hA hAsmall.
+claim hnA : n :e A.
+exact (SepE2
+  {C :e Power (ordsucc n)|equip C r}
+  (fun B => n :e B) A hA).
+claim hApower : A :e Power n.
+exact (SepE1 (Power n) (fun B => equip B r) A hAsmall).
+exact (In_irref n ((PowerE n A hApower) n hnA)).
+claim hunionEquip :
+  equip
+    ({A :e Power n|equip A r}
+      :\/: {A :e {B :e Power (ordsucc n)|equip B r}|n :e A})
+    (add_nat
+      (binomial_coefficient n r)
+      (binomial_coefficient n (Union r))).
+exact (god1_disjoint_union_cardinality
+  {A :e Power n|equip A r}
+  (binomial_coefficient n r) hcoeffR hsmallEquip
+  {A :e {B :e Power (ordsucc n)|equip B r}|n :e A}
+  hcontainFinite
+  (binomial_coefficient n (Union r)) hcoeffU hcontainEquip
+  hdisjoint).
+claim hbigUnion :
+  {A :e Power (ordsucc n)|equip A r}
+  = {A :e Power n|equip A r}
+    :\/: {A :e {B :e Power (ordsucc n)|equip B r}|n :e A}.
+exact (god1_binomial_family_split n r).
+claim hbigAdd :
+  equip {A :e Power (ordsucc n)|equip A r}
+    (add_nat
+      (binomial_coefficient n r)
+      (binomial_coefficient n (Union r))).
+exact (god1_equip_domain_eq_subst
+  ({A :e Power n|equip A r}
+    :\/: {A :e {B :e Power (ordsucc n)|equip B r}|n :e A})
+  {A :e Power (ordsucc n)|equip A r}
+  (add_nat
+    (binomial_coefficient n r)
+    (binomial_coefficient n (Union r)))
+  (eq_sym
+    {A :e Power (ordsucc n)|equip A r}
+    ({A :e Power n|equip A r}
+      :\/: {A :e {B :e Power (ordsucc n)|equip B r}|n :e A})
+    hbigUnion)
+  hunionEquip).
+exact (god1_nat_equip_eq
+  (add_nat
+    (binomial_coefficient n r)
+    (binomial_coefficient n (Union r)))
+  (binomial_coefficient (ordsucc n) r)
+  (add_nat_p
+    (binomial_coefficient n r)
+      (omega_nat_p (binomial_coefficient n r) hcoeffR)
+    (binomial_coefficient n (Union r))
+      (omega_nat_p (binomial_coefficient n (Union r)) hcoeffU))
+  (omega_nat_p (binomial_coefficient (ordsucc n) r) hcoeffBig)
+  (equip_tra
+    (add_nat
+      (binomial_coefficient n r)
+      (binomial_coefficient n (Union r)))
+    {A :e Power (ordsucc n)|equip A r}
+    (binomial_coefficient (ordsucc n) r)
+    (equip_sym
+      {A :e Power (ordsucc n)|equip A r}
+      (add_nat
+        (binomial_coefficient n r)
+        (binomial_coefficient n (Union r)))
+      hbigAdd)
+    hbigEquip)).
+Qed.
 
 Theorem god1_s8_theorem3_binomial_theorem :
   forall K, forall add mul:set -> set -> set,
