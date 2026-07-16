@@ -35799,7 +35799,7 @@ Theorem god1_de_moivre :
       (mul_CSNo Complex_i (complex_sin (mul_SNo n theta))).
 Admitted.
 
-(** §§ 10–11. Modules, linear relations, and bases. **)
+(** § 10. Modules and vector spaces. **)
 
 //GOD1:195183 left_module : "#4 with addition #5 and scalar multiplication #6 is a left module over the ring #1" | $#4\text{ is a left }#1\text{-module}$
 Definition left_module :
@@ -35972,6 +35972,8 @@ Theorem god1_right_modules_are_left_modules_over_opposite_ring :
       K addK (opposite_ring_multiplication mulK)
       M addM (fun scalar x => smulR x scalar).
 Admitted.
+
+(** § 11. Linear relations in a module. **)
 
 //GOD1:232289 almost_all_zero : "almost all terms of #3 indexed by #1 are the zero #2" | $#3_i=0\text{ for almost all }i\in #1$
 Definition almost_all_zero :
@@ -36196,7 +36198,7 @@ Theorem god1_s11_theorem3_finite_dimensional_vector_space_has_basis :
       module_basis K addK mulK M addM smul I a.
 Admitted.
 
-(** §§ 12–14. Linear mappings and matrices. **)
+(** § 12. Linear mappings and matrices. **)
 
 //GOD1:249688 module_homomorphism : "#11 is a linear mapping from the left module #4 to the left module #7" | $#11:#4\to #7$
 Definition module_homomorphism :
@@ -36389,6 +36391,8 @@ Theorem god1_s12_corollary2_finitely_generated_iff_quotient_of_power :
       /\ surj (K :^: n) M f).
 Admitted.
 
+(** § 13. Addition of homomorphisms and matrices. **)
+
 //GOD1:280927 module_homomorphism_space : "the set of linear maps from #4 to #7" | $\operatorname{Hom}_{#1}(#4,#7)$
 Definition module_homomorphism_space :
   set -> (set -> set -> set) -> (set -> set -> set) ->
@@ -36539,6 +36543,8 @@ Theorem god1_s13_theorem2_matrix_of_sum :
       (matrix_of_right_linear_map
         K addK mulK L addL smulL M addM smulM q p a b g).
 Admitted.
+
+(** § 14. Products of matrices. **)
 
 //GOD1:288589 module_endomorphism_ring : "the ring of endomorphisms of the module #4" | $\operatorname{End}_{#1}(#4)$
 Definition module_endomorphism_ring :
@@ -36912,8 +36918,8 @@ Theorem god1_s16_theorem1_dual_of_finite_free_module :
       (right_module_dual_addition L addK)
       (right_module_dual_left_scalar L mulK)
       n
-      (fun i => right_module_dual_basis_vector
-        K addK mulK L addL smulR n a i)
+      (fun i => fun x :e L => right_module_dual_basis_vector
+        K addK mulK L addL smulR n a i x)
     /\ forall i j :e n,
       right_module_dual_basis_vector
         K addK mulK L addL smulR n a i (a j)
@@ -37102,10 +37108,10 @@ Theorem god1_matrix_of_transposed_map_is_transpose_matrix :
       (right_module_dual_addition L addK)
       (fun u scalar => right_module_dual_left_scalar L mulK scalar u)
       p q
-      (fun i => right_module_dual_basis_vector
-        K addK mulK M addM smulM p b i)
-      (fun j => right_module_dual_basis_vector
-        K addK mulK L addL smulL q a j)
+      (fun i => fun x :e M => right_module_dual_basis_vector
+        K addK mulK M addM smulM p b i x)
+      (fun j => fun x :e L => right_module_dual_basis_vector
+        K addK mulK L addL smulL q a j x)
       (fun u => module_transpose
         K addK mulK L addL smulL M addM smulM f u)
     = matrix_transpose K p q
@@ -37521,7 +37527,7 @@ Definition stationary_sequence_of_sets : set -> (set -> set) -> prop :=
 //GOD1:416424 maximal_element_by_inclusion : "#3 is a maximal element of the family #2 of subsets of #1" | $#3\in\max(#2)$
 Definition maximal_element_by_inclusion : set -> set -> set -> prop :=
   fun X F A =>
-    F c= power X /\ A :e F
+    F c= Power X /\ A :e F
     /\ forall B :e F, A c= B -> B = A.
 
 Theorem god1_s18_theorem4_noetherian_chain_conditions :
@@ -37873,19 +37879,24 @@ Theorem god1_s19_theorem10_basis_characterizations :
   forall n :e omega, forall x:set -> set,
     right_vector_space K addK mulK M addM smulR ->
     let mul0 := opposite_ring_multiplication mulK in
-    let smul := fun scalar y => smulR y scalar in
     (right_module_basis K addK mulK M addM smulR n x
-    <-> linearly_independent_family K addK mul0 M addM smul n x
+    <-> linearly_independent_family K addK mul0 M addM
+      (fun scalar y => smulR y scalar) n x
       /\ right_vector_dimension K addK mulK M addM smulR = n)
     /\ (right_module_basis K addK mulK M addM smulR n x
-    <-> linearly_independent_family K addK mul0 M addM smul n x
-      /\ independent_family_size_bound K addK mul0 M addM smul n)
+    <-> linearly_independent_family K addK mul0 M addM
+      (fun scalar y => smulR y scalar) n x
+      /\ independent_family_size_bound K addK mul0 M addM
+        (fun scalar y => smulR y scalar) n)
     /\ (right_module_basis K addK mulK M addM smulR n x
-    <-> generating_family K addK mul0 M addM smul n x
+    <-> generating_family K addK mul0 M addM
+      (fun scalar y => smulR y scalar) n x
       /\ right_vector_dimension K addK mulK M addM smulR = n)
     /\ (right_module_basis K addK mulK M addM smulR n x
-    <-> generating_family K addK mul0 M addM smul n x
-      /\ generating_family_size_bound K addK mul0 M addM smul n).
+    <-> generating_family K addK mul0 M addM
+      (fun scalar y => smulR y scalar) n x
+      /\ generating_family_size_bound K addK mul0 M addM
+        (fun scalar y => smulR y scalar) n).
 Admitted.
 
 Theorem god1_s19_theorem11_dimension_extremal_characterizations :
@@ -38125,9 +38136,9 @@ Admitted.
 
 //GOD1:476223 linear_forms_common_kernel : "the subspace defined by the homogeneous equations #8" | $\bigcap_i\ker(#8_i)$
 Definition linear_forms_common_kernel :
-  set -> (set -> set -> set) -> set -> (set -> set) -> set :=
+  set -> (set -> set -> set) -> set -> set -> (set -> set) -> set :=
   fun K addK L I f =>
-    {x :e L|forall i :e I, f i x = ring_zero K addK}.
+    {x :e L|forall i :e I, ap (f i) x = ring_zero K addK}.
 
 Theorem god1_s19_theorem17_dimension_from_linear_equations :
   forall K, forall addK mulK:set -> set -> set,
@@ -38215,7 +38226,8 @@ Theorem god1_linear_system_rank_equals_row_form_rank_and_matrix_rank :
             (opposite_ring_multiplication mul) scalar x))
         (right_module_dual_addition (K :^: p) add)
         (right_module_dual_left_scalar (K :^: p) mul)
-        n (matrix_row_linear_form K add mul p A).
+        n (fun i => fun x :e K :^: p =>
+          matrix_row_linear_form K add mul p A i x).
 Admitted.
 
 //GOD1:496635 associated_homogeneous_solution_space : "the solution space of the homogeneous system associated with #6x=#7" | $\ker(#6)$
@@ -38264,7 +38276,8 @@ Theorem god1_s20_theorem1_cramer_system_characterizations :
             (opposite_ring_multiplication mul) scalar x))
         (right_module_dual_addition (K :^: p) add)
         (right_module_dual_left_scalar (K :^: p) mul)
-        n (matrix_row_linear_form K add mul p A)).
+        n (fun i => fun x :e K :^: p =>
+          matrix_row_linear_form K add mul p A i x)).
 Admitted.
 
 Theorem god1_s20_theorem2_square_cramer_equivalences_and_solution :
@@ -38306,7 +38319,8 @@ Theorem god1_s20_theorem3_independent_system_reduces_to_cramer_system :
           (opposite_ring_multiplication mul) scalar x))
       (right_module_dual_addition (K :^: p) add)
       (right_module_dual_left_scalar (K :^: p) mul)
-      n (matrix_row_linear_form K add mul p A) ->
+      n (fun i => fun x :e K :^: p =>
+        matrix_row_linear_form K add mul p A i x) ->
     exists cols :e p :^: n,
       inj n p (fun i => cols i)
       /\ invertible_matrix K add mul n
@@ -38334,6 +38348,4663 @@ Theorem god1_s20_theorem3_independent_system_reduces_to_cramer_system :
               linear_system_solution K add mul n p A b y ->
               (forall k :e p,
                 k /:e {cols i|i :e n} -> y k = eta k) -> y = x.
+Admitted.
+
+(** § 21. Multilinear functions. **)
+
+//GOD1:517873 indexed_function_update : "the family obtained from #2 by replacing its #3-th term by #4" | $#2[#3:=#4]$
+Definition indexed_function_update :
+  set -> set -> set -> set -> set :=
+  fun I x i y => fun j :e I => if j = i then y else x j.
+
+//GOD1:517873 multilinear_mapping : "#11 is a multilinear mapping from the product of the modules #5 to #8" | $#11\in\mathscr L(#5;#8)$
+Definition multilinear_mapping :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set) ->
+  (set -> set -> set -> set) -> (set -> set -> set -> set) ->
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  (set -> set) -> prop :=
+  fun K addK mulK I X addX smulX M addM smulM f =>
+    commutative_ring K addK mulK
+    /\ (forall i :e I,
+      left_module K addK mulK (X i) (addX i) (smulX i))
+    /\ left_module K addK mulK M addM smulM
+    /\ (forall x :e indexed_module_product I X, f x :e M)
+    /\ forall i :e I, forall x :e indexed_module_product I X,
+      forall u v :e X i, forall scalar mu :e K,
+      f (indexed_function_update I x i
+          (addX i (smulX i scalar u) (smulX i mu v)))
+      = addM
+        (smulM scalar (f (indexed_function_update I x i u)))
+        (smulM mu (f (indexed_function_update I x i v))).
+
+//GOD1:516587 bilinear_mapping : "#11 is a bilinear mapping from #4 times #7 to #8" | $#11:#4\times #7\to #8$
+Definition bilinear_mapping :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  (set -> set) -> prop :=
+  fun K addK mulK X addX smulX Y addY smulY M addM smulM f =>
+    multilinear_mapping K addK mulK 2
+      (fun i => if i = 0 then X else Y)
+      (fun i x y => if i = 0 then addX x y else addY x y)
+      (fun i scalar x =>
+        if i = 0 then smulX scalar x else smulY scalar x)
+      M addM smulM f.
+
+//GOD1:516587 bilinear_tuple : "the pair of arguments #1 and #2 as a two-indexed family" | $(#1,#2)$
+Definition bilinear_tuple : set -> set -> set :=
+  fun x y => fun i :e 2 => if i = 0 then x else y.
+
+//GOD1:517334 trilinear_mapping : "#14 is a trilinear mapping from #4 times #7 times #10 to #11" | $#14:#4\times #7\times #10\to #11$
+Definition trilinear_mapping :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  (set -> set) -> prop :=
+  fun K addK mulK X addX smulX Y addY smulY Z addZ smulZ
+      M addM smulM f =>
+    multilinear_mapping K addK mulK 3
+      (fun i => if i = 0 then X else if i = 1 then Y else Z)
+      (fun i x y =>
+        if i = 0 then addX x y
+        else if i = 1 then addY x y else addZ x y)
+      (fun i scalar x =>
+        if i = 0 then smulX scalar x
+        else if i = 1 then smulY scalar x else smulZ scalar x)
+      M addM smulM f.
+
+//GOD1:517334 trilinear_tuple : "the triple of arguments #1, #2, and #3 as a three-indexed family" | $(#1,#2,#3)$
+Definition trilinear_tuple : set -> set -> set -> set :=
+  fun x y z => fun i :e 3 => if i = 0 then x else if i = 1 then y else z.
+
+//GOD1:519026 multilinear_mapping_space : "the module of multilinear mappings from the product of #5 into #8" | $\mathscr L(#5;#8)$
+Definition multilinear_mapping_space :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set) ->
+  (set -> set -> set -> set) -> (set -> set -> set -> set) ->
+  set -> (set -> set -> set) -> (set -> set -> set) -> set :=
+  fun K addK mulK I X addX smulX M addM smulM =>
+    {f :e M :^: (indexed_module_product I X)|
+      multilinear_mapping K addK mulK I X addX smulX M addM smulM
+        (fun x => f x)}.
+
+//GOD1:519026 multilinear_mapping_addition : "pointwise addition of multilinear mappings" | $(f+g)(x)=f(x)+g(x)$
+Definition multilinear_mapping_addition :
+  set -> (set -> set -> set) -> set -> set -> set :=
+  fun D addM => module_homomorphism_addition D addM.
+
+//GOD1:519026 multilinear_mapping_scalar : "pointwise scalar multiplication of multilinear mappings" | $(\lambda f)(x)=\lambda f(x)$
+Definition multilinear_mapping_scalar :
+  set -> (set -> set -> set) -> set -> set -> set :=
+  fun D smulM => module_homomorphism_scalar D smulM.
+
+Theorem god1_multilinear_mappings_form_module :
+  forall K, forall addK mulK:set -> set -> set,
+  forall I, forall X:set -> set,
+  forall addX smulX:set -> set -> set -> set,
+  forall M, forall addM smulM:set -> set -> set,
+    commutative_ring K addK mulK ->
+    (forall i :e I,
+      left_module K addK mulK (X i) (addX i) (smulX i)) ->
+    left_module K addK mulK M addM smulM ->
+    left_module K addK mulK
+      (multilinear_mapping_space
+        K addK mulK I X addX smulX M addM smulM)
+      (multilinear_mapping_addition (indexed_module_product I X) addM)
+      (multilinear_mapping_scalar (indexed_module_product I X) smulM).
+Admitted.
+
+//GOD1:524442 commutative_module_dual : "the dual of the module #4 over the commutative ring #1" | $#4^*$
+Definition commutative_module_dual :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set -> set) -> (set -> set -> set) -> set :=
+  fun K addK mulK X addX smulX =>
+    module_homomorphism_space K addK mulK
+      X addX smulX K addK mulK.
+
+//GOD1:524442 tensor_argument_family : "the family of #7 dual and #8 vector argument modules for a tensor of type (#7,#8)" | $(#4^*)^{#7}\times #4^{#8}$
+Definition tensor_argument_family :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> set -> set -> set :=
+  fun K addK mulK X addX smulX p q h =>
+    if h :e {Inj0 i|i :e p}
+    then commutative_module_dual K addK mulK X addX smulX
+    else X.
+
+//GOD1:524442 tensor_argument_addition : "addition in each argument module of a tensor" | $+$
+Definition tensor_argument_addition :
+  set -> (set -> set -> set) ->
+  set -> set -> set -> set -> set -> set :=
+  fun X addX p q h x y =>
+    if h :e {Inj0 i|i :e p}
+    then module_homomorphism_addition X addX x y
+    else addX x y.
+
+//GOD1:524442 tensor_argument_scalar : "scalar multiplication in each argument module of a tensor" | $\lambda x$
+Definition tensor_argument_scalar :
+  set -> (set -> set -> set) ->
+  set -> set -> set -> set -> set -> set :=
+  fun X smulX p q h scalar x =>
+    if h :e {Inj0 i|i :e p}
+    then module_homomorphism_scalar X smulX scalar x
+    else smulX scalar x.
+
+//GOD1:524442 tensor_space : "the module of tensors of type (#7,#8) on #4" | $T_{#8}^{#7}(#4)$
+Definition tensor_space :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> set -> set :=
+  fun K addK mulK X addX smulX p q =>
+    multilinear_mapping_space K addK mulK (p :+: q)
+      (tensor_argument_family K addK mulK X addX smulX p q)
+      (tensor_argument_addition X addX p q)
+      (tensor_argument_scalar X smulX p q)
+      K addK mulK.
+
+//GOD1:527304 tensor_product_of_multilinear_forms : "the tensor product of the multilinear forms #12 and #13" | $#12\otimes #13$
+Definition tensor_product_of_multilinear_forms :
+  set -> (set -> set -> set) ->
+  set -> set -> (set -> set) -> (set -> set) -> set :=
+  fun K mul I J f g =>
+    fun z :e indexed_module_product (I :+: J)
+      (fun h => if h :e {Inj0 i|i :e I} then K else K) =>
+      mul
+        (f (fun i :e I => z (Inj0 i)))
+        (g (fun j :e J => z (Inj1 j))).
+
+Theorem god1_tensor_product_of_multilinear_forms_is_multilinear_and_associative :
+  forall K, forall add mul:set -> set -> set,
+  forall I J, forall X Y:set -> set,
+  forall addX smulX addY smulY:set -> set -> set -> set,
+  forall f g:set -> set,
+    commutative_ring K add mul ->
+    multilinear_mapping K add mul I X addX smulX K add mul f ->
+    multilinear_mapping K add mul J Y addY smulY K add mul g ->
+    multilinear_mapping K add mul (I :+: J)
+      (fun h => if h :e {Inj0 i|i :e I}
+        then X (Unj h) else Y (Unj h))
+      (fun h x y => if h :e {Inj0 i|i :e I}
+        then addX (Unj h) x y else addY (Unj h) x y)
+      (fun h scalar x => if h :e {Inj0 i|i :e I}
+        then smulX (Unj h) scalar x else smulY (Unj h) scalar x)
+      K add mul
+      (fun z => mul
+        (f (fun i :e I => z (Inj0 i)))
+        (g (fun j :e J => z (Inj1 j)))).
+Admitted.
+
+Theorem god1_s21_theorem1_bilinear_maps_on_free_modules :
+  forall K, forall addK mulK:set -> set -> set,
+  forall X, forall addX smulX:set -> set -> set,
+  forall Y, forall addY smulY:set -> set -> set,
+  forall M, forall addM smulM:set -> set -> set,
+  forall m n :e omega, forall a b:set -> set, forall f:set -> set,
+    commutative_ring K addK mulK ->
+    module_basis K addK mulK X addX smulX m a ->
+    module_basis K addK mulK Y addY smulY n b ->
+    left_module K addK mulK M addM smulM ->
+    (bilinear_mapping
+      K addK mulK X addX smulX Y addY smulY M addM smulM f
+    <-> exists c:set -> set -> set,
+      (forall i :e m, forall j :e n, c i j :e M)
+      /\ (forall i :e m, forall j :e n,
+        c i j = f (bilinear_tuple (a i) (b j)))
+      /\ forall x :e X, forall y :e Y,
+        f (bilinear_tuple x y)
+        = module_finitely_supported_sum M addM (m :*: n)
+          (fun u => smulM
+            (mulK
+              (basis_coordinates K addK mulK X addX smulX m a x (u 0))
+              (basis_coordinates K addK mulK Y addY smulY n b y (u 1)))
+            (c (u 0) (u 1)))).
+Admitted.
+
+Theorem god1_bilinear_tensor_basis :
+  forall K, forall addK mulK:set -> set -> set,
+  forall X, forall addX smulX:set -> set -> set,
+  forall Y, forall addY smulY:set -> set -> set,
+  forall m n :e omega, forall a b:set -> set,
+    commutative_ring K addK mulK ->
+    module_basis K addK mulK X addX smulX m a ->
+    module_basis K addK mulK Y addY smulY n b ->
+    module_basis K addK mulK
+      (multilinear_mapping_space K addK mulK 2
+        (fun i => if i = 0 then X else Y)
+        (fun i x y => if i = 0 then addX x y else addY x y)
+        (fun i scalar x =>
+          if i = 0 then smulX scalar x else smulY scalar x)
+        K addK mulK)
+      (multilinear_mapping_addition
+        (indexed_module_product 2 (fun i => if i = 0 then X else Y)) addK)
+      (multilinear_mapping_scalar
+        (indexed_module_product 2 (fun i => if i = 0 then X else Y)) mulK)
+      (m :*: n)
+      (fun u => fun z :e indexed_module_product 2
+          (fun i => if i = 0 then X else Y) =>
+        mulK
+          (basis_coordinate_function K addK mulK X addX smulX m a (u 0) (z 0))
+          (basis_coordinate_function K addK mulK Y addY smulY n b (u 1) (z 1))).
+Admitted.
+
+Theorem god1_s21_theorem2_trilinear_maps_on_free_modules :
+  forall K, forall addK mulK:set -> set -> set,
+  forall X, forall addX smulX:set -> set -> set,
+  forall Y, forall addY smulY:set -> set -> set,
+  forall Z, forall addZ smulZ:set -> set -> set,
+  forall M, forall addM smulM:set -> set -> set,
+  forall m n p :e omega, forall a b c:set -> set, forall f:set -> set,
+    commutative_ring K addK mulK ->
+    module_basis K addK mulK X addX smulX m a ->
+    module_basis K addK mulK Y addY smulY n b ->
+    module_basis K addK mulK Z addZ smulZ p c ->
+    left_module K addK mulK M addM smulM ->
+    (trilinear_mapping K addK mulK
+      X addX smulX Y addY smulY Z addZ smulZ M addM smulM f
+    <-> exists coeff:set -> set -> set -> set,
+      (forall i :e m, forall j :e n, forall k :e p, coeff i j k :e M)
+      /\ (forall i :e m, forall j :e n, forall k :e p,
+        coeff i j k = f (trilinear_tuple (a i) (b j) (c k)))
+      /\ forall x :e X, forall y :e Y, forall z :e Z,
+        f (trilinear_tuple x y z)
+        = module_finitely_supported_sum M addM (m :*: (n :*: p))
+          (fun u => smulM
+            (mulK
+              (basis_coordinates K addK mulK X addX smulX m a x (u 0))
+              (mulK
+                (basis_coordinates K addK mulK Y addY smulY n b y (u 1 0))
+                (basis_coordinates K addK mulK Z addZ smulZ p c z (u 1 1))))
+            (coeff (u 0) (u 1 0) (u 1 1)))).
+Admitted.
+
+Theorem god1_s21_theorem3_multilinear_maps_on_free_modules :
+  forall K, forall addK mulK:set -> set -> set,
+  forall p :e omega, forall X:set -> set,
+  forall addX smulX:set -> set -> set -> set,
+  forall n:set -> set, forall a:set -> set -> set,
+  forall M, forall addM smulM:set -> set -> set, forall f:set -> set,
+    commutative_ring K addK mulK ->
+    (forall h :e p, n h :e omega
+      /\ module_basis K addK mulK
+        (X h) (addX h) (smulX h) (n h) (a h)) ->
+    left_module K addK mulK M addM smulM ->
+    (multilinear_mapping K addK mulK p X addX smulX M addM smulM f
+    <-> exists coeff:set -> set,
+      (forall idx :e (Pi_ h :e p, n h), coeff idx :e M)
+      /\ (forall idx :e (Pi_ h :e p, n h),
+        coeff idx = f (fun h :e p => a h (idx h)))
+      /\ forall x :e indexed_module_product p X,
+        f x = module_finitely_supported_sum M addM (Pi_ h :e p, n h)
+          (fun idx => smulM
+            (ring_finite_product K addK mulK p
+              (fun h => basis_coordinates K addK mulK
+                (X h) (addX h) (smulX h) (n h) (a h) (x h) (idx h)))
+            (coeff idx))).
+Admitted.
+
+(** § 22. Alternating bilinear and trilinear mappings. **)
+
+//GOD1:580671 alternating_bilinear_mapping : "#13 is an alternating bilinear mapping on #4 with values in #10" | $#13(x,x)=0$
+Definition alternating_bilinear_mapping :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  (set -> set) -> prop :=
+  fun K addK mulK X addX smulX M addM smulM f =>
+    bilinear_mapping K addK mulK
+      X addX smulX X addX smulX M addM smulM f
+    /\ forall x :e X, f (bilinear_tuple x x) = module_zero M addM.
+
+//GOD1:580671 alternating_bilinear_mapping_space : "the module of alternating bilinear mappings on #4 with values in #7" | $\operatorname{Alt}^2(#4,#7)$
+Definition alternating_bilinear_mapping_space :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set -> set) -> (set -> set -> set) -> set :=
+  fun K addK mulK X addX smulX M addM smulM =>
+    {f :e M :^: (indexed_module_product 2 (fun i => X))|
+      alternating_bilinear_mapping K addK mulK
+        X addX smulX M addM smulM (fun z => f z)}.
+
+Theorem god1_alternating_bilinear_maps_are_skew_and_form_submodule :
+  forall K, forall addK mulK:set -> set -> set,
+  forall X, forall addX smulX:set -> set -> set,
+  forall M, forall addM smulM:set -> set -> set,
+  forall f:set -> set,
+    alternating_bilinear_mapping K addK mulK
+      X addX smulX M addM smulM f ->
+    (forall x y :e X,
+      f (bilinear_tuple y x)
+      = module_negation M addM (f (bilinear_tuple x y)))
+    /\ submodule K addK mulK
+      (multilinear_mapping_space K addK mulK 2
+        (fun i => X) (fun i => addX) (fun i => smulX) M addM smulM)
+      (multilinear_mapping_addition (indexed_module_product 2 (fun i => X)) addM)
+      (multilinear_mapping_scalar (indexed_module_product 2 (fun i => X)) smulM)
+      (alternating_bilinear_mapping_space
+        K addK mulK X addX smulX M addM smulM).
+Admitted.
+
+//GOD1:582578 exterior_product_two_linear_forms : "the exterior product of the linear forms #7 and #8" | $#7\wedge #8$
+Definition exterior_product_two_linear_forms :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set) -> (set -> set) -> set :=
+  fun K addK mulK X u v =>
+    fun z :e indexed_module_product 2 (fun i => X) =>
+      addK
+        (mulK (u (z 0)) (v (z 1)))
+        (ring_negation K addK (mulK (u (z 1)) (v (z 0)))).
+
+Theorem god1_exterior_product_two_forms_is_alternating :
+  forall K, forall addK mulK:set -> set -> set,
+  forall X, forall addX smulX:set -> set -> set,
+  forall u v:set -> set,
+    commutative_ring K addK mulK ->
+    module_homomorphism K addK mulK X addX smulX K addK mulK u ->
+    module_homomorphism K addK mulK X addX smulX K addK mulK v ->
+    alternating_bilinear_mapping K addK mulK
+      X addX smulX K addK mulK
+      (fun z =>
+        addK
+          (mulK (u (z 0)) (v (z 1)))
+          (ring_negation K addK (mulK (u (z 1)) (v (z 0))))).
+Admitted.
+
+Theorem god1_s22_theorem1_alternating_bilinear_coefficients :
+  forall K, forall addK mulK:set -> set -> set,
+  forall X, forall addX smulX:set -> set -> set,
+  forall M, forall addM smulM:set -> set -> set,
+  forall n :e omega, forall a:set -> set, forall f:set -> set,
+    commutative_ring K addK mulK ->
+    module_basis K addK mulK X addX smulX n a ->
+    left_module K addK mulK M addM smulM ->
+    bilinear_mapping K addK mulK
+      X addX smulX X addX smulX M addM smulM f ->
+    (alternating_bilinear_mapping K addK mulK
+      X addX smulX M addM smulM f
+    <-> (forall i :e n,
+      f (bilinear_tuple (a i) (a i)) = module_zero M addM)
+      /\ forall i j :e n,
+        addM (f (bilinear_tuple (a i) (a j)))
+          (f (bilinear_tuple (a j) (a i))) = module_zero M addM)
+    /\ (alternating_bilinear_mapping K addK mulK
+        X addX smulX M addM smulM f ->
+      forall x y :e X,
+        f (bilinear_tuple x y)
+        = module_finitely_supported_sum M addM
+          {u :e n :*: n|u 0 :e u 1}
+          (fun u => smulM
+            (addK
+              (mulK
+                (basis_coordinates K addK mulK X addX smulX n a x (u 0))
+                (basis_coordinates K addK mulK X addX smulX n a y (u 1)))
+              (ring_negation K addK
+                (mulK
+                  (basis_coordinates K addK mulK X addX smulX n a x (u 1))
+                  (basis_coordinates K addK mulK X addX smulX n a y (u 0)))))
+            (f (bilinear_tuple (a (u 0)) (a (u 1)))))).
+Admitted.
+
+//GOD1:587005 determinant_of_two_vectors_in_basis : "the determinant of #9 and #10 with respect to the two-vector basis #8" | $\det_{#8}(#9,#10)$
+Definition determinant_of_two_vectors_in_basis :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  (set -> set) -> set -> set -> set :=
+  fun K addK mulK X addX smulX a x y =>
+    addK
+      (mulK
+        (basis_coordinates K addK mulK X addX smulX 2 a x 0)
+        (basis_coordinates K addK mulK X addX smulX 2 a y 1))
+      (ring_negation K addK
+        (mulK
+          (basis_coordinates K addK mulK X addX smulX 2 a x 1)
+          (basis_coordinates K addK mulK X addX smulX 2 a y 0))).
+
+Theorem god1_two_dimensional_determinant_is_unique_normalized_alternating_form :
+  forall K, forall addK mulK:set -> set -> set,
+  forall X, forall addX smulX:set -> set -> set,
+  forall a:set -> set,
+    commutative_ring K addK mulK ->
+    module_basis K addK mulK X addX smulX 2 a ->
+    alternating_bilinear_mapping K addK mulK
+      X addX smulX K addK mulK
+      (fun z => determinant_of_two_vectors_in_basis
+        K addK mulK X addX smulX a (z 0) (z 1))
+    /\ determinant_of_two_vectors_in_basis
+      K addK mulK X addX smulX a (a 0) (a 1) = ring_one K mulK
+    /\ forall f:set -> set,
+      alternating_bilinear_mapping K addK mulK
+        X addX smulX K addK mulK f ->
+      f (bilinear_tuple (a 0) (a 1)) = ring_one K mulK ->
+      f = (fun z =>
+        determinant_of_two_vectors_in_basis
+          K addK mulK X addX smulX a (z 0) (z 1)).
+Admitted.
+
+//GOD1:589730 alternating_trilinear_mapping : "#13 is an alternating trilinear mapping on #4 with values in #10" | $#13(x,y,z)=0\text{ when two arguments agree}$
+Definition alternating_trilinear_mapping :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  (set -> set) -> prop :=
+  fun K addK mulK X addX smulX M addM smulM f =>
+    trilinear_mapping K addK mulK
+      X addX smulX X addX smulX X addX smulX M addM smulM f
+    /\ forall x y z :e X,
+      f (trilinear_tuple x y y) = module_zero M addM
+      /\ f (trilinear_tuple x y x) = module_zero M addM
+      /\ f (trilinear_tuple x x z) = module_zero M addM.
+
+//GOD1:591195 exterior_product_three_linear_forms : "the exterior product of the linear forms #6, #7, and #8" | $#6\wedge #7\wedge #8$
+Definition exterior_product_three_linear_forms :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set) -> (set -> set) -> (set -> set) -> set :=
+  fun K add mul X u v w =>
+    fun z :e indexed_module_product 3 (fun i => X) =>
+      add
+        (add
+          (mul (u (z 0)) (mul (v (z 1)) (w (z 2))))
+          (mul (u (z 1)) (mul (v (z 2)) (w (z 0)))))
+        (add
+          (mul (u (z 2)) (mul (v (z 0)) (w (z 1))))
+          (add
+            (ring_negation K add
+              (mul (u (z 0)) (mul (v (z 2)) (w (z 1)))))
+            (add
+              (ring_negation K add
+                (mul (u (z 1)) (mul (v (z 0)) (w (z 2)))))
+              (ring_negation K add
+                (mul (u (z 2)) (mul (v (z 1)) (w (z 0)))))))).
+
+//GOD1:592100 exterior_product_linear_form_and_bilinear_form : "the exterior product of the linear form #6 and alternating bilinear form #7" | $#6\wedge #7$
+Definition exterior_product_linear_form_and_bilinear_form :
+  set -> (set -> set -> set) -> (set -> set -> set) -> set ->
+  (set -> set) -> (set -> set) -> set :=
+  fun K add mul X u f =>
+    fun z :e indexed_module_product 3 (fun i => X) =>
+      add
+        (mul (u (z 0)) (f (bilinear_tuple (z 1) (z 2))))
+        (add
+          (mul (u (z 1)) (f (bilinear_tuple (z 2) (z 0))))
+          (mul (u (z 2)) (f (bilinear_tuple (z 0) (z 1))))).
+
+//GOD1:597062 determinant_3 : "the determinant of the square matrix #4 of order three" | $\det(#4)$
+Definition determinant_3 :
+  set -> (set -> set -> set) -> (set -> set -> set) -> set -> set :=
+  fun K add mul A =>
+    add
+      (add
+        (mul (matrix_entry A 0 0)
+          (mul (matrix_entry A 1 1) (matrix_entry A 2 2)))
+        (mul (matrix_entry A 1 0)
+          (mul (matrix_entry A 2 1) (matrix_entry A 0 2))))
+      (add
+        (mul (matrix_entry A 2 0)
+          (mul (matrix_entry A 0 1) (matrix_entry A 1 2)))
+        (add
+          (ring_negation K add
+            (mul (matrix_entry A 0 0)
+              (mul (matrix_entry A 2 1) (matrix_entry A 1 2))))
+          (add
+            (ring_negation K add
+              (mul (matrix_entry A 1 0)
+                (mul (matrix_entry A 0 1) (matrix_entry A 2 2))))
+            (ring_negation K add
+              (mul (matrix_entry A 2 0)
+                (mul (matrix_entry A 1 1) (matrix_entry A 0 2))))))).
+
+//GOD1:592463 basis_triple_coordinate_matrix : "the three-by-three coordinate matrix of #13, #14, and #15 in rows #10, #11, and #12 of basis #9" | $C_{#9}(#13,#14,#15)$
+Definition basis_triple_coordinate_matrix :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set) -> set -> set -> set -> set -> set -> set -> set :=
+  fun K addK mulK X addX smulX n a i j k x y z =>
+    fun u :e 3 :*: 3 =>
+      basis_coordinates K addK mulK X addX smulX n a
+        (if u 1 = 0 then x else if u 1 = 1 then y else z)
+        (if u 0 = 0 then i else if u 0 = 1 then j else k).
+
+Theorem god1_s22_theorem2_alternating_trilinear_coefficients :
+  forall K, forall addK mulK:set -> set -> set,
+  forall X, forall addX smulX:set -> set -> set,
+  forall M, forall addM smulM:set -> set -> set,
+  forall n :e omega, forall a:set -> set, forall f:set -> set,
+    commutative_ring K addK mulK ->
+    module_basis K addK mulK X addX smulX n a ->
+    left_module K addK mulK M addM smulM ->
+    trilinear_mapping K addK mulK
+      X addX smulX X addX smulX X addX smulX M addM smulM f ->
+    (alternating_trilinear_mapping K addK mulK
+      X addX smulX M addM smulM f
+    <-> (forall i j :e n,
+      f (trilinear_tuple (a i) (a j) (a j)) = module_zero M addM
+      /\ f (trilinear_tuple (a i) (a j) (a i)) = module_zero M addM
+      /\ f (trilinear_tuple (a i) (a i) (a j)) = module_zero M addM)
+      /\ forall i j k :e n,
+        f (trilinear_tuple (a i) (a j) (a k))
+          = f (trilinear_tuple (a j) (a k) (a i))
+        /\ f (trilinear_tuple (a i) (a j) (a k))
+          = f (trilinear_tuple (a k) (a i) (a j))
+        /\ f (trilinear_tuple (a i) (a j) (a k))
+          = module_negation M addM
+            (f (trilinear_tuple (a i) (a k) (a j))))
+    /\ (alternating_trilinear_mapping K addK mulK
+        X addX smulX M addM smulM f ->
+      forall x y z :e X,
+        f (trilinear_tuple x y z)
+        = module_finitely_supported_sum M addM
+          {t :e n :*: (n :*: n)|t 0 :e t 1 0 /\ t 1 0 :e t 1 1}
+          (fun t => smulM
+            (determinant_3 K addK mulK
+              (basis_triple_coordinate_matrix
+                K addK mulK X addX smulX n a
+                (t 0) (t 1 0) (t 1 1) x y z))
+            (f (trilinear_tuple (a (t 0)) (a (t 1 0)) (a (t 1 1)))))).
+Admitted.
+
+(** § 23. Alternating multilinear mappings and determinants. **)
+
+//GOD1:615300 permutation_inversion_set : "the inversions of the permutation #2 of #1" | $\operatorname{Inv}(#2)$
+Definition permutation_inversion_set : set -> set -> set :=
+  fun p sigma =>
+    {u :e p :*: p|u 0 :e u 1 /\ sigma (u 1) :e sigma (u 0)}.
+
+//GOD1:615300 permutation_signature : "the signature of the permutation #2 of #1" | $\varepsilon_{#2}$
+Definition permutation_signature : set -> set -> set :=
+  fun p sigma =>
+    if exists k :e omega,
+      finite_cardinality (permutation_inversion_set p sigma) = 2 * k
+    then 1 else minus_SNo 1.
+
+//GOD1:610657 permuted_tuple : "the tuple #3 permuted by #2" | $(#3_{#2(i)})_i$
+Definition permuted_tuple : set -> set -> set -> set :=
+  fun p sigma x => fun i :e p => x (sigma i).
+
+//GOD1:610657 signed_group_element : "the element #4 multiplied by the sign #3 in the additive group #1" | $#3#4$
+Definition signed_group_element :
+  set -> (set -> set -> set) -> set -> set -> set :=
+  fun M addM sign x =>
+    if sign = 1 then x else module_negation M addM x.
+
+//GOD1:610657 antisymmetric_mapping : "#6 is an antisymmetric mapping from #1^#4 to the additive group #2" | $#6(x_\tau)=-#6(x)$
+Definition antisymmetric_mapping :
+  set -> set -> (set -> set -> set) -> set -> (set -> set) -> prop :=
+  fun X M addM p f =>
+    group M addM
+    /\ (forall x :e X :^: p, f x :e M)
+    /\ forall tau :e adjacent_transpositions p, forall x :e X :^: p,
+      f (permuted_tuple p tau x) = module_negation M addM (f x).
+
+Theorem god1_s23_theorem1_signature_and_antisymmetric_permutation_law :
+  forall p :e omega, 0 :e p ->
+    group_homomorphism
+      (permutation_group p) (permutation_composition p)
+      {1,minus_SNo 1} mul_SNo
+      (permutation_signature p)
+    /\ (forall tau :e adjacent_transpositions p,
+      permutation_signature p tau = minus_SNo 1)
+    /\ (forall s:set -> set,
+      group_homomorphism
+        (permutation_group p) (permutation_composition p)
+        {1,minus_SNo 1} mul_SNo s ->
+      (forall tau :e adjacent_transpositions p, s tau = minus_SNo 1) ->
+      s = permutation_signature p)
+    /\ forall X M, forall addM:set -> set -> set, forall f:set -> set,
+      antisymmetric_mapping X M addM p f ->
+      forall sigma :e permutation_group p, forall x :e X :^: p,
+        f (permuted_tuple p sigma x)
+        = signed_group_element M addM
+          (permutation_signature p sigma) (f x).
+Admitted.
+
+//GOD1:618185 antisymmetrization : "the antisymmetrization of the #5-variable mapping #6" | $\operatorname{Alt}(#6)$
+Definition antisymmetrization :
+  set -> (set -> set -> set) -> set -> set -> (set -> set) -> set :=
+  fun M addM X p f =>
+    fun x :e X :^: p =>
+      module_finitely_supported_sum M addM (permutation_group p)
+        (fun sigma => signed_group_element M addM
+          (permutation_signature p sigma)
+          (f (permuted_tuple p sigma x))).
+
+Theorem god1_antisymmetrization_is_antisymmetric_and_vanishes_on_repetitions :
+  forall X M, forall addM:set -> set -> set,
+  forall p :e omega, forall f:set -> set,
+    0 :e p -> group M addM -> (forall x :e X :^: p, f x :e M) ->
+    antisymmetric_mapping X M addM p
+      (fun x => antisymmetrization M addM X p f x)
+    /\ forall x :e X :^: p,
+      (exists i j :e p, i <> j /\ x i = x j) ->
+      antisymmetrization M addM X p f x = module_zero M addM.
+Admitted.
+
+//GOD1:623317 alternating_multilinear_mapping : "#9 is an alternating #4-linear mapping on #5 with values in #6" | $#9\in\operatorname{Alt}^{#4}(#5,#6)$
+Definition alternating_multilinear_mapping :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  (set -> set) -> prop :=
+  fun K addK mulK p X addX smulX M addM smulM f =>
+    multilinear_mapping K addK mulK p
+      (fun i => X) (fun i => addX) (fun i => smulX) M addM smulM f
+    /\ forall x :e X :^: p,
+      (exists i j :e p, i <> j /\ x i = x j) ->
+      f x = module_zero M addM.
+
+//GOD1:623317 alternating_multilinear_mapping_space : "the module of alternating #4-linear mappings on #5 with values in #6" | $\operatorname{Alt}^{#4}(#5,#6)$
+Definition alternating_multilinear_mapping_space :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set -> set) -> (set -> set -> set) -> set :=
+  fun K addK mulK p X addX smulX M addM smulM =>
+    {f :e M :^: (X :^: p)|
+      alternating_multilinear_mapping K addK mulK p
+        X addX smulX M addM smulM (fun x => f x)}.
+
+Theorem god1_s23_theorem2_alternating_multilinear_is_antisymmetric :
+  forall K, forall addK mulK:set -> set -> set,
+  forall p :e omega, forall X, forall addX smulX:set -> set -> set,
+  forall M, forall addM smulM:set -> set -> set, forall f:set -> set,
+    0 :e p ->
+    alternating_multilinear_mapping K addK mulK p
+      X addX smulX M addM smulM f ->
+    antisymmetric_mapping X M addM p f
+    /\ forall sigma :e permutation_group p, forall x :e X :^: p,
+      f (permuted_tuple p sigma x)
+      = signed_group_element M addM
+        (permutation_signature p sigma) (f x).
+Admitted.
+
+Theorem god1_s23_theorem3_antisymmetrization_of_multilinear_map :
+  forall K, forall addK mulK:set -> set -> set,
+  forall p :e omega, forall X, forall addX smulX:set -> set -> set,
+  forall M, forall addM smulM:set -> set -> set, forall f:set -> set,
+    0 :e p ->
+    multilinear_mapping K addK mulK p
+      (fun i => X) (fun i => addX) (fun i => smulX) M addM smulM f ->
+    alternating_multilinear_mapping K addK mulK p
+      X addX smulX M addM smulM
+      (fun x => antisymmetrization M addM X p f x).
+Admitted.
+
+//GOD1:625569 exterior_product_linear_forms : "the exterior product of the family of linear forms #8 indexed by #7" | $\bigwedge_{i\in #7}#8_i$
+Definition exterior_product_linear_forms :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> set -> (set -> set) -> set :=
+  fun K add mul X p u =>
+    antisymmetrization K add X p
+      (fun x => ring_finite_product K add mul p
+        (fun i => ap (u i) (x i))).
+
+Theorem god1_exterior_product_of_linear_forms_is_alternating :
+  forall K, forall add mul:set -> set -> set,
+  forall p :e omega, forall X, forall addX smulX:set -> set -> set,
+  forall u:set -> set,
+    0 :e p -> commutative_ring K add mul ->
+    (forall i :e p,
+      module_homomorphism K add mul X addX smulX K add mul (fun x => u i x)) ->
+    alternating_multilinear_mapping K add mul p
+      X addX smulX K add mul
+      (fun x => exterior_product_linear_forms K add mul X p u x).
+Admitted.
+
+Theorem god1_s23_theorem4_alternating_map_vanishes_on_short_span :
+  forall K, forall addK mulK:set -> set -> set,
+  forall p q :e omega, forall X, forall addX smulX:set -> set -> set,
+  forall M, forall addM smulM:set -> set -> set, forall f:set -> set,
+    q :e p ->
+    alternating_multilinear_mapping K addK mulK p
+      X addX smulX M addM smulM f ->
+    forall b:set -> set, forall coeff:set -> set -> set,
+    forall x :e X :^: p,
+      (forall j :e q, b j :e X)
+      /\ (forall i :e p, forall j :e q, coeff i j :e K)
+      /\ (forall i :e p,
+        x i = module_finitely_supported_sum X addX q
+          (fun j => smulX (coeff i j) (b j))) ->
+      f x = module_zero M addM.
+Admitted.
+
+Theorem god1_s23_theorem4_corollary1_dependent_arguments_vanish :
+  forall K, forall addK mulK:set -> set -> set,
+  forall p :e omega, forall X, forall addX smulX:set -> set -> set,
+  forall M, forall addM smulM:set -> set -> set, forall f:set -> set,
+    field K addK mulK ->
+    alternating_multilinear_mapping K addK mulK p
+      X addX smulX M addM smulM f ->
+    forall x :e X :^: p,
+      not (linearly_independent_family
+        K addK mulK X addX smulX p (fun i => x i)) ->
+      f x = module_zero M addM.
+Admitted.
+
+Theorem god1_s23_theorem4_corollary2_degree_above_rank_is_zero :
+  forall K, forall addK mulK:set -> set -> set,
+  forall p r :e omega, forall X, forall addX smulX:set -> set -> set,
+  forall M, forall addM smulM:set -> set -> set,
+  forall a:set -> set, forall f:set -> set,
+    r :e p ->
+    module_basis K addK mulK X addX smulX r a ->
+    left_module K addK mulK M addM smulM ->
+    alternating_multilinear_mapping K addK mulK p
+      X addX smulX M addM smulM f ->
+    f = (fun x => module_zero M addM).
+Admitted.
+
+//GOD1:635431 signature_scalar : "the signature of #5 represented in the commutative ring #1" | $\varepsilon_{#5}\cdot 1_{#1}$
+Definition signature_scalar :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> set -> set :=
+  fun K add mul p sigma =>
+    if permutation_signature p sigma = 1
+    then ring_one K mul
+    else ring_negation K add (ring_one K mul).
+
+//GOD1:635431 matrix_determinant : "the determinant of the square matrix #5 of order #4" | $\det(#5)$
+Definition matrix_determinant :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> set -> set :=
+  fun K add mul p A =>
+    module_finitely_supported_sum K add (permutation_group p)
+      (fun sigma => mul (signature_scalar K add mul p sigma)
+        (ring_finite_product K add mul p
+          (fun j => matrix_entry A (sigma j) j))).
+
+//GOD1:634852 basis_coordinate_matrix : "the coordinate matrix of the #9-indexed vector family #10 in the basis #8" | $[#10]_{#8}$
+Definition basis_coordinate_matrix :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set) -> (set -> set) -> set :=
+  fun K addK mulK X addX smulX p a x =>
+    fun u :e p :*: p =>
+      basis_coordinates K addK mulK X addX smulX p a (x (u 1)) (u 0).
+
+//GOD1:634852 determinant_of_vectors_in_basis : "the determinant of the #9-indexed vector family #10 relative to basis #8" | $\det_{#8}(#10)$
+Definition determinant_of_vectors_in_basis :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set) -> (set -> set) -> set :=
+  fun K addK mulK X addX smulX p a x =>
+    matrix_determinant K addK mulK p
+      (basis_coordinate_matrix K addK mulK X addX smulX p a x).
+
+Theorem god1_s23_theorem5_unique_normalized_top_alternating_form :
+  forall K, forall addK mulK:set -> set -> set,
+  forall X, forall addX smulX:set -> set -> set,
+  forall p :e omega, forall a:set -> set,
+    0 :e p -> commutative_ring K addK mulK ->
+    module_basis K addK mulK X addX smulX p a ->
+    alternating_multilinear_mapping K addK mulK p
+      X addX smulX K addK mulK
+      (fun x => determinant_of_vectors_in_basis
+        K addK mulK X addX smulX p a (fun i => x i))
+    /\ determinant_of_vectors_in_basis K addK mulK
+      X addX smulX p a a = ring_one K mulK
+    /\ (forall D:set -> set,
+      alternating_multilinear_mapping K addK mulK p
+        X addX smulX K addK mulK D ->
+      D (fun i :e p => a i) = ring_one K mulK ->
+      D = (fun x => determinant_of_vectors_in_basis
+        K addK mulK X addX smulX p a (fun i => x i)))
+    /\ forall M, forall addM smulM:set -> set -> set,
+      forall f:set -> set,
+      left_module K addK mulK M addM smulM ->
+      alternating_multilinear_mapping K addK mulK p
+        X addX smulX M addM smulM f ->
+      forall x :e X :^: p,
+        f x = smulM
+          (determinant_of_vectors_in_basis
+            K addK mulK X addX smulX p a (fun i => x i))
+          (f (fun i :e p => a i)).
+Admitted.
+
+Theorem god1_s23_theorem5_corollary_bases_of_commutative_free_module_same_size :
+  forall K, forall addK mulK:set -> set -> set,
+  forall X, forall addX smulX:set -> set -> set,
+  forall p q :e omega, forall a b:set -> set,
+    commutative_ring K addK mulK ->
+    module_basis K addK mulK X addX smulX p a ->
+    module_basis K addK mulK X addX smulX q b ->
+    p = q.
+Admitted.
+
+Theorem god1_s23_theorem6_determinant_of_transpose :
+  forall K, forall add mul:set -> set -> set,
+  forall p :e omega, forall A :e square_matrix_ring K p,
+    commutative_ring K add mul ->
+    matrix_determinant K add mul p A
+    = matrix_determinant K add mul p (matrix_transpose K p p A).
+Admitted.
+
+Theorem god1_s23_theorem7_determinant_multiplicative :
+  forall K, forall add mul:set -> set -> set,
+  forall p :e omega, forall A B :e square_matrix_ring K p,
+    commutative_ring K add mul ->
+    matrix_determinant K add mul p
+      (matrix_multiplication K add mul p p p A B)
+    = mul (matrix_determinant K add mul p A)
+      (matrix_determinant K add mul p B).
+Admitted.
+
+//GOD1:641088 endomorphism_coordinate_matrix : "the matrix of the endomorphism #9 relative to the basis #8" | $[#9]_{#8}$
+Definition endomorphism_coordinate_matrix :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set) -> (set -> set) -> set :=
+  fun K addK mulK X addX smulX p a u =>
+    fun z :e p :*: p =>
+      basis_coordinates K addK mulK X addX smulX p a
+        (u (a (z 1))) (z 0).
+
+//GOD1:641088 endomorphism_determinant : "the determinant of the endomorphism #9 relative to the basis #8" | $\det(#9)$
+Definition endomorphism_determinant :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set) -> (set -> set) -> set :=
+  fun K addK mulK X addX smulX p a u =>
+    matrix_determinant K addK mulK p
+      (endomorphism_coordinate_matrix
+        K addK mulK X addX smulX p a u).
+
+Theorem god1_endomorphism_determinant_independent_of_basis_and_composes :
+  forall K, forall addK mulK:set -> set -> set,
+  forall X, forall addX smulX:set -> set -> set,
+  forall p :e omega, forall a b:set -> set, forall u v:set -> set,
+    commutative_ring K addK mulK ->
+    module_basis K addK mulK X addX smulX p a ->
+    module_basis K addK mulK X addX smulX p b ->
+    module_endomorphism K addK mulK X addX smulX u ->
+    module_endomorphism K addK mulK X addX smulX v ->
+    endomorphism_determinant K addK mulK X addX smulX p a u
+      = endomorphism_determinant K addK mulK X addX smulX p b u
+    /\ endomorphism_determinant K addK mulK X addX smulX p a
+      (fun x => u (v x))
+      = mulK
+        (endomorphism_determinant K addK mulK X addX smulX p a u)
+        (endomorphism_determinant K addK mulK X addX smulX p a v)
+    /\ endomorphism_determinant K addK mulK X addX smulX p a
+      (fun x => x) = ring_one K mulK.
+Admitted.
+
+Theorem god1_s23_theorem8_basis_determinant_criterion :
+  forall K, forall addK mulK:set -> set -> set,
+  forall X, forall addX smulX:set -> set -> set,
+  forall p :e omega, forall a x:set -> set,
+    field K addK mulK ->
+    module_basis K addK mulK X addX smulX p a ->
+    (linearly_independent_family K addK mulK X addX smulX p x
+    <-> module_basis K addK mulK X addX smulX p x)
+    /\ (module_basis K addK mulK X addX smulX p x
+    <-> invertible_matrix K addK mulK p
+      (basis_coordinate_matrix K addK mulK X addX smulX p a x))
+    /\ (invertible_matrix K addK mulK p
+      (basis_coordinate_matrix K addK mulK X addX smulX p a x)
+    <-> matrix_determinant K addK mulK p
+      (basis_coordinate_matrix K addK mulK X addX smulX p a x)
+      <> ring_zero K addK).
+Admitted.
+
+Theorem god1_s23_theorem8_corollary1_matrix_invertible_iff_determinant_nonzero :
+  forall K, forall add mul:set -> set -> set,
+  forall p :e omega, forall A :e square_matrix_ring K p,
+    field K add mul ->
+    (invertible_matrix K add mul p A
+    <-> matrix_determinant K add mul p A <> ring_zero K add).
+Admitted.
+
+Theorem god1_s23_theorem8_corollary2_endomorphism_conditions :
+  forall K, forall addK mulK:set -> set -> set,
+  forall X, forall addX smulX:set -> set -> set,
+  forall p :e omega, forall a:set -> set, forall u:set -> set,
+    field K addK mulK ->
+    module_basis K addK mulK X addX smulX p a ->
+    module_endomorphism K addK mulK X addX smulX u ->
+    (bij X X u <-> surj X X u)
+    /\ (surj X X u <-> inj X X u)
+    /\ (inj X X u <->
+      module_homomorphism_kernel
+        K addK mulK X addX smulX X addX smulX u
+      = {module_zero X addX})
+    /\ (bij X X u <->
+      endomorphism_determinant K addK mulK X addX smulX p a u
+      <> ring_zero K addK).
+Admitted.
+
+Theorem god1_s23_theorem8_corollary3_homogeneous_square_system :
+  forall K, forall add mul:set -> set -> set,
+  forall n :e omega, forall A :e square_matrix_ring K n,
+    field K add mul ->
+    ((exists x :e K :^: n,
+      homogeneous_linear_system_solution K add mul n n A x
+      /\ x <> (fun i :e n => ring_zero K add))
+    <-> matrix_determinant K add mul n A = ring_zero K add).
+Admitted.
+
+Theorem god1_s23_theorem8_corollary4_cramer_determinant_criterion :
+  forall K, forall add mul:set -> set -> set,
+  forall n :e omega, forall A :e square_matrix_ring K n,
+    field K add mul ->
+    (cramer_linear_system K add mul n n A
+    <-> matrix_determinant K add mul n A <> ring_zero K add).
+Admitted.
+
+//GOD1:651243 strictly_increasing_index_tuple : "the #2-tuple of indices in #1 is strictly increasing" | $#2_1<\cdots<#2_p$
+Definition strictly_increasing_index_tuple : set -> set -> set -> prop :=
+  fun n p idx =>
+    idx :e n :^: p
+    /\ forall i j :e p, i :e j -> idx i :e idx j.
+
+//GOD1:651243 selected_coordinate_matrix : "the coordinate matrix of #11 on the rows selected by #10 in the basis #9" | $(\xi_{#10_i,j})_{i,j}$
+Definition selected_coordinate_matrix :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> set -> (set -> set) -> (set -> set) -> (set -> set) -> set :=
+  fun K addK mulK X addX smulX n p a idx x =>
+    fun u :e p :*: p =>
+      basis_coordinates K addK mulK X addX smulX n a
+        (x (u 1)) (idx (u 0)).
+
+//GOD1:651243 alternating_basis_coefficient_conditions : "the basis coefficients of #12 satisfy the alternating relations" | $c_{i_1\ldots i_p}=0,\ c_{i_\sigma}=\varepsilon(\sigma)c_i$
+Definition alternating_basis_coefficient_conditions :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> set -> (set -> set) -> (set -> set) -> prop :=
+  fun K addK mulK X addX smulX M addM smulM n p a f =>
+    (forall idx :e n :^: p,
+      (exists i j :e p, i <> j /\ idx i = idx j) ->
+      f (fun h :e p => a (idx h)) = module_zero M addM)
+    /\ forall idx :e n :^: p,
+      forall sigma :e permutation_group p,
+        f (fun h :e p => a (idx (sigma h)))
+        = smulM (signature_scalar K addK mulK p sigma)
+          (f (fun h :e p => a (idx h))).
+
+Theorem god1_s23_theorem9_alternating_coefficient_characterization_and_expansion :
+  forall K, forall addK mulK:set -> set -> set,
+  forall X, forall addX smulX:set -> set -> set,
+  forall M, forall addM smulM:set -> set -> set,
+  forall n p :e omega, forall a:set -> set, forall f:set -> set,
+    commutative_ring K addK mulK ->
+    module_basis K addK mulK X addX smulX n a ->
+    left_module K addK mulK M addM smulM ->
+    multilinear_mapping K addK mulK p
+      (fun i => X) (fun i => addX) (fun i => smulX)
+      M addM smulM f ->
+    (alternating_multilinear_mapping K addK mulK p
+      X addX smulX M addM smulM f
+    <-> alternating_basis_coefficient_conditions
+      K addK mulK X addX smulX M addM smulM n p a f)
+    /\ (alternating_basis_coefficient_conditions
+      K addK mulK X addX smulX M addM smulM n p a f ->
+      forall x :e X :^: p,
+        f x = module_finitely_supported_sum M addM
+          {idx :e n :^: p|strictly_increasing_index_tuple n p idx}
+          (fun idx => smulM
+            (matrix_determinant K addK mulK p
+              (selected_coordinate_matrix K addK mulK
+                X addX smulX n p a (fun h => idx h) (fun j => x j)))
+            (f (fun h :e p => a (idx h))))).
+Admitted.
+
+//GOD1:657642 family_coordinate_matrix : "the #10-by-#11 coordinate matrix of the vector family #13 in the basis #12" | $([#13_j]_{#12,i})_{i,j}$
+Definition family_coordinate_matrix :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> set -> (set -> set) -> (set -> set) -> set :=
+  fun K addK mulK X addX smulX n p a x =>
+    fun u :e n :*: p =>
+      basis_coordinates K addK mulK X addX smulX n a
+        (x (u 1)) (u 0).
+
+Theorem god1_s23_theorem10_linear_independence_by_alternating_form_and_minor :
+  forall K, forall addK mulK:set -> set -> set,
+  forall X, forall addX smulX:set -> set -> set,
+  forall n p :e omega, forall a x:set -> set,
+    field K addK mulK ->
+    module_basis K addK mulK X addX smulX n a ->
+    (linearly_independent_family K addK mulK X addX smulX p x
+    <-> exists f :e alternating_multilinear_mapping_space
+        K addK mulK p X addX smulX K addK mulK,
+      f (fun j :e p => x j) <> ring_zero K addK)
+    /\ ((exists f :e alternating_multilinear_mapping_space
+        K addK mulK p X addX smulX K addK mulK,
+      f (fun j :e p => x j) <> ring_zero K addK)
+    <-> exists rows :e n :^: p,
+      inj p n (fun i => rows i)
+      /\ matrix_determinant K addK mulK p
+        (matrix_submatrix p p (fun i => rows i) (fun j => j)
+          (family_coordinate_matrix K addK mulK
+            X addX smulX n p a x))
+        <> ring_zero K addK).
+Admitted.
+
+//GOD1:662750 augmented_consistency_matrix : "the augmented leading coefficient matrix with final row #7" | $[A_{1..r,1..r}\mid b;A_{#7,1..r}\mid b_{#7}]$
+Definition augmented_consistency_matrix : set -> set -> set -> set -> set :=
+  fun r A b j =>
+    fun u :e ordsucc r :*: ordsucc r =>
+      if u 0 :e r
+      then if u 1 :e r
+        then matrix_entry A (u 0) (u 1)
+        else b (u 0)
+      else if u 1 :e r
+        then matrix_entry A j (u 1)
+        else b j.
+
+Theorem god1_s23_theorem11_consistency_by_augmented_determinants :
+  forall K, forall add mul:set -> set -> set,
+  forall n p r :e omega, forall A :e matrix_space K n p,
+  forall b :e K :^: n,
+    field K add mul ->
+    r c= n -> r c= p ->
+    linear_system_rank K add mul n p A = r ->
+    matrix_determinant K add mul r
+      (matrix_submatrix r r (fun i => i) (fun j => j) A)
+      <> ring_zero K add ->
+    ((exists x :e K :^: p,
+      linear_system_solution K add mul n p A b x)
+    <-> forall j :e n, not (j :e r) ->
+      matrix_determinant K add mul (ordsucc r)
+        (augmented_consistency_matrix r A b j)
+      = ring_zero K add).
+Admitted.
+
+(** § 24. Determinants. **)
+
+//GOD1:678375 matrix_from_columns : "the matrix whose family of columns is #3" | $[#3_1\ \cdots\ #3_n]$
+Definition matrix_from_columns : set -> set -> (set -> set) -> set :=
+  fun K n x =>
+    fun u :e n :*: n => x (u 1) (u 0).
+
+//GOD1:678375 matrix_from_rows : "the matrix whose family of rows is #3" | $[#3_1;\ldots;#3_n]$
+Definition matrix_from_rows : set -> set -> (set -> set) -> set :=
+  fun K n x =>
+    fun u :e n :*: n => x (u 0) (u 1).
+
+//GOD1:678375 matrix_add_linear_combination_to_column : "the matrix obtained from #7 by adding the #9-linear combination of its columns to column #8" | $#7_{*#8}\leftarrow #7_{*#8}+\sum_k#9_k#7_{*k}$
+Definition matrix_add_linear_combination_to_column :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> set -> set -> (set -> set) -> set :=
+  fun K add mul n A j coeff =>
+    fun u :e n :*: n =>
+      if u 1 = j
+      then add (matrix_entry A (u 0) j)
+        (ring_finite_sum K add n
+          (fun k => mul (matrix_entry A (u 0) k) (coeff k)))
+      else matrix_entry A (u 0) (u 1).
+
+Theorem god1_s24_fundamental_determinant_properties :
+  forall K, forall add mul:set -> set -> set,
+  forall n :e omega,
+    commutative_ring K add mul ->
+    alternating_multilinear_mapping K add mul n
+      (K :^: n) (module_power_addition n add)
+      (module_power_left_scalar n mul)
+      K add mul
+      (fun x => matrix_determinant K add mul n
+        (matrix_from_columns K n (fun j => x j)))
+    /\ alternating_multilinear_mapping K add mul n
+      (K :^: n) (module_power_addition n add)
+      (module_power_left_scalar n mul)
+      K add mul
+      (fun x => matrix_determinant K add mul n
+        (matrix_from_rows K n (fun i => x i)))
+    /\ forall A :e square_matrix_ring K n,
+      forall j :e n, forall coeff :e K :^: n,
+        coeff j = ring_zero K add ->
+        matrix_determinant K add mul n
+          (matrix_add_linear_combination_to_column
+            K add mul n A j (fun k => coeff k))
+        = matrix_determinant K add mul n A.
+Admitted.
+
+//GOD1:687075 skip_ordinal_index : "the increasing enumeration of #1 with the index #2 omitted" | $[k\mapsto k]_{#1\setminus\{#2\}}$
+Definition skip_ordinal_index : set -> set -> set -> set :=
+  fun n i k => if k :e n then if k :e i then k else ordsucc k else 0.
+
+//GOD1:687075 matrix_minor : "the matrix obtained from #4 by deleting row #2 and column #3" | $#4_{#2#3}$
+Definition matrix_minor : set -> set -> set -> set -> set :=
+  fun n i j A =>
+    matrix_submatrix n n
+      (skip_ordinal_index n i) (skip_ordinal_index n j) A.
+
+//GOD1:687075 cofactor_sign_scalar : "the scalar sign associated with #4" | $(-1)^{#4}$
+Definition cofactor_sign_scalar :
+  set -> (set -> set -> set) -> (set -> set -> set) -> set -> set :=
+  fun K add mul k =>
+    if exists h :e omega, k = 2 * h
+    then ring_one K mul
+    else ring_negation K add (ring_one K mul).
+
+//GOD1:687075 matrix_cofactor : "the cofactor of entry (#5,#6) of #7" | $(-1)^{#5+#6}\det(#7_{#5#6})$
+Definition matrix_cofactor :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> set -> set -> set -> set :=
+  fun K add mul n i j A =>
+    mul (cofactor_sign_scalar K add mul (i + j))
+      (matrix_determinant K add mul n (matrix_minor n i j A)).
+
+Theorem god1_s24_theorem1_laplace_expansion_along_row_or_column :
+  forall K, forall add mul:set -> set -> set,
+  forall n :e omega, forall A :e square_matrix_ring K (ordsucc n),
+    commutative_ring K add mul ->
+    (forall j :e ordsucc n,
+      matrix_determinant K add mul (ordsucc n) A
+      = ring_finite_sum K add (ordsucc n)
+        (fun i => mul (matrix_entry A i j)
+          (matrix_cofactor K add mul n i j A)))
+    /\ forall i :e ordsucc n,
+      matrix_determinant K add mul (ordsucc n) A
+      = ring_finite_sum K add (ordsucc n)
+        (fun j => mul (matrix_entry A i j)
+          (matrix_cofactor K add mul n i j A)).
+Admitted.
+
+//GOD1:690072 upper_triangular_matrix : "the square matrix #5 is upper triangular" | $#5_{ij}=0\text{ for }j<i$
+Definition upper_triangular_matrix :
+  set -> (set -> set -> set) -> set -> set -> prop :=
+  fun K add n A =>
+    A :e square_matrix_ring K n
+    /\ forall i j :e n, j :e i ->
+      matrix_entry A i j = ring_zero K add.
+
+Theorem god1_s24_example2_determinant_of_upper_triangular_matrix :
+  forall K, forall add mul:set -> set -> set,
+  forall n :e omega, forall A :e square_matrix_ring K n,
+    commutative_ring K add mul ->
+    upper_triangular_matrix K add n A ->
+    matrix_determinant K add mul n A
+    = ring_finite_product K add mul n (fun i => matrix_entry A i i).
+Admitted.
+
+Theorem god1_s24_example2_determinant_of_two_block_upper_triangular_matrix :
+  forall K, forall add mul:set -> set -> set,
+  forall p q :e omega, forall A :e square_matrix_ring K (p + q),
+    commutative_ring K add mul ->
+    (forall i :e q, forall j :e p,
+      matrix_entry A (p + i) j = ring_zero K add) ->
+    matrix_determinant K add mul (p + q) A
+    = mul
+      (matrix_determinant K add mul p
+        (matrix_submatrix p p (fun i => i) (fun j => j) A))
+      (matrix_determinant K add mul q
+        (matrix_submatrix q q
+          (fun i => p + i) (fun j => p + j) A)).
+Admitted.
+
+//GOD1:694957 matrix_adjugate : "the adjugate matrix of #5" | $\widetilde{#5}$
+Definition matrix_adjugate :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> set -> set :=
+  fun K add mul n A =>
+    fun u :e ordsucc n :*: ordsucc n =>
+      matrix_cofactor K add mul n (u 1) (u 0) A.
+
+Theorem god1_s24_theorem2_adjugate_identity :
+  forall K, forall add mul:set -> set -> set,
+  forall n :e omega, forall A :e square_matrix_ring K (ordsucc n),
+    commutative_ring K add mul ->
+    matrix_multiplication K add mul
+      (ordsucc n) (ordsucc n) (ordsucc n)
+      A (matrix_adjugate K add mul n A)
+    = matrix_left_scalar K mul (ordsucc n) (ordsucc n)
+      (matrix_determinant K add mul (ordsucc n) A)
+      (unit_matrix K add mul (ordsucc n))
+    /\ matrix_multiplication K add mul
+      (ordsucc n) (ordsucc n) (ordsucc n)
+      (matrix_adjugate K add mul n A) A
+    = matrix_left_scalar K mul (ordsucc n) (ordsucc n)
+      (matrix_determinant K add mul (ordsucc n) A)
+      (unit_matrix K add mul (ordsucc n)).
+Admitted.
+
+Theorem god1_s24_theorem2_corollary1_invertible_iff_determinant_unit :
+  forall K, forall add mul:set -> set -> set,
+  forall n :e omega, forall A :e square_matrix_ring K (ordsucc n),
+    commutative_ring K add mul ->
+    (invertible_matrix K add mul (ordsucc n) A
+    <-> ring_unit K add mul
+      (matrix_determinant K add mul (ordsucc n) A))
+    /\ (ring_unit K add mul
+      (matrix_determinant K add mul (ordsucc n) A) ->
+      matrix_inverse K add mul (ordsucc n) A
+      = matrix_left_scalar K mul (ordsucc n) (ordsucc n)
+        (ring_inverse K add mul
+          (matrix_determinant K add mul (ordsucc n) A))
+        (matrix_adjugate K add mul n A)).
+Admitted.
+
+Theorem god1_s24_theorem2_corollary2_basis_iff_determinant_unit :
+  forall K, forall addK mulK:set -> set -> set,
+  forall X, forall addX smulX:set -> set -> set,
+  forall n :e omega, forall a x:set -> set,
+    commutative_ring K addK mulK ->
+    module_basis K addK mulK X addX smulX n a ->
+    (module_basis K addK mulK X addX smulX n x
+    <-> ring_unit K addK mulK
+      (determinant_of_vectors_in_basis
+        K addK mulK X addX smulX n a x)).
+Admitted.
+
+//GOD1:700191 matrix_replace_column : "the matrix obtained from #6 by replacing column #7 by #8" | $#6[#7\leftarrow #8]$
+Definition matrix_replace_column : set -> set -> set -> set -> set :=
+  fun n A j b =>
+    fun u :e n :*: n =>
+      if u 1 = j then b (u 0) else matrix_entry A (u 0) (u 1).
+
+Theorem god1_s24_cramer_formulae :
+  forall K, forall add mul:set -> set -> set,
+  forall n :e omega, forall A :e square_matrix_ring K n,
+  forall b :e K :^: n,
+    commutative_ring K add mul ->
+    ring_unit K add mul (matrix_determinant K add mul n A) ->
+    linear_system_unique_solution K add mul n n A b
+    /\ forall x :e K :^: n,
+      linear_system_solution K add mul n n A b x ->
+      forall i :e n,
+        mul (matrix_determinant K add mul n A) (x i)
+        = matrix_determinant K add mul n
+          (matrix_replace_column n A i b)
+        /\ x i = mul
+          (ring_inverse K add mul (matrix_determinant K add mul n A))
+          (matrix_determinant K add mul n
+            (matrix_replace_column n A i b)).
+Admitted.
+
+(** § 25. Affine spaces. **)
+
+//GOD1:718680 affine_space : "#7 is an affine space associated with the vector space #4 via the action #8" | $#4\curvearrowright #7$
+Definition affine_space :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set -> set) -> prop :=
+  fun K addK mulK T addT smulT E action =>
+    left_vector_space K addK mulK T addT smulT
+    /\ (forall s :e T, forall P :e E, action s P :e E)
+    /\ (forall s t :e T, forall P :e E,
+      action s (action t P) = action (addT s t) P)
+    /\ (forall P :e E, action (module_zero T addT) P = P)
+    /\ forall P Q :e E,
+      exists s :e T, action s P = Q
+      /\ forall t :e T, action t P = Q -> t = s.
+
+//GOD1:718680 affine_translation : "the translation of #2 by the vector #4 under #3" | $P\mapsto #4+P$
+Definition affine_translation :
+  set -> set -> (set -> set -> set) -> set -> set :=
+  fun E T action s => fun P :e E => action s P.
+
+//GOD1:718680 affine_difference : "the unique vector carrying point #5 to point #6" | $#6-#5$
+Definition affine_difference :
+  set -> set -> (set -> set -> set) -> set -> set -> set :=
+  fun T E action P Q =>
+    Eps_i (fun s => s :e T /\ action s P = Q).
+
+//GOD1:723287 affine_origin : "a chosen point of #1" | $O_{#1}$
+Definition affine_origin : set -> set :=
+  fun E => Eps_i (fun O => O :e E).
+
+//GOD1:723287 affine_origin_addition : "addition on #7 induced by the origin #9" | $#10+_{#9}#11$
+Definition affine_origin_addition :
+  set -> (set -> set -> set) -> set -> (set -> set -> set) ->
+  set -> set -> set -> set :=
+  fun T addT E action O P Q =>
+    action (addT
+      (affine_difference T E action O P)
+      (affine_difference T E action O Q)) O.
+
+//GOD1:723287 affine_origin_scalar : "scalar multiplication on #7 induced by the origin #9" | $#10\cdot_{#9}#11$
+Definition affine_origin_scalar :
+  set -> (set -> set -> set) -> set -> (set -> set -> set) ->
+  set -> set -> set -> set :=
+  fun T smulT E action O scalar P =>
+    action (smulT scalar (affine_difference T E action O P)) O.
+
+Theorem god1_affine_space_with_origin_is_vector_space :
+  forall K, forall addK mulK:set -> set -> set,
+  forall T, forall addT smulT:set -> set -> set,
+  forall E, forall action:set -> set -> set, forall O :e E,
+    affine_space K addK mulK T addT smulT E action ->
+    left_vector_space K addK mulK E
+      (affine_origin_addition T addT E action O)
+      (affine_origin_scalar T smulT E action O)
+    /\ module_isomorphism K addK mulK
+      T addT smulT E
+      (affine_origin_addition T addT E action O)
+      (affine_origin_scalar T smulT E action O)
+      (fun s => action s O).
+Admitted.
+
+//GOD1:727842 affine_coefficients_sum_one : "the coefficient family #4 indexed by #3 has sum one in #1" | $\sum_i#4_i=1$
+Definition affine_coefficients_sum_one :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set) -> prop :=
+  fun K add mul I coeff =>
+    (fun i :e I => coeff i) :e K :^: I
+    /\ ring_finite_sum K add I (fun i => coeff i) = ring_one K mul.
+
+//GOD1:727842 affine_barycenter : "the barycentre of the point family #10 with masses #11" | $\sum_i#11_i#10_i$
+Definition affine_barycenter :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set -> set) ->
+  set -> (set -> set) -> (set -> set) -> set :=
+  fun T addT smulT E action I P coeff =>
+    action
+      (module_finitely_supported_sum T addT I
+        (fun i => smulT (coeff i)
+          (affine_difference T E action (affine_origin E) (P i))))
+      (affine_origin E).
+
+Theorem god1_affine_barycenter_is_origin_independent :
+  forall K, forall addK mulK:set -> set -> set,
+  forall T, forall addT smulT:set -> set -> set,
+  forall E, forall action:set -> set -> set,
+  forall I, forall P:set -> set, forall coeff:set -> set,
+    affine_space K addK mulK T addT smulT E action ->
+    finite I -> (forall i :e I, P i :e E) ->
+    affine_coefficients_sum_one K addK mulK I coeff ->
+    forall O :e E,
+      affine_difference T E action O
+        (affine_barycenter T addT smulT E action I P coeff)
+      = module_finitely_supported_sum T addT I
+        (fun i => smulT (coeff i)
+          (affine_difference T E action O (P i))).
+Admitted.
+
+Theorem god1_affine_barycenter_distributive_law :
+  forall K, forall addK mulK:set -> set -> set,
+  forall T, forall addT smulT:set -> set -> set,
+  forall E, forall action:set -> set -> set,
+  forall I J, forall P:set -> set -> set,
+  forall mu:set -> set, forall lambda:set -> set -> set,
+    affine_space K addK mulK T addT smulT E action ->
+    finite I -> finite J ->
+    (forall i :e I, forall j :e J, P i j :e E) ->
+    affine_coefficients_sum_one K addK mulK I mu ->
+    (forall i :e I,
+      affine_coefficients_sum_one K addK mulK J (fun j => lambda i j)) ->
+    affine_barycenter T addT smulT E action I
+      (fun i => affine_barycenter T addT smulT E action J
+        (fun j => P i j) (fun j => lambda i j)) mu
+    = affine_barycenter T addT smulT E action (I :*: J)
+      (fun u => P (u 0) (u 1))
+      (fun u => mulK (mu (u 0)) (lambda (u 0) (u 1))).
+Admitted.
+
+//GOD1:732701 affine_linear_variety : "#9 is a linear variety in the affine space #7" | $#9\subseteq_{\mathrm{aff}}#7$
+Definition affine_linear_variety :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set -> set) -> set -> prop :=
+  fun K addK mulK T addT smulT E action V =>
+    affine_space K addK mulK T addT smulT E action
+    /\ V c= E
+    /\ forall n :e omega, forall P :e V :^: n,
+      forall coeff:set -> set,
+        affine_coefficients_sum_one K addK mulK n coeff ->
+        affine_barycenter T addT smulT E action n
+          (fun i => P i) coeff :e V.
+
+//GOD1:733904 affine_span : "the linear variety generated by the point family #10" | $\operatorname{Aff}(#10)$
+Definition affine_span :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set -> set) -> set -> (set -> set) -> set :=
+  fun K addK mulK T addT smulT E action I P =>
+    {Q :e E|forall V,
+      affine_linear_variety K addK mulK T addT smulT E action V ->
+      (forall i :e I, P i :e V) -> Q :e V}.
+
+//GOD1:735866 affine_displacement_set : "the set of displacement vectors from #10 to points of #9" | $#9-#10$
+Definition affine_displacement_set :
+  set -> set -> (set -> set -> set) -> set -> set -> set :=
+  fun T E action V O =>
+    {s :e T|exists P :e V, s = affine_difference T E action O P}.
+
+//GOD1:739945 affine_director_subspace : "the director subspace of the linear variety #9" | $\operatorname{Dir}(#9)$
+Definition affine_director_subspace :
+  set -> set -> (set -> set -> set) -> set -> set :=
+  fun T E action V =>
+    {s :e T|exists P Q :e V,
+      s = affine_difference T E action P Q}.
+
+Theorem god1_s25_theorem1_characterization_of_nonempty_linear_varieties :
+  forall K, forall addK mulK:set -> set -> set,
+  forall T, forall addT smulT:set -> set -> set,
+  forall E, forall action:set -> set -> set, forall V,
+    affine_space K addK mulK T addT smulT E action ->
+    V c= E -> V <> 0 ->
+    (affine_linear_variety K addK mulK T addT smulT E action V
+    <-> forall O :e V,
+      vector_subspace K addK mulK T addT smulT
+        (affine_displacement_set T E action V O))
+    /\ ((forall O :e V,
+      vector_subspace K addK mulK T addT smulT
+        (affine_displacement_set T E action V O))
+    <-> exists O :e V,
+      vector_subspace K addK mulK T addT smulT
+        (affine_displacement_set T E action V O))
+    /\ (affine_linear_variety K addK mulK T addT smulT E action V ->
+      (forall O :e V,
+        affine_displacement_set T E action V O
+        = affine_director_subspace T E action V)
+      /\ affine_director_subspace T E action V
+        = {s :e T|forall P :e V, action s P :e V}).
+Admitted.
+
+Theorem god1_linear_varieties_with_same_director_are_translates :
+  forall K, forall addK mulK:set -> set -> set,
+  forall T, forall addT smulT:set -> set -> set,
+  forall E, forall action:set -> set -> set, forall V W,
+    affine_space K addK mulK T addT smulT E action ->
+    affine_linear_variety K addK mulK T addT smulT E action V ->
+    affine_linear_variety K addK mulK T addT smulT E action W ->
+    V <> 0 -> W <> 0 ->
+    affine_director_subspace T E action V
+      = affine_director_subspace T E action W ->
+    exists s :e T,
+      {action s P|P :e V} = W.
+Admitted.
+
+//GOD1:744870 affine_line : "the line joining the points #9 and #10" | $\overline{#9#10}$
+Definition affine_line :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set -> set) -> set -> set -> set :=
+  fun K addK mulK T addT smulT E action P Q =>
+    affine_span K addK mulK T addT smulT E action 2
+      (fun i => if i = 0 then P else Q).
+
+Theorem god1_s25_theorem2_generation_of_linear_variety_by_lines :
+  forall K, forall addK mulK:set -> set -> set,
+  forall T, forall addT smulT:set -> set -> set,
+  forall E, forall action:set -> set -> set, forall V,
+    affine_space K addK mulK T addT smulT E action ->
+    addK (ring_one K mulK) (ring_one K mulK) <> ring_zero K addK ->
+    V c= E ->
+    (affine_linear_variety K addK mulK T addT smulT E action V
+    <-> forall P Q :e V, P <> Q ->
+      affine_line K addK mulK T addT smulT E action P Q c= V).
+Admitted.
+
+//GOD1:749545 affine_space_dimension : "the dimension of the affine space #7" | $\dim(#7)$
+Definition affine_space_dimension :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set -> set) -> (set -> set -> set) -> set -> set :=
+  fun K addK mulK T addT smulT E =>
+    module_dimension K addK mulK T addT smulT.
+
+//GOD1:749545 affine_variety_dimension : "the dimension of the nonempty linear variety #9" | $\dim(#9)$
+Definition affine_variety_dimension :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set -> set) -> set -> set :=
+  fun K addK mulK T addT smulT E action V =>
+    module_dimension K addK mulK
+      (affine_director_subspace T E action V) addT smulT.
+
+//GOD1:749545 affine_basis : "the #10-indexed point family #11 is an affine basis of #7" | $#11\text{ is an affine basis of }#7$
+Definition affine_basis :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set -> set) -> set -> (set -> set) -> prop :=
+  fun K addK mulK T addT smulT E action n P =>
+    (forall i :e ordsucc n, P i :e E)
+    /\ module_basis K addK mulK T addT smulT n
+      (fun i => affine_difference T E action (P 0) (P (ordsucc i))).
+
+//GOD1:749545 affine_coordinates : "the affine coordinates of point #12 in affine basis #11" | $[#12]_{#11}^{\mathrm{aff}}$
+Definition affine_coordinates :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set -> set) ->
+  set -> (set -> set) -> set -> set :=
+  fun K addK mulK T addT smulT E action n P Q =>
+    Eps_i (fun coeff =>
+      affine_coefficients_sum_one K addK mulK (ordsucc n)
+        (fun i => coeff i)
+      /\ affine_barycenter T addT smulT E action (ordsucc n) P
+        (fun i => coeff i) = Q).
+
+//GOD1:752963 affinely_independent_family : "the #9-indexed family #10 is affinely independent" | $#10\text{ is affinely independent}$
+Definition affinely_independent_family :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set -> set) -> set -> (set -> set) -> prop :=
+  fun K addK mulK T addT smulT E action m Q =>
+    (forall j :e ordsucc m, Q j :e E)
+    /\ linearly_independent_family K addK mulK T addT smulT m
+      (fun j => affine_difference T E action (Q 0) (Q (ordsucc j))).
+
+Theorem god1_s25_theorem3_affine_basis_spanning_characterization :
+  forall K, forall addK mulK:set -> set -> set,
+  forall T, forall addT smulT:set -> set -> set,
+  forall E, forall action:set -> set -> set,
+  forall n :e omega, forall P:set -> set,
+    affine_space K addK mulK T addT smulT E action ->
+    affine_space_dimension K addK mulK T addT smulT E = n ->
+    (forall i :e ordsucc n, P i :e E) ->
+    (affine_basis K addK mulK T addT smulT E action n P
+    <-> affine_span K addK mulK T addT smulT E action (ordsucc n) P = E)
+    /\ (affine_basis K addK mulK T addT smulT E action n P
+    <-> forall V,
+      affine_linear_variety K addK mulK T addT smulT E action V ->
+      (forall i :e ordsucc n, P i :e V) -> V = E).
+Admitted.
+
+Theorem god1_affine_variety_dimension_monotonicity :
+  forall K, forall addK mulK:set -> set -> set,
+  forall T, forall addT smulT:set -> set -> set,
+  forall E, forall action:set -> set -> set, forall V W,
+    affine_space K addK mulK T addT smulT E action ->
+    affine_linear_variety K addK mulK T addT smulT E action V ->
+    affine_linear_variety K addK mulK T addT smulT E action W ->
+    V <> 0 -> V c= W ->
+    affine_variety_dimension K addK mulK T addT smulT E action V
+      c= affine_variety_dimension K addK mulK T addT smulT E action W
+    /\ (affine_variety_dimension K addK mulK T addT smulT E action V
+      = affine_variety_dimension K addK mulK T addT smulT E action W
+      <-> V = W).
+Admitted.
+
+//GOD1:753757 affine_coordinate_matrix : "the affine-coordinate matrix of point family #13 in affine basis #12" | $([#13_j]_{#12,i}^{\mathrm{aff}})_{i,j}$
+Definition affine_coordinate_matrix :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set -> set) -> set -> set ->
+  (set -> set) -> (set -> set) -> set :=
+  fun K addK mulK T addT smulT E action m n P Q =>
+    fun u :e ordsucc m :*: ordsucc n =>
+      affine_coordinates K addK mulK T addT smulT E action m P
+        (Q (u 1)) (u 0).
+
+Theorem god1_s25_theorem4_rank_of_affine_coordinate_matrix :
+  forall K, forall addK mulK:set -> set -> set,
+  forall T, forall addT smulT:set -> set -> set,
+  forall E, forall action:set -> set -> set,
+  forall m n :e omega, forall P Q:set -> set,
+    affine_space K addK mulK T addT smulT E action ->
+    affine_basis K addK mulK T addT smulT E action m P ->
+    (forall j :e ordsucc n, Q j :e E) ->
+    matrix_rank K addK mulK (ordsucc m) (ordsucc n)
+      (affine_coordinate_matrix K addK mulK T addT smulT
+        E action m n P Q)
+    = ordsucc (affine_variety_dimension K addK mulK T addT smulT
+      E action
+      (affine_span K addK mulK T addT smulT E action (ordsucc n) Q)).
+Admitted.
+
+//GOD1:759058 affine_membership_coordinate_matrix : "the affine-coordinate matrix with first column #14 and remaining columns #13" | $[[#14]_{#12}^{\mathrm{aff}}\mid[#13]_{#12}^{\mathrm{aff}}]$
+Definition affine_membership_coordinate_matrix :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set -> set) -> set -> set ->
+  (set -> set) -> (set -> set) -> set -> set :=
+  fun K addK mulK T addT smulT E action n q P Q R =>
+    fun u :e ordsucc n :*: ordsucc q =>
+      if u 1 = 0
+      then affine_coordinates K addK mulK T addT smulT E action n P R (u 0)
+      else affine_coordinates K addK mulK T addT smulT E action n P
+        (Q (Union (u 1))) (u 0).
+
+Theorem god1_affine_variety_equations_in_affine_coordinates :
+  forall K, forall addK mulK:set -> set -> set,
+  forall T, forall addT smulT:set -> set -> set,
+  forall E, forall action:set -> set -> set,
+  forall n m :e omega, forall P Q:set -> set, forall R :e E,
+    affine_space K addK mulK T addT smulT E action ->
+    affine_basis K addK mulK T addT smulT E action n P ->
+    affinely_independent_family K addK mulK T addT smulT E action m Q ->
+    ordsucc m c= ordsucc n ->
+    (R :e affine_span K addK mulK T addT smulT E action (ordsucc m) Q
+    <-> forall rows :e (ordsucc n) :^: (ordsucc (ordsucc m)),
+      (forall i j :e ordsucc (ordsucc m), i :e j -> rows i :e rows j) ->
+      matrix_determinant K addK mulK (ordsucc (ordsucc m))
+        (matrix_submatrix (ordsucc (ordsucc m)) (ordsucc (ordsucc m))
+          (fun i => rows i) (fun j => j)
+          (affine_membership_coordinate_matrix K addK mulK
+            T addT smulT E action n (ordsucc m) P Q R))
+      = ring_zero K addK).
+Admitted.
+
+(** § 26. Algebraic relations. **)
+
+//GOD1:762564 subring_generated_by : "the subring of #1 generated by subring #4 and subset #5" | $#4[#5]$
+Definition subring_generated_by :
+  set -> (set -> set -> set) -> (set -> set -> set) -> set -> set -> set :=
+  fun L add mul K B =>
+    {x :e L|forall A,
+      subring L add mul A -> K c= A -> B c= A -> x :e A}.
+
+//GOD1:762564 ring_natural_power : "the #5-th natural power of #4 in the ring #1" | $#4^{#5}$
+Definition ring_natural_power :
+  set -> (set -> set -> set) -> set -> set -> set :=
+  fun L mul x n => group_nat_power L mul x n.
+
+//GOD1:762564 ring_monomial_value : "the monomial in family #5 with exponent tuple #6" | $\prod_i#5_i^{#6_i}$
+Definition ring_monomial_value :
+  set -> (set -> set -> set) -> set ->
+  (set -> set) -> (set -> set) -> set :=
+  fun L mul n x exponent =>
+    group_word_product L mul
+      (fun i => ring_natural_power L mul (x i) (exponent i)) n.
+
+//GOD1:762564 polynomial_value_in_ring_elements : "the value at #8 of the polynomial coefficient family #9" | $\sum_r#9_r#8^r$
+Definition polynomial_value_in_ring_elements :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> set -> (set -> set) -> (set -> set) -> set :=
+  fun L add mul K n x coeff =>
+    module_finitely_supported_sum L add (omega :^: n)
+      (fun exponent => mul (coeff exponent)
+        (ring_monomial_value L mul n x (fun i => exponent i))).
+
+//GOD1:762564 polynomial_in_ring_elements : "#10 is a polynomial in the family #8 with coefficients in #4" | $#10\in #4[#8]$
+Definition polynomial_in_ring_elements :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> set -> (set -> set) -> set -> prop :=
+  fun L add mul K n x y =>
+    exists coeff:set -> set,
+      (forall exponent :e omega :^: n, coeff exponent :e K)
+      /\ almost_all_zero (omega :^: n) (ring_zero L add) coeff
+      /\ y = polynomial_value_in_ring_elements L add mul K n x coeff.
+
+Theorem god1_subring_generated_by_finite_family_is_polynomial_values :
+  forall L, forall add mul:set -> set -> set, forall K,
+  forall n :e omega, forall x:set -> set,
+    commutative_ring L add mul -> subring L add mul K ->
+    (forall i :e n, x i :e L) ->
+    subring_generated_by L add mul K {x i|i :e n}
+    = {y :e L|polynomial_in_ring_elements L add mul K n x y}.
+Admitted.
+
+//GOD1:767548 algebraic_relation : "#9 is an algebraic relation over #4 between the elements #8" | $\sum_r#9_r#8^r=0$
+Definition algebraic_relation :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> set -> (set -> set) -> (set -> set) -> prop :=
+  fun L add mul K n x coeff =>
+    (forall exponent :e omega :^: n, coeff exponent :e K)
+    /\ almost_all_zero (omega :^: n) (ring_zero L add) coeff
+    /\ polynomial_value_in_ring_elements L add mul K n x coeff
+      = ring_zero L add.
+
+//GOD1:767548 algebraically_independent : "the family #8 is algebraically independent over #4" | $#8\text{ is algebraically independent over }#4$
+Definition algebraically_independent :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> set -> (set -> set) -> prop :=
+  fun L add mul K n x =>
+    forall coeff:set -> set,
+      algebraic_relation L add mul K n x coeff ->
+      forall exponent :e omega :^: n,
+        coeff exponent = ring_zero L add.
+
+//GOD1:767548 algebraically_dependent : "the family #8 is algebraically dependent over #4" | $#8\text{ is algebraically dependent over }#4$
+Definition algebraically_dependent :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> set -> (set -> set) -> prop :=
+  fun L add mul K n x =>
+    exists coeff:set -> set,
+      algebraic_relation L add mul K n x coeff
+      /\ exists exponent :e omega :^: n,
+        coeff exponent <> ring_zero L add.
+
+//GOD1:768775 algebraic_over : "#5 is algebraic over the subring #4" | $#5\text{ is algebraic over }#4$
+Definition algebraic_over :
+  set -> (set -> set -> set) -> (set -> set -> set) -> set -> set -> prop :=
+  fun L add mul K x =>
+    x :e L
+    /\ algebraically_dependent L add mul K 1 (fun i => x).
+
+//GOD1:768775 transcendental_over : "#5 is transcendental over the subring #4" | $#5\text{ is transcendental over }#4$
+Definition transcendental_over :
+  set -> (set -> set -> set) -> (set -> set -> set) -> set -> set -> prop :=
+  fun L add mul K x =>
+    x :e L /\ not (algebraic_over L add mul K x).
+
+Theorem god1_s26_theorem1_algebraic_element_characterizations :
+  forall L, forall add mul:set -> set -> set, forall K, forall x :e L,
+    field L add mul -> subfield L add mul K ->
+    let Kx := subring_generated_by L add mul K {x} in
+    (algebraic_over L add mul K x
+    <-> finite_dimensional_vector_space K add mul Kx add mul)
+    /\ (finite_dimensional_vector_space K add mul Kx add mul
+    <-> subfield L add mul Kx).
+Admitted.
+
+//GOD1:776192 relative_algebraic_closure : "the elements of #1 algebraic over the subfield #4" | $\overline{#4}^{#1}$
+Definition relative_algebraic_closure :
+  set -> (set -> set -> set) -> (set -> set -> set) -> set -> set :=
+  fun L add mul K => {x :e L|algebraic_over L add mul K x}.
+
+Theorem god1_s26_theorem2_algebraic_elements_form_subfield :
+  forall L, forall add mul:set -> set -> set, forall K,
+    field L add mul -> subfield L add mul K ->
+    subfield L add mul (relative_algebraic_closure L add mul K).
+Admitted.
+
+(** § 27. Polynomial rings. **)
+
+//GOD1:789896 multivariate_polynomial_ring : "the ring of polynomials in #4 indeterminates over #1" | $#1[X_1,\ldots,X_{#4}]$
+Definition multivariate_polynomial_ring :
+  set -> (set -> set -> set) -> set -> set :=
+  fun K add n =>
+    {f :e K :^: (omega :^: n)|
+      almost_all_zero (omega :^: n) (ring_zero K add) (fun exponent => f exponent)}.
+
+//GOD1:789896 polynomial_addition : "addition in the #4-variable polynomial ring over #1" | $#5+#6$
+Definition polynomial_addition :
+  set -> (set -> set -> set) -> set -> set -> set -> set :=
+  fun K add n f g =>
+    fun exponent :e omega :^: n => add (f exponent) (g exponent).
+
+//GOD1:789896 polynomial_multiplication : "convolution multiplication in the #5-variable polynomial ring over #1" | $#6#7$
+Definition polynomial_multiplication :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> set -> set -> set :=
+  fun K add mul n f g =>
+    fun exponent :e omega :^: n =>
+      module_finitely_supported_sum K add
+        {u :e (omega :^: n) :*: (omega :^: n)|
+          forall i :e n, add_SNo (u 0 i) (u 1 i) = exponent i}
+        (fun u => mul (f (u 0)) (g (u 1))).
+
+//GOD1:797289 polynomial_constant : "the constant polynomial associated with #5" | $#5$
+Definition polynomial_constant :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> set -> set :=
+  fun K add mul n a =>
+    fun exponent :e omega :^: n =>
+      if exponent = (fun i :e n => 0) then a else ring_zero K add.
+
+//GOD1:797289 polynomial_constant_subring : "the constant subring of the #4-variable polynomial ring" | $#1\subseteq #1[X_1,\ldots,X_{#4}]$
+Definition polynomial_constant_subring :
+  set -> (set -> set -> set) -> (set -> set -> set) -> set -> set :=
+  fun K add mul n => {polynomial_constant K add mul n a|a :e K}.
+
+//GOD1:798246 polynomial_standard_exponent : "the exponent tuple of indeterminate #2 among #1 indeterminates" | $e_{#2}$
+Definition polynomial_standard_exponent : set -> set -> set :=
+  fun n i => fun j :e n => if j = i then 1 else 0.
+
+//GOD1:798246 polynomial_indeterminate : "indeterminate #5 in the #4-variable polynomial ring over #1" | $X_{#5}$
+Definition polynomial_indeterminate :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> set -> set :=
+  fun K add mul n i =>
+    fun exponent :e omega :^: n =>
+      if exponent = polynomial_standard_exponent n i
+      then ring_one K mul else ring_zero K add.
+
+Theorem god1_polynomial_ring_construction_properties :
+  forall K, forall add mul:set -> set -> set,
+  forall n :e omega, 0 :e n ->
+    commutative_ring K add mul ->
+    let P := multivariate_polynomial_ring K add n in
+    let addP := polynomial_addition K add n in
+    let mulP := polynomial_multiplication K add mul n in
+    let C := polynomial_constant_subring K add mul n in
+    commutative_ring P addP mulP
+    /\ subring P addP mulP C
+    /\ algebraically_independent P addP mulP C n
+      (polynomial_indeterminate K add mul n)
+    /\ subring_generated_by P addP mulP C
+      {polynomial_indeterminate K add mul n i|i :e n} = P
+    /\ bij K C (polynomial_constant K add mul n).
+Admitted.
+
+//GOD1:804975 exponent_total_degree : "the total degree of exponent tuple #2" | $|#2|$
+Definition exponent_total_degree : set -> (set -> set) -> set :=
+  fun n exponent =>
+    ring_finite_sum omega add_SNo n (fun i => exponent i).
+
+//GOD1:804975 polynomial_total_degree : "the total degree of polynomial #5, with omega representing minus infinity" | $d^0(#5)$
+Definition polynomial_total_degree :
+  set -> (set -> set -> set) -> set -> set -> set :=
+  fun K add n f =>
+    if f = (fun exponent :e omega :^: n => ring_zero K add)
+    then omega
+    else Eps_i (fun d =>
+      d :e omega
+      /\ (exists exponent :e omega :^: n,
+        f exponent <> ring_zero K add
+        /\ exponent_total_degree n (fun i => exponent i) = d)
+      /\ forall exponent :e omega :^: n,
+        f exponent <> ring_zero K add ->
+        exponent_total_degree n (fun i => exponent i) c= d).
+
+//GOD1:804975 polynomial_partial_degree : "the degree of polynomial #6 in indeterminate #5, with omega representing minus infinity" | $d_{X_{#5}}(#6)$
+Definition polynomial_partial_degree :
+  set -> (set -> set -> set) -> set -> set -> set -> set :=
+  fun K add n i f =>
+    if f = (fun exponent :e omega :^: n => ring_zero K add)
+    then omega
+    else Eps_i (fun d =>
+      d :e omega
+      /\ (exists exponent :e omega :^: n,
+        f exponent <> ring_zero K add /\ exponent i = d)
+      /\ forall exponent :e omega :^: n,
+        f exponent <> ring_zero K add -> exponent i c= d).
+
+//GOD1:805532 homogeneous_polynomial : "polynomial #6 is homogeneous of total degree #5" | $#6\text{ is homogeneous of degree }#5$
+Definition homogeneous_polynomial :
+  set -> (set -> set -> set) -> set -> set -> set -> prop :=
+  fun K add n d f =>
+    f :e multivariate_polynomial_ring K add n
+    /\ forall exponent :e omega :^: n,
+      f exponent <> ring_zero K add ->
+      exponent_total_degree n (fun i => exponent i) = d.
+
+//GOD1:806412 polynomial_degree_addition : "addition of polynomial degrees, with omega representing minus infinity" | $#1+#2$
+Definition polynomial_degree_addition : set -> set -> set :=
+  fun d e => if d = omega \/ e = omega then omega else d + e.
+
+//GOD1:806412 polynomial_degree_le : "comparison of polynomial degrees, with omega representing minus infinity" | $#1\leq #2$
+Definition polynomial_degree_le : set -> set -> prop :=
+  fun d e => d = omega \/ (e <> omega /\ d c= e).
+
+Theorem god1_polynomial_degree_bounds :
+  forall K, forall add mul:set -> set -> set,
+  forall n :e omega, forall f g :e multivariate_polynomial_ring K add n,
+    commutative_ring K add mul ->
+    (polynomial_degree_le
+      (polynomial_total_degree K add n
+        (polynomial_addition K add n f g))
+      (polynomial_total_degree K add n f)
+    \/ polynomial_degree_le
+      (polynomial_total_degree K add n
+        (polynomial_addition K add n f g))
+      (polynomial_total_degree K add n g))
+    /\ polynomial_degree_le
+      (polynomial_total_degree K add n
+        (polynomial_multiplication K add mul n f g))
+      (polynomial_degree_addition
+        (polynomial_total_degree K add n f)
+        (polynomial_total_degree K add n g)).
+Admitted.
+
+Theorem god1_s27_theorem1_polynomial_ring_over_domain_and_product_degree :
+  forall K, forall add mul:set -> set -> set,
+  forall n :e omega, 0 :e n ->
+    integral_domain K add mul ->
+    integral_domain
+      (multivariate_polynomial_ring K add n)
+      (polynomial_addition K add n)
+      (polynomial_multiplication K add mul n)
+    /\ forall f g :e multivariate_polynomial_ring K add n,
+      polynomial_total_degree K add n
+        (polynomial_multiplication K add mul n f g)
+      = polynomial_degree_addition
+        (polynomial_total_degree K add n f)
+        (polynomial_total_degree K add n g).
+Admitted.
+
+(** § 28. Polynomial functions. **)
+
+//GOD1:810103 polynomial_evaluation : "the value of polynomial #9 at #10 in #4" | $#9(#10)$
+Definition polynomial_evaluation :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> set -> (set -> set) -> set :=
+  fun K addK mulK L addL mulL n f u =>
+    polynomial_value_in_ring_elements L addL mulL K n u
+      (fun exponent => f exponent).
+
+//GOD1:810103 polynomial_zero : "#10 is a zero of polynomial #9" | $#9(#10)=0$
+Definition polynomial_zero :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> set -> (set -> set) -> prop :=
+  fun K addK mulK L addL mulL n f u =>
+    (fun i :e n => u i) :e L :^: n
+    /\ polynomial_evaluation K addK mulK L addL mulL n f u
+      = ring_zero L addL.
+
+//GOD1:810103 polynomial_function : "#10 is a polynomial function on #4^#7 with coefficients in #1" | $#10:#4^{#7}\to #4$
+Definition polynomial_function :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set) -> prop :=
+  fun K addK mulK L addL mulL n phi =>
+    exists f :e multivariate_polynomial_ring K addK n,
+      forall u :e L :^: n,
+        phi u = polynomial_evaluation K addK mulK L addL mulL n f
+          (fun i => u i).
+
+//GOD1:810103 polynomial_mapping : "#11 is a polynomial mapping from #4^#7 to #4^#8 with coefficients in #1" | $#11:#4^{#7}\to #4^{#8}$
+Definition polynomial_mapping :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> set -> (set -> set) -> prop :=
+  fun K addK mulK L addL mulL n r phi =>
+    (forall u :e L :^: n, phi u :e L :^: r)
+    /\ forall j :e r,
+      polynomial_function K addK mulK L addL mulL n
+        (fun u => phi u j).
+
+Theorem god1_polynomial_evaluation_homomorphism_and_kernel :
+  forall K, forall addK mulK:set -> set -> set,
+  forall L, forall addL mulL:set -> set -> set,
+  forall n :e omega, forall u :e L :^: n,
+    commutative_ring L addL mulL -> subring L addL mulL K ->
+    let P := multivariate_polynomial_ring K addK n in
+    let addP := polynomial_addition K addK n in
+    let mulP := polynomial_multiplication K addK mulK n in
+    let ev := polynomial_evaluation K addK mulK L addL mulL n in
+    (forall f g :e P,
+      ev (addP f g) (fun i => u i)
+        = addL (ev f (fun i => u i)) (ev g (fun i => u i))
+      /\ ev (mulP f g) (fun i => u i)
+        = mulL (ev f (fun i => u i)) (ev g (fun i => u i)))
+    /\ {ev f (fun i => u i)|f :e P}
+      = subring_generated_by L addL mulL K {u i|i :e n}
+    /\ {f :e P|ev f (fun i => u i) = ring_zero L addL}
+      = {f :e P|algebraic_relation L addL mulL K n
+        (fun i => u i) (fun exponent => f exponent)}.
+Admitted.
+
+Theorem god1_s28_theorem1_polynomials_over_infinite_domain_determined_by_values :
+  forall K, forall add mul:set -> set -> set,
+  forall n :e omega,
+  forall f g :e multivariate_polynomial_ring K add n,
+    integral_domain K add mul -> not (finite K) ->
+    (f = g <-> forall x :e K :^: n,
+      polynomial_evaluation K add mul K add mul n f (fun i => x i)
+      = polynomial_evaluation K add mul K add mul n g (fun i => x i)).
+Admitted.
+
+Theorem god1_s28_lemma1_factor_theorem :
+  forall K, forall add mul:set -> set -> set,
+  forall f :e multivariate_polynomial_ring K add 1, forall a :e K,
+    commutative_ring K add mul ->
+    (polynomial_zero K add mul K add mul 1 f (fun i => a)
+    <-> exists g :e multivariate_polynomial_ring K add 1,
+      f = polynomial_multiplication K add mul 1
+        (polynomial_addition K add 1
+          (polynomial_indeterminate K add mul 1 0)
+          (ring_negation
+            (multivariate_polynomial_ring K add 1)
+            (polynomial_addition K add 1)
+            (polynomial_constant K add mul 1 a)))
+        g).
+Admitted.
+
+//GOD1:820500 polynomial_root_set : "the set of roots of the one-variable polynomial #5 in #1" | $Z(#5)$
+Definition polynomial_root_set :
+  set -> (set -> set -> set) -> (set -> set -> set) -> set -> set :=
+  fun K add mul f =>
+    {a :e K|polynomial_zero K add mul K add mul 1 f (fun i => a)}.
+
+Theorem god1_s28_lemma2_root_bound :
+  forall K, forall add mul:set -> set -> set,
+  forall f :e multivariate_polynomial_ring K add 1, forall d :e omega,
+    integral_domain K add mul ->
+    polynomial_total_degree K add 1 f = d ->
+    finite (polynomial_root_set K add mul f)
+    /\ finite_cardinality (polynomial_root_set K add mul f) c= d.
+Admitted.
+
+(** § 29. Rational fractions. **)
+
+//GOD1:850114 fraction_pairs : "the numerator-denominator pairs over the integral domain #1" | $#1\times(#1\setminus\{0\})$
+Definition fraction_pairs :
+  set -> (set -> set -> set) -> set :=
+  fun K add => K :*: (K :\: {ring_zero K add}).
+
+//GOD1:850114 equivalent_fraction_pairs : "the fraction pairs #5 and #6 are equivalent" | $#5_0#6_1=#5_1#6_0$
+Definition equivalent_fraction_pairs :
+  set -> (set -> set -> set) -> set -> set -> prop :=
+  fun K mul p q => mul (p 0) (q 1) = mul (p 1) (q 0).
+
+//GOD1:850114 fraction_class : "the equivalence class of fraction pair #4" | $[#4]$
+Definition fraction_class :
+  set -> (set -> set -> set) -> (set -> set -> set) -> set -> set :=
+  fun K add mul p =>
+    {q :e fraction_pairs K add|equivalent_fraction_pairs K mul p q}.
+
+//GOD1:850114 fraction_field : "the field of fractions of the integral domain #1" | $\operatorname{Frac}(#1)$
+Definition fraction_field :
+  set -> (set -> set -> set) -> (set -> set -> set) -> set :=
+  fun K add mul =>
+    {fraction_class K add mul p|p :e fraction_pairs K add}.
+
+//GOD1:850114 fraction_representative : "a numerator-denominator representative of fraction #4" | $\operatorname{rep}(#4)$
+Definition fraction_representative :
+  set -> (set -> set -> set) -> (set -> set -> set) -> set -> set :=
+  fun K add mul x =>
+    Eps_i (fun p => p :e fraction_pairs K add
+      /\ x = fraction_class K add mul p).
+
+//GOD1:852741 fraction_addition : "addition in the field of fractions of #1" | $#4+#5$
+Definition fraction_addition :
+  set -> (set -> set -> set) -> (set -> set -> set) -> set -> set -> set :=
+  fun K add mul x y =>
+    let p := fraction_representative K add mul x in
+    let q := fraction_representative K add mul y in
+    fraction_class K add mul
+      (add (mul (p 0) (q 1)) (mul (p 1) (q 0)),
+       mul (p 1) (q 1)).
+
+//GOD1:852741 fraction_multiplication : "multiplication in the field of fractions of #1" | $#4#5$
+Definition fraction_multiplication :
+  set -> (set -> set -> set) -> (set -> set -> set) -> set -> set -> set :=
+  fun K add mul x y =>
+    let p := fraction_representative K add mul x in
+    let q := fraction_representative K add mul y in
+    fraction_class K add mul
+      (mul (p 0) (q 0),mul (p 1) (q 1)).
+
+//GOD1:862315 fraction_embedding : "the canonical embedding of #1 into its field of fractions" | $#4\mapsto #4/1$
+Definition fraction_embedding :
+  set -> (set -> set -> set) -> (set -> set -> set) -> set -> set :=
+  fun K add mul a =>
+    fraction_class K add mul (a,ring_one K mul).
+
+Theorem god1_fraction_field_construction :
+  forall K, forall add mul:set -> set -> set,
+    integral_domain K add mul ->
+    field (fraction_field K add mul)
+      (fraction_addition K add mul)
+      (fraction_multiplication K add mul)
+    /\ inj K (fraction_field K add mul)
+      (fraction_embedding K add mul)
+    /\ subring
+      (fraction_field K add mul)
+      (fraction_addition K add mul)
+      (fraction_multiplication K add mul)
+      {fraction_embedding K add mul a|a :e K}
+    /\ forall x :e fraction_field K add mul,
+      exists a :e K, exists b :e K,
+        b <> ring_zero K add
+        /\ x = fraction_multiplication K add mul
+          (fraction_embedding K add mul a)
+          (ring_inverse
+            (fraction_field K add mul)
+            (fraction_addition K add mul)
+            (fraction_multiplication K add mul)
+            (fraction_embedding K add mul b)).
+Admitted.
+
+//GOD1:864242 rational_function_field : "the field of rational fractions in #4 indeterminates over #1" | $#1(X_1,\ldots,X_{#4})$
+Definition rational_function_field :
+  set -> (set -> set -> set) -> (set -> set -> set) -> set -> set :=
+  fun K add mul n =>
+    fraction_field
+      (multivariate_polynomial_ring K add n)
+      (polynomial_addition K add n)
+      (polynomial_multiplication K add mul n).
+
+Theorem god1_rational_function_field_properties :
+  forall K, forall add mul:set -> set -> set,
+  forall n :e omega, 0 :e n ->
+    field K add mul ->
+    field (rational_function_field K add mul n)
+      (fraction_addition
+        (multivariate_polynomial_ring K add n)
+        (polynomial_addition K add n)
+        (polynomial_multiplication K add mul n))
+      (fraction_multiplication
+        (multivariate_polynomial_ring K add n)
+        (polynomial_addition K add n)
+        (polynomial_multiplication K add mul n))
+    /\ forall x :e rational_function_field K add mul n,
+      exists p q :e multivariate_polynomial_ring K add n,
+        q <> (fun exponent :e omega :^: n => ring_zero K add)
+        /\ x = fraction_class
+          (multivariate_polynomial_ring K add n)
+          (polynomial_addition K add n)
+          (polynomial_multiplication K add mul n) (p,q).
+Admitted.
+
+(** § 30. Derivations and Taylor's formula. **)
+
+//GOD1:897998 ring_derivation : "#4 is a derivation of the ring #1" | $#4(xy)=#4(x)y+x#4(y)$
+Definition ring_derivation :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  (set -> set) -> prop :=
+  fun K add mul D =>
+    ring K add mul
+    /\ (forall x :e K, D x :e K)
+    /\ (forall x y :e K, D (add x y) = add (D x) (D y))
+    /\ forall x y :e K,
+      D (mul x y) = add (mul (D x) y) (mul x (D y)).
+
+Theorem god1_derivation_of_one_and_natural_powers :
+  forall K, forall add mul:set -> set -> set, forall D:set -> set,
+    commutative_ring K add mul -> ring_derivation K add mul D ->
+    D (ring_one K mul) = ring_zero K add
+    /\ forall x :e K, forall n :e omega, 0 :e n ->
+      D (ring_nat_power K add mul x n)
+      = mul
+        (ring_nat_multiple K add n
+          (ring_nat_power K add mul x (Union n)))
+        (D x).
+Admitted.
+
+//GOD1:900246 polynomial_coefficient_derivation : "the polynomial obtained by applying derivation #5 to the coefficients of #7" | $#7^{#5}$
+Definition polynomial_coefficient_derivation :
+  set -> (set -> set -> set) -> set -> (set -> set) -> set -> set :=
+  fun K add n D f =>
+    fun exponent :e omega :^: n => D (f exponent).
+
+//GOD1:905121 increment_exponent_coordinate : "the exponent tuple #3 with coordinate #2 increased by one" | $#3+e_{#2}$
+Definition increment_exponent_coordinate : set -> set -> (set -> set) -> set :=
+  fun n i exponent =>
+    fun j :e n => if j = i then ordsucc (exponent j) else exponent j.
+
+//GOD1:905121 polynomial_partial_derivative : "the partial derivative of polynomial #6 with respect to indeterminate #5" | $\partial #6/\partial X_{#5}$
+Definition polynomial_partial_derivative :
+  set -> (set -> set -> set) -> set -> set -> set -> set :=
+  fun K add n i f =>
+    fun exponent :e omega :^: n =>
+      ring_nat_multiple K add (ordsucc (exponent i))
+        (f (increment_exponent_coordinate n i (fun j => exponent j))).
+
+//GOD1:900246 polynomial_derived : "the derived polynomial of the one-variable polynomial #4" | $#4'$
+Definition polynomial_derived :
+  set -> (set -> set -> set) -> set -> set :=
+  fun K add f => polynomial_partial_derivative K add 1 0 f.
+
+//GOD1:911914 iterated_polynomial_derivative : "the #5-th derived polynomial of #4" | $#4^{(#5)}$
+Definition iterated_polynomial_derivative :
+  set -> (set -> set -> set) -> set -> set -> set :=
+  fun K add f k =>
+    let h := Eps_i (fun h =>
+      h :e (multivariate_polynomial_ring K add 1) :^: (ordsucc k)
+      /\ h 0 = f
+      /\ forall j :e k, h (ordsucc j) = polynomial_derived K add (h j)) in
+    h k.
+
+Theorem god1_s30_theorem1_derivation_extension_to_one_variable_polynomials :
+  forall K, forall add mul:set -> set -> set,
+  forall D:set -> set, forall u :e multivariate_polynomial_ring K add 1,
+    commutative_ring K add mul -> ring_derivation K add mul D ->
+    exists Dp:set -> set,
+      ring_derivation
+        (multivariate_polynomial_ring K add 1)
+        (polynomial_addition K add 1)
+        (polynomial_multiplication K add mul 1) Dp
+      /\ (forall a :e K,
+        Dp (polynomial_constant K add mul 1 a)
+        = polynomial_constant K add mul 1 (D a))
+      /\ Dp (polynomial_indeterminate K add mul 1 0) = u
+      /\ (forall f :e multivariate_polynomial_ring K add 1,
+        Dp f = polynomial_addition K add 1
+          (polynomial_coefficient_derivation K add 1 D f)
+          (polynomial_multiplication K add mul 1 u
+            (polynomial_derived K add f)))
+      /\ forall E:set -> set,
+        ring_derivation
+          (multivariate_polynomial_ring K add 1)
+          (polynomial_addition K add 1)
+          (polynomial_multiplication K add mul 1) E ->
+        (forall a :e K,
+          E (polynomial_constant K add mul 1 a)
+          = polynomial_constant K add mul 1 (D a)) ->
+        E (polynomial_indeterminate K add mul 1 0) = u -> E = Dp.
+Admitted.
+
+Theorem god1_s30_theorem2_derivation_extension_to_multivariate_polynomials :
+  forall K, forall add mul:set -> set -> set,
+  forall D:set -> set, forall n :e omega,
+  forall u :e (multivariate_polynomial_ring K add n) :^: n,
+    commutative_ring K add mul -> ring_derivation K add mul D ->
+    exists Dp:set -> set,
+      ring_derivation
+        (multivariate_polynomial_ring K add n)
+        (polynomial_addition K add n)
+        (polynomial_multiplication K add mul n) Dp
+      /\ (forall a :e K,
+        Dp (polynomial_constant K add mul n a)
+        = polynomial_constant K add mul n (D a))
+      /\ (forall i :e n, Dp (polynomial_indeterminate K add mul n i) = u i)
+      /\ (forall f :e multivariate_polynomial_ring K add n,
+        Dp f = polynomial_addition K add n
+          (polynomial_coefficient_derivation K add n D f)
+          (module_finitely_supported_sum
+            (multivariate_polynomial_ring K add n)
+            (polynomial_addition K add n) n
+            (fun i => polynomial_multiplication K add mul n (u i)
+              (polynomial_partial_derivative K add n i f))))
+      /\ forall E:set -> set,
+        ring_derivation
+          (multivariate_polynomial_ring K add n)
+          (polynomial_addition K add n)
+          (polynomial_multiplication K add mul n) E ->
+        (forall a :e K,
+          E (polynomial_constant K add mul n a)
+          = polynomial_constant K add mul n (D a)) ->
+        (forall i :e n, E (polynomial_indeterminate K add mul n i) = u i) ->
+        E = Dp.
+Admitted.
+
+//GOD1:907343 polynomial_substitution : "the polynomial obtained from #9 by substituting the polynomial family #10" | $#9(#10_1,\ldots,#10_n)$
+Definition polynomial_substitution :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> set -> set -> (set -> set) -> set :=
+  fun K add mul n p f u =>
+    module_finitely_supported_sum
+      (multivariate_polynomial_ring K add p)
+      (polynomial_addition K add p) (omega :^: n)
+      (fun exponent => polynomial_multiplication K add mul p
+        (polynomial_constant K add mul p (f exponent))
+        (ring_monomial_value
+          (multivariate_polynomial_ring K add p)
+          (polynomial_multiplication K add mul p) n u
+          (fun i => exponent i))).
+
+Theorem god1_s30_theorem3_polynomial_chain_rule :
+  forall L, forall add mul:set -> set -> set, forall K,
+  forall D:set -> set, forall n :e omega,
+  forall f :e multivariate_polynomial_ring K add n,
+  forall u :e L :^: n,
+    commutative_ring L add mul -> subring L add mul K ->
+    ring_derivation L add mul D ->
+    (forall a :e K, D a = ring_zero L add) ->
+    D (polynomial_evaluation K add mul L add mul n f (fun j => u j))
+    = ring_finite_sum L add n
+      (fun i => mul
+        (polynomial_evaluation K add mul L add mul n
+          (polynomial_partial_derivative K add n i f) (fun j => u j))
+        (D (u i))).
+Admitted.
+
+Theorem god1_s30_theorem3_corollary_multivariate_chain_rule :
+  forall K, forall add mul:set -> set -> set,
+  forall n p :e omega,
+  forall f :e multivariate_polynomial_ring K add n,
+  forall u :e (multivariate_polynomial_ring K add p) :^: n,
+    commutative_ring K add mul ->
+    forall j :e p,
+      polynomial_partial_derivative K add p j
+        (polynomial_substitution K add mul n p f (fun h => u h))
+      = ring_finite_sum
+        (multivariate_polynomial_ring K add p)
+        (polynomial_addition K add p) n
+        (fun i => polynomial_multiplication K add mul p
+          (polynomial_substitution K add mul n p
+            (polynomial_partial_derivative K add n i f) (fun h => u h))
+          (polynomial_partial_derivative K add p j (u i))).
+Admitted.
+
+//GOD1:911914 polynomial_taylor_coefficient : "the #5-th Taylor coefficient polynomial of #4" | $#4_{#5}$
+Definition polynomial_taylor_coefficient :
+  set -> (set -> set -> set) -> set -> set -> set :=
+  fun K add f k =>
+    fun exponent :e omega :^: 1 =>
+      ring_nat_multiple K add
+        (binomial_coefficient (add_SNo (exponent 0) k) k)
+        (f (fun i :e 1 => add_SNo (exponent 0) k)).
+
+Theorem god1_s30_theorem4_taylor_formula :
+  forall K, forall add mul:set -> set -> set,
+  forall f :e multivariate_polynomial_ring K add 1,
+  forall n :e omega,
+    commutative_ring K add mul ->
+    polynomial_total_degree K add 1 f = n ->
+    (forall x y :e K,
+      polynomial_evaluation K add mul K add mul 1 f
+        (fun i => add x y)
+      = ring_finite_sum K add (ordsucc n)
+        (fun k => mul
+          (polynomial_evaluation K add mul K add mul 1
+            (polynomial_taylor_coefficient K add f k)
+            (fun i => x))
+          (ring_nat_power K add mul y k)))
+    /\ forall k :e ordsucc n,
+      polynomial_multiplication K add mul 1
+        (polynomial_constant K add mul 1
+          (ring_nat_multiple K add (factorial k) (ring_one K mul)))
+        (polynomial_taylor_coefficient K add f k)
+      = iterated_polynomial_derivative K add f k.
+Admitted.
+
+//GOD1:915262 field_characteristic : "the characteristic of the field #1" | $\operatorname{char}(#1)$
+Definition field_characteristic :
+  set -> (set -> set -> set) -> (set -> set -> set) -> set :=
+  fun K add mul =>
+    Eps_i (fun p => p :e omega
+      /\ {r :e int|group_int_power K add (ring_one K mul) r = ring_zero K add}
+        = {mul_SNo p z|z :e int}).
+
+Theorem god1_field_characteristic_zero_or_prime_and_scalar_criterion :
+  forall K, forall add mul:set -> set -> set,
+    field K add mul ->
+    (field_characteristic K add mul = 0
+      \/ prime_nat (field_characteristic K add mul))
+    /\ forall r :e int,
+      (group_int_power K add (ring_one K mul) r = ring_zero K add
+      <-> exists z :e int,
+        r = mul_SNo (field_characteristic K add mul) z).
+Admitted.
+
+//GOD1:920202 polynomial_divides : "polynomial #4 divides polynomial #5" | $#4\mid #5$
+Definition polynomial_divides :
+  set -> (set -> set -> set) -> (set -> set -> set) -> set -> set -> prop :=
+  fun K add mul g f =>
+    exists q :e multivariate_polynomial_ring K add 1,
+      f = polynomial_multiplication K add mul 1 g q.
+
+//GOD1:920883 polynomial_root_multiplicity : "the multiplicity of #5 as a root of polynomial #4" | $\operatorname{mult}_{#5}(#4)$
+Definition polynomial_root_multiplicity :
+  set -> (set -> set -> set) -> (set -> set -> set) -> set -> set -> set :=
+  fun K add mul f a =>
+    Eps_i (fun r => r :e omega
+      /\ polynomial_divides K add mul
+        (ring_nat_power
+          (multivariate_polynomial_ring K add 1)
+          (polynomial_addition K add 1)
+          (polynomial_multiplication K add mul 1)
+          (polynomial_addition K add 1
+            (polynomial_indeterminate K add mul 1 0)
+            (ring_negation
+              (multivariate_polynomial_ring K add 1)
+              (polynomial_addition K add 1)
+              (polynomial_constant K add mul 1 a))) r) f
+      /\ forall s :e omega,
+        polynomial_divides K add mul
+          (ring_nat_power
+            (multivariate_polynomial_ring K add 1)
+            (polynomial_addition K add 1)
+            (polynomial_multiplication K add mul 1)
+            (polynomial_addition K add 1
+              (polynomial_indeterminate K add mul 1 0)
+              (ring_negation
+                (multivariate_polynomial_ring K add 1)
+                (polynomial_addition K add 1)
+                (polynomial_constant K add mul 1 a))) s) f -> s c= r).
+
+Theorem god1_s30_theorem5_root_iff_linear_factor :
+  forall K, forall add mul:set -> set -> set,
+  forall f :e multivariate_polynomial_ring K add 1, forall a :e K,
+    commutative_ring K add mul ->
+    (polynomial_zero K add mul K add mul 1 f (fun i => a)
+    <-> polynomial_divides K add mul
+      (polynomial_addition K add 1
+        (polynomial_indeterminate K add mul 1 0)
+        (ring_negation
+          (multivariate_polynomial_ring K add 1)
+          (polynomial_addition K add 1)
+          (polynomial_constant K add mul 1 a))) f).
+Admitted.
+
+Theorem god1_s30_theorem6_simple_root_derivative_criterion :
+  forall K, forall add mul:set -> set -> set,
+  forall f :e multivariate_polynomial_ring K add 1, forall a :e K,
+    commutative_ring K add mul ->
+    (polynomial_root_multiplicity K add mul f a = 1
+    <-> polynomial_evaluation K add mul K add mul 1 f (fun i => a)
+          = ring_zero K add
+      /\ polynomial_evaluation K add mul K add mul 1
+          (polynomial_derived K add f) (fun i => a)
+          <> ring_zero K add).
+Admitted.
+
+Theorem god1_s30_theorem7_root_multiplicity_by_successive_derivatives :
+  forall K, forall add mul:set -> set -> set,
+  forall f :e multivariate_polynomial_ring K add 1,
+  forall a :e K, forall r :e omega,
+    field K add mul -> field_characteristic K add mul = 0 ->
+    (polynomial_root_multiplicity K add mul f a = r
+    <-> (forall k :e r,
+      polynomial_evaluation K add mul K add mul 1
+        (iterated_polynomial_derivative K add f k) (fun i => a)
+      = ring_zero K add)
+      /\ polynomial_evaluation K add mul K add mul 1
+        (iterated_polynomial_derivative K add f r) (fun i => a)
+      <> ring_zero K add).
+Admitted.
+
+(** § 31. Principal ideal domains. **)
+
+//GOD1:934934 ring_divides : "#4 divides #5 in the ring #1" | $#4\mid #5$
+Definition ring_divides :
+  set -> (set -> set -> set) -> set -> set -> prop :=
+  fun K mul d x => d :e K /\ x :e K /\ exists q :e K, x = mul q d.
+
+//GOD1:934934 ideal_generated_by_finite_family : "the ideal generated by the family #6 indexed by #5" | $(#6_i)_{i\in #5}$
+Definition ideal_generated_by_finite_family :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set) -> set :=
+  fun K add mul I x =>
+    {y :e K|exists coeff :e K :^: I,
+      y = module_finitely_supported_sum K add I
+        (fun i => mul (coeff i) (x i))}.
+
+//GOD1:934934 highest_common_factor : "#8 is a highest common factor of family #7" | $#8=\operatorname{hcf}(#7_i)$
+Definition highest_common_factor :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set) -> set -> prop :=
+  fun K add mul I x d =>
+    d :e K
+    /\ ideal_generated_by_finite_family K add mul I x
+      = principal_ideal K add mul d.
+
+Theorem god1_hcf_existence_bezout_and_divisor_characterization :
+  forall K, forall add mul:set -> set -> set,
+  forall n :e omega, forall x :e K :^: n,
+    principal_ideal_domain K add mul ->
+    exists d :e K,
+      highest_common_factor K add mul n (fun i => x i) d
+      /\ (exists coeff :e K :^: n,
+        d = module_finitely_supported_sum K add n
+          (fun i => mul (coeff i) (x i)))
+      /\ forall m :e K,
+        ((forall i :e n, ring_divides K mul m (x i))
+        <-> ring_divides K mul m d).
+Admitted.
+
+//GOD1:937835 coprime_family : "the family #6 indexed by #5 is coprime" | $\operatorname{hcf}(#6_i)=1$
+Definition coprime_family :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set) -> prop :=
+  fun K add mul I x =>
+    highest_common_factor K add mul I x (ring_one K mul).
+
+//GOD1:937835 coprime_elements : "#4 and #5 are coprime in the ring #1" | $\operatorname{hcf}(#4,#5)=1$
+Definition coprime_elements :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> set -> prop :=
+  fun K add mul x y =>
+    coprime_family K add mul 2 (fun i => if i = 0 then x else y).
+
+Theorem god1_s31_theorem1_coprime_characterizations :
+  forall K, forall add mul:set -> set -> set,
+  forall n :e omega, forall x :e K :^: n,
+    principal_ideal_domain K add mul ->
+    (coprime_family K add mul n (fun i => x i)
+    <-> forall d :e K,
+      (forall i :e n, ring_divides K mul d (x i)) -> ring_unit K add mul d)
+    /\ ((forall d :e K,
+      (forall i :e n, ring_divides K mul d (x i)) -> ring_unit K add mul d)
+    <-> exists coeff :e K :^: n,
+      module_finitely_supported_sum K add n
+        (fun i => mul (coeff i) (x i)) = ring_one K mul)
+    /\ ((exists coeff :e K :^: n,
+      module_finitely_supported_sum K add n
+        (fun i => mul (coeff i) (x i)) = ring_one K mul)
+    <-> forall y :e K, exists coeff :e K :^: n,
+      module_finitely_supported_sum K add n
+        (fun i => mul (coeff i) (x i)) = y).
+Admitted.
+
+Theorem god1_s31_theorem2_euclid_coprime_divisor_lemma :
+  forall K, forall add mul:set -> set -> set,
+  forall x y d :e K,
+    principal_ideal_domain K add mul ->
+    x <> ring_zero K add -> y <> ring_zero K add ->
+    ring_divides K mul d (mul x y) ->
+    coprime_elements K add mul d x ->
+    ring_divides K mul d y.
+Admitted.
+
+//GOD1:939756 least_common_multiple : "#8 is a least common multiple of family #7" | $#8=\operatorname{lcm}(#7_i)$
+Definition least_common_multiple :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set) -> set -> prop :=
+  fun K add mul I x m =>
+    m :e K
+    /\ {y :e K|forall i :e I, y :e principal_ideal K add mul (x i)}
+      = principal_ideal K add mul m.
+
+Theorem god1_s31_theorem3_hcf_lcm_product :
+  forall K, forall add mul:set -> set -> set,
+  forall x y :e K,
+    principal_ideal_domain K add mul ->
+    x <> ring_zero K add -> y <> ring_zero K add ->
+    exists d m :e K,
+      highest_common_factor K add mul 2
+        (fun i => if i = 0 then x else y) d
+      /\ least_common_multiple K add mul 2
+        (fun i => if i = 0 then x else y) m
+      /\ mul x y = mul m d.
+Admitted.
+
+Theorem god1_s31_lemma1_quotients_by_hcf_are_coprime :
+  forall K, forall add mul:set -> set -> set,
+  forall x y d xp yp :e K,
+    principal_ideal_domain K add mul ->
+    x <> ring_zero K add -> y <> ring_zero K add ->
+    highest_common_factor K add mul 2
+      (fun i => if i = 0 then x else y) d ->
+    x = mul xp d -> y = mul yp d ->
+    coprime_elements K add mul xp yp.
+Admitted.
+
+Theorem god1_s31_lemma2_product_is_lcm_of_coprime_elements :
+  forall K, forall add mul:set -> set -> set,
+  forall x y :e K,
+    principal_ideal_domain K add mul ->
+    coprime_elements K add mul x y ->
+    least_common_multiple K add mul 2
+      (fun i => if i = 0 then x else y) (mul x y).
+Admitted.
+
+Theorem god1_s31_theorem4_pairwise_coprime_product_is_lcm :
+  forall K, forall add mul:set -> set -> set,
+  forall n :e omega, forall x :e K :^: n,
+    principal_ideal_domain K add mul ->
+    (forall i :e n, x i <> ring_zero K add) ->
+    (forall i j :e n, i <> j -> coprime_elements K add mul (x i) (x j)) ->
+    least_common_multiple K add mul n (fun i => x i)
+      (ring_finite_product K add mul n (fun i => x i)).
+Admitted.
+
+//GOD1:943756 extremal_element : "#4 is an extremal element of the principal ideal domain #1" | $#4\text{ is extremal}$
+Definition extremal_element :
+  set -> (set -> set -> set) -> (set -> set -> set) -> set -> prop :=
+  fun K add mul p =>
+    p :e K
+    /\ not (ring_unit K add mul p)
+    /\ forall d :e K,
+      ring_divides K mul d p ->
+      ring_unit K add mul d
+      \/ exists u :e K, ring_unit K add mul u /\ d = mul u p.
+
+//GOD1:947164 factorization_into_extremals : "#4 is a product of a unit and finitely many extremal elements" | $#4=u\prod_i p_i$
+Definition factorization_into_extremals :
+  set -> (set -> set -> set) -> (set -> set -> set) -> set -> prop :=
+  fun K add mul x =>
+    exists n :e omega, exists u :e K, exists p :e K :^: n,
+      ring_unit K add mul u
+      /\ (forall i :e n, extremal_element K add mul (p i))
+      /\ x = mul u (ring_finite_product K add mul n (fun i => p i)).
+
+Theorem god1_s31_theorem5_existence_of_extremal_factorization :
+  forall K, forall add mul:set -> set -> set, forall x :e K,
+    principal_ideal_domain K add mul ->
+    x <> ring_zero K add -> factorization_into_extremals K add mul x.
+Admitted.
+
+Theorem god1_s31_lemma3_maximal_member_of_nonempty_ideal_family :
+  forall K, forall add mul:set -> set -> set, forall X,
+    principal_ideal_domain K add mul ->
+    X <> 0 ->
+    (forall I :e X, two_sided_ideal K add mul I) ->
+    exists I :e X, forall J :e X, I c= J -> J = I.
+Admitted.
+
+//GOD1:948807 maximal_proper_ideal : "#4 is a maximal proper ideal of #1" | $#4\text{ is maximal}$
+Definition maximal_proper_ideal :
+  set -> (set -> set -> set) -> (set -> set -> set) -> set -> prop :=
+  fun K add mul I =>
+    two_sided_ideal K add mul I
+    /\ I <> K
+    /\ forall J, two_sided_ideal K add mul J ->
+      I c= J -> J = I \/ J = K.
+
+Theorem god1_s31_theorem6_extremal_characterizations :
+  forall K, forall add mul:set -> set -> set, forall p :e K,
+    principal_ideal_domain K add mul ->
+    p <> ring_zero K add -> not (ring_unit K add mul p) ->
+    (extremal_element K add mul p
+    <-> forall d :e K, ring_divides K mul d p ->
+      ring_unit K add mul d
+      \/ exists u :e K, ring_unit K add mul u /\ d = mul u p)
+    /\ ((forall d :e K, ring_divides K mul d p ->
+      ring_unit K add mul d
+      \/ exists u :e K, ring_unit K add mul u /\ d = mul u p)
+    <-> maximal_proper_ideal K add mul (principal_ideal K add mul p))
+    /\ (maximal_proper_ideal K add mul (principal_ideal K add mul p)
+    <-> forall n :e omega, forall x :e K :^: n,
+      ring_divides K mul p
+        (ring_finite_product K add mul n (fun i => x i)) ->
+      exists i :e n, ring_divides K mul p (x i)).
+Admitted.
+
+Theorem god1_s31_theorem6_corollary_coprime_to_each_factor :
+  forall K, forall add mul:set -> set -> set,
+  forall n :e omega, forall x :e K, forall y :e K :^: n,
+    principal_ideal_domain K add mul ->
+    x <> ring_zero K add -> (forall i :e n, y i <> ring_zero K add) ->
+    (forall i :e n, coprime_elements K add mul x (y i)) ->
+    coprime_elements K add mul x
+      (ring_finite_product K add mul n (fun i => y i)).
+Admitted.
+
+//GOD1:952017 associated_elements : "#4 and #5 are associated elements of #1" | $#4\sim #5$
+Definition associated_elements :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> set -> prop :=
+  fun K add mul x y =>
+    x :e K /\ y :e K
+    /\ exists u :e K, ring_unit K add mul u /\ y = mul u x.
+
+Theorem god1_s31_theorem7_uniqueness_of_extremal_factorization :
+  forall K, forall add mul:set -> set -> set,
+  forall x :e K, forall m n :e omega,
+  forall p :e K :^: m, forall q :e K :^: n,
+    principal_ideal_domain K add mul ->
+    x <> ring_zero K add -> not (ring_unit K add mul x) ->
+    (forall i :e m, extremal_element K add mul (p i)) ->
+    (forall j :e n, extremal_element K add mul (q j)) ->
+    x = ring_finite_product K add mul m (fun i => p i) ->
+    x = ring_finite_product K add mul n (fun j => q j) ->
+    m = n
+    /\ exists sigma :e permutation_group n,
+      forall i :e n, associated_elements K add mul (p i) (q (sigma i)).
+Admitted.
+
+//GOD1:955945 extremal_valuation : "the exponent of extremal element #4 in nonzero element #5" | $v_{#4}(#5)$
+Definition extremal_valuation :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> set -> set :=
+  fun K add mul p x =>
+    Eps_i (fun n => n :e omega
+      /\ ring_divides K mul
+        (ring_nat_power K add mul p n) x
+      /\ forall r :e omega,
+        ring_divides K mul (ring_nat_power K add mul p r) x -> r c= n).
+
+Theorem god1_s31_lemma4_divisibility_by_extremal_valuations :
+  forall K, forall add mul:set -> set -> set, forall x y :e K,
+    principal_ideal_domain K add mul ->
+    x <> ring_zero K add -> y <> ring_zero K add ->
+    (ring_divides K mul x y
+    <-> forall p :e K, extremal_element K add mul p ->
+      extremal_valuation K add mul p x c=
+      extremal_valuation K add mul p y).
+Admitted.
+
+//GOD1:958268 natural_minimum : "the minimum of natural numbers #1 and #2" | $\min(#1,#2)$
+Definition natural_minimum : set -> set -> set :=
+  fun n m => if n c= m then n else m.
+
+//GOD1:958268 natural_maximum : "the maximum of natural numbers #1 and #2" | $\max(#1,#2)$
+Definition natural_maximum : set -> set -> set :=
+  fun n m => if n c= m then m else n.
+
+Theorem god1_hcf_and_lcm_by_extremal_valuations :
+  forall K, forall add mul:set -> set -> set,
+  forall x y d m :e K,
+    principal_ideal_domain K add mul ->
+    x <> ring_zero K add -> y <> ring_zero K add ->
+    (highest_common_factor K add mul 2
+      (fun i => if i = 0 then x else y) d
+    <-> forall p :e K, extremal_element K add mul p ->
+      extremal_valuation K add mul p d
+      = natural_minimum
+        (extremal_valuation K add mul p x)
+        (extremal_valuation K add mul p y))
+    /\ (least_common_multiple K add mul 2
+      (fun i => if i = 0 then x else y) m
+    <-> forall p :e K, extremal_element K add mul p ->
+      extremal_valuation K add mul p m
+      = natural_maximum
+        (extremal_valuation K add mul p x)
+        (extremal_valuation K add mul p y)).
+Admitted.
+
+Theorem god1_s31_lemma5_partial_fraction_coprime_denominators :
+  forall K, forall add mul:set -> set -> set,
+  forall n :e omega, forall a :e K, forall b :e K :^: n,
+    principal_ideal_domain K add mul ->
+    (forall i :e n, b i <> ring_zero K add) ->
+    (forall i j :e n, i <> j -> coprime_elements K add mul (b i) (b j)) ->
+    exists c :e K :^: n,
+      fraction_class K add mul
+        (a,ring_finite_product K add mul n (fun i => b i))
+      = module_finitely_supported_sum
+        (fraction_field K add mul) (fraction_addition K add mul) n
+        (fun i => fraction_class K add mul (c i,b i)).
+Admitted.
+
+Theorem god1_s31_lemma6_powers_of_nonassociated_extremals_are_coprime :
+  forall K, forall add mul:set -> set -> set,
+  forall n :e omega, forall p :e K :^: n, forall r :e omega :^: n,
+    principal_ideal_domain K add mul ->
+    (forall i :e n, extremal_element K add mul (p i) /\ 0 :e r i) ->
+    (forall i j :e n, i <> j ->
+      not (associated_elements K add mul (p i) (p j))) ->
+    forall i j :e n, i <> j ->
+      coprime_elements K add mul
+        (ring_nat_power K add mul (p i) (r i))
+        (ring_nat_power K add mul (p j) (r j)).
+Admitted.
+
+Theorem god1_s31_theorem8_partial_fraction_decomposition_over_pid :
+  forall K, forall add mul:set -> set -> set,
+  forall n :e omega, forall a :e K,
+  forall p :e K :^: n, forall r :e omega :^: n,
+    principal_ideal_domain K add mul ->
+    (forall i :e n, extremal_element K add mul (p i) /\ 0 :e r i) ->
+    (forall i j :e n, i <> j ->
+      not (associated_elements K add mul (p i) (p j))) ->
+    exists c :e K :^: n,
+      fraction_class K add mul
+        (a,ring_finite_product K add mul n
+          (fun i => ring_nat_power K add mul (p i) (r i)))
+      = module_finitely_supported_sum
+        (fraction_field K add mul) (fraction_addition K add mul) n
+        (fun i => fraction_class K add mul
+          (c i,ring_nat_power K add mul (p i) (r i))).
+Admitted.
+
+(** § 32. Division of polynomials. **)
+
+//GOD1:980609 polynomial_leading_coefficient : "the leading coefficient of the nonzero polynomial #4" | $\operatorname{lc}(#4)$
+Definition polynomial_leading_coefficient :
+  set -> (set -> set -> set) -> set -> set :=
+  fun K add f =>
+    f (fun i :e 1 => polynomial_total_degree K add 1 f).
+
+//GOD1:980609 unitary_polynomial : "the nonzero polynomial #5 has a unit leading coefficient" | $#5\text{ is unitary}$
+Definition unitary_polynomial :
+  set -> (set -> set -> set) -> (set -> set -> set) -> set -> prop :=
+  fun K add mul f =>
+    f :e multivariate_polynomial_ring K add 1
+    /\ f <> (fun exponent :e omega :^: 1 => ring_zero K add)
+    /\ ring_unit K add mul (polynomial_leading_coefficient K add f).
+
+//GOD1:981059 polynomial_degree_lt : "polynomial degree #1 is strictly less than polynomial degree #2, with omega representing minus infinity" | $#1<#2$
+Definition polynomial_degree_lt : set -> set -> prop :=
+  fun d e => e <> omega /\ (d = omega \/ d :e e).
+
+//GOD1:981059 polynomial_division_equations : "#7 and #8 are the quotient and remainder when #5 is divided by #6" | $#5=#6#7+#8,\ \deg #8<\deg #6$
+Definition polynomial_division_equations :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> set -> set -> set -> prop :=
+  fun K add mul f g q r =>
+    q :e multivariate_polynomial_ring K add 1
+    /\ r :e multivariate_polynomial_ring K add 1
+    /\ f = polynomial_addition K add 1
+      (polynomial_multiplication K add mul 1 g q) r
+    /\ polynomial_degree_lt
+      (polynomial_total_degree K add 1 r)
+      (polynomial_total_degree K add 1 g).
+
+Theorem god1_s32_theorem1_polynomial_division_with_remainder :
+  forall K, forall add mul:set -> set -> set,
+  forall f :e multivariate_polynomial_ring K add 1,
+  forall g :e multivariate_polynomial_ring K add 1,
+    commutative_ring K add mul -> unitary_polynomial K add mul g ->
+    exists q r :e multivariate_polynomial_ring K add 1,
+      polynomial_division_equations K add mul f g q r
+      /\ forall q2 r2 :e multivariate_polynomial_ring K add 1,
+        polynomial_division_equations K add mul f g q2 r2 ->
+        q2 = q /\ r2 = r.
+Admitted.
+
+Theorem god1_s32_lemma1_degree_of_unitary_polynomial_product :
+  forall K, forall add mul:set -> set -> set,
+  forall g q :e multivariate_polynomial_ring K add 1,
+    commutative_ring K add mul -> unitary_polynomial K add mul g ->
+    q <> (fun exponent :e omega :^: 1 => ring_zero K add) ->
+    polynomial_total_degree K add 1
+      (polynomial_multiplication K add mul 1 g q)
+    = add_SNo
+      (polynomial_total_degree K add 1 g)
+      (polynomial_total_degree K add 1 q)
+    /\ not (polynomial_degree_lt
+      (polynomial_total_degree K add 1
+        (polynomial_multiplication K add mul 1 g q))
+      (polynomial_total_degree K add 1 g)).
+Admitted.
+
+//GOD1:985057 polynomial_quotient : "the quotient on division of #5 by the unitary polynomial #6" | $#5\operatorname{quo}#6$
+Definition polynomial_quotient :
+  set -> (set -> set -> set) -> (set -> set -> set) -> set -> set -> set :=
+  fun K add mul f g =>
+    Eps_i (fun q => exists r,
+      polynomial_division_equations K add mul f g q r).
+
+//GOD1:985057 polynomial_remainder : "the remainder on division of #5 by the unitary polynomial #6" | $#5\operatorname{rem}#6$
+Definition polynomial_remainder :
+  set -> (set -> set -> set) -> (set -> set -> set) -> set -> set -> set :=
+  fun K add mul f g =>
+    Eps_i (fun r => exists q,
+      polynomial_division_equations K add mul f g q r).
+
+Theorem god1_s32_theorem2_polynomial_ring_over_field_is_pid :
+  forall K, forall add mul:set -> set -> set,
+    field K add mul ->
+    principal_ideal_domain
+      (multivariate_polynomial_ring K add 1)
+      (polynomial_addition K add 1)
+      (polynomial_multiplication K add mul 1).
+Admitted.
+
+Theorem god1_s32_lemma2_units_of_univariate_polynomial_ring :
+  forall K, forall add mul:set -> set -> set,
+    integral_domain K add mul ->
+    forall f :e multivariate_polynomial_ring K add 1,
+      (ring_unit
+        (multivariate_polynomial_ring K add 1)
+        (polynomial_addition K add 1)
+        (polynomial_multiplication K add mul 1) f
+      <-> exists a :e K,
+        ring_unit K add mul a
+        /\ f = polynomial_constant K add mul 1 a).
+Admitted.
+
+Theorem god1_hilbert_basis_theorem_for_polynomial_rings :
+  forall K, forall add mul:set -> set -> set,
+  forall n :e omega,
+    noetherian_ring K add mul ->
+    noetherian_ring
+      (multivariate_polynomial_ring K add n)
+      (polynomial_addition K add n)
+      (polynomial_multiplication K add mul n).
+Admitted.
+
+Theorem god1_s32_theorem3_polynomial_hcf_characterizations :
+  forall K, forall add mul:set -> set -> set,
+  forall n :e omega,
+  forall f :e (multivariate_polynomial_ring K add 1) :^: n,
+  forall d :e multivariate_polynomial_ring K add 1,
+    field K add mul ->
+    d <> (fun exponent :e omega :^: 1 => ring_zero K add) ->
+    (forall i :e n,
+      f i <> (fun exponent :e omega :^: 1 => ring_zero K add)) ->
+    let P := multivariate_polynomial_ring K add 1 in
+    let addP := polynomial_addition K add 1 in
+    let mulP := polynomial_multiplication K add mul 1 in
+    (highest_common_factor P addP mulP n (fun i => f i) d
+    <-> forall c :e P,
+      ((forall i :e n, ring_divides P mulP c (f i))
+      <-> ring_divides P mulP c d))
+    /\ ((forall c :e P,
+      ((forall i :e n, ring_divides P mulP c (f i))
+      <-> ring_divides P mulP c d))
+    <-> ideal_generated_by_finite_family P addP mulP n (fun i => f i)
+      = principal_ideal P addP mulP d)
+    /\ (highest_common_factor P addP mulP n (fun i => f i) d
+    <-> (exists u :e P :^: n,
+      d = module_finitely_supported_sum P addP n
+        (fun i => mulP (u i) (f i)))
+      /\ forall h :e P,
+        h <> (fun exponent :e omega :^: 1 => ring_zero K add) ->
+        (exists u :e P :^: n,
+          h = module_finitely_supported_sum P addP n
+            (fun i => mulP (u i) (f i))) ->
+        polynomial_degree_le
+          (polynomial_total_degree K add 1 d)
+          (polynomial_total_degree K add 1 h)).
+Admitted.
+
+Theorem god1_s32_theorem3_corollary_coprime_polynomials_bezout :
+  forall K, forall add mul:set -> set -> set,
+  forall n :e omega,
+  forall f :e (multivariate_polynomial_ring K add 1) :^: n,
+    field K add mul ->
+    let P := multivariate_polynomial_ring K add 1 in
+    let addP := polynomial_addition K add 1 in
+    let mulP := polynomial_multiplication K add mul 1 in
+    ((forall d :e P,
+      (forall i :e n, ring_divides P mulP d (f i)) ->
+      exists a :e K, a <> ring_zero K add
+        /\ d = polynomial_constant K add mul 1 a)
+    <-> exists u :e P :^: n,
+      module_finitely_supported_sum P addP n
+        (fun i => mulP (u i) (f i))
+      = polynomial_constant K add mul 1 (ring_one K mul)).
+Admitted.
+
+//GOD1:993873 irreducible_polynomial : "#4 is an irreducible one-variable polynomial over #1" | $#4\text{ is irreducible}$
+Definition irreducible_polynomial :
+  set -> (set -> set -> set) -> (set -> set -> set) -> set -> prop :=
+  fun K add mul f =>
+    extremal_element
+      (multivariate_polynomial_ring K add 1)
+      (polynomial_addition K add 1)
+      (polynomial_multiplication K add mul 1) f.
+
+//GOD1:998849 polynomial_fraction : "the rational fraction with numerator #5 and denominator #6" | $#5/#6$
+Definition polynomial_fraction :
+  set -> (set -> set -> set) -> (set -> set -> set) -> set -> set -> set :=
+  fun K add mul p q =>
+    fraction_class
+      (multivariate_polynomial_ring K add 1)
+      (polynomial_addition K add 1)
+      (polynomial_multiplication K add mul 1) (p,q).
+
+Theorem god1_s32_lemma3_expansion_in_powers_of_unitary_polynomial :
+  forall K, forall add mul:set -> set -> set,
+  forall p q :e multivariate_polynomial_ring K add 1,
+    commutative_ring K add mul -> unitary_polynomial K add mul q ->
+    exists h :e (multivariate_polynomial_ring K add 1) :^: omega,
+      almost_all_zero omega
+        (fun exponent :e omega :^: 1 => ring_zero K add) (fun i => h i)
+      /\ p = module_finitely_supported_sum
+        (multivariate_polynomial_ring K add 1)
+        (polynomial_addition K add 1) omega
+        (fun i => polynomial_multiplication K add mul 1 (h i)
+          (ring_nat_power
+            (multivariate_polynomial_ring K add 1)
+            (polynomial_addition K add 1)
+            (polynomial_multiplication K add mul 1) q i))
+      /\ forall i :e omega,
+        h i <> (fun exponent :e omega :^: 1 => ring_zero K add) ->
+        polynomial_degree_lt
+          (polynomial_total_degree K add 1 (h i))
+          (polynomial_total_degree K add 1 q).
+Admitted.
+
+Theorem god1_polynomial_partial_fraction_decomposition :
+  forall K, forall add mul:set -> set -> set,
+  forall n :e omega,
+  forall q :e (multivariate_polynomial_ring K add 1) :^: n,
+  forall r :e omega :^: n,
+  forall p :e multivariate_polynomial_ring K add 1,
+    field K add mul ->
+    (forall i :e n,
+      irreducible_polynomial K add mul (q i) /\ 0 :e r i) ->
+    (forall i j :e n, i <> j ->
+      not (associated_elements
+        (multivariate_polynomial_ring K add 1)
+        (polynomial_addition K add 1)
+        (polynomial_multiplication K add mul 1) (q i) (q j))) ->
+    exists g :e multivariate_polynomial_ring K add 1,
+    exists h :e (Pi_ i :e n,
+      (multivariate_polynomial_ring K add 1) :^: (ordsucc (r i))),
+      polynomial_fraction K add mul p
+        (ring_finite_product
+          (multivariate_polynomial_ring K add 1)
+          (polynomial_addition K add 1)
+          (polynomial_multiplication K add mul 1) n
+          (fun i => ring_nat_power
+            (multivariate_polynomial_ring K add 1)
+            (polynomial_addition K add 1)
+            (polynomial_multiplication K add mul 1) (q i) (r i)))
+      = fraction_addition
+        (multivariate_polynomial_ring K add 1)
+        (polynomial_addition K add 1)
+        (polynomial_multiplication K add mul 1)
+        (polynomial_fraction K add mul g
+          (polynomial_constant K add mul 1 (ring_one K mul)))
+        (module_finitely_supported_sum
+          (rational_function_field K add mul 1)
+          (fraction_addition
+            (multivariate_polynomial_ring K add 1)
+            (polynomial_addition K add 1)
+            (polynomial_multiplication K add mul 1))
+          (Sigma_ i :e n, ordsucc (r i))
+          (fun u => polynomial_fraction K add mul (h (u 0) (u 1))
+            (ring_nat_power
+              (multivariate_polynomial_ring K add 1)
+              (polynomial_addition K add 1)
+              (polynomial_multiplication K add mul 1)
+              (q (u 0)) (u 1))))
+      /\ forall i :e n, forall j :e ordsucc (r i),
+        h i j <> (fun exponent :e omega :^: 1 => ring_zero K add) ->
+        polynomial_degree_lt
+          (polynomial_total_degree K add 1 (h i j))
+          (polynomial_total_degree K add 1 (q i)).
+Admitted.
+
+(** § 33. Roots of algebraic equations. **)
+
+//GOD1:1031006 linear_root_polynomial : "the polynomial X minus #4" | $X-#4$
+Definition linear_root_polynomial :
+  set -> (set -> set -> set) -> (set -> set -> set) -> set -> set :=
+  fun K add mul a =>
+    polynomial_addition K add 1
+      (polynomial_indeterminate K add mul 1 0)
+      (ring_negation
+        (multivariate_polynomial_ring K add 1)
+        (polynomial_addition K add 1)
+        (polynomial_constant K add mul 1 a)).
+
+//GOD1:1031006 root_factor_product : "the product of the root factors for roots #6 with multiplicities #7" | $\prod_i(X-#6_i)^{#7_i}$
+Definition root_factor_product :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set) -> (set -> set) -> set :=
+  fun K add mul p a r =>
+    ring_finite_product
+      (multivariate_polynomial_ring K add 1)
+      (polynomial_addition K add 1)
+      (polynomial_multiplication K add mul 1) p
+      (fun i => ring_nat_power
+        (multivariate_polynomial_ring K add 1)
+        (polynomial_addition K add 1)
+        (polynomial_multiplication K add mul 1)
+        (linear_root_polynomial K add mul (a i)) (r i)).
+
+Theorem god1_s33_theorem1_factor_out_all_roots_with_multiplicity :
+  forall K, forall add mul:set -> set -> set,
+  forall f :e multivariate_polynomial_ring K add 1,
+  forall n p :e omega, forall a :e K :^: p, forall r :e omega :^: p,
+    field K add mul -> polynomial_total_degree K add 1 f = n ->
+    (forall i j :e p, i <> j -> a i <> a j) ->
+    (forall z :e K,
+      polynomial_zero K add mul K add mul 1 f (fun h => z)
+      <-> exists i :e p, z = a i) ->
+    (forall i :e p,
+      polynomial_root_multiplicity K add mul f (a i) = r i) ->
+    exists g :e multivariate_polynomial_ring K add 1,
+      f = polynomial_multiplication K add mul 1
+        (root_factor_product K add mul p (fun i => a i) (fun i => r i)) g
+      /\ forall z :e K,
+        not (polynomial_zero K add mul K add mul 1 g (fun h => z)).
+Admitted.
+
+Theorem god1_s33_theorem1_corollary_sum_of_root_multiplicities :
+  forall K, forall add mul:set -> set -> set,
+  forall f :e multivariate_polynomial_ring K add 1,
+  forall n p :e omega, forall a :e K :^: p, forall r :e omega :^: p,
+    field K add mul -> polynomial_total_degree K add 1 f = n ->
+    (forall i j :e p, i <> j -> a i <> a j) ->
+    (forall z :e K,
+      polynomial_zero K add mul K add mul 1 f (fun h => z)
+      <-> exists i :e p, z = a i) ->
+    (forall i :e p,
+      polynomial_root_multiplicity K add mul f (a i) = r i) ->
+    ring_finite_sum omega add_SNo p (fun i => r i) c= n.
+Admitted.
+
+//GOD1:1037709 polynomial_splits_over : "the polynomial #5 has all its roots in the field #1" | $#5\text{ splits over }#1$
+Definition polynomial_splits_over :
+  set -> (set -> set -> set) -> (set -> set -> set) -> set -> prop :=
+  fun K add mul f =>
+    exists n :e omega, exists c :e K, exists a :e K :^: n,
+      c <> ring_zero K add
+      /\ f = polynomial_multiplication K add mul 1
+        (polynomial_constant K add mul 1 c)
+        (ring_finite_product
+          (multivariate_polynomial_ring K add 1)
+          (polynomial_addition K add 1)
+          (polynomial_multiplication K add mul 1) n
+          (fun i => linear_root_polynomial K add mul (a i))).
+
+//GOD1:1037709 algebraically_closed_field : "the field #1 is algebraically closed" | $#1\text{ is algebraically closed}$
+Definition algebraically_closed_field :
+  set -> (set -> set -> set) -> (set -> set -> set) -> prop :=
+  fun K add mul =>
+    field K add mul
+    /\ forall f :e multivariate_polynomial_ring K add 1,
+      forall n :e omega, 0 :e n ->
+      polynomial_total_degree K add 1 f = n ->
+      exists a :e K,
+        polynomial_zero K add mul K add mul 1 f (fun i => a).
+
+Theorem god1_s33_theorem2_dalembert_gauss :
+  algebraically_closed_field complex add_CSNo mul_CSNo.
+Admitted.
+
+Theorem god1_s33_theorem3_steinitz_algebraic_closure_embedding :
+  forall K, forall add mul:set -> set -> set,
+    field K add mul ->
+    exists L, exists addL mulL:set -> set -> set,
+    exists j:set -> set,
+      algebraically_closed_field L addL mulL
+      /\ ring_homomorphism K add mul L addL mulL j
+      /\ inj K L j.
+Admitted.
+
+Theorem god1_s33_theorem4_hilbert_nullstellensatz :
+  forall K, forall add mul:set -> set -> set,
+  forall n :e omega, forall I,
+    algebraically_closed_field K add mul ->
+    two_sided_ideal
+      (multivariate_polynomial_ring K add n)
+      (polynomial_addition K add n)
+      (polynomial_multiplication K add mul n) I ->
+    ((exists x :e K :^: n,
+      forall f :e I,
+        polynomial_evaluation K add mul K add mul n f (fun i => x i)
+        = ring_zero K add)
+    <-> I <> multivariate_polynomial_ring K add n).
+Admitted.
+
+Theorem god1_s33_theorem4_corollary_no_common_zero_bezout_identity :
+  forall K, forall add mul:set -> set -> set,
+  forall n p :e omega,
+  forall f :e (multivariate_polynomial_ring K add n) :^: p,
+    algebraically_closed_field K add mul ->
+    (not (exists x :e K :^: n,
+      forall i :e p,
+        polynomial_evaluation K add mul K add mul n (f i) (fun j => x j)
+        = ring_zero K add)
+    <-> exists u :e (multivariate_polynomial_ring K add n) :^: p,
+      module_finitely_supported_sum
+        (multivariate_polynomial_ring K add n)
+        (polynomial_addition K add n) p
+        (fun i => polynomial_multiplication K add mul n (u i) (f i))
+      = polynomial_constant K add mul n (ring_one K mul)).
+Admitted.
+
+//GOD1:1042154 affine_algebraic_variety : "#5 is an affine algebraic variety in #1^#4" | $#5\subseteq #1^{#4}\text{ is algebraic}$
+Definition affine_algebraic_variety :
+  set -> (set -> set -> set) -> (set -> set -> set) -> set -> set -> prop :=
+  fun K add mul n V =>
+    V c= K :^: n
+    /\ exists I, exists f :e (multivariate_polynomial_ring K add n) :^: I,
+      V = {x :e K :^: n|forall i :e I,
+        polynomial_evaluation K add mul K add mul n (f i)
+          (fun j => x j)
+        = ring_zero K add}.
+
+//GOD1:1042154 algebraic_hypersurface : "the hypersurface defined by polynomial #5 in #1^#4" | $V(#5)$
+Definition algebraic_hypersurface :
+  set -> (set -> set -> set) -> (set -> set -> set) -> set -> set -> set :=
+  fun K add mul n f =>
+    {x :e K :^: n|
+      polynomial_evaluation K add mul K add mul n f (fun j => x j)
+      = ring_zero K add}.
+
+Theorem god1_s33_theorem5_complete_root_factorization :
+  forall K, forall add mul:set -> set -> set,
+  forall f :e multivariate_polynomial_ring K add 1,
+  forall n p :e omega, forall a :e K :^: p, forall r :e omega :^: p,
+    algebraically_closed_field K add mul -> 0 :e n ->
+    polynomial_total_degree K add 1 f = n ->
+    (forall i j :e p, i <> j -> a i <> a j) ->
+    (forall z :e K,
+      polynomial_zero K add mul K add mul 1 f (fun h => z)
+      <-> exists i :e p, z = a i) ->
+    (forall i :e p,
+      polynomial_root_multiplicity K add mul f (a i) = r i) ->
+    f = polynomial_multiplication K add mul 1
+      (polynomial_constant K add mul 1
+        (polynomial_leading_coefficient K add f))
+      (root_factor_product K add mul p (fun i => a i) (fun i => r i))
+    /\ ring_finite_sum omega add_SNo p (fun i => r i) = n.
+Admitted.
+
+Theorem god1_irreducibles_over_algebraically_closed_field_are_linear :
+  forall K, forall add mul:set -> set -> set,
+  forall f :e multivariate_polynomial_ring K add 1,
+    algebraically_closed_field K add mul ->
+    (irreducible_polynomial K add mul f
+    <-> polynomial_total_degree K add 1 f = 1).
+Admitted.
+
+Theorem god1_s33_theorem6_real_irreducible_polynomials :
+  forall f :e multivariate_polynomial_ring real add_SNo 1,
+    (irreducible_polynomial real add_SNo mul_SNo f
+    <-> polynomial_total_degree real add_SNo 1 f = 1
+      \/ (polynomial_total_degree real add_SNo 1 f = 2
+        /\ SNoLt
+          (add_SNo
+            (mul_SNo (f (fun i :e 1 => 1)) (f (fun i :e 1 => 1)))
+            (minus_SNo (mul_SNo 4
+              (mul_SNo (f (fun i :e 1 => 2)) (f (fun i :e 1 => 0))))))
+          0)).
+Admitted.
+
+//GOD1:1059017 elementary_symmetric_root_sum : "the #5-th elementary symmetric function of the root family #6" | $e_{#5}(#6)$
+Definition elementary_symmetric_root_sum :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> set -> (set -> set) -> set :=
+  fun K add mul n k a =>
+    module_finitely_supported_sum K add
+      {A :e Power n|equip A k}
+      (fun A => ring_finite_product K add mul A (fun i => a i)).
+
+//GOD1:1059017 natural_difference : "the natural difference of #1 and #2 when #2 is at most #1" | $#1-#2$
+Definition natural_difference : set -> set -> set :=
+  fun n k => Eps_i (fun d => d :e omega /\ add_SNo d k = n).
+
+Theorem god1_vieta_relations_between_coefficients_and_roots :
+  forall K, forall add mul:set -> set -> set,
+  forall f :e multivariate_polynomial_ring K add 1,
+  forall n :e omega, forall a :e K :^: n,
+    field K add mul -> 0 :e n ->
+    polynomial_total_degree K add 1 f = n ->
+    f = polynomial_multiplication K add mul 1
+      (polynomial_constant K add mul 1
+        (polynomial_leading_coefficient K add f))
+      (ring_finite_product
+        (multivariate_polynomial_ring K add 1)
+        (polynomial_addition K add 1)
+        (polynomial_multiplication K add mul 1) n
+        (fun i => linear_root_polynomial K add mul (a i))) ->
+    forall k :e ordsucc n,
+      elementary_symmetric_root_sum K add mul n k (fun i => a i)
+      = mul (cofactor_sign_scalar K add mul k)
+        (mul
+          (f (fun i :e 1 => natural_difference n k))
+          (ring_inverse K add mul (polynomial_leading_coefficient K add f))).
+Admitted.
+
+(** § 34. Eigenvalues. **)
+
+//GOD1:1090759 endomorphism_eigenvector : "#8 is an eigenvector of the endomorphism #7" | $#7(#8)=\lambda #8$
+Definition endomorphism_eigenvector :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  (set -> set) -> set -> prop :=
+  fun K addK mulK E addE smul u x =>
+    x :e E /\ x <> module_zero E addE
+    /\ exists lambda :e K, u x = smul lambda x.
+
+//GOD1:1091348 endomorphism_eigenvalue : "#8 is an eigenvalue of the endomorphism #7" | $#8\in\operatorname{Spec}(#7)$
+Definition endomorphism_eigenvalue :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  (set -> set) -> set -> prop :=
+  fun K addK mulK E addE smul u lambda =>
+    lambda :e K /\ exists x :e E,
+      x <> module_zero E addE /\ u x = smul lambda x.
+
+//GOD1:1094498 matrix_characteristic_polynomial : "the characteristic polynomial of the square matrix #5" | $p_{#5}(X)=\det(#5-X1)$
+Definition matrix_characteristic_polynomial :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> set -> set :=
+  fun K add mul n A =>
+    let P := multivariate_polynomial_ring K add 1 in
+    let addP := polynomial_addition K add 1 in
+    let mulP := polynomial_multiplication K add mul 1 in
+    matrix_determinant P addP mulP n
+      (fun z :e n :*: n =>
+        if z 0 = z 1
+        then addP
+          (polynomial_constant K add mul 1 (matrix_entry A (z 0) (z 1)))
+          (ring_negation P addP
+            (polynomial_indeterminate K add mul 1 0))
+        else polynomial_constant K add mul 1
+          (matrix_entry A (z 0) (z 1))).
+
+//GOD1:1096366 endomorphism_characteristic_polynomial : "the characteristic polynomial of #9 in the basis #8" | $p_{#9}(X)$
+Definition endomorphism_characteristic_polynomial :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set) -> (set -> set) -> set :=
+  fun K addK mulK E addE smul n a u =>
+    matrix_characteristic_polynomial K addK mulK n
+      (endomorphism_coordinate_matrix
+        K addK mulK E addE smul n a u).
+
+//GOD1:1098295 matrix_trace : "the trace of the square matrix #5" | $\operatorname{Tr}(#5)$
+Definition matrix_trace :
+  set -> (set -> set -> set) -> set -> set -> set :=
+  fun K add n A =>
+    ring_finite_sum K add n (fun i => matrix_entry A i i).
+
+//GOD1:1098295 endomorphism_trace : "the trace of the endomorphism #9 in the basis #8" | $\operatorname{Tr}(#9)$
+Definition endomorphism_trace :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set) -> (set -> set) -> set :=
+  fun K addK mulK E addE smul n a u =>
+    matrix_trace K addK n
+      (endomorphism_coordinate_matrix
+        K addK mulK E addE smul n a u).
+
+Theorem god1_s34_theorem1_eigenvalue_determinant_criterion :
+  forall K, forall addK mulK:set -> set -> set,
+  forall E, forall addE smul:set -> set -> set,
+  forall n :e omega, forall a:set -> set, forall u:set -> set,
+  forall lambda :e K,
+    field K addK mulK ->
+    module_basis K addK mulK E addE smul n a ->
+    module_endomorphism K addK mulK E addE smul u ->
+    (endomorphism_eigenvalue K addK mulK E addE smul u lambda
+    <-> endomorphism_determinant K addK mulK E addE smul n a
+      (fun x => addE (u x)
+        (module_negation E addE (smul lambda x)))
+      = ring_zero K addK).
+Admitted.
+
+Theorem god1_characteristic_polynomial_is_basis_independent :
+  forall K, forall addK mulK:set -> set -> set,
+  forall E, forall addE smul:set -> set -> set,
+  forall n :e omega, forall a b:set -> set, forall u:set -> set,
+    field K addK mulK ->
+    module_basis K addK mulK E addE smul n a ->
+    module_basis K addK mulK E addE smul n b ->
+    module_endomorphism K addK mulK E addE smul u ->
+    endomorphism_characteristic_polynomial
+      K addK mulK E addE smul n a u
+    = endomorphism_characteristic_polynomial
+      K addK mulK E addE smul n b u.
+Admitted.
+
+Theorem god1_eigenvalues_are_characteristic_roots :
+  forall K, forall addK mulK:set -> set -> set,
+  forall E, forall addE smul:set -> set -> set,
+  forall n :e omega, forall a:set -> set, forall u:set -> set,
+  forall lambda :e K,
+    field K addK mulK ->
+    module_basis K addK mulK E addE smul n a ->
+    module_endomorphism K addK mulK E addE smul u ->
+    (endomorphism_eigenvalue K addK mulK E addE smul u lambda
+    <-> polynomial_zero K addK mulK K addK mulK 1
+      (endomorphism_characteristic_polynomial
+        K addK mulK E addE smul n a u)
+      (fun i => lambda)).
+Admitted.
+
+Theorem god1_characteristic_polynomial_leading_trace_and_constant_terms :
+  forall K, forall add mul:set -> set -> set,
+  forall n :e omega, forall A :e square_matrix_ring K n,
+    field K add mul -> 0 :e n ->
+    let p := matrix_characteristic_polynomial K add mul n A in
+    p (fun i :e 1 => n) = cofactor_sign_scalar K add mul n
+    /\ p (fun i :e 1 => natural_difference n 1)
+      = mul
+        (cofactor_sign_scalar K add mul (natural_difference n 1))
+        (matrix_trace K add n A)
+    /\ p (fun i :e 1 => 0) = matrix_determinant K add mul n A.
+Admitted.
+
+Theorem god1_s34_theorem2_eigenvalue_exists_over_algebraically_closed_field :
+  forall K, forall addK mulK:set -> set -> set,
+  forall E, forall addE smul:set -> set -> set,
+  forall n :e omega, forall u:set -> set,
+    algebraically_closed_field K addK mulK -> 0 :e n ->
+    module_dimension K addK mulK E addE smul = n ->
+    module_endomorphism K addK mulK E addE smul u ->
+    exists lambda :e K,
+      endomorphism_eigenvalue K addK mulK E addE smul u lambda.
+Admitted.
+
+//GOD1:1101246 endomorphism_has_all_eigenvalues_in_field : "#9 has all its eigenvalues in #1" | $#9\text{ splits over }#1$
+Definition endomorphism_has_all_eigenvalues_in_field :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set) -> (set -> set) -> prop :=
+  fun K addK mulK E addE smul n a u =>
+    polynomial_splits_over K addK mulK
+      (endomorphism_characteristic_polynomial
+        K addK mulK E addE smul n a u).
+
+//GOD1:1102862 triangulable_endomorphism : "the endomorphism #7 is triangulable" | $#7\text{ is triangulable}$
+Definition triangulable_endomorphism :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  (set -> set) -> prop :=
+  fun K addK mulK E addE smul u =>
+    exists n :e omega, exists a:set -> set,
+      module_basis K addK mulK E addE smul n a
+      /\ upper_triangular_matrix K addK n
+        (endomorphism_coordinate_matrix
+          K addK mulK E addE smul n a u).
+
+Theorem god1_s34_theorem3_triangulable_iff_characteristic_polynomial_splits :
+  forall K, forall addK mulK:set -> set -> set,
+  forall E, forall addE smul:set -> set -> set,
+  forall n :e omega, forall a:set -> set, forall u:set -> set,
+    field K addK mulK ->
+    module_basis K addK mulK E addE smul n a ->
+    module_endomorphism K addK mulK E addE smul u ->
+    (triangulable_endomorphism K addK mulK E addE smul u
+    <-> endomorphism_has_all_eigenvalues_in_field
+      K addK mulK E addE smul n a u).
+Admitted.
+
+Theorem god1_s34_theorem3_corollary1_algebraically_closed_triangulation :
+  forall K, forall addK mulK:set -> set -> set,
+  forall E, forall addE smul:set -> set -> set,
+  forall u:set -> set,
+    algebraically_closed_field K addK mulK ->
+    finite_dimensional_vector_space K addK mulK E addE smul ->
+    module_endomorphism K addK mulK E addE smul u ->
+    triangulable_endomorphism K addK mulK E addE smul u.
+Admitted.
+
+Theorem god1_s34_theorem3_corollary2_algebraically_closed_matrix_triangulation :
+  forall K, forall add mul:set -> set -> set,
+  forall n :e omega, forall U :e square_matrix_ring K n,
+    algebraically_closed_field K add mul -> 0 :e n ->
+    exists P :e square_matrix_ring K n,
+      invertible_matrix K add mul n P
+      /\ upper_triangular_matrix K add n
+        (matrix_multiplication K add mul n n n
+          (matrix_multiplication K add mul n n n P U)
+          (matrix_inverse K add mul n P)).
+Admitted.
+
+//GOD1:1110319 triangulable_matrix : "the square matrix #5 is triangulable over #1" | $#5\text{ is triangulable over }#1$
+Definition triangulable_matrix :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> set -> prop :=
+  fun K add mul n U =>
+    U :e square_matrix_ring K n
+    /\ exists P :e square_matrix_ring K n,
+      invertible_matrix K add mul n P
+      /\ upper_triangular_matrix K add n
+        (matrix_multiplication K add mul n n n
+          (matrix_multiplication K add mul n n n P U)
+          (matrix_inverse K add mul n P)).
+
+Theorem god1_s34_theorem3_corollary3_matrix_triangulation_criterion :
+  forall K, forall add mul:set -> set -> set,
+  forall n :e omega, forall U :e square_matrix_ring K n,
+    field K add mul ->
+    (triangulable_matrix K add mul n U
+    <-> polynomial_splits_over K add mul
+      (matrix_characteristic_polynomial K add mul n U)).
+Admitted.
+
+Theorem god1_s34_theorem4_distinct_eigenvectors_are_independent :
+  forall K, forall addK mulK:set -> set -> set,
+  forall E, forall addE smul:set -> set -> set,
+  forall n :e omega, forall u:set -> set,
+  forall x :e E :^: n, forall lambda :e K :^: n,
+    field K addK mulK ->
+    module_endomorphism K addK mulK E addE smul u ->
+    (forall i :e n,
+      x i <> module_zero E addE /\ u (x i) = smul (lambda i) (x i)) ->
+    (forall i j :e n, i <> j -> lambda i <> lambda j) ->
+    linearly_independent_family K addK mulK E addE smul n
+      (fun i => x i).
+Admitted.
+
+//GOD1:1115739 diagonal_matrix_from_family : "the diagonal matrix with diagonal family #5" | $\operatorname{diag}(#5)$
+Definition diagonal_matrix_from_family :
+  set -> (set -> set -> set) -> set -> (set -> set) -> set :=
+  fun K add n lambda =>
+    fun z :e n :*: n =>
+      if z 0 = z 1 then lambda (z 0) else ring_zero K add.
+
+//GOD1:1115739 diagonal_matrix : "the square matrix #4 is diagonal" | $#4\text{ is diagonal}$
+Definition diagonal_matrix :
+  set -> (set -> set -> set) -> set -> set -> prop :=
+  fun K add n A =>
+    A :e square_matrix_ring K n
+    /\ forall i j :e n, i <> j ->
+      matrix_entry A i j = ring_zero K add.
+
+Theorem god1_s34_theorem5_simple_characteristic_roots_diagonalize :
+  forall K, forall addK mulK:set -> set -> set,
+  forall E, forall addE smul:set -> set -> set,
+  forall n :e omega, forall a:set -> set, forall u:set -> set,
+  forall lambda :e K :^: n,
+    field K addK mulK -> 0 :e n ->
+    module_basis K addK mulK E addE smul n a ->
+    module_endomorphism K addK mulK E addE smul u ->
+    (forall i :e n,
+      polynomial_root_multiplicity K addK mulK
+        (endomorphism_characteristic_polynomial
+          K addK mulK E addE smul n a u) (lambda i) = 1) ->
+    (forall i j :e n, i <> j -> lambda i <> lambda j) ->
+    exists b:set -> set,
+      module_basis K addK mulK E addE smul n b
+      /\ endomorphism_coordinate_matrix
+        K addK mulK E addE smul n b u
+        = diagonal_matrix_from_family K addK n (fun i => lambda i).
+Admitted.
+
+Theorem god1_s34_theorem5_corollary_simple_root_matrix_diagonalization :
+  forall K, forall add mul:set -> set -> set,
+  forall n :e omega, forall U :e square_matrix_ring K n,
+  forall lambda :e K :^: n,
+    field K add mul -> 0 :e n ->
+    (forall i :e n,
+      polynomial_root_multiplicity K add mul
+        (matrix_characteristic_polynomial K add mul n U) (lambda i) = 1) ->
+    (forall i j :e n, i <> j -> lambda i <> lambda j) ->
+    exists P :e square_matrix_ring K n,
+      invertible_matrix K add mul n P
+      /\ matrix_multiplication K add mul n n n
+        (matrix_multiplication K add mul n n n P U)
+        (matrix_inverse K add mul n P)
+        = diagonal_matrix_from_family K add n (fun i => lambda i).
+Admitted.
+
+//GOD1:1117983 diagonalizable_endomorphism : "the endomorphism #7 is diagonalizable" | $#7\text{ is diagonalizable}$
+Definition diagonalizable_endomorphism :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  (set -> set) -> prop :=
+  fun K addK mulK E addE smul u =>
+    exists n :e omega, exists a:set -> set,
+      module_basis K addK mulK E addE smul n a
+      /\ forall i :e n,
+        endomorphism_eigenvector K addK mulK E addE smul u (a i).
+
+//GOD1:1118691 endomorphism_eigenspace : "the eigenspace of #7 associated with #8" | $E_{#7}(#8)$
+Definition endomorphism_eigenspace :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  (set -> set) -> set -> set :=
+  fun K addK mulK E addE smul u lambda =>
+    {x :e E|u x = smul lambda x}.
+
+//GOD1:1118691 endomorphism_eigenvalue_multiplicity : "the multiplicity of eigenvalue #10 of endomorphism #9" | $\operatorname{mult}_{#9}(#10)$
+Definition endomorphism_eigenvalue_multiplicity :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set) -> (set -> set) -> set -> set :=
+  fun K addK mulK E addE smul n a u lambda =>
+    polynomial_root_multiplicity K addK mulK
+      (endomorphism_characteristic_polynomial
+        K addK mulK E addE smul n a u) lambda.
+
+Theorem god1_s34_theorem6_diagonalizable_characterization :
+  forall K, forall addK mulK:set -> set -> set,
+  forall E, forall addE smul:set -> set -> set,
+  forall n :e omega, forall a:set -> set, forall u:set -> set,
+    field K addK mulK ->
+    module_basis K addK mulK E addE smul n a ->
+    module_endomorphism K addK mulK E addE smul u ->
+    (diagonalizable_endomorphism K addK mulK E addE smul u
+    <-> endomorphism_has_all_eigenvalues_in_field
+      K addK mulK E addE smul n a u
+      /\ forall lambda :e K,
+        endomorphism_eigenvalue K addK mulK E addE smul u lambda ->
+        module_dimension K addK mulK
+          (endomorphism_eigenspace
+            K addK mulK E addE smul u lambda) addE smul
+        = endomorphism_eigenvalue_multiplicity
+          K addK mulK E addE smul n a u lambda).
+Admitted.
+
+Theorem god1_eigenspace_dimension_at_most_root_multiplicity :
+  forall K, forall addK mulK:set -> set -> set,
+  forall E, forall addE smul:set -> set -> set,
+  forall n :e omega, forall a:set -> set, forall u:set -> set,
+  forall lambda :e K,
+    field K addK mulK ->
+    module_basis K addK mulK E addE smul n a ->
+    module_endomorphism K addK mulK E addE smul u ->
+    endomorphism_eigenvalue K addK mulK E addE smul u lambda ->
+    module_dimension K addK mulK
+      (endomorphism_eigenspace
+        K addK mulK E addE smul u lambda) addE smul
+    c= endomorphism_eigenvalue_multiplicity
+      K addK mulK E addE smul n a u lambda.
+Admitted.
+
+//GOD1:1124590 diagonalizable_matrix : "the square matrix #5 is diagonalizable over #1" | $#5\text{ is diagonalizable}$
+Definition diagonalizable_matrix :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> set -> prop :=
+  fun K add mul n U =>
+    U :e square_matrix_ring K n
+    /\ exists P :e square_matrix_ring K n,
+      invertible_matrix K add mul n P
+      /\ diagonal_matrix K add n
+        (matrix_multiplication K add mul n n n
+          (matrix_multiplication K add mul n n n P U)
+          (matrix_inverse K add mul n P)).
+
+//GOD1:1125133 semisimple_matrix : "the square matrix #5 is semisimple over #1" | $#5\text{ is semisimple}$
+Definition semisimple_matrix :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> set -> prop :=
+  fun K add mul n U =>
+    U :e square_matrix_ring K n
+    /\ exists L, exists addL mulL:set -> set -> set,
+      exists j:set -> set,
+        field L addL mulL
+        /\ ring_homomorphism K add mul L addL mulL j
+        /\ inj K L j
+        /\ diagonalizable_matrix L addL mulL n
+          (fun z :e n :*: n => j (matrix_entry U (z 0) (z 1))).
+
+(** § 35. The canonical form of a matrix. **)
+
+//GOD1:1171229 matrix_polynomial_evaluation : "the value of polynomial #6 at the square matrix #7" | $#6(#7)$
+Definition matrix_polynomial_evaluation :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> set -> set -> set :=
+  fun K add mul n f U =>
+    module_finitely_supported_sum
+      (square_matrix_ring K n) (matrix_addition K add n n) omega
+      (fun k => matrix_left_scalar K mul n n
+        (f (fun i :e 1 => k))
+        (ring_nat_power
+          (square_matrix_ring K n)
+          (matrix_addition K add n n)
+          (matrix_multiplication K add mul n n n) U k)).
+
+Theorem god1_s35_theorem1_cayley_hamilton :
+  forall K, forall add mul:set -> set -> set,
+  forall n :e omega, forall U :e square_matrix_ring K n,
+    commutative_ring K add mul ->
+    matrix_polynomial_evaluation K add mul n
+      (matrix_characteristic_polynomial K add mul n U) U
+    = (fun z :e n :*: n => ring_zero K add).
+Admitted.
+
+//GOD1:1182039 endomorphism_shift : "the endomorphism #7 minus #8 times the identity" | $#7-#8\,1$
+Definition endomorphism_shift :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  (set -> set) -> set -> set -> set :=
+  fun K addK mulK E addE smul u lambda x =>
+    if x :e E
+    then addE (u x) (module_negation E addE (smul lambda x))
+    else 0.
+
+//GOD1:1182039 endomorphism_natural_power : "the #8-th compositional power of endomorphism #7" | $#7^{#8}$
+Definition endomorphism_natural_power :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  (set -> set) -> set -> set :=
+  fun K addK mulK E addE smul u r =>
+    ring_nat_power
+      (module_endomorphism_ring K addK mulK E addE smul)
+      (module_homomorphism_addition E addE)
+      (module_endomorphism_composition E)
+      (fun x :e E => u x) r.
+
+//GOD1:1182039 endomorphism_power_kernel : "the kernel of the #8-th power of endomorphism #7" | $\ker(#7^{#8})$
+Definition endomorphism_power_kernel :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  (set -> set) -> set -> set :=
+  fun K addK mulK E addE smul u r =>
+    {x :e E|
+      endomorphism_natural_power K addK mulK E addE smul u r x
+      = module_zero E addE}.
+
+//GOD1:1177888 generalized_eigenspace : "the generalized eigenspace of #7 for #8 of exponent #9" | $\ker((#7-#8)^{#9})$
+Definition generalized_eigenspace :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  (set -> set) -> set -> set -> set :=
+  fun K addK mulK E addE smul u lambda r =>
+    endomorphism_power_kernel K addK mulK E addE smul
+      (endomorphism_shift K addK mulK E addE smul u lambda) r.
+
+//GOD1:1182039 nilpotent_endomorphism : "the endomorphism #7 is nilpotent" | $#7\text{ is nilpotent}$
+Definition nilpotent_endomorphism :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  (set -> set) -> prop :=
+  fun K addK mulK E addE smul u =>
+    exists p :e omega, 0 :e p
+      /\ endomorphism_natural_power K addK mulK E addE smul u p
+        = (fun x :e E => module_zero E addE).
+
+Theorem god1_s35_theorem2_primary_decomposition :
+  forall K, forall addK mulK:set -> set -> set,
+  forall E, forall addE smul:set -> set -> set,
+  forall n q :e omega, forall a:set -> set, forall u:set -> set,
+  forall lambda :e K :^: q, forall r :e omega :^: q,
+    field K addK mulK ->
+    module_basis K addK mulK E addE smul n a ->
+    module_endomorphism K addK mulK E addE smul u ->
+    endomorphism_has_all_eigenvalues_in_field
+      K addK mulK E addE smul n a u ->
+    (forall i j :e q, i <> j -> lambda i <> lambda j) ->
+    (forall z :e K,
+      endomorphism_eigenvalue K addK mulK E addE smul u z
+      <-> exists i :e q, z = lambda i) ->
+    (forall i :e q,
+      endomorphism_eigenvalue_multiplicity
+        K addK mulK E addE smul n a u (lambda i) = r i) ->
+    direct_sum_decomposition K addK mulK E addE smul q
+      (fun i => generalized_eigenspace
+        K addK mulK E addE smul u (lambda i) (r i))
+    /\ forall i :e q,
+      module_dimension K addK mulK
+        (generalized_eigenspace
+          K addK mulK E addE smul u (lambda i) (r i)) addE smul
+      = r i.
+Admitted.
+
+Theorem god1_s35_theorem2_generalized_eigenspaces_are_stable_and_nilpotent :
+  forall K, forall addK mulK:set -> set -> set,
+  forall E, forall addE smul:set -> set -> set,
+  forall u:set -> set, forall lambda :e K, forall r :e omega,
+    field K addK mulK ->
+    module_endomorphism K addK mulK E addE smul u ->
+    let G := generalized_eigenspace
+      K addK mulK E addE smul u lambda r in
+    (forall x :e G, u x :e G)
+    /\ forall x :e G,
+      endomorphism_natural_power K addK mulK E addE smul
+        (endomorphism_shift K addK mulK E addE smul u lambda) r x
+      = module_zero E addE.
+Admitted.
+
+Theorem god1_s35_theorem3_nilpotent_basis_structure :
+  forall K, forall addK mulK:set -> set -> set,
+  forall E, forall addE smul:set -> set -> set,
+  forall n :e omega, forall u:set -> set,
+    field K addK mulK -> 0 :e n ->
+    module_dimension K addK mulK E addE smul = n ->
+    module_endomorphism K addK mulK E addE smul u ->
+    nilpotent_endomorphism K addK mulK E addE smul u ->
+    exists b:set -> set, exists v :e K :^: n,
+      module_basis K addK mulK E addE smul n b
+      /\ (forall i :e n,
+        v i = ring_zero K addK \/ v i = ring_one K mulK)
+      /\ forall i j :e n,
+        matrix_entry
+          (endomorphism_coordinate_matrix
+            K addK mulK E addE smul n b u) i j
+        = if j = ordsucc i then v j else ring_zero K addK.
+Admitted.
+
+Theorem god1_s35_lemma1_nilpotent_kernel_filtration :
+  forall K, forall addK mulK:set -> set -> set,
+  forall E, forall addE smul:set -> set -> set,
+  forall u:set -> set, forall q :e omega,
+    field K addK mulK -> 0 :e q ->
+    module_endomorphism K addK mulK E addE smul u ->
+    endomorphism_natural_power K addK mulK E addE smul u q
+      <> (fun x :e E => module_zero E addE) ->
+    endomorphism_natural_power K addK mulK E addE smul u (ordsucc q)
+      = (fun x :e E => module_zero E addE) ->
+    (forall i :e ordsucc q,
+      endomorphism_power_kernel K addK mulK E addE smul u i
+        c= endomorphism_power_kernel
+          K addK mulK E addE smul u (ordsucc i)
+      /\ endomorphism_power_kernel K addK mulK E addE smul u i
+        <> endomorphism_power_kernel
+          K addK mulK E addE smul u (ordsucc i))
+    /\ forall i :e ordsucc q,
+      forall x :e endomorphism_power_kernel
+        K addK mulK E addE smul u (ordsucc i),
+      u x :e endomorphism_power_kernel K addK mulK E addE smul u i.
+Admitted.
+
+Theorem god1_s35_lemma2_nilpotent_image_avoids_previous_kernel :
+  forall K, forall addK mulK:set -> set -> set,
+  forall E, forall addE smul:set -> set -> set,
+  forall u:set -> set, forall i :e omega, forall F,
+    field K addK mulK -> 0 :e i ->
+    module_endomorphism K addK mulK E addE smul u ->
+    vector_subspace K addK mulK E addE smul F ->
+    F :/\: endomorphism_power_kernel K addK mulK E addE smul u i
+      = {module_zero E addE} ->
+    module_homomorphism_image F u
+      :/\: endomorphism_power_kernel
+        K addK mulK E addE smul u (Union i)
+      = {module_zero E addE}
+    /\ module_isomorphism K addK mulK
+      F addE smul (module_homomorphism_image F u) addE smul u.
+Admitted.
+
+Theorem god1_s35_lemma3_complements_adapted_to_nilpotent_map :
+  forall K, forall addK mulK:set -> set -> set,
+  forall E, forall addE smul:set -> set -> set,
+  forall u:set -> set, forall q :e omega,
+    field K addK mulK ->
+    module_endomorphism K addK mulK E addE smul u ->
+    exists F:set -> set,
+      forall i :e ordsucc (ordsucc q), 0 :e i ->
+        vector_subspace K addK mulK E addE smul (F i)
+        /\ direct_sum_decomposition K addK mulK
+          (endomorphism_power_kernel K addK mulK E addE smul u i)
+          addE smul 2
+          (fun k => if k = 0
+            then endomorphism_power_kernel
+              K addK mulK E addE smul u (Union i)
+            else F i)
+        /\ (0 :e Union i ->
+          (forall x :e F i, u x :e F (Union i))
+          /\ inj (F i) (F (Union i)) u).
+Admitted.
+
+//GOD1:1189561 reduced_jordan_matrix : "the square matrix #5 is a reduced matrix or Jordan block" | $#5=J_{#4}(\lambda)$
+Definition reduced_jordan_matrix :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> set -> prop :=
+  fun K add mul n A =>
+    0 :e n /\ A :e square_matrix_ring K n
+    /\ exists lambda :e K, forall i j :e n,
+      matrix_entry A i j
+      = if i = j then lambda
+        else if j = ordsucc i then ring_one K mul
+        else ring_zero K add.
+
+//GOD1:1190848 natural_prefix_sum : "the sum of the terms of #2 before index #3" | $\sum_{j<#3}#2_j$
+Definition natural_prefix_sum : set -> (set -> set) -> set -> set :=
+  fun r sizes i =>
+    ring_finite_sum omega add_SNo i (fun j => sizes j).
+
+//GOD1:1190848 jordan_canonical_matrix : "the square matrix #5 is a diagonal tableau of reduced matrices" | $#5\text{ is in Jordan canonical form}$
+Definition jordan_canonical_matrix :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> set -> prop :=
+  fun K add mul n A =>
+    A :e square_matrix_ring K n
+    /\ exists r :e omega, exists sizes :e omega :^: r,
+      exists lambda :e K :^: r,
+        (forall k :e r, 0 :e sizes k)
+        /\ ring_finite_sum omega add_SNo r (fun k => sizes k) = n
+        /\ forall k l :e r, forall i :e sizes k, forall j :e sizes l,
+          matrix_entry A
+            (natural_prefix_sum r (fun h => sizes h) k + i)
+            (natural_prefix_sum r (fun h => sizes h) l + j)
+          = if k = l
+            then if i = j then lambda k
+              else if j = ordsucc i then ring_one K mul
+              else ring_zero K add
+            else ring_zero K add.
+
+Theorem god1_s35_theorem4_jordan_canonical_form :
+  forall K, forall addK mulK:set -> set -> set,
+  forall E, forall addE smul:set -> set -> set,
+  forall n :e omega, forall a:set -> set, forall u:set -> set,
+    field K addK mulK ->
+    module_basis K addK mulK E addE smul n a ->
+    module_endomorphism K addK mulK E addE smul u ->
+    (endomorphism_has_all_eigenvalues_in_field
+      K addK mulK E addE smul n a u
+    <-> exists b:set -> set,
+      module_basis K addK mulK E addE smul n b
+      /\ jordan_canonical_matrix K addK mulK n
+        (endomorphism_coordinate_matrix
+          K addK mulK E addE smul n b u)).
+Admitted.
+
+Theorem god1_jordan_canonical_form_for_matrices :
+  forall K, forall add mul:set -> set -> set,
+  forall n :e omega, forall U :e square_matrix_ring K n,
+    field K add mul ->
+    polynomial_splits_over K add mul
+      (matrix_characteristic_polynomial K add mul n U) ->
+    exists P :e square_matrix_ring K n,
+      invertible_matrix K add mul n P
+      /\ jordan_canonical_matrix K add mul n
+        (matrix_multiplication K add mul n n n
+          (matrix_multiplication K add mul n n n P U)
+          (matrix_inverse K add mul n P)).
+Admitted.
+
+(** § 36. Hermitian forms. **)
+
+//GOD1:1216307 field_involution : "#4 is an involution of the field #1" | $#4^2=1_{#1}$
+Definition field_involution :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  (set -> set) -> prop :=
+  fun K add mul star =>
+    field K add mul
+    /\ ring_isomorphism K add mul K add mul star
+    /\ forall x :e K, star (star x) = x.
+
+//GOD1:1217138 sesquilinear_form : "#9 is a sesquilinear form on #5 relative to involution #4" | $#9:#5\times #5\to #1$
+Definition sesquilinear_form :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  (set -> set) -> set -> (set -> set -> set) ->
+  (set -> set -> set) -> (set -> set -> set) -> prop :=
+  fun K addK mulK star L addL smul f =>
+    left_vector_space K addK mulK L addL smul
+    /\ (forall x y :e L, f x y :e K)
+    /\ (forall x x' y :e L,
+      f (addL x x') y = addK (f x y) (f x' y))
+    /\ (forall scalar :e K, forall x y :e L,
+      f (smul scalar x) y = mulK scalar (f x y))
+    /\ (forall x y y' :e L,
+      f x (addL y y') = addK (f x y) (f x y'))
+    /\ forall scalar :e K, forall x y :e L,
+      f x (smul scalar y) = mulK (star scalar) (f x y).
+
+//GOD1:1218102 hermitian_form : "the sesquilinear form #9 is hermitian" | $#9(x,y)=#9(y,x)^*$
+Definition hermitian_form :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  (set -> set) -> set -> (set -> set -> set) ->
+  (set -> set -> set) -> (set -> set -> set) -> prop :=
+  fun K addK mulK star L addL smul f =>
+    sesquilinear_form K addK mulK star L addL smul f
+    /\ forall x y :e L, f x y = star (f y x).
+
+//GOD1:1218844 symmetric_bilinear_form : "#8 is a symmetric bilinear form on #4" | $#8(x,y)=#8(y,x)$
+Definition symmetric_bilinear_form :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  (set -> set -> set) -> prop :=
+  fun K addK mulK L addL smul f =>
+    hermitian_form K addK mulK (fun x => x) L addL smul f.
+
+//GOD1:1222927 sesquilinear_form_matrix : "the matrix of form #10 relative to basis #9" | $[#10]_{#9}$
+Definition sesquilinear_form_matrix :
+  set -> set -> (set -> set) -> (set -> set -> set) -> set :=
+  fun K n a f =>
+    fun z :e n :*: n => f (a (z 0)) (a (z 1)).
+
+//GOD1:1223101 hermitian_matrix : "the square matrix #6 is hermitian relative to involution #4" | $#6^*=#6$
+Definition hermitian_matrix :
+  set -> (set -> set -> set) -> (set -> set) ->
+  set -> set -> prop :=
+  fun K add star n A =>
+    A :e square_matrix_ring K n
+    /\ forall i j :e n,
+      matrix_entry A j i = star (matrix_entry A i j).
+
+//GOD1:1223101 symmetric_matrix : "the square matrix #4 is symmetric" | ${}^t#4=#4$
+Definition symmetric_matrix : set -> set -> set -> prop :=
+  fun K n A =>
+    A :e square_matrix_ring K n
+    /\ forall i j :e n, matrix_entry A j i = matrix_entry A i j.
+
+//GOD1:1225511 nondegenerate_sesquilinear_form : "the sesquilinear form #9 is non-degenerate" | $#9\text{ is non-degenerate}$
+Definition nondegenerate_sesquilinear_form :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  (set -> set) -> set -> (set -> set -> set) ->
+  (set -> set -> set) -> (set -> set -> set) -> prop :=
+  fun K addK mulK star L addL smul f =>
+    sesquilinear_form K addK mulK star L addL smul f
+    /\ forall y :e L,
+      (forall x :e L, f x y = ring_zero K addK) -> y = module_zero L addL.
+
+//GOD1:1224136 sesquilinear_dual_map : "the semilinear map associated with form #9" | $\widehat{#9}:#5\to #5^*$
+Definition sesquilinear_dual_map :
+  set -> set -> (set -> set -> set) -> set -> set :=
+  fun K L f y => fun x :e L => f x y.
+
+Theorem god1_s36_theorem1_nondegenerate_form_characterizations :
+  forall K, forall addK mulK:set -> set -> set,
+  forall star:set -> set,
+  forall L, forall addL smul:set -> set -> set,
+  forall n :e omega, forall a:set -> set,
+  forall f:set -> set -> set,
+    field_involution K addK mulK star ->
+    module_basis K addK mulK L addL smul n a ->
+    sesquilinear_form K addK mulK star L addL smul f ->
+    let A := sesquilinear_form_matrix K n a f in
+    (nondegenerate_sesquilinear_form K addK mulK star L addL smul f
+      <-> forall x :e L,
+      (forall y :e L, f x y = ring_zero K addK) -> x = module_zero L addL)
+    /\ ((forall x :e L,
+      (forall y :e L, f x y = ring_zero K addK) -> x = module_zero L addL)
+      <-> invertible_matrix K addK mulK n A)
+    /\ (invertible_matrix K addK mulK n A
+      <-> bij L (commutative_module_dual K addK mulK L addL smul)
+        (fun y => sesquilinear_dual_map K L f y)).
+Admitted.
+
+//GOD1:1229884 adjoint_homomorphism : "the adjoint of #14 with respect to forms #12 and #13" | $#14^*$
+Definition adjoint_homomorphism :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> set -> (set -> set -> set) -> (set -> set -> set) ->
+  (set -> set) -> set -> set :=
+  fun K addK mulK L M f g u y =>
+    Eps_i (fun z => z :e L /\ forall x :e L, f x z = g (u x) y).
+
+//GOD1:1231527 matrix_adjoint : "the adjoint of matrix #6 relative to involution #4" | $#6^*$
+Definition matrix_adjoint :
+  set -> (set -> set) -> set -> set -> set -> set :=
+  fun K star p q A =>
+    fun z :e q :*: p => star (matrix_entry A (z 1) (z 0)).
+
+Theorem god1_adjoint_homomorphism_exists_is_linear_and_unique :
+  forall K, forall addK mulK:set -> set -> set,
+  forall star:set -> set,
+  forall L M, forall addL smulL addM smulM:set -> set -> set,
+  forall f g:set -> set -> set, forall u:set -> set,
+    field_involution K addK mulK star ->
+    nondegenerate_sesquilinear_form K addK mulK star L addL smulL f ->
+    nondegenerate_sesquilinear_form K addK mulK star M addM smulM g ->
+    module_homomorphism K addK mulK L addL smulL M addM smulM u ->
+    module_homomorphism K addK mulK M addM smulM L addL smulL
+      (fun y => adjoint_homomorphism K addK mulK L M f g u y)
+    /\ (forall x :e L, forall y :e M,
+      f x (adjoint_homomorphism K addK mulK L M f g u y) = g (u x) y)
+    /\ forall v:set -> set,
+      (forall x :e L, forall y :e M, f x (v y) = g (u x) y) ->
+      v = (fun y => adjoint_homomorphism K addK mulK L M f g u y).
+Admitted.
+
+Theorem god1_matrix_adjoint_calculation_rules :
+  forall K, forall add mul:set -> set -> set, forall star:set -> set,
+  forall p q r :e omega,
+    field_involution K add mul star ->
+    (forall A B :e matrix_space K p q,
+      matrix_adjoint K star p q (matrix_addition K add p q A B)
+      = matrix_addition K add q p
+        (matrix_adjoint K star p q A) (matrix_adjoint K star p q B))
+    /\ (forall A :e matrix_space K p q, forall scalar :e K,
+      matrix_adjoint K star p q (matrix_left_scalar K mul p q scalar A)
+      = matrix_left_scalar K mul q p (star scalar)
+        (matrix_adjoint K star p q A))
+    /\ (forall A :e matrix_space K p q,
+      forall B :e matrix_space K q r,
+      matrix_adjoint K star p r
+        (matrix_multiplication K add mul p q r A B)
+      = matrix_multiplication K add mul r q p
+        (matrix_adjoint K star q r B) (matrix_adjoint K star p q A))
+    /\ (forall A :e matrix_space K p q,
+      matrix_adjoint K star q p (matrix_adjoint K star p q A) = A)
+    /\ matrix_adjoint K star p p (unit_matrix K add mul p)
+      = unit_matrix K add mul p.
+Admitted.
+
+Theorem god1_adjoint_homomorphism_calculation_rules :
+  forall K, forall addK mulK:set -> set -> set, forall star:set -> set,
+  forall L M N,
+  forall addL smulL addM smulM addN smulN:set -> set -> set,
+  forall f g h:set -> set -> set,
+  forall u v:set -> set,
+    field_involution K addK mulK star ->
+    nondegenerate_sesquilinear_form
+      K addK mulK star L addL smulL f ->
+    nondegenerate_sesquilinear_form
+      K addK mulK star M addM smulM g ->
+    nondegenerate_sesquilinear_form
+      K addK mulK star N addN smulN h ->
+    hermitian_form K addK mulK star L addL smulL f ->
+    hermitian_form K addK mulK star M addM smulM g ->
+    hermitian_form K addK mulK star N addN smulN h ->
+    module_homomorphism K addK mulK L addL smulL M addM smulM u ->
+    module_homomorphism K addK mulK M addM smulM N addN smulN v ->
+    (fun z:set => adjoint_homomorphism K addK mulK L N f h
+      (fun x:set => v (u x)) z)
+      = (fun z:set => adjoint_homomorphism K addK mulK L M f g u
+        (adjoint_homomorphism K addK mulK M N g h v z))
+    /\ (fun x:set => adjoint_homomorphism K addK mulK M L g f
+      (fun y:set => adjoint_homomorphism K addK mulK L M f g u y) x)
+      = (fun x:set => u x).
+Admitted.
+
+//GOD1:1234612 hermitian_orthogonal : "#10 and #11 are orthogonal relative to #9" | $#10\perp #11$
+Definition hermitian_orthogonal :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> set -> prop :=
+  fun K addK f x y => f x y = ring_zero K addK.
+
+//GOD1:1235521 hermitian_orthogonal_complement : "the orthogonal complement of #10 relative to #9" | $#10^\perp$
+Definition hermitian_orthogonal_complement :
+  set -> (set -> set -> set) -> set -> (set -> set -> set) -> set -> set :=
+  fun K addK L f M =>
+    {x :e L|forall y :e M, f x y = ring_zero K addK}.
+
+Theorem god1_s36_theorem2_double_orthogonal_complement :
+  forall K, forall addK mulK:set -> set -> set, forall star:set -> set,
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set, forall M,
+    field_involution K addK mulK star ->
+    finite_dimensional_vector_space K addK mulK L addL smul ->
+    hermitian_form K addK mulK star L addL smul f ->
+    nondegenerate_sesquilinear_form K addK mulK star L addL smul f ->
+    vector_subspace K addK mulK L addL smul M ->
+    hermitian_orthogonal_complement K addK L f
+      (hermitian_orthogonal_complement K addK L f M) = M.
+Admitted.
+
+Theorem god1_s36_theorem3_orthogonal_complement_sum_and_intersection :
+  forall K, forall addK mulK:set -> set -> set, forall star:set -> set,
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set, forall M N,
+    field_involution K addK mulK star ->
+    finite_dimensional_vector_space K addK mulK L addL smul ->
+    hermitian_form K addK mulK star L addL smul f ->
+    nondegenerate_sesquilinear_form K addK mulK star L addL smul f ->
+    vector_subspace K addK mulK L addL smul M ->
+    vector_subspace K addK mulK L addL smul N ->
+    hermitian_orthogonal_complement K addK L f
+      (submodule_sum K addK mulK L addL smul M N)
+      = (hermitian_orthogonal_complement K addK L f M
+        :/\: hermitian_orthogonal_complement K addK L f N)
+    /\ hermitian_orthogonal_complement K addK L f (M :/\: N)
+      = submodule_sum K addK mulK L addL smul
+        (hermitian_orthogonal_complement K addK L f M)
+        (hermitian_orthogonal_complement K addK L f N).
+Admitted.
+
+Theorem god1_s36_theorem4_dimension_of_orthogonal_complement :
+  forall K, forall addK mulK:set -> set -> set, forall star:set -> set,
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set, forall M,
+    field_involution K addK mulK star ->
+    finite_dimensional_vector_space K addK mulK L addL smul ->
+    hermitian_form K addK mulK star L addL smul f ->
+    nondegenerate_sesquilinear_form K addK mulK star L addL smul f ->
+    vector_subspace K addK mulK L addL smul M ->
+    add_SNo
+      (module_dimension K addK mulK M addL smul)
+      (module_dimension K addK mulK
+        (hermitian_orthogonal_complement K addK L f M) addL smul)
+    = module_dimension K addK mulK L addL smul.
+Admitted.
+
+//GOD1:1242481 isotropic_subspace : "#10 is isotropic relative to the hermitian form #9" | $#10\cap #10^\perp\ne0$
+Definition isotropic_subspace :
+  set -> (set -> set -> set) -> set -> (set -> set -> set) ->
+  (set -> set -> set) -> set -> prop :=
+  fun K addK L addL f M =>
+    M :/\: hermitian_orthogonal_complement K addK L f M
+      <> {module_zero L addL}.
+
+//GOD1:1243880 isotropic_vector : "#10 is an isotropic vector relative to #9" | $#9(#10,#10)=0$
+Definition isotropic_vector :
+  set -> (set -> set -> set) -> set -> (set -> set -> set) -> set -> prop :=
+  fun K addK L f x => x :e L /\ f x x = ring_zero K addK.
+
+//GOD1:1243880 isotropic_cone : "the isotropic cone of form #9" | $\{x:#9(x,x)=0\}$
+Definition isotropic_cone :
+  set -> (set -> set -> set) -> set -> (set -> set -> set) -> set :=
+  fun K addK L f => {x :e L|f x x = ring_zero K addK}.
+
+//GOD1:1243378 orthogonal_projection : "the orthogonal projection of #11 onto #10" | $p_{#10}(#11)$
+Definition orthogonal_projection :
+  set -> (set -> set -> set) -> set -> (set -> set -> set) ->
+  set -> (set -> set -> set) -> set -> set :=
+  fun K addK L addL M f x =>
+    Eps_i (fun y => y :e M /\ forall z :e M,
+      f (addL x (module_negation L addL y)) z = ring_zero K addK).
+
+Theorem god1_s36_theorem5_nonisotropic_subspace_characterizations :
+  forall K, forall addK mulK:set -> set -> set, forall star:set -> set,
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set, forall M,
+    field_involution K addK mulK star ->
+    finite_dimensional_vector_space K addK mulK L addL smul ->
+    hermitian_form K addK mulK star L addL smul f ->
+    vector_subspace K addK mulK L addL smul M ->
+    ((M :/\: hermitian_orthogonal_complement K addK L f M
+        = {module_zero L addL})
+    <-> nondegenerate_sesquilinear_form K addK mulK star M addL smul f)
+    /\ (nondegenerate_sesquilinear_form K addK mulK star M addL smul f
+      <-> direct_sum_decomposition K addK mulK L addL smul 2
+        (fun i => if i = 0 then M
+          else hermitian_orthogonal_complement K addK L f M))
+    /\ (nondegenerate_sesquilinear_form K addK mulK star L addL smul f ->
+      (submodule_sum K addK mulK L addL smul M
+        (hermitian_orthogonal_complement K addK L f M) = L
+      <-> M :/\: hermitian_orthogonal_complement K addK L f M
+        = {module_zero L addL})).
+Admitted.
+
+Theorem god1_s36_theorem5_corollary_no_isotropic_vectors :
+  forall K, forall addK mulK:set -> set -> set, forall star:set -> set,
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set,
+    field_involution K addK mulK star ->
+    finite_dimensional_vector_space K addK mulK L addL smul ->
+    hermitian_form K addK mulK star L addL smul f ->
+    ((forall x :e L, f x x = ring_zero K addK -> x = module_zero L addL)
+    <-> forall M,
+      vector_subspace K addK mulK L addL smul M ->
+      direct_sum_decomposition K addK mulK L addL smul 2
+        (fun i => if i = 0 then M
+          else hermitian_orthogonal_complement K addK L f M)).
+Admitted.
+
+Theorem god1_orthogonal_projection_characterization :
+  forall K, forall addK mulK:set -> set -> set, forall star:set -> set,
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set, forall M,
+    field_involution K addK mulK star ->
+    hermitian_form K addK mulK star L addL smul f ->
+    vector_subspace K addK mulK L addL smul M ->
+    nondegenerate_sesquilinear_form K addK mulK star M addL smul f ->
+    forall x :e L, forall y,
+      (y = orthogonal_projection K addK L addL M f x
+      <-> y :e M /\ forall z :e M,
+        f (addL x (module_negation L addL y)) z = ring_zero K addK).
+Admitted.
+
+Theorem god1_orthogonal_projection_onto_nonisotropic_line :
+  forall K, forall addK mulK:set -> set -> set, forall star:set -> set,
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set, forall a :e L,
+    field_involution K addK mulK star ->
+    hermitian_form K addK mulK star L addL smul f ->
+    f a a <> ring_zero K addK ->
+    let M := {smul scalar a|scalar :e K} in
+    forall x :e L,
+      orthogonal_projection K addK L addL M f x
+      = smul (mulK (f x a) (ring_inverse K addK mulK (f a a))) a.
+Admitted.
+
+Theorem god1_algebraically_closed_symmetric_form_has_isotropic_vector :
+  forall K, forall addK mulK:set -> set -> set,
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set,
+    algebraically_closed_field K addK mulK ->
+    symmetric_bilinear_form K addK mulK L addL smul f ->
+    2 c= module_dimension K addK mulK L addL smul ->
+    exists x :e L, x <> module_zero L addL /\ f x x = ring_zero K addK.
+Admitted.
+
+//GOD1:1246801 orthogonal_basis_for_form : "the basis #11 is orthogonal relative to form #9" | $#11\text{ is orthogonal for }#9$
+Definition orthogonal_basis_for_form :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  (set -> set -> set) -> set -> (set -> set) -> prop :=
+  fun K addK mulK L addL smul f n a =>
+    module_basis K addK mulK L addL smul n a
+    /\ forall i j :e n, i <> j -> f (a i) (a j) = ring_zero K addK.
+
+Theorem god1_s36_theorem6_orthogonal_basis_exists :
+  forall K, forall addK mulK:set -> set -> set, forall star:set -> set,
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set,
+    field_involution K addK mulK star ->
+    finite_dimensional_vector_space K addK mulK L addL smul ->
+    hermitian_form K addK mulK star L addL smul f ->
+    field_characteristic K addK mulK <> 2 ->
+    exists n :e omega, exists a:set -> set,
+      orthogonal_basis_for_form K addK mulK L addL smul f n a.
+Admitted.
+
+Theorem god1_s36_theorem6_lemma_nonzero_form_has_nonisotropic_vector :
+  forall K, forall addK mulK:set -> set -> set, forall star:set -> set,
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set,
+    field_involution K addK mulK star ->
+    hermitian_form K addK mulK star L addL smul f ->
+    field_characteristic K addK mulK <> 2 ->
+    (exists x y :e L, f x y <> ring_zero K addK) ->
+    exists x :e L, f x x <> ring_zero K addK.
+Admitted.
+
+Theorem god1_s36_theorem6_corollary1_algebraically_closed_symmetric_form :
+  forall K, forall addK mulK:set -> set -> set,
+  forall L, forall addL smul:set -> set -> set,
+  forall n :e omega, forall f:set -> set -> set,
+    algebraically_closed_field K addK mulK ->
+    field_characteristic K addK mulK <> 2 ->
+    module_dimension K addK mulK L addL smul = n ->
+    symmetric_bilinear_form K addK mulK L addL smul f ->
+    exists r :e ordsucc n, exists a:set -> set,
+      module_basis K addK mulK L addL smul n a
+      /\ (forall i j :e n,
+        f (a i) (a j)
+        = if i = j /\ i :e r then ring_one K mulK else ring_zero K addK)
+      /\ (nondegenerate_sesquilinear_form
+        K addK mulK (fun x => x) L addL smul f <-> r = n).
+Admitted.
+
+Theorem god1_s36_theorem6_corollary2_real_symmetric_inertia_form :
+  forall L, forall addL smul:set -> set -> set,
+  forall n :e omega, forall f:set -> set -> set,
+    module_dimension real add_SNo mul_SNo L addL smul = n ->
+    symmetric_bilinear_form real add_SNo mul_SNo L addL smul f ->
+    exists p q :e ordsucc n, exists a:set -> set,
+      add_SNo p q c= n
+      /\ module_basis real add_SNo mul_SNo L addL smul n a
+      /\ (forall i j :e n,
+        f (a i) (a j)
+        = if i <> j then 0
+          else if i :e p then 1
+          else if i :e add_SNo p q then minus_SNo 1 else 0)
+      /\ (nondegenerate_sesquilinear_form
+        real add_SNo mul_SNo (fun x => x) L addL smul f
+        <-> add_SNo p q = n).
+Admitted.
+
+Theorem god1_s36_theorem6_corollary3_complex_hermitian_inertia_form :
+  forall L, forall addL smul:set -> set -> set,
+  forall n :e omega, forall f:set -> set -> set,
+    module_dimension complex add_CSNo mul_CSNo L addL smul = n ->
+    hermitian_form complex add_CSNo mul_CSNo conj_CSNo L addL smul f ->
+    exists p q :e ordsucc n, exists a:set -> set,
+      add_SNo p q c= n
+      /\ module_basis complex add_CSNo mul_CSNo L addL smul n a
+      /\ (forall i j :e n,
+        f (a i) (a j)
+        = if i <> j then 0
+          else if i :e p then 1
+          else if i :e add_SNo p q then minus_SNo 1 else 0)
+      /\ (nondegenerate_sesquilinear_form
+        complex add_CSNo mul_CSNo conj_CSNo L addL smul f
+        <-> add_SNo p q = n).
+Admitted.
+
+//GOD1:1253795 orthonormal_basis_for_form : "the basis #11 is orthonormal relative to form #9" | $#11\text{ is orthonormal for }#9$
+Definition orthonormal_basis_for_form :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  (set -> set -> set) -> set -> (set -> set) -> prop :=
+  fun K addK mulK L addL smul f n a =>
+    module_basis K addK mulK L addL smul n a
+    /\ forall i j :e n,
+      f (a i) (a j)
+      = if i = j then ring_one K mulK else ring_zero K addK.
+
+//GOD1:1254966 positive_definite_hermitian_form : "the hermitian form #9 is positive definite" | $#9(x,x)>0\ (x\ne0)$
+Definition positive_definite_hermitian_form :
+  set -> (set -> set -> set) -> set -> (set -> set -> set) ->
+  (set -> set -> set) -> prop :=
+  fun K addK L addL f =>
+    forall x :e L, x <> module_zero L addL ->
+      exists r :e real, SNoLt 0 r /\ f x x = r.
+
+//GOD1:1256875 positive_semidefinite_hermitian_form : "the hermitian form #9 is positive semidefinite" | $#9(x,x)\ge0$
+Definition positive_semidefinite_hermitian_form :
+  set -> set -> (set -> set -> set) -> (set -> set -> set) -> prop :=
+  fun K L addL f =>
+    forall x :e L, exists r :e real, SNoLe 0 r /\ f x x = r.
+
+//GOD1:1256875 negative_semidefinite_hermitian_form : "the hermitian form #9 is negative semidefinite" | $#9(x,x)\le0$
+Definition negative_semidefinite_hermitian_form :
+  set -> set -> (set -> set -> set) -> (set -> set -> set) -> prop :=
+  fun K L addL f =>
+    forall x :e L, exists r :e real, SNoLe r 0 /\ f x x = r.
+
+//GOD1:1257200 indefinite_hermitian_form : "the hermitian form #9 is indefinite" | $#9\text{ is indefinite}$
+Definition indefinite_hermitian_form :
+  set -> set -> (set -> set -> set) -> (set -> set -> set) -> prop :=
+  fun K L addL f =>
+    not (positive_semidefinite_hermitian_form K L addL f)
+    /\ not (negative_semidefinite_hermitian_form K L addL f).
+
+Theorem god1_s36_theorem7_real_and_complex_orthonormal_basis_criterion :
+  (forall L, forall addL smul:set -> set -> set,
+    forall f:set -> set -> set,
+    finite_dimensional_vector_space real add_SNo mul_SNo L addL smul ->
+    symmetric_bilinear_form real add_SNo mul_SNo L addL smul f ->
+    ((exists n :e omega, exists a:set -> set,
+      orthonormal_basis_for_form real add_SNo mul_SNo L addL smul f n a)
+    <-> positive_definite_hermitian_form real add_SNo L addL f))
+  /\ (forall L, forall addL smul:set -> set -> set,
+    forall f:set -> set -> set,
+    finite_dimensional_vector_space complex add_CSNo mul_CSNo L addL smul ->
+    hermitian_form complex add_CSNo mul_CSNo conj_CSNo L addL smul f ->
+    ((exists n :e omega, exists a:set -> set,
+      orthonormal_basis_for_form complex add_CSNo mul_CSNo L addL smul f n a)
+    <-> positive_definite_hermitian_form complex add_CSNo L addL f)).
+Admitted.
+
+//GOD1:1257575 hermitian_form_automorphism : "#10 is an automorphism of hermitian form #9" | $#10\in\operatorname{GL}(#9)$
+Definition hermitian_form_automorphism :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  (set -> set -> set) -> (set -> set) -> prop :=
+  fun K addK mulK L addL smul f u =>
+    module_automorphism K addK mulK L addL smul u
+    /\ forall x y :e L, f (u x) (u y) = f x y.
+
+//GOD1:1258540 hermitian_form_automorphism_group : "the group of automorphisms of form #9" | $\operatorname{GL}(#9)$
+Definition hermitian_form_automorphism_group :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  (set -> set -> set) -> set :=
+  fun K addK mulK L addL smul f =>
+    {u :e module_general_linear_group K addK mulK L addL smul|
+      hermitian_form_automorphism K addK mulK L addL smul f
+        (fun x => u x)}.
+
+//GOD1:1260134 orthogonal_matrix : "the square matrix #5 is orthogonal" | ${}^t#5\,#5=1$
+Definition orthogonal_matrix :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> set -> prop :=
+  fun K add mul n A =>
+    A :e square_matrix_ring K n
+    /\ matrix_multiplication K add mul n n n
+      (matrix_transpose K n n A) A = unit_matrix K add mul n.
+
+//GOD1:1259622 orthogonal_group : "the orthogonal group in #4 variables over #1" | $\operatorname O(#4,#1)$
+Definition orthogonal_group :
+  set -> (set -> set -> set) -> (set -> set -> set) -> set -> set :=
+  fun K add mul n =>
+    {A :e square_matrix_ring K n|orthogonal_matrix K add mul n A}.
+
+//GOD1:1260624 special_orthogonal_group : "the special orthogonal group in #4 variables over #1" | $\operatorname{SO}(#4,#1)$
+Definition special_orthogonal_group :
+  set -> (set -> set -> set) -> (set -> set -> set) -> set -> set :=
+  fun K add mul n =>
+    {A :e orthogonal_group K add mul n|
+      matrix_determinant K add mul n A = ring_one K mul}.
+
+//GOD1:1261350 unitary_matrix : "the square matrix #6 is unitary relative to involution #4" | $#6^*#6=1$
+Definition unitary_matrix :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  (set -> set) -> set -> set -> prop :=
+  fun K add mul star n A =>
+    A :e square_matrix_ring K n
+    /\ matrix_multiplication K add mul n n n
+      (matrix_adjoint K star n n A) A = unit_matrix K add mul n.
+
+//GOD1:1261099 unitary_group : "the unitary group in #5 variables over #1" | $\operatorname U(#5,#1)$
+Definition unitary_group :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  (set -> set) -> set -> set :=
+  fun K add mul star n =>
+    {A :e square_matrix_ring K n|unitary_matrix K add mul star n A}.
+
+Theorem god1_orthogonal_matrix_determinant_is_plus_or_minus_one :
+  forall K, forall add mul:set -> set -> set,
+  forall n :e omega, forall A :e square_matrix_ring K n,
+    field K add mul -> orthogonal_matrix K add mul n A ->
+    matrix_determinant K add mul n A = ring_one K mul
+    \/ matrix_determinant K add mul n A
+      = ring_negation K add (ring_one K mul).
+Admitted.
+
+Theorem god1_automorphisms_of_hermitian_form_form_group :
+  forall K, forall addK mulK:set -> set -> set,
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set,
+    group (module_general_linear_group K addK mulK L addL smul)
+      (module_endomorphism_composition L) ->
+    group (hermitian_form_automorphism_group K addK mulK L addL smul f)
+      (module_endomorphism_composition L).
+Admitted.
+
+Theorem god1_s36_theorem8_unitary_automorphism_spectral_theorem :
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set, forall u:set -> set,
+    finite_dimensional_vector_space complex add_CSNo mul_CSNo L addL smul ->
+    hermitian_form complex add_CSNo mul_CSNo conj_CSNo L addL smul f ->
+    positive_definite_hermitian_form complex add_CSNo L addL f ->
+    hermitian_form_automorphism complex add_CSNo mul_CSNo
+      L addL smul f u ->
+    exists n :e omega, exists a:set -> set,
+      orthonormal_basis_for_form complex add_CSNo mul_CSNo
+        L addL smul f n a
+      /\ forall i :e n,
+        endomorphism_eigenvector complex add_CSNo mul_CSNo
+          L addL smul u (a i).
+Admitted.
+
+//GOD1:1262950 normal_endomorphism : "the endomorphism #10 is normal relative to form #9" | $#10^*#10=#10#10^*$
+Definition normal_endomorphism :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  (set -> set -> set) -> (set -> set) -> prop :=
+  fun K addK mulK L addL smul f u =>
+    module_endomorphism K addK mulK L addL smul u
+    /\ module_endomorphism_composition L
+      (fun x :e L => adjoint_homomorphism K addK mulK L L f f u x)
+      (fun x :e L => u x)
+      = module_endomorphism_composition L
+        (fun x :e L => u x)
+        (fun x :e L => adjoint_homomorphism K addK mulK L L f f u x).
+
+Theorem god1_s36_theorem9_normal_spectral_theorem :
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set, forall u:set -> set,
+    finite_dimensional_vector_space complex add_CSNo mul_CSNo L addL smul ->
+    hermitian_form complex add_CSNo mul_CSNo conj_CSNo L addL smul f ->
+    nondegenerate_sesquilinear_form complex add_CSNo mul_CSNo conj_CSNo
+      L addL smul f ->
+    positive_definite_hermitian_form complex add_CSNo L addL f ->
+    normal_endomorphism complex add_CSNo mul_CSNo L addL smul f u ->
+    exists n :e omega, exists a:set -> set,
+      orthonormal_basis_for_form complex add_CSNo mul_CSNo
+        L addL smul f n a
+      /\ forall i :e n,
+        endomorphism_eigenvector complex add_CSNo mul_CSNo
+          L addL smul u (a i).
+Admitted.
+
+Theorem god1_s36_theorem9_lemma1_normal_kernel_equals_adjoint_kernel :
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set, forall u:set -> set,
+    hermitian_form complex add_CSNo mul_CSNo conj_CSNo L addL smul f ->
+    positive_definite_hermitian_form complex add_CSNo L addL f ->
+    normal_endomorphism complex add_CSNo mul_CSNo L addL smul f u ->
+    {x :e L|u x = module_zero L addL}
+    = {x :e L|adjoint_homomorphism complex add_CSNo mul_CSNo
+        L L f f u x = module_zero L addL}.
+Admitted.
+
+Theorem god1_s36_theorem9_lemma2_adjoint_on_eigenvectors :
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set, forall u:set -> set,
+  forall lambda :e complex,
+    hermitian_form complex add_CSNo mul_CSNo conj_CSNo L addL smul f ->
+    positive_definite_hermitian_form complex add_CSNo L addL f ->
+    normal_endomorphism complex add_CSNo mul_CSNo L addL smul f u ->
+    endomorphism_eigenvalue complex add_CSNo mul_CSNo L addL smul u lambda ->
+    forall x :e L,
+      (u x = smul lambda x
+      <-> adjoint_homomorphism complex add_CSNo mul_CSNo L L f f u x
+        = smul (conj_CSNo lambda) x).
+Admitted.
+
+Theorem god1_s36_theorem9_lemma3_distinct_eigenspaces_orthogonal :
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set, forall u:set -> set,
+  forall lambda mu :e complex,
+    hermitian_form complex add_CSNo mul_CSNo conj_CSNo L addL smul f ->
+    normal_endomorphism complex add_CSNo mul_CSNo L addL smul f u ->
+    lambda <> mu ->
+    forall x :e endomorphism_eigenspace
+      complex add_CSNo mul_CSNo L addL smul u lambda,
+    forall y :e endomorphism_eigenspace
+      complex add_CSNo mul_CSNo L addL smul u mu,
+      f x y = ring_zero complex add_CSNo.
+Admitted.
+
+Theorem god1_s36_theorem9_lemma4_stability_of_orthogonal_complement :
+  forall K, forall addK mulK:set -> set -> set,
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set, forall u ustar:set -> set, forall M,
+    vector_subspace K addK mulK L addL smul M ->
+    (forall x :e M, u x :e M /\ ustar x :e M) ->
+    (forall x y :e L, f (u x) y = f x (ustar y)) ->
+    forall x :e hermitian_orthogonal_complement K addK L f M,
+      u x :e hermitian_orthogonal_complement K addK L f M
+      /\ ustar x :e hermitian_orthogonal_complement K addK L f M.
+Admitted.
+
+//GOD1:1269561 normal_matrix : "the complex square matrix #5 is normal" | $#5^*#5=#5#5^*$
+Definition normal_matrix :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  (set -> set) -> set -> set -> prop :=
+  fun K add mul star n A =>
+    A :e square_matrix_ring K n
+    /\ matrix_multiplication K add mul n n n
+      (matrix_adjoint K star n n A) A
+      = matrix_multiplication K add mul n n n A
+        (matrix_adjoint K star n n A).
+
+Theorem god1_s36_theorem9_corollary_normal_matrix_unitary_diagonalization :
+  forall n :e omega, forall A :e square_matrix_ring complex n,
+    normal_matrix complex add_CSNo mul_CSNo conj_CSNo n A ->
+    exists U D :e square_matrix_ring complex n,
+      unitary_matrix complex add_CSNo mul_CSNo conj_CSNo n U
+      /\ diagonal_matrix complex add_CSNo n D
+      /\ A = matrix_multiplication complex add_CSNo mul_CSNo n n n
+        (matrix_multiplication complex add_CSNo mul_CSNo n n n U D)
+        (matrix_inverse complex add_CSNo mul_CSNo n U)
+      /\ (unitary_matrix complex add_CSNo mul_CSNo conj_CSNo n A
+        <-> forall i :e n,
+          mul_CSNo (matrix_entry D i i) (conj_CSNo (matrix_entry D i i)) = 1)
+      /\ (hermitian_matrix complex add_CSNo conj_CSNo n A
+        <-> forall i :e n,
+          conj_CSNo (matrix_entry D i i) = matrix_entry D i i).
+Admitted.
+
+Theorem god1_unitary_automorphism_eigenvalues_have_modulus_one :
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set, forall u:set -> set, forall lambda :e complex,
+    hermitian_form complex add_CSNo mul_CSNo conj_CSNo L addL smul f ->
+    positive_definite_hermitian_form complex add_CSNo L addL f ->
+    hermitian_form_automorphism complex add_CSNo mul_CSNo
+      L addL smul f u ->
+    endomorphism_eigenvalue complex add_CSNo mul_CSNo L addL smul u lambda ->
+    mul_CSNo lambda (conj_CSNo lambda) = 1.
+Admitted.
+
+//GOD1:1267220 self_adjoint_endomorphism : "the endomorphism #10 is self-adjoint relative to form #9" | $#10^*=#10$
+Definition self_adjoint_endomorphism :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  (set -> set -> set) -> (set -> set) -> prop :=
+  fun K addK mulK L addL smul f u =>
+    (fun x:set => adjoint_homomorphism K addK mulK L L f f u x)
+      = (fun x:set => u x).
+
+Theorem god1_self_adjoint_complex_endomorphism_eigenvalues_are_real :
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set, forall u:set -> set, forall lambda :e complex,
+    hermitian_form complex add_CSNo mul_CSNo conj_CSNo L addL smul f ->
+    positive_definite_hermitian_form complex add_CSNo L addL f ->
+    self_adjoint_endomorphism complex add_CSNo mul_CSNo L addL smul f u ->
+    endomorphism_eigenvalue complex add_CSNo mul_CSNo L addL smul u lambda ->
+    conj_CSNo lambda = lambda.
+Admitted.
+
+Theorem god1_s36_theorem10_real_self_adjoint_spectral_theorem :
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set, forall u:set -> set,
+    finite_dimensional_vector_space real add_SNo mul_SNo L addL smul ->
+    symmetric_bilinear_form real add_SNo mul_SNo L addL smul f ->
+    nondegenerate_sesquilinear_form real add_SNo mul_SNo (fun x => x)
+      L addL smul f ->
+    positive_definite_hermitian_form real add_SNo L addL f ->
+    module_endomorphism real add_SNo mul_SNo L addL smul u ->
+    self_adjoint_endomorphism real add_SNo mul_SNo L addL smul f u ->
+    exists n :e omega, exists a:set -> set,
+      orthonormal_basis_for_form real add_SNo mul_SNo L addL smul f n a
+      /\ forall i :e n,
+        endomorphism_eigenvector real add_SNo mul_SNo L addL smul u (a i).
+Admitted.
+
+Theorem god1_s36_theorem10_corollary_real_symmetric_spectral_theorem :
+  forall n :e omega, forall A :e square_matrix_ring real n,
+    symmetric_matrix real n A ->
+    exists U D :e square_matrix_ring real n,
+      orthogonal_matrix real add_SNo mul_SNo n U
+      /\ diagonal_matrix real add_SNo n D
+      /\ A = matrix_multiplication real add_SNo mul_SNo n n n
+        (matrix_multiplication real add_SNo mul_SNo n n n U D)
+        (matrix_inverse real add_SNo mul_SNo n U).
+Admitted.
+
+//GOD1:1273609 definite_hermitian_form : "the real or complex hermitian form #9 is definite" | $#9\text{ is definite}$
+Definition definite_hermitian_form :
+  set -> (set -> set -> set) -> set ->
+  (set -> set -> set) -> (set -> set -> set) -> prop :=
+  fun K addK L addL f =>
+    positive_definite_hermitian_form K addK L addL f
+    \/ (forall x :e L, x <> module_zero L addL ->
+      exists r :e real, SNoLt r 0 /\ f x x = r).
+
+Theorem god1_definite_iff_no_nonzero_isotropic_vectors :
+  (forall L, forall addL smul:set -> set -> set,
+    forall f:set -> set -> set,
+    symmetric_bilinear_form real add_SNo mul_SNo L addL smul f ->
+    (definite_hermitian_form real add_SNo L addL f
+    <-> forall x :e L, f x x = 0 -> x = module_zero L addL))
+  /\ (forall L, forall addL smul:set -> set -> set,
+    forall f:set -> set -> set,
+    hermitian_form complex add_CSNo mul_CSNo conj_CSNo L addL smul f ->
+    (definite_hermitian_form complex add_CSNo L addL f
+    <-> forall x :e L, f x x = 0 -> x = module_zero L addL)).
+Admitted.
+
+//GOD1:1276396 hermitian_form_norm : "the seminorm induced by the positive hermitian form #9" | $\|#10\|=\sqrt{#9(#10,#10)}$
+Definition hermitian_form_norm :
+  set -> (set -> set -> set) -> set -> set :=
+  fun L f x => sqrt_SNo_nonneg (CSNo_Re (f x x)).
+
+Theorem god1_s36_theorem11_cauchy_schwarz :
+  forall K, forall addK mulK:set -> set -> set, forall star:set -> set,
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set,
+    field_involution K addK mulK star ->
+    hermitian_form K addK mulK star L addL smul f ->
+    positive_semidefinite_hermitian_form K L addL f ->
+    forall x y :e L,
+      exists lhs rhs :e real,
+        lhs = mulK (f x y) (star (f x y))
+        /\ rhs = mulK (f x x) (f y y)
+        /\ SNoLe lhs rhs.
+Admitted.
+
+Theorem god1_s36_theorem11_corollary1_positive_nondegenerate_iff_definite :
+  forall K, forall addK mulK:set -> set -> set, forall star:set -> set,
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set,
+    field_involution K addK mulK star ->
+    hermitian_form K addK mulK star L addL smul f ->
+    positive_semidefinite_hermitian_form K L addL f ->
+    (nondegenerate_sesquilinear_form K addK mulK star L addL smul f
+    <-> positive_definite_hermitian_form K addK L addL f).
+Admitted.
+
+Theorem god1_s36_theorem11_corollary2_triangle_inequality :
+  forall K, forall addK mulK:set -> set -> set, forall star:set -> set,
+  forall L, forall addL smul:set -> set -> set,
+  forall f:set -> set -> set,
+    field_involution K addK mulK star ->
+    hermitian_form K addK mulK star L addL smul f ->
+    positive_semidefinite_hermitian_form K L addL f ->
+    forall x y :e L,
+      SNoLe (hermitian_form_norm L f (addL x y))
+        (add_SNo (hermitian_form_norm L f x) (hermitian_form_norm L f y)).
+Admitted.
+
+Theorem god1_s36_theorem11_corollary3_triangle_side_inequalities :
+  forall n :e omega, forall x y z :e Rn n,
+    SNoLe (Rn_dist n x y)
+      (add_SNo (Rn_dist n x z) (Rn_dist n z y))
+    /\ SNoLe (Rn_dist n y z)
+      (add_SNo (Rn_dist n y x) (Rn_dist n x z))
+    /\ SNoLe (Rn_dist n z x)
+      (add_SNo (Rn_dist n z y) (Rn_dist n y x)).
 Admitted.
 
 
