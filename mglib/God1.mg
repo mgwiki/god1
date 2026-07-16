@@ -62037,6 +62037,5093 @@ exact (god1_ring_binomial_theorem_core K add mul hK
   x hx y hy hcomm n hn).
 Qed.
 
+Theorem god1_abelian_word_product_adjacent_swap_end :
+  forall G, forall op:set -> set -> set,
+    abelian_group G op -> forall i,
+    nat_p i -> forall f:set -> set,
+    (forall k :e ordsucc (ordsucc i), f k :e G) ->
+    group_word_product G op
+      (fun k => f (permutation_swap
+        (ordsucc (ordsucc i)) i (ordsucc i) k))
+      (ordsucc (ordsucc i))
+    = group_word_product G op f (ordsucc (ordsucc i)).
+let G op.
+assume hG.
+let i.
+assume hi.
+let f.
+assume hf.
+claim hgroup : group G op.
+exact (andEL (group G op) (commutative_on G op) hG).
+claim hcomm : commutative_on G op.
+exact (andER (group G op) (commutative_on G op) hG).
+claim hprefix :
+  group_word_product G op
+    (fun k => f (permutation_swap
+      (ordsucc (ordsucc i)) i (ordsucc i) k)) i
+  = group_word_product G op f i.
+apply (god1_group_word_product_congr G op
+  (fun k => f (permutation_swap
+    (ordsucc (ordsucc i)) i (ordsucc i) k)) f i hi).
+let k.
+assume hk.
+claim hki : k <> i.
+assume hki.
+exact (In_irref i (mem_eq_substR i k i hki hk)).
+claim hksucc : k <> ordsucc i.
+assume hksucc.
+exact (In_no2cycle i (ordsucc i) (ordsuccI2 i)
+  (mem_eq_substR i k (ordsucc i) hksucc hk)).
+exact (f_eq_i f
+  (permutation_swap (ordsucc (ordsucc i)) i (ordsucc i) k) k
+  (god1_permutation_swap_at_other
+    (ordsucc (ordsucc i)) i (ordsucc i) k
+    (ordsuccI1 (ordsucc i) k (ordsuccI1 i k hk)) hki hksucc)).
+claim hprefixIn : group_word_product G op f i :e G.
+apply (god1_group_word_product_in G op f i hgroup hi).
+let k.
+assume hk.
+exact (hf k (ordsuccI1 (ordsucc i) k (ordsuccI1 i k hk))).
+claim hfi : f i :e G.
+exact (hf i (ordsuccI1 (ordsucc i) i (ordsuccI2 i))).
+claim hfsucc : f (ordsucc i) :e G.
+exact (hf (ordsucc i) (ordsuccI2 (ordsucc i))).
+apply (eq_i_tra
+  (group_word_product G op
+    (fun k => f (permutation_swap
+      (ordsucc (ordsucc i)) i (ordsucc i) k))
+    (ordsucc (ordsucc i)))
+  (op
+    (op (group_word_product G op f i) (f (ordsucc i)))
+    (f i))
+  (group_word_product G op f (ordsucc (ordsucc i)))).
+- apply (eq_i_tra
+    (group_word_product G op
+      (fun k => f (permutation_swap
+        (ordsucc (ordsucc i)) i (ordsucc i) k))
+      (ordsucc (ordsucc i)))
+    (op
+      (group_word_product G op
+        (fun k => f (permutation_swap
+          (ordsucc (ordsucc i)) i (ordsucc i) k))
+        (ordsucc i))
+      (f i))
+    (op
+      (op (group_word_product G op f i) (f (ordsucc i)))
+      (f i))).
+  - apply (eq_i_tra
+      (group_word_product G op
+        (fun k => f (permutation_swap
+          (ordsucc (ordsucc i)) i (ordsucc i) k))
+        (ordsucc (ordsucc i)))
+      (op
+        (group_word_product G op
+          (fun k => f (permutation_swap
+            (ordsucc (ordsucc i)) i (ordsucc i) k))
+          (ordsucc i))
+        (f (permutation_swap
+          (ordsucc (ordsucc i)) i (ordsucc i) (ordsucc i))))
+      (op
+        (group_word_product G op
+          (fun k => f (permutation_swap
+            (ordsucc (ordsucc i)) i (ordsucc i) k))
+          (ordsucc i))
+        (f i))).
+    - exact (god1_group_word_product_successor G op
+        (fun k => f (permutation_swap
+          (ordsucc (ordsucc i)) i (ordsucc i) k))
+        (ordsucc i) (nat_ordsucc i hi)).
+    - f_equal.
+      exact (f_eq_i f
+        (permutation_swap
+          (ordsucc (ordsucc i)) i (ordsucc i) (ordsucc i)) i
+        (god1_permutation_swap_at_right
+          (ordsucc (ordsucc i)) i (ordsucc i)
+          (ordsuccI1 (ordsucc i) i (ordsuccI2 i))
+          (ordsuccI2 (ordsucc i)))).
+  - f_equal.
+    apply (eq_i_tra
+      (group_word_product G op
+        (fun k => f (permutation_swap
+          (ordsucc (ordsucc i)) i (ordsucc i) k))
+        (ordsucc i))
+      (op
+        (group_word_product G op
+          (fun k => f (permutation_swap
+            (ordsucc (ordsucc i)) i (ordsucc i) k)) i)
+        (f (ordsucc i)))
+      (op (group_word_product G op f i) (f (ordsucc i)))).
+    - apply (eq_i_tra
+        (group_word_product G op
+          (fun k => f (permutation_swap
+            (ordsucc (ordsucc i)) i (ordsucc i) k))
+          (ordsucc i))
+        (op
+          (group_word_product G op
+            (fun k => f (permutation_swap
+              (ordsucc (ordsucc i)) i (ordsucc i) k)) i)
+          (f (permutation_swap
+            (ordsucc (ordsucc i)) i (ordsucc i) i)))
+        (op
+          (group_word_product G op
+            (fun k => f (permutation_swap
+              (ordsucc (ordsucc i)) i (ordsucc i) k)) i)
+          (f (ordsucc i)))).
+      - exact (god1_group_word_product_successor G op
+          (fun k => f (permutation_swap
+            (ordsucc (ordsucc i)) i (ordsucc i) k)) i hi).
+      - f_equal.
+        exact (f_eq_i f
+          (permutation_swap
+            (ordsucc (ordsucc i)) i (ordsucc i) i) (ordsucc i)
+          (god1_permutation_swap_at_left
+            (ordsucc (ordsucc i)) i (ordsucc i)
+            (ordsuccI1 (ordsucc i) i (ordsuccI2 i)))).
+    - f_equal.
+      exact hprefix.
+- apply (eq_i_tra
+    (op (op (group_word_product G op f i) (f (ordsucc i))) (f i))
+    (op (op (group_word_product G op f i) (f i)) (f (ordsucc i)))
+    (group_word_product G op f (ordsucc (ordsucc i)))).
+  - apply (eq_i_tra
+      (op (op (group_word_product G op f i) (f (ordsucc i))) (f i))
+      (op (group_word_product G op f i) (op (f (ordsucc i)) (f i)))
+      (op (op (group_word_product G op f i) (f i)) (f (ordsucc i)))).
+    - exact (god1_group_associative_reverse G op hgroup
+        (group_word_product G op f i) hprefixIn
+        (f (ordsucc i)) hfsucc (f i) hfi).
+    - apply (eq_i_tra
+        (op (group_word_product G op f i) (op (f (ordsucc i)) (f i)))
+        (op (group_word_product G op f i) (op (f i) (f (ordsucc i))))
+        (op (op (group_word_product G op f i) (f i)) (f (ordsucc i)))).
+      - f_equal.
+        exact (hcomm (f (ordsucc i)) hfsucc (f i) hfi).
+      - exact (god1_group_associative G op hgroup
+          (group_word_product G op f i) hprefixIn
+          (f i) hfi (f (ordsucc i)) hfsucc).
+  - apply eq_sym.
+    apply (eq_i_tra
+      (group_word_product G op f (ordsucc (ordsucc i)))
+      (op (group_word_product G op f (ordsucc i)) (f (ordsucc i)))
+      (op (op (group_word_product G op f i) (f i)) (f (ordsucc i)))).
+    - exact (god1_group_word_product_successor G op f
+        (ordsucc i) (nat_ordsucc i hi)).
+    - f_equal.
+      exact (god1_group_word_product_successor G op f i hi).
+Qed.
+
+Theorem god1_adjacent_map_eq_swap :
+  forall n i, forall t:set -> set,
+    i :e n -> ordsucc i :e n ->
+    t i = ordsucc i -> t (ordsucc i) = i ->
+    (forall k :e n,
+      k <> i -> k <> ordsucc i -> t k = k) ->
+    forall k :e n,
+      t k = permutation_swap n i (ordsucc i) k.
+let n i t.
+assume hi hsucci hti htsucc hfix.
+let k.
+assume hk.
+apply (orE (k = i) (k <> i) (xm (k = i))
+  (t k = permutation_swap n i (ordsucc i) k)).
+- assume hki.
+  apply (eq_i_tra
+    (t k) (ordsucc i) (permutation_swap n i (ordsucc i) k)).
+  - exact (eq_i_tra (t k) (t i) (ordsucc i)
+      (f_eq_i t k i hki) hti).
+  - apply eq_sym.
+    exact (eq_i_tra
+      (permutation_swap n i (ordsucc i) k)
+      (permutation_swap n i (ordsucc i) i) (ordsucc i)
+      (f_eq_i (fun z => permutation_swap n i (ordsucc i) z)
+        k i hki)
+      (god1_permutation_swap_at_left n i (ordsucc i) hi)).
+- assume hki.
+  apply (orE
+    (k = ordsucc i) (k <> ordsucc i)
+    (xm (k = ordsucc i))
+    (t k = permutation_swap n i (ordsucc i) k)).
+  - assume hksucc.
+    apply (eq_i_tra
+      (t k) i (permutation_swap n i (ordsucc i) k)).
+    - exact (eq_i_tra
+        (t k) (t (ordsucc i)) i
+        (f_eq_i t k (ordsucc i) hksucc) htsucc).
+    - apply eq_sym.
+      exact (eq_i_tra
+        (permutation_swap n i (ordsucc i) k)
+        (permutation_swap n i (ordsucc i) (ordsucc i)) i
+        (f_eq_i (fun z => permutation_swap n i (ordsucc i) z)
+          k (ordsucc i) hksucc)
+        (god1_permutation_swap_at_right n i (ordsucc i) hi hsucci)).
+  - assume hksucc.
+    apply (eq_i_tra
+      (t k) k (permutation_swap n i (ordsucc i) k)).
+    - exact (hfix k hk hki hksucc).
+    - apply eq_sym.
+      exact (god1_permutation_swap_at_other n i (ordsucc i) k
+        hk hki hksucc).
+Qed.
+
+Theorem god1_abelian_word_product_adjacent_map_end :
+  forall G, forall op:set -> set -> set,
+    abelian_group G op -> forall i,
+    nat_p i -> forall t:set -> set,
+    (forall k :e ordsucc (ordsucc i),
+      t k :e ordsucc (ordsucc i)) ->
+    t i = ordsucc i -> t (ordsucc i) = i ->
+    (forall k :e ordsucc (ordsucc i),
+      k <> i -> k <> ordsucc i -> t k = k) ->
+    forall f:set -> set,
+    (forall k :e ordsucc (ordsucc i), f k :e G) ->
+    group_word_product G op (fun k => f (t k))
+      (ordsucc (ordsucc i))
+    = group_word_product G op f (ordsucc (ordsucc i)).
+let G op.
+assume hG.
+let i.
+assume hi.
+let t.
+assume htmap hti htsucc hfix.
+let f.
+assume hf.
+exact (eq_i_tra
+  (group_word_product G op (fun k => f (t k))
+    (ordsucc (ordsucc i)))
+  (group_word_product G op
+    (fun k => f (permutation_swap
+      (ordsucc (ordsucc i)) i (ordsucc i) k))
+    (ordsucc (ordsucc i)))
+  (group_word_product G op f (ordsucc (ordsucc i)))
+  (god1_group_word_product_congr G op
+    (fun k => f (t k))
+    (fun k => f (permutation_swap
+      (ordsucc (ordsucc i)) i (ordsucc i) k))
+    (ordsucc (ordsucc i)) (nat_ordsucc (ordsucc i) (nat_ordsucc i hi))
+    (fun k hk => f_eq_i f (t k)
+      (permutation_swap (ordsucc (ordsucc i)) i (ordsucc i) k)
+      (god1_adjacent_map_eq_swap
+        (ordsucc (ordsucc i)) i t
+        (ordsuccI1 (ordsucc i) i (ordsuccI2 i))
+        (ordsuccI2 (ordsucc i)) hti htsucc hfix k hk)))
+  (god1_abelian_word_product_adjacent_swap_end
+    G op hG i hi f hf)).
+Qed.
+
+Theorem god1_adjacent_map_values_in :
+  forall n i, forall t:set -> set,
+    i :e n -> ordsucc i :e n ->
+    t i = ordsucc i -> t (ordsucc i) = i ->
+    (forall k :e n,
+      k <> i -> k <> ordsucc i -> t k = k) ->
+    forall k :e n, t k :e n.
+let n i t.
+assume hi hsucci hti htsucc hfix.
+let k.
+assume hk.
+exact (mem_eq_substL n
+  (permutation_swap n i (ordsucc i) k) (t k)
+  (god1_adjacent_map_eq_swap n i t hi hsucci
+    hti htsucc hfix k hk)
+  (god1_permutation_swap_values_in n i (ordsucc i)
+    hi hsucci k hk)).
+Qed.
+
+Theorem god1_adjacent_predecessor_in_prefix :
+  forall n i,
+    i :e ordsucc n -> ordsucc i :e n -> i :e n.
+let n i.
+assume hi hsucci.
+apply (orE (i :e n) (i = n) (ordsuccE n i hi) (i :e n)).
+- exact (fun hin => hin).
+- assume hin.
+  exact (FalseE
+    (In_no2cycle i (ordsucc i) (ordsuccI2 i)
+      (mem_eq_set_subst n i (ordsucc i) (eq_sym i n hin) hsucci))
+    (i :e n)).
+Qed.
+
+Theorem god1_abelian_word_product_adjacent_map_last :
+  forall G, forall op:set -> set -> set,
+    abelian_group G op -> forall n i,
+    nat_p i -> ordsucc i = n -> forall t:set -> set,
+    t i = ordsucc i -> t (ordsucc i) = i ->
+    (forall k :e ordsucc n,
+      k <> i -> k <> ordsucc i -> t k = k) ->
+    forall f:set -> set,
+    (forall k :e ordsucc n, f k :e G) ->
+    group_word_product G op (fun k => f (t k)) (ordsucc n)
+    = group_word_product G op f (ordsucc n).
+let G op.
+assume hG.
+let n i.
+assume hi hin.
+let t.
+assume hti htsucc hfix.
+let f.
+assume hf.
+claim hset : ordsucc (ordsucc i) = ordsucc n.
+exact (f_eq_i ordsucc (ordsucc i) n hin).
+claim hfixcanon :
+  forall k :e ordsucc (ordsucc i),
+    k <> i -> k <> ordsucc i -> t k = k.
+let k.
+assume hk hki hksucc.
+exact (hfix k (mem_eq_set_subst
+  (ordsucc (ordsucc i)) (ordsucc n) k hset hk) hki hksucc).
+claim hfcanon :
+  forall k :e ordsucc (ordsucc i), f k :e G.
+let k.
+assume hk.
+exact (hf k (mem_eq_set_subst
+  (ordsucc (ordsucc i)) (ordsucc n) k hset hk)).
+claim htcanon :
+  forall k :e ordsucc (ordsucc i), t k :e ordsucc (ordsucc i).
+exact (god1_adjacent_map_values_in
+  (ordsucc (ordsucc i)) i t
+  (ordsuccI1 (ordsucc i) i (ordsuccI2 i))
+  (ordsuccI2 (ordsucc i)) hti htsucc hfixcanon).
+exact (eq_i_tra
+  (group_word_product G op (fun k => f (t k)) (ordsucc n))
+  (group_word_product G op (fun k => f (t k))
+    (ordsucc (ordsucc i)))
+  (group_word_product G op f (ordsucc n))
+  (f_eq_i
+    (fun m:set => group_word_product G op (fun k => f (t k)) m)
+    (ordsucc n) (ordsucc (ordsucc i))
+    (eq_sym (ordsucc (ordsucc i)) (ordsucc n) hset))
+  (eq_i_tra
+    (group_word_product G op (fun k => f (t k))
+      (ordsucc (ordsucc i)))
+    (group_word_product G op f (ordsucc (ordsucc i)))
+    (group_word_product G op f (ordsucc n))
+    (god1_abelian_word_product_adjacent_map_end
+      G op hG i hi t htcanon hti htsucc hfixcanon f hfcanon)
+    (f_eq_i (fun m:set => group_word_product G op f m)
+      (ordsucc (ordsucc i)) (ordsucc n) hset))).
+Qed.
+
+Theorem god1_abelian_word_product_adjacent_map_zero :
+  forall G, forall op:set -> set -> set,
+    abelian_group G op -> forall t f:set -> set, forall i,
+    nat_p i -> i :e 0 -> ordsucc i :e 0 ->
+    t i = ordsucc i -> t (ordsucc i) = i ->
+    (forall k :e 0,
+      k <> i -> k <> ordsucc i -> t k = k) ->
+    (forall k :e 0, f k :e G) ->
+    group_word_product G op (fun k => f (t k)) 0
+    = group_word_product G op f 0.
+let G op.
+assume hG.
+let t f i.
+assume hi hi0 hsucc0 hti htsucc hfix hf.
+exact (FalseE (EmptyE i hi0)
+  (group_word_product G op (fun k => f (t k)) 0
+    = group_word_product G op f 0)).
+Qed.
+
+Theorem god1_abelian_word_product_adjacent_map_step :
+  forall G, forall op:set -> set -> set,
+    abelian_group G op -> forall n,
+    nat_p n ->
+    (forall t f:set -> set, forall i,
+      nat_p i -> i :e n -> ordsucc i :e n ->
+      t i = ordsucc i -> t (ordsucc i) = i ->
+      (forall k :e n,
+        k <> i -> k <> ordsucc i -> t k = k) ->
+      (forall k :e n, f k :e G) ->
+      group_word_product G op (fun k => f (t k)) n
+      = group_word_product G op f n) ->
+    forall t f:set -> set, forall i,
+      nat_p i -> i :e ordsucc n -> ordsucc i :e ordsucc n ->
+      t i = ordsucc i -> t (ordsucc i) = i ->
+      (forall k :e ordsucc n,
+        k <> i -> k <> ordsucc i -> t k = k) ->
+      (forall k :e ordsucc n, f k :e G) ->
+      group_word_product G op (fun k => f (t k)) (ordsucc n)
+      = group_word_product G op f (ordsucc n).
+let G op.
+assume hG.
+let n.
+assume hn hind.
+let t f i.
+assume hi hiN hsuccN hti htsucc hfix hf.
+apply (orE
+  (ordsucc i :e n) (ordsucc i = n)
+  (ordsuccE n (ordsucc i) hsuccN)
+  (group_word_product G op (fun k => f (t k)) (ordsucc n)
+    = group_word_product G op f (ordsucc n))).
+- assume hsuccPrefix.
+  claim hiPrefix : i :e n.
+  exact (god1_adjacent_predecessor_in_prefix n i hiN hsuccPrefix).
+  claim hfixPrefix :
+    forall k :e n,
+      k <> i -> k <> ordsucc i -> t k = k.
+  exact (fun k hk hki hksucc =>
+    hfix k (ordsuccI1 n k hk) hki hksucc).
+  claim hfPrefix : forall k :e n, f k :e G.
+  exact (fun k hk => hf k (ordsuccI1 n k hk)).
+  claim hprefix :
+    group_word_product G op (fun k => f (t k)) n
+    = group_word_product G op f n.
+  exact (hind t f i hi hiPrefix hsuccPrefix
+    hti htsucc hfixPrefix hfPrefix).
+  claim hni : n <> i.
+  assume hni.
+  exact (In_no2cycle i (ordsucc i) (ordsuccI2 i)
+    (mem_eq_set_subst n i (ordsucc i) hni hsuccPrefix)).
+  claim hnsucc : n <> ordsucc i.
+  assume hnsucc.
+  exact (In_irref (ordsucc i)
+    (mem_eq_set_subst n (ordsucc i) (ordsucc i)
+      hnsucc hsuccPrefix)).
+  claim htn : t n = n.
+  exact (hfix n (ordsuccI2 n) hni hnsucc).
+  apply (eq_i_tra
+    (group_word_product G op (fun k => f (t k)) (ordsucc n))
+    (op (group_word_product G op (fun k => f (t k)) n) (f (t n)))
+    (group_word_product G op f (ordsucc n))).
+  - exact (god1_group_word_product_successor G op
+      (fun k => f (t k)) n hn).
+  - apply (eq_i_tra
+      (op (group_word_product G op (fun k => f (t k)) n) (f (t n)))
+      (op (group_word_product G op f n) (f n))
+      (group_word_product G op f (ordsucc n))).
+    - f_equal.
+      - exact hprefix.
+      - exact (f_eq_i f (t n) n htn).
+    - apply eq_sym.
+      exact (god1_group_word_product_successor G op f n hn).
+- assume hlast.
+  exact (god1_abelian_word_product_adjacent_map_last
+    G op hG n i hi hlast t hti htsucc hfix f hf).
+Qed.
+
+Theorem god1_abelian_word_product_adjacent_map :
+  forall G, forall op:set -> set -> set,
+    abelian_group G op -> forall n :e omega,
+    forall t f:set -> set, forall i,
+    nat_p i -> i :e n -> ordsucc i :e n ->
+    t i = ordsucc i -> t (ordsucc i) = i ->
+    (forall k :e n,
+      k <> i -> k <> ordsucc i -> t k = k) ->
+    (forall k :e n, f k :e G) ->
+    group_word_product G op (fun k => f (t k)) n
+    = group_word_product G op f n.
+let G op.
+assume hG.
+let n.
+assume hn.
+let t f i.
+assume hi hiN hsuccN hti htsucc hfix hf.
+exact (nat_ind
+  (fun m =>
+    forall u g:set -> set, forall j,
+      nat_p j -> j :e m -> ordsucc j :e m ->
+      u j = ordsucc j -> u (ordsucc j) = j ->
+      (forall k :e m,
+        k <> j -> k <> ordsucc j -> u k = k) ->
+      (forall k :e m, g k :e G) ->
+      group_word_product G op (fun k => g (u k)) m
+      = group_word_product G op g m)
+  (god1_abelian_word_product_adjacent_map_zero G op hG)
+  (god1_abelian_word_product_adjacent_map_step G op hG)
+  n (omega_nat_p n hn) t f i hi hiN hsuccN hti htsucc hfix hf).
+Qed.
+
+Theorem god1_abelian_word_product_adjacent_transposition :
+  forall G, forall op:set -> set -> set,
+    abelian_group G op -> forall n :e omega,
+    forall t :e adjacent_transpositions n,
+    forall f:set -> set,
+    (forall k :e n, f k :e G) ->
+    group_word_product G op (fun k => f (t k)) n
+    = group_word_product G op f n.
+let G op.
+assume hG.
+let n.
+assume hn.
+let t.
+assume ht.
+let f.
+assume hf.
+apply (exandE_i
+  (fun i => i :e n)
+  (fun i => ordsucc i :e n
+    /\ t = permutation_swap n i (ordsucc i))
+  (god1_adjacent_transposition_has_swap_index n t
+    (god1_adjacent_transpositions_elim_property n t ht))).
+let i.
+assume hi hdata.
+claim hsucci : ordsucc i :e n.
+exact (andEL
+  (ordsucc i :e n)
+  (t = permutation_swap n i (ordsucc i)) hdata).
+claim hteq : t = permutation_swap n i (ordsucc i).
+exact (andER
+  (ordsucc i :e n)
+  (t = permutation_swap n i (ordsucc i)) hdata).
+claim hti : t i = ordsucc i.
+exact (eq_i_tra
+  (t i) (permutation_swap n i (ordsucc i) i) (ordsucc i)
+  (f_eq_i (fun s:set => s i) t
+    (permutation_swap n i (ordsucc i)) hteq)
+  (god1_permutation_swap_at_left n i (ordsucc i) hi)).
+claim htsucc : t (ordsucc i) = i.
+exact (eq_i_tra
+  (t (ordsucc i))
+  (permutation_swap n i (ordsucc i) (ordsucc i)) i
+  (f_eq_i (fun s:set => s (ordsucc i)) t
+    (permutation_swap n i (ordsucc i)) hteq)
+  (god1_permutation_swap_at_right n i (ordsucc i) hi hsucci)).
+claim hfix :
+  forall k :e n,
+    k <> i -> k <> ordsucc i -> t k = k.
+let k.
+assume hk hki hksucc.
+exact (eq_i_tra
+  (t k) (permutation_swap n i (ordsucc i) k) k
+  (f_eq_i (fun s:set => s k) t
+    (permutation_swap n i (ordsucc i)) hteq)
+  (god1_permutation_swap_at_other n i (ordsucc i) k
+    hk hki hksucc)).
+exact (god1_abelian_word_product_adjacent_map G op hG n hn
+  (fun k => t k) f i
+  (omega_nat_p i (omega_TransSet n hn i hi))
+  hi hsucci hti htsucc hfix hf).
+Qed.
+
+Definition god1_word_product_preserving_permutations :
+  set -> (set -> set -> set) -> set -> set :=
+  fun G op n =>
+    {t :e permutation_group n|
+      forall f:set -> set,
+        (forall k :e n, f k :e G) ->
+        group_word_product G op (fun k => f (t k)) n
+        = group_word_product G op f n}.
+
+Theorem god1_permutation_group_inverse_left_eval :
+  forall n, forall u :e permutation_group n,
+  forall k :e n,
+    group_inverse
+      (permutation_group n) (permutation_composition n) u (u k)
+    = k.
+let n.
+let u.
+assume hu.
+let k.
+assume hk.
+claim huvalue : u k :e n.
+exact (ap_Pi n (fun z => n) u k
+  (god1_permutation_function_in n u hu) hk).
+claim hinv :
+  group_inverse
+    (permutation_group n) (permutation_composition n) u
+    :e permutation_group n.
+exact (god1_group_inverse_in
+  (permutation_group n) (permutation_composition n)
+  (god1_permutations_form_group n) u hu).
+claim hcomposition :
+  permutation_composition n
+    (group_inverse
+      (permutation_group n) (permutation_composition n) u) u
+  = group_identity
+      (permutation_group n) (permutation_composition n).
+exact (andER
+  (group_inverse
+    (permutation_group n) (permutation_composition n) u
+    :e permutation_group n)
+  (permutation_composition n
+    (group_inverse
+      (permutation_group n) (permutation_composition n) u) u
+    = group_identity
+      (permutation_group n) (permutation_composition n))
+  (andEL
+    (group_inverse
+      (permutation_group n) (permutation_composition n) u
+      :e permutation_group n
+      /\ permutation_composition n
+        (group_inverse
+          (permutation_group n) (permutation_composition n) u) u
+        = group_identity
+          (permutation_group n) (permutation_composition n))
+    (permutation_composition n u
+      (group_inverse
+        (permutation_group n) (permutation_composition n) u)
+      = group_identity
+        (permutation_group n) (permutation_composition n))
+    (god1_group_inverse_specification
+      (permutation_group n) (permutation_composition n)
+      (god1_permutations_form_group n) u hu))).
+exact (eq_i_tra
+  (group_inverse
+    (permutation_group n) (permutation_composition n) u (u k))
+  (permutation_composition n
+    (group_inverse
+      (permutation_group n) (permutation_composition n) u) u k) k
+  (eq_sym
+    (permutation_composition n
+      (group_inverse
+        (permutation_group n) (permutation_composition n) u) u k)
+    (group_inverse
+      (permutation_group n) (permutation_composition n) u (u k))
+    (beta n
+      (fun z => group_inverse
+        (permutation_group n) (permutation_composition n) u (u z))
+      k hk))
+  (eq_i_tra
+    (permutation_composition n
+      (group_inverse
+        (permutation_group n) (permutation_composition n) u) u k)
+    (group_identity
+      (permutation_group n) (permutation_composition n) k) k
+    (f_eq_i (fun s:set => s k)
+      (permutation_composition n
+        (group_inverse
+          (permutation_group n) (permutation_composition n) u) u)
+      (group_identity
+        (permutation_group n) (permutation_composition n)) hcomposition)
+    (eq_i_tra
+      (group_identity
+        (permutation_group n) (permutation_composition n) k)
+      (permutation_identity n k) k
+      (f_eq_i (fun s:set => s k)
+        (group_identity
+          (permutation_group n) (permutation_composition n))
+        (permutation_identity n)
+        (god1_permutation_group_identity_eq n))
+      (beta n (fun z => z) k hk)))).
+Qed.
+
+Theorem god1_word_product_identity_preserves :
+  forall G, forall op:set -> set -> set, forall n :e omega,
+  forall f:set -> set,
+    (forall k :e n, f k :e G) ->
+    group_word_product G op
+      (fun k => f
+        (group_identity
+          (permutation_group n) (permutation_composition n) k)) n
+    = group_word_product G op f n.
+let G op.
+let n.
+assume hn.
+let f.
+assume hf.
+apply (god1_group_word_product_congr G op
+  (fun k => f
+    (group_identity (permutation_group n) (permutation_composition n) k))
+  f n (omega_nat_p n hn)).
+let k.
+assume hk.
+exact (f_eq_i f
+  (group_identity (permutation_group n) (permutation_composition n) k) k
+  (eq_i_tra
+    (group_identity
+      (permutation_group n) (permutation_composition n) k)
+    (permutation_identity n k) k
+    (f_eq_i (fun s:set => s k)
+      (group_identity
+        (permutation_group n) (permutation_composition n))
+      (permutation_identity n)
+      (god1_permutation_group_identity_eq n))
+    (beta n (fun z => z) k hk))).
+Qed.
+
+Theorem god1_word_product_preserver_identity :
+  forall G, forall op:set -> set -> set, forall n :e omega,
+    group_identity (permutation_group n) (permutation_composition n)
+    :e god1_word_product_preserving_permutations G op n.
+let G op.
+let n.
+assume hn.
+exact (SepI
+  (permutation_group n)
+  (fun t => forall f:set -> set,
+    (forall k :e n, f k :e G) ->
+    group_word_product G op (fun k => f (t k)) n
+      = group_word_product G op f n)
+  (group_identity (permutation_group n) (permutation_composition n))
+  (god1_group_identity_in
+    (permutation_group n) (permutation_composition n)
+    (god1_permutations_form_group n))
+  (god1_word_product_identity_preserves G op n hn)).
+Qed.
+
+Theorem god1_word_product_preserver_subset :
+  forall G, forall op:set -> set -> set, forall n,
+    god1_word_product_preserving_permutations G op n
+    c= permutation_group n.
+let G op n.
+let t.
+assume ht.
+exact (SepE1
+  (permutation_group n)
+  (fun u => forall f:set -> set,
+    (forall k :e n, f k :e G) ->
+    group_word_product G op (fun k => f (u k)) n
+      = group_word_product G op f n) t ht).
+Qed.
+
+Theorem god1_word_product_preserver_property :
+  forall G, forall op:set -> set -> set, forall n,
+  forall t :e god1_word_product_preserving_permutations G op n,
+  forall f:set -> set,
+    (forall k :e n, f k :e G) ->
+    group_word_product G op (fun k => f (t k)) n
+    = group_word_product G op f n.
+let G op n.
+let t.
+assume ht.
+exact (SepE2
+  (permutation_group n)
+  (fun u => forall f:set -> set,
+    (forall k :e n, f k :e G) ->
+    group_word_product G op (fun k => f (u k)) n
+      = group_word_product G op f n) t ht).
+Qed.
+
+Theorem god1_word_product_preserver_product_property :
+  forall G, forall op:set -> set -> set, forall n :e omega,
+  forall u v :e god1_word_product_preserving_permutations G op n,
+  forall f:set -> set,
+    (forall k :e n, f k :e G) ->
+    group_word_product G op
+      (fun k => f (permutation_composition n u v k)) n
+    = group_word_product G op f n.
+let G op.
+let n.
+assume hn.
+let u.
+assume hu.
+let v.
+assume hv.
+let f.
+assume hf.
+claim huperm : u :e permutation_group n.
+exact (god1_word_product_preserver_subset G op n u hu).
+claim hvperm : v :e permutation_group n.
+exact (god1_word_product_preserver_subset G op n v hv).
+claim hfu : forall k :e n, f (u k) :e G.
+let k.
+assume hk.
+exact (hf (u k)
+  (ap_Pi n (fun z => n) u k
+    (god1_permutation_function_in n u huperm) hk)).
+exact (eq_i_tra
+  (group_word_product G op
+    (fun k => f (permutation_composition n u v k)) n)
+  (group_word_product G op (fun k => f (u (v k))) n)
+  (group_word_product G op f n)
+  (god1_group_word_product_congr G op
+    (fun k => f (permutation_composition n u v k))
+    (fun k => f (u (v k))) n (omega_nat_p n hn)
+    (fun k hk => f_eq_i f
+      (permutation_composition n u v k) (u (v k))
+      (beta n (fun z => u (v z)) k hk)))
+  (eq_i_tra
+    (group_word_product G op (fun k => f (u (v k))) n)
+    (group_word_product G op (fun k => f (u k)) n)
+    (group_word_product G op f n)
+    (god1_word_product_preserver_property G op n v hv
+      (fun k => f (u k)) hfu)
+    (god1_word_product_preserver_property G op n u hu f hf))).
+Qed.
+
+Theorem god1_word_product_preserver_product :
+  forall G, forall op:set -> set -> set, forall n :e omega,
+  forall u v :e god1_word_product_preserving_permutations G op n,
+    permutation_composition n u v
+    :e god1_word_product_preserving_permutations G op n.
+let G op.
+let n.
+assume hn.
+let u.
+assume hu.
+let v.
+assume hv.
+claim huperm : u :e permutation_group n.
+exact (god1_word_product_preserver_subset G op n u hu).
+claim hvperm : v :e permutation_group n.
+exact (god1_word_product_preserver_subset G op n v hv).
+exact (SepI
+  (permutation_group n)
+  (fun t => forall f:set -> set,
+    (forall k :e n, f k :e G) ->
+    group_word_product G op (fun k => f (t k)) n
+      = group_word_product G op f n)
+  (permutation_composition n u v)
+  (god1_permutation_composition_in n u huperm v hvperm)
+  (god1_word_product_preserver_product_property
+    G op n hn u hu v hv)).
+Qed.
+
+Theorem god1_word_product_inverse_cancel :
+  forall G, forall op:set -> set -> set, forall n :e omega,
+  forall u :e permutation_group n, forall f:set -> set,
+    (forall k :e n, f k :e G) ->
+    group_word_product G op
+      (fun k => f
+        (group_inverse
+          (permutation_group n) (permutation_composition n) u (u k))) n
+    = group_word_product G op f n.
+let G op.
+let n.
+assume hn.
+let u.
+assume hu.
+let f.
+assume hf.
+exact (god1_group_word_product_congr G op
+  (fun k => f
+    (group_inverse
+      (permutation_group n) (permutation_composition n) u (u k)))
+  f n (omega_nat_p n hn)
+  (fun k hk => f_eq_i f
+    (group_inverse
+      (permutation_group n) (permutation_composition n) u (u k)) k
+    (god1_permutation_group_inverse_left_eval n u hu k hk))).
+Qed.
+
+Theorem god1_word_product_preserver_inverse_property :
+  forall G, forall op:set -> set -> set, forall n :e omega,
+  forall u :e god1_word_product_preserving_permutations G op n,
+  forall f:set -> set,
+    (forall k :e n, f k :e G) ->
+    group_word_product G op
+      (fun k => f
+        (group_inverse
+          (permutation_group n) (permutation_composition n) u k)) n
+    = group_word_product G op f n.
+let G op.
+let n.
+assume hn.
+let u.
+assume hu.
+let f.
+assume hf.
+claim huperm : u :e permutation_group n.
+exact (god1_word_product_preserver_subset G op n u hu).
+claim hinvperm :
+  group_inverse
+    (permutation_group n) (permutation_composition n) u
+  :e permutation_group n.
+exact (god1_group_inverse_in
+  (permutation_group n) (permutation_composition n)
+  (god1_permutations_form_group n) u huperm).
+claim hfinv : forall k :e n,
+  f (group_inverse
+    (permutation_group n) (permutation_composition n) u k) :e G.
+let k.
+assume hk.
+exact (hf
+  (group_inverse
+    (permutation_group n) (permutation_composition n) u k)
+  (ap_Pi n (fun z => n)
+    (group_inverse
+      (permutation_group n) (permutation_composition n) u) k
+    (god1_permutation_function_in n
+      (group_inverse
+        (permutation_group n) (permutation_composition n) u) hinvperm) hk)).
+claim hpreserve :
+  group_word_product G op
+    (fun k => f
+      (group_inverse
+        (permutation_group n) (permutation_composition n) u (u k))) n
+  = group_word_product G op
+    (fun k => f
+      (group_inverse
+        (permutation_group n) (permutation_composition n) u k)) n.
+exact (god1_word_product_preserver_property G op n u hu
+  (fun k => f
+    (group_inverse
+      (permutation_group n) (permutation_composition n) u k)) hfinv).
+exact (eq_i_tra
+  (group_word_product G op
+    (fun k => f
+      (group_inverse
+        (permutation_group n) (permutation_composition n) u k)) n)
+  (group_word_product G op
+    (fun k => f
+      (group_inverse
+        (permutation_group n) (permutation_composition n) u (u k))) n)
+  (group_word_product G op f n)
+  (eq_sym
+    (group_word_product G op
+      (fun k => f
+        (group_inverse
+          (permutation_group n) (permutation_composition n) u (u k))) n)
+    (group_word_product G op
+      (fun k => f
+        (group_inverse
+          (permutation_group n) (permutation_composition n) u k)) n)
+    hpreserve)
+  (god1_word_product_inverse_cancel G op n hn u huperm f hf)).
+Qed.
+
+Theorem god1_word_product_preserver_inverse :
+  forall G, forall op:set -> set -> set, forall n :e omega,
+  forall u :e god1_word_product_preserving_permutations G op n,
+    group_inverse
+      (permutation_group n) (permutation_composition n) u
+    :e god1_word_product_preserving_permutations G op n.
+let G op.
+let n.
+assume hn.
+let u.
+assume hu.
+claim huperm : u :e permutation_group n.
+exact (god1_word_product_preserver_subset G op n u hu).
+exact (SepI
+  (permutation_group n)
+  (fun t => forall f:set -> set,
+    (forall k :e n, f k :e G) ->
+    group_word_product G op (fun k => f (t k)) n
+      = group_word_product G op f n)
+  (group_inverse
+    (permutation_group n) (permutation_composition n) u)
+  (god1_group_inverse_in
+    (permutation_group n) (permutation_composition n)
+    (god1_permutations_form_group n) u huperm)
+  (god1_word_product_preserver_inverse_property G op n hn u hu)).
+Qed.
+
+Theorem god1_word_product_preservers_form_subgroup :
+  forall G, forall op:set -> set -> set, forall n :e omega,
+    subgroup (permutation_group n) (permutation_composition n)
+      (god1_word_product_preserving_permutations G op n).
+let G op.
+let n.
+assume hn.
+exact (god1_subgroup_of_identity_product_inverse
+  (permutation_group n) (permutation_composition n)
+  (god1_word_product_preserving_permutations G op n)
+  (god1_permutations_form_group n)
+  (god1_word_product_preserver_subset G op n)
+  (god1_word_product_preserver_identity G op n hn)
+  (god1_word_product_preserver_product G op n hn)
+  (god1_word_product_preserver_inverse G op n hn)).
+Qed.
+
+Theorem god1_adjacent_transpositions_preserve_abelian_word_product :
+  forall G, forall op:set -> set -> set,
+    abelian_group G op -> forall n :e omega,
+    adjacent_transpositions n
+    c= god1_word_product_preserving_permutations G op n.
+let G op.
+assume hG.
+let n.
+assume hn.
+let t.
+assume ht.
+exact (SepI
+  (permutation_group n)
+  (fun u => forall f:set -> set,
+    (forall k :e n, f k :e G) ->
+    group_word_product G op (fun k => f (u k)) n
+      = group_word_product G op f n)
+  t (god1_adjacent_transpositions_elim_member n t ht)
+  (god1_abelian_word_product_adjacent_transposition
+    G op hG n hn t ht)).
+Qed.
+
+Theorem god1_abelian_word_product_permutation_preserver :
+  forall G, forall op:set -> set -> set,
+    abelian_group G op -> forall n :e omega,
+    permutation_group n
+    c= god1_word_product_preserving_permutations G op n.
+let G op.
+assume hG.
+let n.
+assume hn.
+claim hsubgroup :
+  subgroup (permutation_group n) (permutation_composition n)
+    (god1_word_product_preserving_permutations G op n).
+exact (god1_word_product_preservers_form_subgroup G op n hn).
+claim hpower :
+  god1_word_product_preserving_permutations G op n
+  :e Power (permutation_group n).
+exact (PowerI
+  (permutation_group n)
+  (god1_word_product_preserving_permutations G op n)
+  (god1_word_product_preserver_subset G op n)).
+claim hgenerated_subset :
+  subgroup_generated_by
+    (permutation_group n) (permutation_composition n)
+    (adjacent_transpositions n)
+  c= god1_word_product_preserving_permutations G op n.
+exact ((andER
+  (subgroup (permutation_group n) (permutation_composition n)
+    (subgroup_generated_by
+      (permutation_group n) (permutation_composition n)
+      (adjacent_transpositions n))
+    /\ adjacent_transpositions n c= subgroup_generated_by
+      (permutation_group n) (permutation_composition n)
+      (adjacent_transpositions n))
+  (forall H :e Power (permutation_group n),
+    subgroup (permutation_group n) (permutation_composition n) H ->
+    adjacent_transpositions n c= H ->
+    subgroup_generated_by
+      (permutation_group n) (permutation_composition n)
+      (adjacent_transpositions n) c= H)
+  (god1_generated_subgroup_is_smallest
+    (permutation_group n) (permutation_composition n)
+    (adjacent_transpositions n)
+    (god1_permutations_form_group n)
+    (god1_adjacent_transpositions_subset n)))
+  (god1_word_product_preserving_permutations G op n)
+  hpower hsubgroup
+  (god1_adjacent_transpositions_preserve_abelian_word_product
+    G op hG n hn)).
+claim hgenerated_eq :
+  subgroup_generated_by
+    (permutation_group n) (permutation_composition n)
+    (adjacent_transpositions n)
+  = permutation_group n.
+exact (andER
+  (adjacent_transpositions n c= permutation_group n)
+  (subgroup_generated_by
+    (permutation_group n) (permutation_composition n)
+    (adjacent_transpositions n) = permutation_group n)
+  (god1_s7_theorem3_symmetric_group_generated_by_transpositions n hn)).
+let u.
+assume hu.
+exact (hgenerated_subset u
+  (mem_eq_set_subst
+    (permutation_group n)
+    (subgroup_generated_by
+      (permutation_group n) (permutation_composition n)
+      (adjacent_transpositions n)) u
+    (eq_sym
+      (subgroup_generated_by
+        (permutation_group n) (permutation_composition n)
+        (adjacent_transpositions n))
+      (permutation_group n) hgenerated_eq) hu)).
+Qed.
+
+Theorem god1_abelian_word_product_permutation_invariant :
+  forall G, forall op:set -> set -> set,
+    abelian_group G op -> forall n :e omega,
+    forall u :e permutation_group n, forall f:set -> set,
+    (forall k :e n, f k :e G) ->
+    group_word_product G op (fun k => f (u k)) n
+    = group_word_product G op f n.
+let G op.
+assume hG.
+let n.
+assume hn.
+let u.
+assume hu.
+let f.
+assume hf.
+exact (god1_word_product_preserver_property G op n u
+  ((god1_abelian_word_product_permutation_preserver
+    G op hG n hn) u hu) f hf).
+Qed.
+
+Theorem god1_bounded_bijection_between :
+  forall X Y, forall f:set -> set,
+    bij X Y f ->
+    (fun x :e X => f x) :e Y :^: X
+    /\ bij X Y (fun x => (fun u :e X => f u) x).
+let X Y f.
+assume hf.
+apply andI.
+- exact (lam_Pi X (fun x => Y) f
+    (god1_bijection_maps_into X Y f hf)).
+- apply (bijI X Y (fun x => (fun u :e X => f u) x)).
+  - let x.
+    assume hx.
+    exact (mem_eq_substL Y (f x) ((fun u :e X => f u) x)
+      (beta X f x hx)
+      (god1_bijection_maps_into X Y f hf x hx)).
+  - let x.
+    assume hx.
+    let z.
+    assume hz heq.
+    apply (god1_bijection_injective X Y f hf x hx z hz).
+    exact (eq_i_tra
+      (f x) ((fun u :e X => f u) x)
+      (f z)
+      (eq_sym ((fun u :e X => f u) x) (f x)
+        (beta X f x hx))
+      (eq_i_tra
+        ((fun u :e X => f u) x)
+        ((fun u :e X => f u) z) (f z)
+        heq (beta X f z hz))).
+  - let y.
+    assume hy.
+    apply (exandE_i
+      (fun x => x :e X) (fun x => f x = y)
+      (god1_bijection_surjective X Y f hf y hy)).
+    let x.
+    assume hx heq.
+    apply (ex_intro
+      (fun z => z :e X /\ (fun u :e X => f u) z = y) x).
+    exact (andI
+      (x :e X) ((fun u :e X => f u) x = y) hx
+      (eq_i_tra ((fun u :e X => f u) x) (f x) y
+        (beta X f x hx) heq)).
+Qed.
+
+Theorem god1_bijection_pointwise_congr :
+  forall X Y, forall f g:set -> set,
+    bij X Y f -> (forall x :e X, f x = g x) -> bij X Y g.
+let X Y f g.
+assume hf heq.
+apply (bijI X Y g).
+- let x.
+  assume hx.
+  exact (mem_eq_substL Y (f x) (g x)
+    (eq_sym (f x) (g x) (heq x hx))
+    (god1_bijection_maps_into X Y f hf x hx)).
+- let x.
+  assume hx.
+  let z.
+  assume hz hgz.
+  apply (god1_bijection_injective X Y f hf x hx z hz).
+  exact (eq_i_tra (f x) (g x) (f z)
+    (heq x hx)
+    (eq_i_tra (g x) (g z) (f z) hgz
+      (eq_sym (f z) (g z) (heq z hz)))).
+- let y.
+  assume hy.
+  apply (exandE_i
+    (fun x => x :e X) (fun x => f x = y)
+    (god1_bijection_surjective X Y f hf y hy)).
+  let x.
+  assume hx hxy.
+  apply (ex_intro (fun z => z :e X /\ g z = y) x).
+  exact (andI (x :e X) (g x = y) hx
+    (eq_i_tra (g x) (f x) y
+      (eq_sym (f x) (g x) (heq x hx)) hxy)).
+Qed.
+
+Theorem god1_finite_enumeration_natural_specification :
+  forall n :e omega,
+    finite_enumeration n :e n :^: finite_cardinality n
+    /\ bij (finite_cardinality n) n
+      (fun i => finite_enumeration n i).
+let n.
+assume hn.
+claim hcard : finite_cardinality n = n.
+exact (god1_finite_cardinality_natural n hn).
+claim henum : finite_enumeration n = (fun j :e n => j).
+exact (If_i_1 (n :e omega)
+  (fun j :e n => j)
+  (Eps_i (fun f =>
+    f :e n :^: finite_cardinality n
+    /\ bij (finite_cardinality n) n (fun j => f j))) hn).
+claim hiddata :
+  (fun j :e n => j) :e n :^: n
+  /\ bij n n (fun i => (fun j :e n => j) i).
+exact (god1_bounded_bijection_between n n (fun j => j) (bij_id n)).
+claim hsetexp : n :^: n = n :^: finite_cardinality n.
+exact (f_eq_i (fun q => n :^: q) n (finite_cardinality n)
+  (eq_sym (finite_cardinality n) n hcard)).
+apply andI.
+- exact (mem_eq_substL
+    (n :^: finite_cardinality n)
+    (fun j :e n => j) (finite_enumeration n) henum
+    (mem_eq_set_subst
+      (n :^: n) (n :^: finite_cardinality n)
+      (fun j :e n => j) hsetexp
+      (andEL
+        ((fun j :e n => j) :e n :^: n)
+        (bij n n (fun i => (fun j :e n => j) i)) hiddata))).
+- claim hboundedbij :
+    bij (finite_cardinality n) n
+      (fun i => (fun j :e n => j) i).
+  exact (god1_bij_domain_eq_subst
+    n (finite_cardinality n) n
+    (eq_sym (finite_cardinality n) n hcard)
+    (fun i => (fun j :e n => j) i)
+    (andER
+      ((fun j :e n => j) :e n :^: n)
+      (bij n n (fun i => (fun j :e n => j) i)) hiddata)).
+  apply (god1_bijection_pointwise_congr
+    (finite_cardinality n) n
+    (fun i => (fun j :e n => j) i)
+    (fun i => finite_enumeration n i) hboundedbij).
+  let i.
+  assume hi.
+  exact (eq_sym
+    (finite_enumeration n i) ((fun j :e n => j) i)
+    (f_eq_i (fun q:set => q i)
+      (finite_enumeration n) (fun j :e n => j) henum)).
+Qed.
+
+Theorem god1_finite_enumeration_nonnatural_specification :
+  forall X, finite X -> X /:e omega ->
+    finite_enumeration X :e X :^: finite_cardinality X
+    /\ bij (finite_cardinality X) X
+      (fun i => finite_enumeration X i).
+let X.
+assume hfin hXnotomega.
+claim hspec :
+  finite_cardinality X :e omega
+  /\ equip X (finite_cardinality X).
+exact (god1_finite_cardinality_specification X hfin).
+claim hexists :
+  exists q,
+    q :e X :^: finite_cardinality X
+    /\ bij (finite_cardinality X) X (fun i => q i).
+apply (andER
+  (finite_cardinality X :e omega)
+  (equip X (finite_cardinality X)) hspec).
+let f.
+assume hf.
+claim hinv :
+  bij (finite_cardinality X) X (inv X f).
+exact (bij_inv X (finite_cardinality X) f hf).
+claim hbounded :
+  (fun i :e finite_cardinality X => inv X f i)
+    :e X :^: finite_cardinality X
+  /\ bij (finite_cardinality X) X
+    (fun i => (fun j :e finite_cardinality X => inv X f j) i).
+exact (god1_bounded_bijection_between
+  (finite_cardinality X) X (inv X f) hinv).
+exact (ex_intro
+  (fun q => q :e X :^: finite_cardinality X
+    /\ bij (finite_cardinality X) X (fun i => q i))
+  (fun i :e finite_cardinality X => inv X f i) hbounded).
+claim heps :
+  Eps_i (fun q =>
+    q :e X :^: finite_cardinality X
+    /\ bij (finite_cardinality X) X (fun i => q i))
+    :e X :^: finite_cardinality X
+  /\ bij (finite_cardinality X) X
+    (fun i => Eps_i (fun q =>
+      q :e X :^: finite_cardinality X
+      /\ bij (finite_cardinality X) X (fun j => q j)) i).
+exact (Eps_i_ex
+  (fun q => q :e X :^: finite_cardinality X
+    /\ bij (finite_cardinality X) X (fun i => q i)) hexists).
+claim henum :
+  finite_enumeration X = Eps_i (fun q =>
+    q :e X :^: finite_cardinality X
+    /\ bij (finite_cardinality X) X (fun i => q i)).
+exact (If_i_0 (X :e omega)
+  (fun i :e X => i)
+  (Eps_i (fun q =>
+    q :e X :^: finite_cardinality X
+    /\ bij (finite_cardinality X) X (fun i => q i))) hXnotomega).
+apply andI.
+- exact (mem_eq_substL
+    (X :^: finite_cardinality X)
+    (Eps_i (fun q =>
+      q :e X :^: finite_cardinality X
+      /\ bij (finite_cardinality X) X (fun i => q i)))
+    (finite_enumeration X) henum
+    (andEL
+      (Eps_i (fun q =>
+        q :e X :^: finite_cardinality X
+        /\ bij (finite_cardinality X) X (fun i => q i))
+        :e X :^: finite_cardinality X)
+      (bij (finite_cardinality X) X
+        (fun i => Eps_i (fun q =>
+          q :e X :^: finite_cardinality X
+          /\ bij (finite_cardinality X) X (fun j => q j)) i)) heps)).
+- apply (god1_bijection_pointwise_congr
+    (finite_cardinality X) X
+    (fun i => Eps_i (fun q =>
+      q :e X :^: finite_cardinality X
+      /\ bij (finite_cardinality X) X (fun j => q j)) i)
+    (fun i => finite_enumeration X i)
+    (andER
+      (Eps_i (fun q =>
+        q :e X :^: finite_cardinality X
+        /\ bij (finite_cardinality X) X (fun i => q i))
+        :e X :^: finite_cardinality X)
+      (bij (finite_cardinality X) X
+        (fun i => Eps_i (fun q =>
+          q :e X :^: finite_cardinality X
+          /\ bij (finite_cardinality X) X (fun j => q j)) i)) heps)).
+  let i.
+  assume hi.
+  exact (eq_sym
+    (finite_enumeration X i)
+    (Eps_i (fun q =>
+      q :e X :^: finite_cardinality X
+      /\ bij (finite_cardinality X) X (fun j => q j)) i)
+    (f_eq_i (fun q:set => q i)
+      (finite_enumeration X)
+      (Eps_i (fun q =>
+        q :e X :^: finite_cardinality X
+        /\ bij (finite_cardinality X) X (fun j => q j))) henum)).
+Qed.
+
+Theorem god1_finite_enumeration_specification :
+  forall X, finite X ->
+    finite_enumeration X :e X :^: finite_cardinality X
+    /\ bij (finite_cardinality X) X
+      (fun i => finite_enumeration X i).
+let X.
+assume hfin.
+exact (orE
+  (X :e omega) (X /:e omega) (xm (X :e omega))
+  (finite_enumeration X :e X :^: finite_cardinality X
+    /\ bij (finite_cardinality X) X
+      (fun i => finite_enumeration X i))
+  (god1_finite_enumeration_natural_specification X)
+  (god1_finite_enumeration_nonnatural_specification X hfin)).
+Qed.
+
+Theorem god1_finite_cardinality_equip_eq :
+  forall X Y, finite X -> finite Y -> equip X Y ->
+    finite_cardinality X = finite_cardinality Y.
+let X Y.
+assume hfinX hfinY heXY.
+claim hspecX :
+  finite_cardinality X :e omega
+  /\ equip X (finite_cardinality X).
+exact (god1_finite_cardinality_specification X hfinX).
+claim hspecY :
+  finite_cardinality Y :e omega
+  /\ equip Y (finite_cardinality Y).
+exact (god1_finite_cardinality_specification Y hfinY).
+claim hecards : equip (finite_cardinality X) (finite_cardinality Y).
+exact (equip_tra
+  (finite_cardinality X) Y (finite_cardinality Y)
+  (equip_tra
+    (finite_cardinality X) X Y
+    (equip_sym X (finite_cardinality X)
+      (andER
+        (finite_cardinality X :e omega)
+        (equip X (finite_cardinality X)) hspecX))
+    heXY)
+  (andER
+    (finite_cardinality Y :e omega)
+    (equip Y (finite_cardinality Y)) hspecY)).
+exact (god1_nat_equip_eq
+  (finite_cardinality X) (finite_cardinality Y)
+  (omega_nat_p (finite_cardinality X)
+    (andEL
+      (finite_cardinality X :e omega)
+      (equip X (finite_cardinality X)) hspecX))
+  (omega_nat_p (finite_cardinality Y)
+    (andEL
+      (finite_cardinality Y :e omega)
+      (equip Y (finite_cardinality Y)) hspecY))
+  hecards).
+Qed.
+
+Theorem god1_ring_finite_sum_bijection_invariant :
+  forall G, forall op:set -> set -> set,
+    abelian_group G op -> forall X Y,
+    finite X -> finite Y -> forall phi:set -> set,
+    bij X Y phi -> forall f:set -> set,
+    (forall y :e Y, f y :e G) ->
+    ring_finite_sum G op Y f
+    = ring_finite_sum G op X (fun x => f (phi x)).
+let G op.
+assume hG.
+let X Y.
+assume hfinX hfinY.
+let phi.
+assume hphi.
+let f.
+assume hf.
+claim hcard : finite_cardinality X = finite_cardinality Y.
+exact (god1_finite_cardinality_equip_eq X Y hfinX hfinY
+  (ex_intro_setfun (fun q => bij X Y q) phi hphi)).
+claim hcardXomega : finite_cardinality X :e omega.
+exact (andEL
+  (finite_cardinality X :e omega)
+  (equip X (finite_cardinality X))
+  (god1_finite_cardinality_specification X hfinX)).
+claim henumX :
+  bij (finite_cardinality X) X
+    (fun i => finite_enumeration X i).
+exact (andER
+  (finite_enumeration X :e X :^: finite_cardinality X)
+  (bij (finite_cardinality X) X
+    (fun i => finite_enumeration X i))
+  (god1_finite_enumeration_specification X hfinX)).
+claim henumYraw :
+  bij (finite_cardinality Y) Y
+    (fun i => finite_enumeration Y i).
+exact (andER
+  (finite_enumeration Y :e Y :^: finite_cardinality Y)
+  (bij (finite_cardinality Y) Y
+    (fun i => finite_enumeration Y i))
+  (god1_finite_enumeration_specification Y hfinY)).
+claim henumY :
+  bij (finite_cardinality X) Y
+    (fun i => finite_enumeration Y i).
+exact (god1_bij_domain_eq_subst
+  (finite_cardinality Y) (finite_cardinality X) Y
+  (eq_sym (finite_cardinality X) (finite_cardinality Y) hcard)
+  (fun i => finite_enumeration Y i) henumYraw).
+claim hrawperm :
+  bij (finite_cardinality X) (finite_cardinality X)
+    (fun i => inv (finite_cardinality X)
+      (fun j => finite_enumeration Y j)
+      (phi (finite_enumeration X i))).
+exact (bij_comp
+  (finite_cardinality X) Y (finite_cardinality X)
+  (fun i => phi (finite_enumeration X i))
+  (inv (finite_cardinality X) (fun j => finite_enumeration Y j))
+  (bij_comp
+    (finite_cardinality X) X Y
+    (fun i => finite_enumeration X i) phi henumX hphi)
+  (bij_inv
+    (finite_cardinality X) Y
+    (fun j => finite_enumeration Y j) henumY)).
+claim hboundedperm :
+  (fun i :e finite_cardinality X =>
+    inv (finite_cardinality X)
+      (fun j => finite_enumeration Y j)
+      (phi (finite_enumeration X i)))
+    :e finite_cardinality X :^: finite_cardinality X
+  /\ bij (finite_cardinality X) (finite_cardinality X)
+    (fun i =>
+      (fun k :e finite_cardinality X =>
+        inv (finite_cardinality X)
+          (fun j => finite_enumeration Y j)
+          (phi (finite_enumeration X k))) i).
+exact (god1_bounded_bijection_between
+  (finite_cardinality X) (finite_cardinality X)
+  (fun i => inv (finite_cardinality X)
+    (fun j => finite_enumeration Y j)
+    (phi (finite_enumeration X i))) hrawperm).
+claim hperm :
+  (fun i :e finite_cardinality X =>
+    inv (finite_cardinality X)
+      (fun j => finite_enumeration Y j)
+      (phi (finite_enumeration X i)))
+  :e permutation_group (finite_cardinality X).
+exact (god1_permutation_group_intro
+  (finite_cardinality X)
+  (fun i :e finite_cardinality X =>
+    inv (finite_cardinality X)
+      (fun j => finite_enumeration Y j)
+      (phi (finite_enumeration X i)))
+  (andEL
+    ((fun i :e finite_cardinality X =>
+      inv (finite_cardinality X)
+        (fun j => finite_enumeration Y j)
+        (phi (finite_enumeration X i)))
+      :e finite_cardinality X :^: finite_cardinality X)
+    (bij (finite_cardinality X) (finite_cardinality X)
+      (fun i =>
+        (fun k :e finite_cardinality X =>
+          inv (finite_cardinality X)
+            (fun j => finite_enumeration Y j)
+            (phi (finite_enumeration X k))) i)) hboundedperm)
+  (andER
+    ((fun i :e finite_cardinality X =>
+      inv (finite_cardinality X)
+        (fun j => finite_enumeration Y j)
+        (phi (finite_enumeration X i)))
+      :e finite_cardinality X :^: finite_cardinality X)
+    (bij (finite_cardinality X) (finite_cardinality X)
+      (fun i =>
+        (fun k :e finite_cardinality X =>
+          inv (finite_cardinality X)
+            (fun j => finite_enumeration Y j)
+            (phi (finite_enumeration X k))) i)) hboundedperm)).
+claim hbasein : forall i :e finite_cardinality X,
+  f (finite_enumeration Y i) :e G.
+let i.
+assume hi.
+exact (hf (finite_enumeration Y i)
+  (god1_bijection_maps_into
+    (finite_cardinality X) Y
+    (fun j => finite_enumeration Y j) henumY i hi)).
+claim hinvariant :
+  group_word_product G op
+    (fun i => f (finite_enumeration Y
+      ((fun k :e finite_cardinality X =>
+        inv (finite_cardinality X)
+          (fun j => finite_enumeration Y j)
+          (phi (finite_enumeration X k))) i)))
+    (finite_cardinality X)
+  = group_word_product G op
+    (fun i => f (finite_enumeration Y i))
+    (finite_cardinality X).
+exact (god1_abelian_word_product_permutation_invariant
+  G op hG (finite_cardinality X) hcardXomega
+  (fun k :e finite_cardinality X =>
+    inv (finite_cardinality X)
+      (fun j => finite_enumeration Y j)
+      (phi (finite_enumeration X k))) hperm
+  (fun i => f (finite_enumeration Y i)) hbasein).
+claim hindices : forall i :e finite_cardinality X,
+  finite_enumeration Y
+    ((fun k :e finite_cardinality X =>
+      inv (finite_cardinality X)
+        (fun j => finite_enumeration Y j)
+        (phi (finite_enumeration X k))) i)
+  = phi (finite_enumeration X i).
+let i.
+assume hi.
+claim htarget : phi (finite_enumeration X i) :e Y.
+exact (god1_bijection_maps_into X Y phi hphi
+  (finite_enumeration X i)
+  (god1_bijection_maps_into
+    (finite_cardinality X) X
+    (fun j => finite_enumeration X j) henumX i hi)).
+claim hrinv :
+  finite_enumeration Y
+    (inv (finite_cardinality X)
+      (fun j => finite_enumeration Y j)
+      (phi (finite_enumeration X i)))
+  = phi (finite_enumeration X i).
+exact (andER
+  (inv (finite_cardinality X)
+    (fun j => finite_enumeration Y j)
+    (phi (finite_enumeration X i)) :e finite_cardinality X)
+  (finite_enumeration Y
+    (inv (finite_cardinality X)
+      (fun j => finite_enumeration Y j)
+      (phi (finite_enumeration X i)))
+    = phi (finite_enumeration X i))
+  (surj_rinv
+    (finite_cardinality X) Y
+    (fun j => finite_enumeration Y j)
+    (god1_bijection_surjective
+      (finite_cardinality X) Y
+      (fun j => finite_enumeration Y j) henumY)
+    (phi (finite_enumeration X i)) htarget)).
+exact (eq_i_tra
+  (finite_enumeration Y
+    ((fun k :e finite_cardinality X =>
+      inv (finite_cardinality X)
+        (fun j => finite_enumeration Y j)
+        (phi (finite_enumeration X k))) i))
+  (finite_enumeration Y
+    (inv (finite_cardinality X)
+      (fun j => finite_enumeration Y j)
+      (phi (finite_enumeration X i))))
+  (phi (finite_enumeration X i))
+  (f_eq_i (fun z => finite_enumeration Y z)
+    ((fun k :e finite_cardinality X =>
+      inv (finite_cardinality X)
+        (fun j => finite_enumeration Y j)
+        (phi (finite_enumeration X k))) i)
+    (inv (finite_cardinality X)
+      (fun j => finite_enumeration Y j)
+      (phi (finite_enumeration X i)))
+    (beta (finite_cardinality X)
+      (fun k => inv (finite_cardinality X)
+        (fun j => finite_enumeration Y j)
+        (phi (finite_enumeration X k))) i hi))
+  hrinv).
+claim hwords :
+  group_word_product G op
+    (fun i => f (finite_enumeration Y
+      ((fun k :e finite_cardinality X =>
+        inv (finite_cardinality X)
+          (fun j => finite_enumeration Y j)
+          (phi (finite_enumeration X k))) i)))
+    (finite_cardinality X)
+  = group_word_product G op
+    (fun i => f (phi (finite_enumeration X i)))
+    (finite_cardinality X).
+exact (god1_group_word_product_congr G op
+  (fun i => f (finite_enumeration Y
+    ((fun k :e finite_cardinality X =>
+      inv (finite_cardinality X)
+        (fun j => finite_enumeration Y j)
+        (phi (finite_enumeration X k))) i)))
+  (fun i => f (phi (finite_enumeration X i)))
+  (finite_cardinality X) (omega_nat_p
+    (finite_cardinality X) hcardXomega)
+  (fun i hi => f_eq_i f
+    (finite_enumeration Y
+      ((fun k :e finite_cardinality X =>
+        inv (finite_cardinality X)
+          (fun j => finite_enumeration Y j)
+          (phi (finite_enumeration X k))) i))
+    (phi (finite_enumeration X i)) (hindices i hi))).
+claim hlength :
+  group_word_product G op
+    (fun i => f (finite_enumeration Y i))
+    (finite_cardinality Y)
+  = group_word_product G op
+    (fun i => f (finite_enumeration Y i))
+    (finite_cardinality X).
+exact (f_eq_i
+  (fun q => group_word_product G op
+    (fun i => f (finite_enumeration Y i)) q)
+  (finite_cardinality Y) (finite_cardinality X)
+  (eq_sym (finite_cardinality X) (finite_cardinality Y) hcard)).
+exact (eq_i_tra
+  (ring_finite_sum G op Y f)
+  (group_word_product G op
+    (fun i => f (finite_enumeration Y i))
+    (finite_cardinality X))
+  (ring_finite_sum G op X (fun x => f (phi x)))
+  hlength
+  (eq_i_tra
+    (group_word_product G op
+      (fun i => f (finite_enumeration Y i))
+      (finite_cardinality X))
+    (group_word_product G op
+      (fun i => f (finite_enumeration Y
+        ((fun k :e finite_cardinality X =>
+          inv (finite_cardinality X)
+            (fun j => finite_enumeration Y j)
+            (phi (finite_enumeration X k))) i)))
+      (finite_cardinality X))
+    (ring_finite_sum G op X (fun x => f (phi x)))
+    (eq_sym
+      (group_word_product G op
+        (fun i => f (finite_enumeration Y
+          ((fun k :e finite_cardinality X =>
+            inv (finite_cardinality X)
+              (fun j => finite_enumeration Y j)
+              (phi (finite_enumeration X k))) i)))
+        (finite_cardinality X))
+      (group_word_product G op
+        (fun i => f (finite_enumeration Y i))
+        (finite_cardinality X)) hinvariant)
+  hwords)).
+Qed.
+
+Definition god1_ring_word_product :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  (set -> set) -> set -> set :=
+  fun K add mul f n =>
+    nat_primrec (ring_one K mul) (fun i r => mul r (f i)) n.
+
+Theorem god1_ring_word_product_zero :
+  forall K, forall add mul:set -> set -> set, forall f:set -> set,
+    god1_ring_word_product K add mul f 0 = ring_one K mul.
+let K add mul f.
+exact (nat_primrec_0
+  (ring_one K mul) (fun i r => mul r (f i))).
+Qed.
+
+Theorem god1_ring_word_product_successor :
+  forall K, forall add mul:set -> set -> set,
+  forall f:set -> set, forall n,
+    nat_p n ->
+    god1_ring_word_product K add mul f (ordsucc n)
+    = mul (god1_ring_word_product K add mul f n) (f n).
+let K add mul f n.
+assume hn.
+exact (nat_primrec_S
+  (ring_one K mul) (fun i r => mul r (f i)) n hn).
+Qed.
+
+Theorem god1_ring_word_product_congr :
+  forall K, forall add mul:set -> set -> set,
+  forall f g:set -> set, forall n,
+    nat_p n -> (forall i :e n, f i = g i) ->
+    god1_ring_word_product K add mul f n
+    = god1_ring_word_product K add mul g n.
+let K add mul f g n.
+assume hn hfg.
+exact (nat_ind
+  (fun p =>
+    (forall i :e p, f i = g i) ->
+    god1_ring_word_product K add mul f p
+    = god1_ring_word_product K add mul g p)
+  (fun hzero => eq_i_tra
+    (god1_ring_word_product K add mul f 0)
+    (ring_one K mul)
+    (god1_ring_word_product K add mul g 0)
+    (god1_ring_word_product_zero K add mul f)
+    (eq_sym
+      (god1_ring_word_product K add mul g 0)
+      (ring_one K mul)
+      (god1_ring_word_product_zero K add mul g)))
+  (fun p hp hind hstep =>
+    eq_i_tra
+      (god1_ring_word_product K add mul f (ordsucc p))
+      (mul (god1_ring_word_product K add mul f p) (f p))
+      (god1_ring_word_product K add mul g (ordsucc p))
+      (god1_ring_word_product_successor K add mul f p hp)
+      (eq_i_tra
+        (mul (god1_ring_word_product K add mul f p) (f p))
+        (mul (god1_ring_word_product K add mul g p) (g p))
+        (god1_ring_word_product K add mul g (ordsucc p))
+        (eq_i_tra
+          (mul (god1_ring_word_product K add mul f p) (f p))
+          (mul (god1_ring_word_product K add mul g p) (f p))
+          (mul (god1_ring_word_product K add mul g p) (g p))
+          (f_eq_i (fun z => mul z (f p))
+            (god1_ring_word_product K add mul f p)
+            (god1_ring_word_product K add mul g p)
+            (hind (fun i hi => hstep i (ordsuccI1 p i hi))))
+          (f_eq_i (fun z => mul
+              (god1_ring_word_product K add mul g p) z)
+            (f p) (g p) (hstep p (ordsuccI2 p))))
+        (eq_sym
+          (god1_ring_word_product K add mul g (ordsucc p))
+          (mul (god1_ring_word_product K add mul g p) (g p))
+          (god1_ring_word_product_successor K add mul g p hp))))
+  n hn hfg).
+Qed.
+
+Theorem god1_ring_word_product_in :
+  forall K, forall add mul:set -> set -> set,
+    ring K add mul -> forall f:set -> set, forall n :e omega,
+    (forall i :e n, f i :e K) ->
+    god1_ring_word_product K add mul f n :e K.
+let K add mul.
+assume hK.
+let f.
+let n.
+assume hn hf.
+claim hone : ring_one K mul :e K.
+exact (andEL
+  (ring_one K mul :e K)
+  (forall z :e K,
+    mul z (ring_one K mul) = z /\ mul (ring_one K mul) z = z)
+  (god1_ring_multiplicative_identity_specification K add mul hK)).
+exact (nat_ind
+  (fun p =>
+    (forall i :e p, f i :e K) ->
+    god1_ring_word_product K add mul f p :e K)
+  (fun hzero => mem_eq_substL K
+    (ring_one K mul) (god1_ring_word_product K add mul f 0)
+    (god1_ring_word_product_zero K add mul f) hone)
+  (fun p hp hind hstep =>
+    mem_eq_substL K
+      (mul (god1_ring_word_product K add mul f p) (f p))
+      (god1_ring_word_product K add mul f (ordsucc p))
+      (god1_ring_word_product_successor K add mul f p hp)
+      (god1_ring_multiplicative_law K add mul hK
+        (god1_ring_word_product K add mul f p)
+        (hind (fun i hi => hstep i (ordsuccI1 p i hi)))
+        (f p) (hstep p (ordsuccI2 p))))
+  n (omega_nat_p n hn) hf).
+Qed.
+
+Theorem god1_ring_word_product_adjacent_swap_end :
+  forall K, forall add mul:set -> set -> set,
+    commutative_ring K add mul -> forall i,
+    nat_p i -> forall f:set -> set,
+    (forall k :e ordsucc (ordsucc i), f k :e K) ->
+    god1_ring_word_product K add mul
+      (fun k => f (permutation_swap
+        (ordsucc (ordsucc i)) i (ordsucc i) k))
+      (ordsucc (ordsucc i))
+    = god1_ring_word_product K add mul f (ordsucc (ordsucc i)).
+let K add mul.
+assume hK.
+let i.
+assume hi.
+let f.
+assume hf.
+claim hring : ring K add mul.
+exact (andEL (ring K add mul) (commutative_on K mul) hK).
+claim hcomm : commutative_on K mul.
+exact (andER (ring K add mul) (commutative_on K mul) hK).
+claim hprefix :
+  god1_ring_word_product K add mul
+    (fun k => f (permutation_swap
+      (ordsucc (ordsucc i)) i (ordsucc i) k)) i
+  = god1_ring_word_product K add mul f i.
+apply (god1_ring_word_product_congr K add mul
+  (fun k => f (permutation_swap
+    (ordsucc (ordsucc i)) i (ordsucc i) k)) f i hi).
+let k.
+assume hk.
+claim hki : k <> i.
+assume hki.
+exact (In_irref i (mem_eq_substR i k i hki hk)).
+claim hksucc : k <> ordsucc i.
+assume hksucc.
+exact (In_no2cycle i (ordsucc i) (ordsuccI2 i)
+  (mem_eq_substR i k (ordsucc i) hksucc hk)).
+exact (f_eq_i f
+  (permutation_swap (ordsucc (ordsucc i)) i (ordsucc i) k) k
+  (god1_permutation_swap_at_other
+    (ordsucc (ordsucc i)) i (ordsucc i) k
+    (ordsuccI1 (ordsucc i) k (ordsuccI1 i k hk)) hki hksucc)).
+claim hprefixIn : god1_ring_word_product K add mul f i :e K.
+exact (god1_ring_word_product_in K add mul hring f i
+  (nat_p_omega i hi)
+  (fun k hk => hf k
+    (ordsuccI1 (ordsucc i) k (ordsuccI1 i k hk)))).
+claim hfi : f i :e K.
+exact (hf i (ordsuccI1 (ordsucc i) i (ordsuccI2 i))).
+claim hfsucc : f (ordsucc i) :e K.
+exact (hf (ordsucc i) (ordsuccI2 (ordsucc i))).
+apply (eq_i_tra
+  (god1_ring_word_product K add mul
+    (fun k => f (permutation_swap
+      (ordsucc (ordsucc i)) i (ordsucc i) k))
+    (ordsucc (ordsucc i)))
+  (mul
+    (mul (god1_ring_word_product K add mul f i) (f (ordsucc i)))
+    (f i))
+  (god1_ring_word_product K add mul f (ordsucc (ordsucc i)))).
+- apply (eq_i_tra
+    (god1_ring_word_product K add mul
+      (fun k => f (permutation_swap
+        (ordsucc (ordsucc i)) i (ordsucc i) k))
+      (ordsucc (ordsucc i)))
+    (mul
+      (god1_ring_word_product K add mul
+        (fun k => f (permutation_swap
+          (ordsucc (ordsucc i)) i (ordsucc i) k))
+        (ordsucc i))
+      (f i))
+    (mul
+      (mul (god1_ring_word_product K add mul f i) (f (ordsucc i)))
+      (f i))).
+  - apply (eq_i_tra
+      (god1_ring_word_product K add mul
+        (fun k => f (permutation_swap
+          (ordsucc (ordsucc i)) i (ordsucc i) k))
+        (ordsucc (ordsucc i)))
+      (mul
+        (god1_ring_word_product K add mul
+          (fun k => f (permutation_swap
+            (ordsucc (ordsucc i)) i (ordsucc i) k))
+          (ordsucc i))
+        (f (permutation_swap
+          (ordsucc (ordsucc i)) i (ordsucc i) (ordsucc i))))
+      (mul
+        (god1_ring_word_product K add mul
+          (fun k => f (permutation_swap
+            (ordsucc (ordsucc i)) i (ordsucc i) k))
+          (ordsucc i))
+        (f i))).
+    - exact (god1_ring_word_product_successor K add mul
+        (fun k => f (permutation_swap
+          (ordsucc (ordsucc i)) i (ordsucc i) k))
+        (ordsucc i) (nat_ordsucc i hi)).
+    - f_equal.
+      exact (f_eq_i f
+        (permutation_swap
+          (ordsucc (ordsucc i)) i (ordsucc i) (ordsucc i)) i
+        (god1_permutation_swap_at_right
+          (ordsucc (ordsucc i)) i (ordsucc i)
+          (ordsuccI1 (ordsucc i) i (ordsuccI2 i))
+          (ordsuccI2 (ordsucc i)))).
+  - f_equal.
+    apply (eq_i_tra
+      (god1_ring_word_product K add mul
+        (fun k => f (permutation_swap
+          (ordsucc (ordsucc i)) i (ordsucc i) k))
+        (ordsucc i))
+      (mul
+        (god1_ring_word_product K add mul
+          (fun k => f (permutation_swap
+            (ordsucc (ordsucc i)) i (ordsucc i) k)) i)
+        (f (ordsucc i)))
+      (mul (god1_ring_word_product K add mul f i) (f (ordsucc i)))).
+    - apply (eq_i_tra
+        (god1_ring_word_product K add mul
+          (fun k => f (permutation_swap
+            (ordsucc (ordsucc i)) i (ordsucc i) k))
+          (ordsucc i))
+        (mul
+          (god1_ring_word_product K add mul
+            (fun k => f (permutation_swap
+              (ordsucc (ordsucc i)) i (ordsucc i) k)) i)
+          (f (permutation_swap
+            (ordsucc (ordsucc i)) i (ordsucc i) i)))
+        (mul
+          (god1_ring_word_product K add mul
+            (fun k => f (permutation_swap
+              (ordsucc (ordsucc i)) i (ordsucc i) k)) i)
+          (f (ordsucc i)))).
+      - exact (god1_ring_word_product_successor K add mul
+          (fun k => f (permutation_swap
+            (ordsucc (ordsucc i)) i (ordsucc i) k)) i hi).
+      - f_equal.
+        exact (f_eq_i f
+          (permutation_swap
+            (ordsucc (ordsucc i)) i (ordsucc i) i) (ordsucc i)
+          (god1_permutation_swap_at_left
+            (ordsucc (ordsucc i)) i (ordsucc i)
+            (ordsuccI1 (ordsucc i) i (ordsuccI2 i)))).
+    - f_equal.
+      exact hprefix.
+- apply (eq_i_tra
+    (mul (mul (god1_ring_word_product K add mul f i) (f (ordsucc i)))
+      (f i))
+    (mul (mul (god1_ring_word_product K add mul f i) (f i))
+      (f (ordsucc i)))
+    (god1_ring_word_product K add mul f (ordsucc (ordsucc i)))).
+  - apply (eq_i_tra
+      (mul (mul (god1_ring_word_product K add mul f i) (f (ordsucc i)))
+        (f i))
+      (mul (god1_ring_word_product K add mul f i)
+        (mul (f (ordsucc i)) (f i)))
+      (mul (mul (god1_ring_word_product K add mul f i) (f i))
+        (f (ordsucc i)))).
+    - exact (eq_sym
+        (mul (god1_ring_word_product K add mul f i)
+          (mul (f (ordsucc i)) (f i)))
+        (mul (mul (god1_ring_word_product K add mul f i) (f (ordsucc i)))
+          (f i))
+        (god1_ring_multiplicative_associative K add mul hring
+          (god1_ring_word_product K add mul f i) hprefixIn
+          (f (ordsucc i)) hfsucc (f i) hfi)).
+    - apply (eq_i_tra
+        (mul (god1_ring_word_product K add mul f i)
+          (mul (f (ordsucc i)) (f i)))
+        (mul (god1_ring_word_product K add mul f i)
+          (mul (f i) (f (ordsucc i))))
+        (mul (mul (god1_ring_word_product K add mul f i) (f i))
+          (f (ordsucc i)))).
+      - f_equal.
+        exact (hcomm (f (ordsucc i)) hfsucc (f i) hfi).
+      - exact (god1_ring_multiplicative_associative K add mul hring
+          (god1_ring_word_product K add mul f i) hprefixIn
+          (f i) hfi (f (ordsucc i)) hfsucc).
+  - apply eq_sym.
+    apply (eq_i_tra
+      (god1_ring_word_product K add mul f (ordsucc (ordsucc i)))
+      (mul (god1_ring_word_product K add mul f (ordsucc i))
+        (f (ordsucc i)))
+      (mul (mul (god1_ring_word_product K add mul f i) (f i))
+        (f (ordsucc i)))).
+    - exact (god1_ring_word_product_successor K add mul f
+        (ordsucc i) (nat_ordsucc i hi)).
+    - f_equal.
+      exact (god1_ring_word_product_successor K add mul f i hi).
+Qed.
+
+Theorem god1_ring_word_product_adjacent_swap_last :
+  forall K, forall add mul:set -> set -> set,
+    commutative_ring K add mul -> forall n i,
+    nat_p i -> ordsucc i = n -> forall f:set -> set,
+    (forall k :e ordsucc n, f k :e K) ->
+    god1_ring_word_product K add mul
+      (fun k => f (permutation_swap (ordsucc n) i (ordsucc i) k))
+      (ordsucc n)
+    = god1_ring_word_product K add mul f (ordsucc n).
+let K add mul.
+assume hK.
+let n i.
+assume hi hin.
+let f.
+assume hf.
+claim hset : ordsucc (ordsucc i) = ordsucc n.
+exact (f_eq_i ordsucc (ordsucc i) n hin).
+claim hfcanon : forall k :e ordsucc (ordsucc i), f k :e K.
+exact (fun k hk => hf k
+  (mem_eq_set_subst (ordsucc (ordsucc i)) (ordsucc n) k hset hk)).
+claim hmaps : forall k :e ordsucc (ordsucc i),
+  permutation_swap (ordsucc n) i (ordsucc i) k
+  = permutation_swap (ordsucc (ordsucc i)) i (ordsucc i) k.
+let k.
+assume hk.
+exact (f_eq_i
+  (fun q => permutation_swap q i (ordsucc i) k)
+  (ordsucc n) (ordsucc (ordsucc i))
+  (eq_sym (ordsucc (ordsucc i)) (ordsucc n) hset)).
+apply (eq_i_tra
+  (god1_ring_word_product K add mul
+    (fun k => f (permutation_swap (ordsucc n) i (ordsucc i) k))
+    (ordsucc n))
+  (god1_ring_word_product K add mul
+    (fun k => f (permutation_swap
+      (ordsucc (ordsucc i)) i (ordsucc i) k))
+    (ordsucc (ordsucc i)))
+  (god1_ring_word_product K add mul f (ordsucc n))).
+- apply (eq_i_tra
+    (god1_ring_word_product K add mul
+      (fun k => f (permutation_swap (ordsucc n) i (ordsucc i) k))
+      (ordsucc n))
+    (god1_ring_word_product K add mul
+      (fun k => f (permutation_swap (ordsucc n) i (ordsucc i) k))
+      (ordsucc (ordsucc i)))
+    (god1_ring_word_product K add mul
+      (fun k => f (permutation_swap
+        (ordsucc (ordsucc i)) i (ordsucc i) k))
+      (ordsucc (ordsucc i)))).
+  - exact (f_eq_i
+      (fun q => god1_ring_word_product K add mul
+        (fun k => f (permutation_swap (ordsucc n) i (ordsucc i) k)) q)
+      (ordsucc n) (ordsucc (ordsucc i))
+      (eq_sym (ordsucc (ordsucc i)) (ordsucc n) hset)).
+  - exact (god1_ring_word_product_congr K add mul
+      (fun k => f (permutation_swap (ordsucc n) i (ordsucc i) k))
+      (fun k => f (permutation_swap
+        (ordsucc (ordsucc i)) i (ordsucc i) k))
+      (ordsucc (ordsucc i))
+      (nat_ordsucc (ordsucc i) (nat_ordsucc i hi))
+      (fun k hk => f_eq_i f
+        (permutation_swap (ordsucc n) i (ordsucc i) k)
+        (permutation_swap (ordsucc (ordsucc i)) i (ordsucc i) k)
+        (hmaps k hk))).
+- exact (eq_i_tra
+    (god1_ring_word_product K add mul
+      (fun k => f (permutation_swap
+        (ordsucc (ordsucc i)) i (ordsucc i) k))
+      (ordsucc (ordsucc i)))
+    (god1_ring_word_product K add mul f (ordsucc (ordsucc i)))
+    (god1_ring_word_product K add mul f (ordsucc n))
+    (god1_ring_word_product_adjacent_swap_end K add mul hK i hi f hfcanon)
+    (f_eq_i (fun q => god1_ring_word_product K add mul f q)
+      (ordsucc (ordsucc i)) (ordsucc n) hset)).
+Qed.
+
+Theorem god1_ring_word_product_adjacent_swap_zero :
+  forall K, forall add mul:set -> set -> set,
+    commutative_ring K add mul -> forall i,
+    nat_p i -> i :e 0 -> ordsucc i :e 0 -> forall f:set -> set,
+    (forall k :e 0, f k :e K) ->
+    god1_ring_word_product K add mul
+      (fun k => f (permutation_swap 0 i (ordsucc i) k)) 0
+    = god1_ring_word_product K add mul f 0.
+let K add mul.
+assume hK.
+let i.
+assume hi hi0 hsucc0.
+let f.
+assume hf.
+exact (FalseE (EmptyE i hi0)
+  (god1_ring_word_product K add mul
+    (fun k => f (permutation_swap 0 i (ordsucc i) k)) 0
+  = god1_ring_word_product K add mul f 0)).
+Qed.
+
+Theorem god1_ring_word_product_adjacent_swap_step :
+  forall K, forall add mul:set -> set -> set,
+    commutative_ring K add mul -> forall n,
+    nat_p n ->
+    (forall i,
+      nat_p i -> i :e n -> ordsucc i :e n -> forall f:set -> set,
+      (forall k :e n, f k :e K) ->
+      god1_ring_word_product K add mul
+        (fun k => f (permutation_swap n i (ordsucc i) k)) n
+      = god1_ring_word_product K add mul f n) ->
+    forall i,
+      nat_p i -> i :e ordsucc n -> ordsucc i :e ordsucc n ->
+      forall f:set -> set,
+      (forall k :e ordsucc n, f k :e K) ->
+      god1_ring_word_product K add mul
+        (fun k => f (permutation_swap
+          (ordsucc n) i (ordsucc i) k)) (ordsucc n)
+      = god1_ring_word_product K add mul f (ordsucc n).
+let K add mul.
+assume hK.
+let n.
+assume hn hind.
+let i.
+assume hi hiN hsuccN.
+let f.
+assume hf.
+apply (orE
+  (ordsucc i :e n) (ordsucc i = n)
+  (ordsuccE n (ordsucc i) hsuccN)
+  (god1_ring_word_product K add mul
+    (fun k => f (permutation_swap (ordsucc n) i (ordsucc i) k))
+    (ordsucc n)
+  = god1_ring_word_product K add mul f (ordsucc n))).
+- assume hsuccPrefix.
+  claim hiPrefix : i :e n.
+  exact (god1_adjacent_predecessor_in_prefix n i hiN hsuccPrefix).
+  claim hmaps : forall k :e n,
+    permutation_swap (ordsucc n) i (ordsucc i) k
+    = permutation_swap n i (ordsucc i) k.
+  exact (god1_adjacent_map_eq_swap n i
+    (fun z => permutation_swap (ordsucc n) i (ordsucc i) z)
+    hiPrefix hsuccPrefix
+    (god1_permutation_swap_at_left
+      (ordsucc n) i (ordsucc i) (ordsuccI1 n i hiPrefix))
+    (god1_permutation_swap_at_right
+      (ordsucc n) i (ordsucc i)
+      (ordsuccI1 n i hiPrefix) (ordsuccI1 n (ordsucc i) hsuccPrefix))
+    (fun k hk hki hksucc =>
+      god1_permutation_swap_at_other
+        (ordsucc n) i (ordsucc i) k
+        (ordsuccI1 n k hk) hki hksucc)).
+  claim hbigsmall :
+    god1_ring_word_product K add mul
+      (fun k => f (permutation_swap (ordsucc n) i (ordsucc i) k)) n
+    = god1_ring_word_product K add mul
+      (fun k => f (permutation_swap n i (ordsucc i) k)) n.
+  exact (god1_ring_word_product_congr K add mul
+    (fun k => f (permutation_swap (ordsucc n) i (ordsucc i) k))
+    (fun k => f (permutation_swap n i (ordsucc i) k))
+    n hn (fun k hk => f_eq_i f
+      (permutation_swap (ordsucc n) i (ordsucc i) k)
+      (permutation_swap n i (ordsucc i) k) (hmaps k hk))).
+  claim hprefix :
+    god1_ring_word_product K add mul
+      (fun k => f (permutation_swap (ordsucc n) i (ordsucc i) k)) n
+    = god1_ring_word_product K add mul f n.
+  exact (eq_i_tra
+    (god1_ring_word_product K add mul
+      (fun k => f (permutation_swap (ordsucc n) i (ordsucc i) k)) n)
+    (god1_ring_word_product K add mul
+      (fun k => f (permutation_swap n i (ordsucc i) k)) n)
+    (god1_ring_word_product K add mul f n)
+    hbigsmall
+    (hind i hi hiPrefix hsuccPrefix f
+      (fun k hk => hf k (ordsuccI1 n k hk)))).
+  claim hni : n <> i.
+  assume hni.
+  exact (In_no2cycle i (ordsucc i) (ordsuccI2 i)
+    (mem_eq_set_subst n i (ordsucc i) hni hsuccPrefix)).
+  claim hnsucc : n <> ordsucc i.
+  assume hnsucc.
+  exact (In_irref (ordsucc i)
+    (mem_eq_set_subst n (ordsucc i) (ordsucc i)
+      hnsucc hsuccPrefix)).
+  claim hlastfix :
+    permutation_swap (ordsucc n) i (ordsucc i) n = n.
+  exact (god1_permutation_swap_at_other
+    (ordsucc n) i (ordsucc i) n (ordsuccI2 n) hni hnsucc).
+  exact (eq_i_tra
+    (god1_ring_word_product K add mul
+      (fun k => f (permutation_swap (ordsucc n) i (ordsucc i) k))
+      (ordsucc n))
+    (mul (god1_ring_word_product K add mul f n) (f n))
+    (god1_ring_word_product K add mul f (ordsucc n))
+    (eq_i_tra
+      (god1_ring_word_product K add mul
+        (fun k => f (permutation_swap (ordsucc n) i (ordsucc i) k))
+        (ordsucc n))
+      (mul
+        (god1_ring_word_product K add mul
+          (fun k => f (permutation_swap (ordsucc n) i (ordsucc i) k)) n)
+        (f (permutation_swap (ordsucc n) i (ordsucc i) n)))
+      (mul (god1_ring_word_product K add mul f n) (f n))
+      (god1_ring_word_product_successor K add mul
+        (fun k => f (permutation_swap (ordsucc n) i (ordsucc i) k))
+        n hn)
+      (eq_i_tra
+        (mul
+          (god1_ring_word_product K add mul
+            (fun k => f (permutation_swap (ordsucc n) i (ordsucc i) k)) n)
+          (f (permutation_swap (ordsucc n) i (ordsucc i) n)))
+        (mul (god1_ring_word_product K add mul f n)
+          (f (permutation_swap (ordsucc n) i (ordsucc i) n)))
+        (mul (god1_ring_word_product K add mul f n) (f n))
+        (f_eq_i
+          (fun z => mul z
+            (f (permutation_swap (ordsucc n) i (ordsucc i) n)))
+          (god1_ring_word_product K add mul
+            (fun k => f (permutation_swap (ordsucc n) i (ordsucc i) k)) n)
+          (god1_ring_word_product K add mul f n) hprefix)
+        (f_eq_i
+          (fun z => mul (god1_ring_word_product K add mul f n) (f z))
+          (permutation_swap (ordsucc n) i (ordsucc i) n) n hlastfix)))
+    (eq_sym
+      (god1_ring_word_product K add mul f (ordsucc n))
+      (mul (god1_ring_word_product K add mul f n) (f n))
+      (god1_ring_word_product_successor K add mul f n hn))).
+- assume hlast.
+  exact (god1_ring_word_product_adjacent_swap_last
+    K add mul hK n i hi hlast f hf).
+Qed.
+
+Theorem god1_ring_word_product_adjacent_swap :
+  forall K, forall add mul:set -> set -> set,
+    commutative_ring K add mul -> forall n :e omega,
+    forall i,
+      nat_p i -> i :e n -> ordsucc i :e n -> forall f:set -> set,
+      (forall k :e n, f k :e K) ->
+      god1_ring_word_product K add mul
+        (fun k => f (permutation_swap n i (ordsucc i) k)) n
+      = god1_ring_word_product K add mul f n.
+let K add mul.
+assume hK.
+let n.
+assume hn.
+let i.
+assume hi hiN hsuccN.
+let f.
+assume hf.
+exact (nat_ind
+  (fun p => forall j,
+    nat_p j -> j :e p -> ordsucc j :e p -> forall g:set -> set,
+    (forall k :e p, g k :e K) ->
+    god1_ring_word_product K add mul
+      (fun k => g (permutation_swap p j (ordsucc j) k)) p
+    = god1_ring_word_product K add mul g p)
+  (god1_ring_word_product_adjacent_swap_zero K add mul hK)
+  (god1_ring_word_product_adjacent_swap_step K add mul hK)
+  n (omega_nat_p n hn) i hi hiN hsuccN f hf).
+Qed.
+
+Theorem god1_ring_word_product_adjacent_transposition :
+  forall K, forall add mul:set -> set -> set,
+    commutative_ring K add mul -> forall n :e omega,
+    forall t :e adjacent_transpositions n, forall f:set -> set,
+    (forall k :e n, f k :e K) ->
+    god1_ring_word_product K add mul (fun k => f (t k)) n
+    = god1_ring_word_product K add mul f n.
+let K add mul.
+assume hK.
+let n.
+assume hn.
+let t.
+assume ht.
+let f.
+assume hf.
+apply (exandE_i
+  (fun i => i :e n)
+  (fun i => ordsucc i :e n
+    /\ t = permutation_swap n i (ordsucc i))
+  (god1_adjacent_transposition_has_swap_index n t
+    (god1_adjacent_transpositions_elim_property n t ht))).
+let i.
+assume hi hdata.
+claim hsucci : ordsucc i :e n.
+exact (andEL
+  (ordsucc i :e n)
+  (t = permutation_swap n i (ordsucc i)) hdata).
+claim hteq : t = permutation_swap n i (ordsucc i).
+exact (andER
+  (ordsucc i :e n)
+  (t = permutation_swap n i (ordsucc i)) hdata).
+exact (eq_i_tra
+  (god1_ring_word_product K add mul (fun k => f (t k)) n)
+  (god1_ring_word_product K add mul
+    (fun k => f (permutation_swap n i (ordsucc i) k)) n)
+  (god1_ring_word_product K add mul f n)
+  (god1_ring_word_product_congr K add mul
+    (fun k => f (t k))
+    (fun k => f (permutation_swap n i (ordsucc i) k))
+    n (omega_nat_p n hn)
+    (fun k hk => f_eq_i f (t k)
+      (permutation_swap n i (ordsucc i) k)
+      (f_eq_i (fun q:set => q k) t
+        (permutation_swap n i (ordsucc i)) hteq)))
+  (god1_ring_word_product_adjacent_swap K add mul hK n hn i
+    (omega_nat_p i (omega_TransSet n hn i hi))
+    hi hsucci f hf)).
+Qed.
+
+Definition god1_ring_word_product_preserving_permutations :
+  set -> (set -> set -> set) -> (set -> set -> set) -> set -> set :=
+  fun K add mul n =>
+    {t :e permutation_group n|
+      forall f:set -> set,
+        (forall k :e n, f k :e K) ->
+        god1_ring_word_product K add mul (fun k => f (t k)) n
+        = god1_ring_word_product K add mul f n}.
+
+Theorem god1_ring_word_product_preserver_subset :
+  forall K, forall add mul:set -> set -> set, forall n,
+    god1_ring_word_product_preserving_permutations K add mul n
+    c= permutation_group n.
+let K add mul n.
+let t.
+assume ht.
+exact (SepE1
+  (permutation_group n)
+  (fun u => forall f:set -> set,
+    (forall k :e n, f k :e K) ->
+    god1_ring_word_product K add mul (fun k => f (u k)) n
+    = god1_ring_word_product K add mul f n) t ht).
+Qed.
+
+Theorem god1_ring_word_product_preserver_property :
+  forall K, forall add mul:set -> set -> set, forall n,
+  forall t :e god1_ring_word_product_preserving_permutations K add mul n,
+  forall f:set -> set,
+    (forall k :e n, f k :e K) ->
+    god1_ring_word_product K add mul (fun k => f (t k)) n
+    = god1_ring_word_product K add mul f n.
+let K add mul n.
+let t.
+assume ht.
+exact (SepE2
+  (permutation_group n)
+  (fun u => forall f:set -> set,
+    (forall k :e n, f k :e K) ->
+    god1_ring_word_product K add mul (fun k => f (u k)) n
+    = god1_ring_word_product K add mul f n) t ht).
+Qed.
+
+Theorem god1_ring_word_product_preserver_identity :
+  forall K, forall add mul:set -> set -> set, forall n :e omega,
+    group_identity (permutation_group n) (permutation_composition n)
+    :e god1_ring_word_product_preserving_permutations K add mul n.
+let K add mul.
+let n.
+assume hn.
+exact (SepI
+  (permutation_group n)
+  (fun t => forall f:set -> set,
+    (forall k :e n, f k :e K) ->
+    god1_ring_word_product K add mul (fun k => f (t k)) n
+    = god1_ring_word_product K add mul f n)
+  (group_identity (permutation_group n) (permutation_composition n))
+  (god1_group_identity_in
+    (permutation_group n) (permutation_composition n)
+    (god1_permutations_form_group n))
+  (fun f hf => god1_ring_word_product_congr K add mul
+    (fun k => f
+      (group_identity
+        (permutation_group n) (permutation_composition n) k))
+    f n (omega_nat_p n hn)
+    (fun k hk => f_eq_i f
+      (group_identity
+        (permutation_group n) (permutation_composition n) k) k
+      (eq_i_tra
+        (group_identity
+          (permutation_group n) (permutation_composition n) k)
+        (permutation_identity n k) k
+        (f_eq_i (fun s:set => s k)
+          (group_identity
+            (permutation_group n) (permutation_composition n))
+          (permutation_identity n)
+          (god1_permutation_group_identity_eq n))
+        (beta n (fun z => z) k hk))))).
+Qed.
+
+Theorem god1_ring_word_product_preserver_product :
+  forall K, forall add mul:set -> set -> set, forall n :e omega,
+  forall u v :e god1_ring_word_product_preserving_permutations K add mul n,
+    permutation_composition n u v
+    :e god1_ring_word_product_preserving_permutations K add mul n.
+let K add mul.
+let n.
+assume hn.
+let u.
+assume hu.
+let v.
+assume hv.
+claim huperm : u :e permutation_group n.
+exact (god1_ring_word_product_preserver_subset K add mul n u hu).
+claim hvperm : v :e permutation_group n.
+exact (god1_ring_word_product_preserver_subset K add mul n v hv).
+exact (SepI
+  (permutation_group n)
+  (fun t => forall f:set -> set,
+    (forall k :e n, f k :e K) ->
+    god1_ring_word_product K add mul (fun k => f (t k)) n
+    = god1_ring_word_product K add mul f n)
+  (permutation_composition n u v)
+  (god1_permutation_composition_in n u huperm v hvperm)
+  (fun f hf =>
+    eq_i_tra
+      (god1_ring_word_product K add mul
+        (fun k => f (permutation_composition n u v k)) n)
+      (god1_ring_word_product K add mul (fun k => f (u (v k))) n)
+      (god1_ring_word_product K add mul f n)
+      (god1_ring_word_product_congr K add mul
+        (fun k => f (permutation_composition n u v k))
+        (fun k => f (u (v k))) n (omega_nat_p n hn)
+        (fun k hk => f_eq_i f
+          (permutation_composition n u v k) (u (v k))
+          (beta n (fun z => u (v z)) k hk)))
+      (eq_i_tra
+        (god1_ring_word_product K add mul (fun k => f (u (v k))) n)
+        (god1_ring_word_product K add mul (fun k => f (u k)) n)
+        (god1_ring_word_product K add mul f n)
+        (god1_ring_word_product_preserver_property K add mul n v hv
+          (fun k => f (u k))
+          (fun k hk => hf (u k)
+            (ap_Pi n (fun z => n) u k
+              (god1_permutation_function_in n u huperm) hk)))
+        (god1_ring_word_product_preserver_property
+          K add mul n u hu f hf)))).
+Qed.
+
+Theorem god1_ring_word_product_inverse_cancel :
+  forall K, forall add mul:set -> set -> set, forall n :e omega,
+  forall u :e permutation_group n, forall f:set -> set,
+    god1_ring_word_product K add mul
+      (fun k => f
+        (group_inverse
+          (permutation_group n) (permutation_composition n) u (u k))) n
+    = god1_ring_word_product K add mul f n.
+let K add mul.
+let n.
+assume hn.
+let u.
+assume hu.
+let f.
+exact (god1_ring_word_product_congr K add mul
+  (fun k => f
+    (group_inverse
+      (permutation_group n) (permutation_composition n) u (u k)))
+  f n (omega_nat_p n hn)
+  (fun k hk => f_eq_i f
+    (group_inverse
+      (permutation_group n) (permutation_composition n) u (u k)) k
+    (god1_permutation_group_inverse_left_eval n u hu k hk))).
+Qed.
+
+Theorem god1_ring_word_product_preserver_inverse_property :
+  forall K, forall add mul:set -> set -> set, forall n :e omega,
+  forall u :e god1_ring_word_product_preserving_permutations K add mul n,
+  forall f:set -> set,
+    (forall k :e n, f k :e K) ->
+    god1_ring_word_product K add mul
+      (fun k => f
+        (group_inverse
+          (permutation_group n) (permutation_composition n) u k)) n
+    = god1_ring_word_product K add mul f n.
+let K add mul.
+let n.
+assume hn.
+let u.
+assume hu.
+let f.
+assume hf.
+claim huperm : u :e permutation_group n.
+exact (god1_ring_word_product_preserver_subset K add mul n u hu).
+claim hinvperm :
+  group_inverse
+    (permutation_group n) (permutation_composition n) u
+  :e permutation_group n.
+exact (god1_group_inverse_in
+  (permutation_group n) (permutation_composition n)
+  (god1_permutations_form_group n) u huperm).
+claim hfinv : forall k :e n,
+  f (group_inverse
+    (permutation_group n) (permutation_composition n) u k) :e K.
+let k.
+assume hk.
+exact (hf
+  (group_inverse
+    (permutation_group n) (permutation_composition n) u k)
+  (ap_Pi n (fun z => n)
+    (group_inverse
+      (permutation_group n) (permutation_composition n) u) k
+    (god1_permutation_function_in n
+      (group_inverse
+        (permutation_group n) (permutation_composition n) u) hinvperm) hk)).
+claim hpreserve :
+  god1_ring_word_product K add mul
+    (fun k => f
+      (group_inverse
+        (permutation_group n) (permutation_composition n) u (u k))) n
+  = god1_ring_word_product K add mul
+    (fun k => f
+      (group_inverse
+        (permutation_group n) (permutation_composition n) u k)) n.
+exact (god1_ring_word_product_preserver_property K add mul n u hu
+  (fun k => f
+    (group_inverse
+      (permutation_group n) (permutation_composition n) u k)) hfinv).
+exact (eq_i_tra
+  (god1_ring_word_product K add mul
+    (fun k => f
+      (group_inverse
+        (permutation_group n) (permutation_composition n) u k)) n)
+  (god1_ring_word_product K add mul
+    (fun k => f
+      (group_inverse
+        (permutation_group n) (permutation_composition n) u (u k))) n)
+  (god1_ring_word_product K add mul f n)
+  (eq_sym
+    (god1_ring_word_product K add mul
+      (fun k => f
+        (group_inverse
+          (permutation_group n) (permutation_composition n) u (u k))) n)
+    (god1_ring_word_product K add mul
+      (fun k => f
+        (group_inverse
+          (permutation_group n) (permutation_composition n) u k)) n)
+    hpreserve)
+  (god1_ring_word_product_inverse_cancel
+    K add mul n hn u huperm f)).
+Qed.
+
+Theorem god1_ring_word_product_preserver_inverse :
+  forall K, forall add mul:set -> set -> set, forall n :e omega,
+  forall u :e god1_ring_word_product_preserving_permutations K add mul n,
+    group_inverse
+      (permutation_group n) (permutation_composition n) u
+    :e god1_ring_word_product_preserving_permutations K add mul n.
+let K add mul.
+let n.
+assume hn.
+let u.
+assume hu.
+claim huperm : u :e permutation_group n.
+exact (god1_ring_word_product_preserver_subset K add mul n u hu).
+claim hinvperm :
+  group_inverse
+    (permutation_group n) (permutation_composition n) u
+  :e permutation_group n.
+exact (god1_group_inverse_in
+  (permutation_group n) (permutation_composition n)
+  (god1_permutations_form_group n) u huperm).
+exact (SepI
+  (permutation_group n)
+  (fun t => forall f:set -> set,
+    (forall k :e n, f k :e K) ->
+    god1_ring_word_product K add mul (fun k => f (t k)) n
+    = god1_ring_word_product K add mul f n)
+  (group_inverse
+    (permutation_group n) (permutation_composition n) u)
+  hinvperm
+  (god1_ring_word_product_preserver_inverse_property
+    K add mul n hn u hu)).
+Qed.
+
+Theorem god1_ring_word_product_preservers_form_subgroup :
+  forall K, forall add mul:set -> set -> set, forall n :e omega,
+    subgroup (permutation_group n) (permutation_composition n)
+      (god1_ring_word_product_preserving_permutations K add mul n).
+let K add mul.
+let n.
+assume hn.
+exact (god1_subgroup_of_identity_product_inverse
+  (permutation_group n) (permutation_composition n)
+  (god1_ring_word_product_preserving_permutations K add mul n)
+  (god1_permutations_form_group n)
+  (god1_ring_word_product_preserver_subset K add mul n)
+  (god1_ring_word_product_preserver_identity K add mul n hn)
+  (god1_ring_word_product_preserver_product K add mul n hn)
+  (god1_ring_word_product_preserver_inverse K add mul n hn)).
+Qed.
+
+Theorem god1_adjacent_transpositions_preserve_ring_word_product :
+  forall K, forall add mul:set -> set -> set,
+    commutative_ring K add mul -> forall n :e omega,
+    adjacent_transpositions n
+    c= god1_ring_word_product_preserving_permutations K add mul n.
+let K add mul.
+assume hK.
+let n.
+assume hn.
+let t.
+assume ht.
+exact (SepI
+  (permutation_group n)
+  (fun u => forall f:set -> set,
+    (forall k :e n, f k :e K) ->
+    god1_ring_word_product K add mul (fun k => f (u k)) n
+    = god1_ring_word_product K add mul f n)
+  t (god1_adjacent_transpositions_elim_member n t ht)
+  (god1_ring_word_product_adjacent_transposition
+    K add mul hK n hn t ht)).
+Qed.
+
+Theorem god1_ring_word_product_permutation_preserver :
+  forall K, forall add mul:set -> set -> set,
+    commutative_ring K add mul -> forall n :e omega,
+    permutation_group n
+    c= god1_ring_word_product_preserving_permutations K add mul n.
+let K add mul.
+assume hK.
+let n.
+assume hn.
+claim hsubgroup :
+  subgroup (permutation_group n) (permutation_composition n)
+    (god1_ring_word_product_preserving_permutations K add mul n).
+exact (god1_ring_word_product_preservers_form_subgroup K add mul n hn).
+claim hpower :
+  god1_ring_word_product_preserving_permutations K add mul n
+  :e Power (permutation_group n).
+exact (PowerI (permutation_group n)
+  (god1_ring_word_product_preserving_permutations K add mul n)
+  (god1_ring_word_product_preserver_subset K add mul n)).
+claim hgenerated_subset :
+  subgroup_generated_by
+    (permutation_group n) (permutation_composition n)
+    (adjacent_transpositions n)
+  c= god1_ring_word_product_preserving_permutations K add mul n.
+exact ((andER
+  (subgroup (permutation_group n) (permutation_composition n)
+    (subgroup_generated_by
+      (permutation_group n) (permutation_composition n)
+      (adjacent_transpositions n))
+    /\ adjacent_transpositions n c= subgroup_generated_by
+      (permutation_group n) (permutation_composition n)
+      (adjacent_transpositions n))
+  (forall H :e Power (permutation_group n),
+    subgroup (permutation_group n) (permutation_composition n) H ->
+    adjacent_transpositions n c= H ->
+    subgroup_generated_by
+      (permutation_group n) (permutation_composition n)
+      (adjacent_transpositions n) c= H)
+  (god1_generated_subgroup_is_smallest
+    (permutation_group n) (permutation_composition n)
+    (adjacent_transpositions n)
+    (god1_permutations_form_group n)
+    (god1_adjacent_transpositions_subset n)))
+  (god1_ring_word_product_preserving_permutations K add mul n)
+  hpower hsubgroup
+  (god1_adjacent_transpositions_preserve_ring_word_product
+    K add mul hK n hn)).
+claim hgenerated_eq :
+  subgroup_generated_by
+    (permutation_group n) (permutation_composition n)
+    (adjacent_transpositions n)
+  = permutation_group n.
+exact (andER
+  (adjacent_transpositions n c= permutation_group n)
+  (subgroup_generated_by
+    (permutation_group n) (permutation_composition n)
+    (adjacent_transpositions n) = permutation_group n)
+  (god1_s7_theorem3_symmetric_group_generated_by_transpositions n hn)).
+let u.
+assume hu.
+exact (hgenerated_subset u
+  (mem_eq_set_subst
+    (permutation_group n)
+    (subgroup_generated_by
+      (permutation_group n) (permutation_composition n)
+      (adjacent_transpositions n)) u
+    (eq_sym
+      (subgroup_generated_by
+        (permutation_group n) (permutation_composition n)
+        (adjacent_transpositions n))
+      (permutation_group n) hgenerated_eq) hu)).
+Qed.
+
+Theorem god1_ring_word_product_permutation_invariant :
+  forall K, forall add mul:set -> set -> set,
+    commutative_ring K add mul -> forall n :e omega,
+    forall u :e permutation_group n, forall f:set -> set,
+    (forall k :e n, f k :e K) ->
+    god1_ring_word_product K add mul (fun k => f (u k)) n
+    = god1_ring_word_product K add mul f n.
+let K add mul.
+assume hK.
+let n.
+assume hn.
+let u.
+assume hu.
+let f.
+assume hf.
+exact (god1_ring_word_product_preserver_property K add mul n u
+  ((god1_ring_word_product_permutation_preserver
+    K add mul hK n hn) u hu) f hf).
+Qed.
+
+Definition god1_induced_enumeration_permutation :
+  set -> set -> (set -> set) -> set :=
+  fun X Y phi =>
+    fun i :e finite_cardinality X =>
+      inv (finite_cardinality X)
+        (fun j => finite_enumeration Y j)
+        (phi (finite_enumeration X i)).
+
+Theorem god1_induced_enumeration_permutation_specification :
+  forall X Y, finite X -> finite Y -> forall phi:set -> set,
+    bij X Y phi ->
+    god1_induced_enumeration_permutation X Y phi
+      :e permutation_group (finite_cardinality X)
+    /\ forall i :e finite_cardinality X,
+      finite_enumeration Y
+        (god1_induced_enumeration_permutation X Y phi i)
+      = phi (finite_enumeration X i).
+let X Y.
+assume hfinX hfinY.
+let phi.
+assume hphi.
+claim hcard : finite_cardinality X = finite_cardinality Y.
+exact (god1_finite_cardinality_equip_eq X Y hfinX hfinY
+  (ex_intro_setfun (fun q => bij X Y q) phi hphi)).
+claim henumX :
+  bij (finite_cardinality X) X
+    (fun i => finite_enumeration X i).
+exact (andER
+  (finite_enumeration X :e X :^: finite_cardinality X)
+  (bij (finite_cardinality X) X
+    (fun i => finite_enumeration X i))
+  (god1_finite_enumeration_specification X hfinX)).
+claim henumYraw :
+  bij (finite_cardinality Y) Y
+    (fun i => finite_enumeration Y i).
+exact (andER
+  (finite_enumeration Y :e Y :^: finite_cardinality Y)
+  (bij (finite_cardinality Y) Y
+    (fun i => finite_enumeration Y i))
+  (god1_finite_enumeration_specification Y hfinY)).
+claim henumY :
+  bij (finite_cardinality X) Y
+    (fun i => finite_enumeration Y i).
+exact (god1_bij_domain_eq_subst
+  (finite_cardinality Y) (finite_cardinality X) Y
+  (eq_sym (finite_cardinality X) (finite_cardinality Y) hcard)
+  (fun i => finite_enumeration Y i) henumYraw).
+claim hrawperm :
+  bij (finite_cardinality X) (finite_cardinality X)
+    (fun i => inv (finite_cardinality X)
+      (fun j => finite_enumeration Y j)
+      (phi (finite_enumeration X i))).
+exact (bij_comp
+  (finite_cardinality X) Y (finite_cardinality X)
+  (fun i => phi (finite_enumeration X i))
+  (inv (finite_cardinality X) (fun j => finite_enumeration Y j))
+  (bij_comp
+    (finite_cardinality X) X Y
+    (fun i => finite_enumeration X i) phi henumX hphi)
+  (bij_inv
+    (finite_cardinality X) Y
+    (fun j => finite_enumeration Y j) henumY)).
+claim hbounded :
+  god1_induced_enumeration_permutation X Y phi
+    :e finite_cardinality X :^: finite_cardinality X
+  /\ bij (finite_cardinality X) (finite_cardinality X)
+    (fun i => god1_induced_enumeration_permutation X Y phi i).
+exact (god1_bounded_bijection_between
+  (finite_cardinality X) (finite_cardinality X)
+  (fun i => inv (finite_cardinality X)
+    (fun j => finite_enumeration Y j)
+    (phi (finite_enumeration X i))) hrawperm).
+apply andI.
+- exact (god1_permutation_group_intro
+    (finite_cardinality X)
+    (god1_induced_enumeration_permutation X Y phi)
+    (andEL
+      (god1_induced_enumeration_permutation X Y phi
+        :e finite_cardinality X :^: finite_cardinality X)
+      (bij (finite_cardinality X) (finite_cardinality X)
+        (fun i => god1_induced_enumeration_permutation X Y phi i))
+      hbounded)
+    (andER
+      (god1_induced_enumeration_permutation X Y phi
+        :e finite_cardinality X :^: finite_cardinality X)
+      (bij (finite_cardinality X) (finite_cardinality X)
+        (fun i => god1_induced_enumeration_permutation X Y phi i))
+      hbounded)).
+- let i.
+  assume hi.
+  claim htarget : phi (finite_enumeration X i) :e Y.
+  exact (god1_bijection_maps_into X Y phi hphi
+    (finite_enumeration X i)
+    (god1_bijection_maps_into
+      (finite_cardinality X) X
+      (fun j => finite_enumeration X j) henumX i hi)).
+  claim hrinv :
+    finite_enumeration Y
+      (inv (finite_cardinality X)
+        (fun j => finite_enumeration Y j)
+        (phi (finite_enumeration X i)))
+    = phi (finite_enumeration X i).
+  exact (andER
+    (inv (finite_cardinality X)
+      (fun j => finite_enumeration Y j)
+      (phi (finite_enumeration X i)) :e finite_cardinality X)
+    (finite_enumeration Y
+      (inv (finite_cardinality X)
+        (fun j => finite_enumeration Y j)
+        (phi (finite_enumeration X i)))
+      = phi (finite_enumeration X i))
+    (surj_rinv
+      (finite_cardinality X) Y
+      (fun j => finite_enumeration Y j)
+      (god1_bijection_surjective
+        (finite_cardinality X) Y
+        (fun j => finite_enumeration Y j) henumY)
+      (phi (finite_enumeration X i)) htarget)).
+  exact (eq_i_tra
+    (finite_enumeration Y
+      (god1_induced_enumeration_permutation X Y phi i))
+    (finite_enumeration Y
+      (inv (finite_cardinality X)
+        (fun j => finite_enumeration Y j)
+        (phi (finite_enumeration X i))))
+    (phi (finite_enumeration X i))
+    (f_eq_i (fun z => finite_enumeration Y z)
+      (god1_induced_enumeration_permutation X Y phi i)
+      (inv (finite_cardinality X)
+        (fun j => finite_enumeration Y j)
+        (phi (finite_enumeration X i)))
+      (beta (finite_cardinality X)
+        (fun k => inv (finite_cardinality X)
+          (fun j => finite_enumeration Y j)
+          (phi (finite_enumeration X k))) i hi))
+    hrinv).
+Qed.
+
+Theorem god1_ring_finite_product_bijection_invariant :
+  forall K, forall add mul:set -> set -> set,
+    commutative_ring K add mul -> forall X Y,
+    finite X -> finite Y -> forall phi:set -> set,
+    bij X Y phi -> forall f:set -> set,
+    (forall y :e Y, f y :e K) ->
+    ring_finite_product K add mul Y f
+    = ring_finite_product K add mul X (fun x => f (phi x)).
+let K add mul.
+assume hK.
+let X Y.
+assume hfinX hfinY.
+let phi.
+assume hphi.
+let f.
+assume hf.
+claim hcard : finite_cardinality X = finite_cardinality Y.
+exact (god1_finite_cardinality_equip_eq X Y hfinX hfinY
+  (ex_intro_setfun (fun q => bij X Y q) phi hphi)).
+claim hcardXomega : finite_cardinality X :e omega.
+exact (andEL
+  (finite_cardinality X :e omega)
+  (equip X (finite_cardinality X))
+  (god1_finite_cardinality_specification X hfinX)).
+claim henumYraw :
+  bij (finite_cardinality Y) Y
+    (fun i => finite_enumeration Y i).
+exact (andER
+  (finite_enumeration Y :e Y :^: finite_cardinality Y)
+  (bij (finite_cardinality Y) Y
+    (fun i => finite_enumeration Y i))
+  (god1_finite_enumeration_specification Y hfinY)).
+claim henumY :
+  bij (finite_cardinality X) Y
+    (fun i => finite_enumeration Y i).
+exact (god1_bij_domain_eq_subst
+  (finite_cardinality Y) (finite_cardinality X) Y
+  (eq_sym (finite_cardinality X) (finite_cardinality Y) hcard)
+  (fun i => finite_enumeration Y i) henumYraw).
+claim hinduced :
+  god1_induced_enumeration_permutation X Y phi
+    :e permutation_group (finite_cardinality X)
+  /\ forall i :e finite_cardinality X,
+    finite_enumeration Y
+      (god1_induced_enumeration_permutation X Y phi i)
+    = phi (finite_enumeration X i).
+exact (god1_induced_enumeration_permutation_specification
+  X Y hfinX hfinY phi hphi).
+claim hbasein : forall i :e finite_cardinality X,
+  f (finite_enumeration Y i) :e K.
+exact (fun i hi => hf (finite_enumeration Y i)
+  (god1_bijection_maps_into
+    (finite_cardinality X) Y
+    (fun j => finite_enumeration Y j) henumY i hi)).
+claim hinvariant :
+  god1_ring_word_product K add mul
+    (fun i => f (finite_enumeration Y
+      (god1_induced_enumeration_permutation X Y phi i)))
+    (finite_cardinality X)
+  = god1_ring_word_product K add mul
+    (fun i => f (finite_enumeration Y i))
+    (finite_cardinality X).
+exact (god1_ring_word_product_permutation_invariant
+  K add mul hK (finite_cardinality X) hcardXomega
+  (god1_induced_enumeration_permutation X Y phi)
+  (andEL
+    (god1_induced_enumeration_permutation X Y phi
+      :e permutation_group (finite_cardinality X))
+    (forall i :e finite_cardinality X,
+      finite_enumeration Y
+        (god1_induced_enumeration_permutation X Y phi i)
+      = phi (finite_enumeration X i)) hinduced)
+  (fun i => f (finite_enumeration Y i)) hbasein).
+claim hwords :
+  god1_ring_word_product K add mul
+    (fun i => f (finite_enumeration Y
+      (god1_induced_enumeration_permutation X Y phi i)))
+    (finite_cardinality X)
+  = god1_ring_word_product K add mul
+    (fun i => f (phi (finite_enumeration X i)))
+    (finite_cardinality X).
+exact (god1_ring_word_product_congr K add mul
+  (fun i => f (finite_enumeration Y
+    (god1_induced_enumeration_permutation X Y phi i)))
+  (fun i => f (phi (finite_enumeration X i)))
+  (finite_cardinality X) (omega_nat_p
+    (finite_cardinality X) hcardXomega)
+  (fun i hi => f_eq_i f
+    (finite_enumeration Y
+      (god1_induced_enumeration_permutation X Y phi i))
+    (phi (finite_enumeration X i))
+    ((andER
+      (god1_induced_enumeration_permutation X Y phi
+        :e permutation_group (finite_cardinality X))
+      (forall j :e finite_cardinality X,
+        finite_enumeration Y
+          (god1_induced_enumeration_permutation X Y phi j)
+        = phi (finite_enumeration X j)) hinduced) i hi))).
+claim hlength :
+  god1_ring_word_product K add mul
+    (fun i => f (finite_enumeration Y i))
+    (finite_cardinality Y)
+  = god1_ring_word_product K add mul
+    (fun i => f (finite_enumeration Y i))
+    (finite_cardinality X).
+exact (f_eq_i
+  (fun q => god1_ring_word_product K add mul
+    (fun i => f (finite_enumeration Y i)) q)
+  (finite_cardinality Y) (finite_cardinality X)
+  (eq_sym (finite_cardinality X) (finite_cardinality Y) hcard)).
+exact (eq_i_tra
+  (ring_finite_product K add mul Y f)
+  (god1_ring_word_product K add mul
+    (fun i => f (finite_enumeration Y i))
+    (finite_cardinality X))
+  (ring_finite_product K add mul X (fun x => f (phi x)))
+  hlength
+  (eq_i_tra
+    (god1_ring_word_product K add mul
+      (fun i => f (finite_enumeration Y i))
+      (finite_cardinality X))
+    (god1_ring_word_product K add mul
+      (fun i => f (finite_enumeration Y
+        (god1_induced_enumeration_permutation X Y phi i)))
+      (finite_cardinality X))
+    (ring_finite_product K add mul X (fun x => f (phi x)))
+    (eq_sym
+      (god1_ring_word_product K add mul
+        (fun i => f (finite_enumeration Y
+          (god1_induced_enumeration_permutation X Y phi i)))
+        (finite_cardinality X))
+      (god1_ring_word_product K add mul
+        (fun i => f (finite_enumeration Y i))
+        (finite_cardinality X)) hinvariant)
+    hwords)).
+Qed.
+
+Theorem god1_group_word_append_bijection :
+  forall n, nat_p n -> forall X, forall f:set -> set,
+    bij n X f -> forall a, a /:e X ->
+    bij (ordsucc n) (X :\/: {a}) (group_word_append n f a).
+let n.
+assume hn.
+let X f.
+assume hf.
+let a.
+assume haX.
+apply (bijI (ordsucc n) (X :\/: {a}) (group_word_append n f a)).
+- let i.
+  assume hi.
+  apply (orE (i :e n) (i = n) (ordsuccE n i hi)
+    (group_word_append n f a i :e X :\/: {a})).
+  - assume hin.
+    exact (mem_eq_substL (X :\/: {a})
+      (f i) (group_word_append n f a i)
+      (god1_group_word_append_in n f a i hin)
+      (binunionI1 X {a} (f i)
+        (god1_bijection_maps_into n X f hf i hin))).
+  - assume hieq.
+    exact (mem_eq_substL (X :\/: {a})
+      a (group_word_append n f a i)
+      (eq_i_tra
+        (group_word_append n f a i)
+        (group_word_append n f a n) a
+        (f_eq_i (group_word_append n f a) i n hieq)
+        (god1_group_word_append_last n hn f a))
+      (binunionI2 X {a} a (SingI a))).
+- let i.
+  assume hi.
+  let j.
+  assume hj heq.
+  apply (orE (i :e n) (i = n) (ordsuccE n i hi) (i = j)).
+  - assume hin.
+    apply (orE (j :e n) (j = n) (ordsuccE n j hj) (i = j)).
+    - assume hjn.
+      apply (god1_bijection_injective n X f hf i hin j hjn).
+      exact (eq_i_tra
+        (f i) (group_word_append n f a i)
+        (f j)
+        (eq_sym
+          (group_word_append n f a i) (f i)
+          (god1_group_word_append_in n f a i hin))
+        (eq_i_tra
+          (group_word_append n f a i)
+          (group_word_append n f a j) (f j)
+          heq (god1_group_word_append_in n f a j hjn))).
+    - assume hjeq.
+      claim hfia : f i = a.
+      exact (eq_i_tra
+        (f i) (group_word_append n f a i)
+        a
+        (eq_sym
+          (group_word_append n f a i) (f i)
+          (god1_group_word_append_in n f a i hin))
+        (eq_i_tra
+          (group_word_append n f a i)
+          (group_word_append n f a j)
+          a
+          heq
+          (eq_i_tra
+            (group_word_append n f a j)
+            (group_word_append n f a n) a
+            (f_eq_i (group_word_append n f a) j n hjeq)
+            (god1_group_word_append_last n hn f a)))).
+      exact (FalseE
+        (haX (mem_eq_substR X (f i) a hfia
+          (god1_bijection_maps_into n X f hf i hin))) (i = j)).
+  - assume hieq.
+    apply (orE (j :e n) (j = n) (ordsuccE n j hj) (i = j)).
+    - assume hjn.
+      claim hafj : a = f j.
+      exact (eq_i_tra
+        a (group_word_append n f a i)
+        (f j)
+        (eq_sym
+          (group_word_append n f a i) a
+          (eq_i_tra
+            (group_word_append n f a i)
+            (group_word_append n f a n) a
+            (f_eq_i (group_word_append n f a) i n hieq)
+            (god1_group_word_append_last n hn f a)))
+        (eq_i_tra
+          (group_word_append n f a i)
+          (group_word_append n f a j) (f j)
+          heq (god1_group_word_append_in n f a j hjn))).
+      exact (FalseE
+        (haX (mem_eq_substL X (f j) a hafj
+          (god1_bijection_maps_into n X f hf j hjn))) (i = j)).
+    - assume hjeq.
+      exact (eq_i_tra i n j hieq (eq_sym j n hjeq)).
+- let z.
+  assume hz.
+  apply (binunionE' X {a} z
+    (exists i :e ordsucc n, group_word_append n f a i = z)).
+  - assume hzX.
+    apply (exandE_i
+      (fun i => i :e n) (fun i => f i = z)
+      (god1_bijection_surjective n X f hf z hzX)).
+    let i.
+    assume hi hiz.
+    apply (ex_intro
+      (fun j => j :e ordsucc n /\ group_word_append n f a j = z) i).
+    exact (andI
+      (i :e ordsucc n) (group_word_append n f a i = z)
+      (ordsuccI1 n i hi)
+      (eq_i_tra (group_word_append n f a i) (f i) z
+        (god1_group_word_append_in n f a i hi) hiz)).
+  - assume hza.
+    apply (ex_intro
+      (fun i => i :e ordsucc n /\ group_word_append n f a i = z) n).
+    exact (andI
+      (n :e ordsucc n) (group_word_append n f a n = z)
+      (ordsuccI2 n)
+      (eq_i_tra (group_word_append n f a n) a z
+        (god1_group_word_append_last n hn f a)
+        (eq_sym z a (SingE a z hza)))).
+  - exact hz.
+Qed.
+
+Theorem god1_ring_finite_product_natural :
+  forall K, forall add mul:set -> set -> set,
+  forall n :e omega, forall f:set -> set,
+    ring_finite_product K add mul n f
+    = god1_ring_word_product K add mul f n.
+let K add mul.
+let n.
+assume hn.
+let f.
+claim hcard : finite_cardinality n = n.
+exact (god1_finite_cardinality_natural n hn).
+apply (eq_i_tra
+  (ring_finite_product K add mul n f)
+  (god1_ring_word_product K add mul
+    (fun i => f (finite_enumeration n i)) n)
+  (god1_ring_word_product K add mul f n)).
+- exact (f_eq_i
+    (fun q => god1_ring_word_product K add mul
+      (fun i => f (finite_enumeration n i)) q)
+    (finite_cardinality n) n hcard).
+- exact (god1_ring_word_product_congr K add mul
+    (fun i => f (finite_enumeration n i)) f n
+    (omega_nat_p n hn)
+    (fun i hi => f_eq_i f (finite_enumeration n i) i
+      (god1_finite_enumeration_natural_eval n hn i hi))).
+Qed.
+
+Theorem god1_ring_finite_product_natural_successor :
+  forall K, forall add mul:set -> set -> set,
+  forall n :e omega, forall f:set -> set,
+    ring_finite_product K add mul (ordsucc n) f
+    = mul (ring_finite_product K add mul n f) (f n).
+let K add mul.
+let n.
+assume hn.
+let f.
+exact (eq_i_tra
+  (ring_finite_product K add mul (ordsucc n) f)
+  (god1_ring_word_product K add mul f (ordsucc n))
+  (mul (ring_finite_product K add mul n f) (f n))
+  (god1_ring_finite_product_natural
+    K add mul (ordsucc n) (omega_ordsucc n hn) f)
+  (eq_i_tra
+    (god1_ring_word_product K add mul f (ordsucc n))
+    (mul (god1_ring_word_product K add mul f n) (f n))
+    (mul (ring_finite_product K add mul n f) (f n))
+    (god1_ring_word_product_successor K add mul f n
+      (omega_nat_p n hn))
+    (f_eq_i (fun z => mul z (f n))
+      (god1_ring_word_product K add mul f n)
+      (ring_finite_product K add mul n f)
+      (eq_sym
+        (ring_finite_product K add mul n f)
+        (god1_ring_word_product K add mul f n)
+        (god1_ring_finite_product_natural K add mul n hn f))))).
+Qed.
+
+Theorem god1_ring_finite_sum_enumerated :
+  forall K, forall add:set -> set -> set, forall X,
+    finite X -> forall f:set -> set,
+    ring_finite_sum K add X f
+    = ring_finite_sum K add (finite_cardinality X)
+      (fun i => f (finite_enumeration X i)).
+let K add X.
+assume hfin.
+let f.
+claim hcardomega : finite_cardinality X :e omega.
+exact (andEL
+  (finite_cardinality X :e omega)
+  (equip X (finite_cardinality X))
+  (god1_finite_cardinality_specification X hfin)).
+exact (eq_sym
+  (ring_finite_sum K add (finite_cardinality X)
+    (fun i => f (finite_enumeration X i)))
+  (ring_finite_sum K add X f)
+  (god1_ring_finite_sum_natural K add
+    (finite_cardinality X) hcardomega
+    (fun i => f (finite_enumeration X i)))).
+Qed.
+
+Theorem god1_ring_finite_product_enumerated :
+  forall K, forall add mul:set -> set -> set, forall X,
+    finite X -> forall f:set -> set,
+    ring_finite_product K add mul X f
+    = ring_finite_product K add mul (finite_cardinality X)
+      (fun i => f (finite_enumeration X i)).
+let K add mul X.
+assume hfin.
+let f.
+claim hcardomega : finite_cardinality X :e omega.
+exact (andEL
+  (finite_cardinality X :e omega)
+  (equip X (finite_cardinality X))
+  (god1_finite_cardinality_specification X hfin)).
+exact (eq_sym
+  (ring_finite_product K add mul (finite_cardinality X)
+    (fun i => f (finite_enumeration X i)))
+  (ring_finite_product K add mul X f)
+  (god1_ring_finite_product_natural K add mul
+    (finite_cardinality X) hcardomega
+    (fun i => f (finite_enumeration X i)))).
+Qed.
+
+Theorem god1_ring_finite_product_congr_natural :
+  forall K, forall add mul:set -> set -> set,
+  forall n :e omega, forall f g:set -> set,
+    (forall i :e n, f i = g i) ->
+    ring_finite_product K add mul n f
+    = ring_finite_product K add mul n g.
+let K add mul.
+let n.
+assume hn.
+let f g.
+assume hfg.
+exact (eq_i_tra
+  (ring_finite_product K add mul n f)
+  (god1_ring_word_product K add mul f n)
+  (ring_finite_product K add mul n g)
+  (god1_ring_finite_product_natural K add mul n hn f)
+  (eq_i_tra
+    (god1_ring_word_product K add mul f n)
+    (god1_ring_word_product K add mul g n)
+    (ring_finite_product K add mul n g)
+    (god1_ring_word_product_congr K add mul f g n
+      (omega_nat_p n hn) hfg)
+    (eq_sym
+      (ring_finite_product K add mul n g)
+      (god1_ring_word_product K add mul g n)
+      (god1_ring_finite_product_natural K add mul n hn g)))).
+Qed.
+
+Theorem god1_ring_finite_product_empty :
+  forall K, forall add mul:set -> set -> set, forall f:set -> set,
+    ring_finite_product K add mul 0 f = ring_one K mul.
+let K add mul f.
+exact (eq_i_tra
+  (ring_finite_product K add mul 0 f)
+  (god1_ring_word_product K add mul f 0)
+  (ring_one K mul)
+  (god1_ring_finite_product_natural K add mul 0
+    (nat_p_omega 0 nat_0) f)
+  (god1_ring_word_product_zero K add mul f)).
+Qed.
+
+Theorem god1_ring_finite_sum_adjoin :
+  forall K, forall add mul:set -> set -> set,
+    ring K add mul -> forall X, finite X -> forall a,
+    a /:e X -> forall f:set -> set,
+    (forall z :e X :\/: {a}, f z :e K) ->
+    ring_finite_sum K add (X :\/: {a}) f
+    = add (ring_finite_sum K add X f) (f a).
+let K add mul.
+assume hK.
+let X.
+assume hfin.
+let a.
+assume haX.
+let f.
+assume hf.
+claim hnomega : finite_cardinality X :e omega.
+exact (andEL
+  (finite_cardinality X :e omega)
+  (equip X (finite_cardinality X))
+  (god1_finite_cardinality_specification X hfin)).
+claim henum :
+  bij (finite_cardinality X) X
+    (fun i => finite_enumeration X i).
+exact (andER
+  (finite_enumeration X :e X :^: finite_cardinality X)
+  (bij (finite_cardinality X) X
+    (fun i => finite_enumeration X i))
+  (god1_finite_enumeration_specification X hfin)).
+claim hphi :
+  bij (ordsucc (finite_cardinality X)) (X :\/: {a})
+    (group_word_append
+      (finite_cardinality X) (fun j => finite_enumeration X j) a).
+exact (god1_group_word_append_bijection
+  (finite_cardinality X)
+  (omega_nat_p (finite_cardinality X) hnomega)
+  X (fun i => finite_enumeration X i) henum a haX).
+claim hprefix :
+  ring_finite_sum K add (finite_cardinality X)
+    (fun i => f (group_word_append
+      (finite_cardinality X) (fun j => finite_enumeration X j) a i))
+  = ring_finite_sum K add X f.
+exact (eq_i_tra
+  (ring_finite_sum K add (finite_cardinality X)
+    (fun i => f (group_word_append
+      (finite_cardinality X) (fun j => finite_enumeration X j) a i)))
+  (ring_finite_sum K add (finite_cardinality X)
+    (fun i => f (finite_enumeration X i)))
+  (ring_finite_sum K add X f)
+  (god1_ring_finite_sum_congr_natural K add
+    (finite_cardinality X) hnomega
+    (fun i => f (group_word_append
+      (finite_cardinality X) (fun j => finite_enumeration X j) a i))
+    (fun i => f (finite_enumeration X i))
+    (fun i hi => f_eq_i f
+      (group_word_append
+        (finite_cardinality X) (fun j => finite_enumeration X j) a i)
+      (finite_enumeration X i)
+      (god1_group_word_append_in
+        (finite_cardinality X) (fun j => finite_enumeration X j) a i hi)))
+  (eq_sym
+    (ring_finite_sum K add X f)
+    (ring_finite_sum K add (finite_cardinality X)
+      (fun i => f (finite_enumeration X i)))
+    (god1_ring_finite_sum_enumerated K add X hfin f))).
+claim hlast :
+  f (group_word_append
+    (finite_cardinality X) (fun j => finite_enumeration X j) a
+    (finite_cardinality X)) = f a.
+exact (f_eq_i f
+  (group_word_append
+    (finite_cardinality X) (fun j => finite_enumeration X j) a
+    (finite_cardinality X)) a
+  (god1_group_word_append_last
+    (finite_cardinality X)
+    (omega_nat_p (finite_cardinality X) hnomega)
+    (fun j => finite_enumeration X j) a)).
+exact (eq_i_tra
+  (ring_finite_sum K add (X :\/: {a}) f)
+  (ring_finite_sum K add (ordsucc (finite_cardinality X))
+    (fun i => f (group_word_append
+      (finite_cardinality X) (fun j => finite_enumeration X j) a i)))
+  (add (ring_finite_sum K add X f) (f a))
+  (god1_ring_finite_sum_bijection_invariant K add
+    (god1_ring_additive_abelian_group K add mul hK)
+    (ordsucc (finite_cardinality X)) (X :\/: {a})
+    (nat_finite (ordsucc (finite_cardinality X))
+      (nat_ordsucc (finite_cardinality X)
+        (omega_nat_p (finite_cardinality X) hnomega)))
+    (adjoin_finite X a hfin)
+    (group_word_append
+      (finite_cardinality X) (fun j => finite_enumeration X j) a)
+    hphi f hf)
+  (eq_i_tra
+    (ring_finite_sum K add (ordsucc (finite_cardinality X))
+      (fun i => f (group_word_append
+        (finite_cardinality X) (fun j => finite_enumeration X j) a i)))
+    (add
+      (ring_finite_sum K add (finite_cardinality X)
+        (fun i => f (group_word_append
+          (finite_cardinality X) (fun j => finite_enumeration X j) a i)))
+      (f (group_word_append
+        (finite_cardinality X) (fun j => finite_enumeration X j) a
+        (finite_cardinality X))))
+    (add (ring_finite_sum K add X f) (f a))
+    (god1_ring_finite_sum_natural_successor K add
+      (finite_cardinality X) hnomega
+      (fun i => f (group_word_append
+        (finite_cardinality X) (fun j => finite_enumeration X j) a i)))
+    (eq_i_tra
+      (add
+        (ring_finite_sum K add (finite_cardinality X)
+          (fun i => f (group_word_append
+            (finite_cardinality X) (fun j => finite_enumeration X j) a i)))
+        (f (group_word_append
+          (finite_cardinality X) (fun j => finite_enumeration X j) a
+          (finite_cardinality X))))
+      (add (ring_finite_sum K add X f)
+        (f (group_word_append
+          (finite_cardinality X) (fun j => finite_enumeration X j) a
+          (finite_cardinality X))))
+      (add (ring_finite_sum K add X f) (f a))
+      (f_eq_i
+        (fun z => add z
+          (f (group_word_append
+            (finite_cardinality X) (fun j => finite_enumeration X j) a
+            (finite_cardinality X))))
+        (ring_finite_sum K add (finite_cardinality X)
+          (fun i => f (group_word_append
+            (finite_cardinality X) (fun j => finite_enumeration X j) a i)))
+        (ring_finite_sum K add X f) hprefix)
+      (f_eq_i (fun z => add (ring_finite_sum K add X f) z)
+        (f (group_word_append
+          (finite_cardinality X) (fun j => finite_enumeration X j) a
+          (finite_cardinality X)))
+        (f a) hlast)))).
+Qed.
+
+Theorem god1_ring_finite_product_adjoin :
+  forall K, forall add mul:set -> set -> set,
+    commutative_ring K add mul -> forall X, finite X -> forall a,
+    a /:e X -> forall f:set -> set,
+    (forall z :e X :\/: {a}, f z :e K) ->
+    ring_finite_product K add mul (X :\/: {a}) f
+    = mul (ring_finite_product K add mul X f) (f a).
+let K add mul.
+assume hK.
+let X.
+assume hfin.
+let a.
+assume haX.
+let f.
+assume hf.
+claim hnomega : finite_cardinality X :e omega.
+exact (andEL
+  (finite_cardinality X :e omega)
+  (equip X (finite_cardinality X))
+  (god1_finite_cardinality_specification X hfin)).
+claim henum :
+  bij (finite_cardinality X) X
+    (fun i => finite_enumeration X i).
+exact (andER
+  (finite_enumeration X :e X :^: finite_cardinality X)
+  (bij (finite_cardinality X) X
+    (fun i => finite_enumeration X i))
+  (god1_finite_enumeration_specification X hfin)).
+claim hphi :
+  bij (ordsucc (finite_cardinality X)) (X :\/: {a})
+    (group_word_append
+      (finite_cardinality X) (fun j => finite_enumeration X j) a).
+exact (god1_group_word_append_bijection
+  (finite_cardinality X)
+  (omega_nat_p (finite_cardinality X) hnomega)
+  X (fun i => finite_enumeration X i) henum a haX).
+claim hprefix :
+  ring_finite_product K add mul (finite_cardinality X)
+    (fun i => f (group_word_append
+      (finite_cardinality X) (fun j => finite_enumeration X j) a i))
+  = ring_finite_product K add mul X f.
+exact (eq_i_tra
+  (ring_finite_product K add mul (finite_cardinality X)
+    (fun i => f (group_word_append
+      (finite_cardinality X) (fun j => finite_enumeration X j) a i)))
+  (ring_finite_product K add mul (finite_cardinality X)
+    (fun i => f (finite_enumeration X i)))
+  (ring_finite_product K add mul X f)
+  (god1_ring_finite_product_congr_natural K add mul
+    (finite_cardinality X) hnomega
+    (fun i => f (group_word_append
+      (finite_cardinality X) (fun j => finite_enumeration X j) a i))
+    (fun i => f (finite_enumeration X i))
+    (fun i hi => f_eq_i f
+      (group_word_append
+        (finite_cardinality X) (fun j => finite_enumeration X j) a i)
+      (finite_enumeration X i)
+      (god1_group_word_append_in
+        (finite_cardinality X) (fun j => finite_enumeration X j) a i hi)))
+  (eq_sym
+    (ring_finite_product K add mul X f)
+    (ring_finite_product K add mul (finite_cardinality X)
+      (fun i => f (finite_enumeration X i)))
+    (god1_ring_finite_product_enumerated K add mul X hfin f))).
+claim hlast :
+  f (group_word_append
+    (finite_cardinality X) (fun j => finite_enumeration X j) a
+    (finite_cardinality X)) = f a.
+exact (f_eq_i f
+  (group_word_append
+    (finite_cardinality X) (fun j => finite_enumeration X j) a
+    (finite_cardinality X)) a
+  (god1_group_word_append_last
+    (finite_cardinality X)
+    (omega_nat_p (finite_cardinality X) hnomega)
+    (fun j => finite_enumeration X j) a)).
+exact (eq_i_tra
+  (ring_finite_product K add mul (X :\/: {a}) f)
+  (ring_finite_product K add mul (ordsucc (finite_cardinality X))
+    (fun i => f (group_word_append
+      (finite_cardinality X) (fun j => finite_enumeration X j) a i)))
+  (mul (ring_finite_product K add mul X f) (f a))
+  (god1_ring_finite_product_bijection_invariant K add mul hK
+    (ordsucc (finite_cardinality X)) (X :\/: {a})
+    (nat_finite (ordsucc (finite_cardinality X))
+      (nat_ordsucc (finite_cardinality X)
+        (omega_nat_p (finite_cardinality X) hnomega)))
+    (adjoin_finite X a hfin)
+    (group_word_append
+      (finite_cardinality X) (fun j => finite_enumeration X j) a)
+    hphi f hf)
+  (eq_i_tra
+    (ring_finite_product K add mul (ordsucc (finite_cardinality X))
+      (fun i => f (group_word_append
+        (finite_cardinality X) (fun j => finite_enumeration X j) a i)))
+    (mul
+      (ring_finite_product K add mul (finite_cardinality X)
+        (fun i => f (group_word_append
+          (finite_cardinality X) (fun j => finite_enumeration X j) a i)))
+      (f (group_word_append
+        (finite_cardinality X) (fun j => finite_enumeration X j) a
+        (finite_cardinality X))))
+    (mul (ring_finite_product K add mul X f) (f a))
+    (god1_ring_finite_product_natural_successor K add mul
+      (finite_cardinality X) hnomega
+      (fun i => f (group_word_append
+        (finite_cardinality X) (fun j => finite_enumeration X j) a i)))
+    (eq_i_tra
+      (mul
+        (ring_finite_product K add mul (finite_cardinality X)
+          (fun i => f (group_word_append
+            (finite_cardinality X) (fun j => finite_enumeration X j) a i)))
+        (f (group_word_append
+          (finite_cardinality X) (fun j => finite_enumeration X j) a
+          (finite_cardinality X))))
+      (mul (ring_finite_product K add mul X f)
+        (f (group_word_append
+          (finite_cardinality X) (fun j => finite_enumeration X j) a
+          (finite_cardinality X))))
+      (mul (ring_finite_product K add mul X f) (f a))
+      (f_eq_i
+        (fun z => mul z
+          (f (group_word_append
+            (finite_cardinality X) (fun j => finite_enumeration X j) a
+            (finite_cardinality X))))
+        (ring_finite_product K add mul (finite_cardinality X)
+          (fun i => f (group_word_append
+            (finite_cardinality X) (fun j => finite_enumeration X j) a i)))
+        (ring_finite_product K add mul X f) hprefix)
+      (f_eq_i (fun z => mul (ring_finite_product K add mul X f) z)
+        (f (group_word_append
+          (finite_cardinality X) (fun j => finite_enumeration X j) a
+          (finite_cardinality X)))
+        (f a) hlast)))).
+Qed.
+
+Theorem god1_power_finite :
+  forall X, finite X -> finite (Power X).
+let X.
+assume hfin.
+apply (exandE_i
+  (fun n => n :e omega) (fun n => equip X n) hfin).
+let n.
+assume hn heXn.
+claim hexp : exp_nat 2 n :e omega.
+exact (nat_p_omega (exp_nat 2 n)
+  (exp_nat_p 2 nat_2 n (omega_nat_p n hn))).
+exact (ex_intro
+  (fun m => m :e omega /\ equip (Power X) m)
+  (exp_nat 2 n)
+  (andI
+    (exp_nat 2 n :e omega)
+    (equip (Power X) (exp_nat 2 n)) hexp
+    (equip_finite_Power n (omega_nat_p n hn) X heXn))).
+Qed.
+
+Theorem god1_ring_finite_sum_in :
+  forall K, forall add mul:set -> set -> set,
+    ring K add mul -> forall X, finite X -> forall f:set -> set,
+    (forall x :e X, f x :e K) -> ring_finite_sum K add X f :e K.
+let K add mul.
+assume hK.
+let X.
+assume hfin.
+let f.
+assume hf.
+claim hcardomega : finite_cardinality X :e omega.
+exact (andEL
+  (finite_cardinality X :e omega)
+  (equip X (finite_cardinality X))
+  (god1_finite_cardinality_specification X hfin)).
+claim henum :
+  bij (finite_cardinality X) X
+    (fun i => finite_enumeration X i).
+exact (andER
+  (finite_enumeration X :e X :^: finite_cardinality X)
+  (bij (finite_cardinality X) X
+    (fun i => finite_enumeration X i))
+  (god1_finite_enumeration_specification X hfin)).
+exact (mem_eq_substL K
+  (ring_finite_sum K add (finite_cardinality X)
+    (fun i => f (finite_enumeration X i)))
+  (ring_finite_sum K add X f)
+  (god1_ring_finite_sum_enumerated K add X hfin f)
+  (god1_ring_finite_sum_in_natural K add mul hK
+    (finite_cardinality X) hcardomega
+    (fun i => f (finite_enumeration X i))
+    (fun i hi => hf (finite_enumeration X i)
+      (god1_bijection_maps_into
+        (finite_cardinality X) X
+        (fun j => finite_enumeration X j) henum i hi)))).
+Qed.
+
+Theorem god1_ring_finite_sum_right_mul_finite :
+  forall K, forall add mul:set -> set -> set,
+    ring K add mul -> forall X, finite X -> forall f:set -> set,
+    (forall x :e X, f x :e K) -> forall z :e K,
+    mul (ring_finite_sum K add X f) z
+    = ring_finite_sum K add X (fun x => mul (f x) z).
+let K add mul.
+assume hK.
+let X.
+assume hfin.
+let f.
+assume hf.
+let z.
+assume hz.
+claim hcardomega : finite_cardinality X :e omega.
+exact (andEL
+  (finite_cardinality X :e omega)
+  (equip X (finite_cardinality X))
+  (god1_finite_cardinality_specification X hfin)).
+claim henum :
+  bij (finite_cardinality X) X
+    (fun i => finite_enumeration X i).
+exact (andER
+  (finite_enumeration X :e X :^: finite_cardinality X)
+  (bij (finite_cardinality X) X
+    (fun i => finite_enumeration X i))
+  (god1_finite_enumeration_specification X hfin)).
+claim hfenum : forall i :e finite_cardinality X,
+  f (finite_enumeration X i) :e K.
+exact (fun i hi => hf (finite_enumeration X i)
+  (god1_bijection_maps_into
+    (finite_cardinality X) X
+    (fun j => finite_enumeration X j) henum i hi)).
+exact (eq_i_tra
+  (mul (ring_finite_sum K add X f) z)
+  (mul
+    (ring_finite_sum K add (finite_cardinality X)
+      (fun i => f (finite_enumeration X i))) z)
+  (ring_finite_sum K add X (fun x => mul (f x) z))
+  (f_eq_i (fun q => mul q z)
+    (ring_finite_sum K add X f)
+    (ring_finite_sum K add (finite_cardinality X)
+      (fun i => f (finite_enumeration X i)))
+    (god1_ring_finite_sum_enumerated K add X hfin f))
+  (eq_i_tra
+    (mul
+      (ring_finite_sum K add (finite_cardinality X)
+        (fun i => f (finite_enumeration X i))) z)
+    (ring_finite_sum K add (finite_cardinality X)
+      (fun i => mul (f (finite_enumeration X i)) z))
+    (ring_finite_sum K add X (fun x => mul (f x) z))
+    (god1_ring_finite_sum_right_mul K add mul hK
+      (finite_cardinality X) hcardomega
+      (fun i => f (finite_enumeration X i)) hfenum z hz)
+    (eq_sym
+      (ring_finite_sum K add X (fun x => mul (f x) z))
+      (ring_finite_sum K add (finite_cardinality X)
+        (fun i => mul (f (finite_enumeration X i)) z))
+      (god1_ring_finite_sum_enumerated K add X hfin
+        (fun x => mul (f x) z))))).
+Qed.
+
+Theorem god1_binunion_associative :
+  forall A B C, (A :\/: B) :\/: C = A :\/: (B :\/: C).
+let A B C.
+apply set_ext.
+- let z.
+  assume hz.
+  apply (binunionE' (A :\/: B) C z (z :e A :\/: (B :\/: C))).
+  - assume hzAB.
+    apply (binunionE' A B z (z :e A :\/: (B :\/: C))).
+    - exact (fun hzA => binunionI1 A (B :\/: C) z hzA).
+    - exact (fun hzB => binunionI2 A (B :\/: C) z
+        (binunionI1 B C z hzB)).
+    - exact hzAB.
+  - exact (fun hzC => binunionI2 A (B :\/: C) z
+      (binunionI2 B C z hzC)).
+  - exact hz.
+- let z.
+  assume hz.
+  apply (binunionE' A (B :\/: C) z (z :e (A :\/: B) :\/: C)).
+  - exact (fun hzA => binunionI1 (A :\/: B) C z
+      (binunionI1 A B z hzA)).
+  - assume hzBC.
+    apply (binunionE' B C z (z :e (A :\/: B) :\/: C)).
+    - exact (fun hzB => binunionI1 (A :\/: B) C z
+        (binunionI2 A B z hzB)).
+    - exact (fun hzC => binunionI2 (A :\/: B) C z hzC).
+    - exact hzBC.
+  - exact hz.
+Qed.
+
+Definition god1_power_adjoin_avoiding : set -> set -> set :=
+  fun X a => {F :e Power (X :\/: {a})|a /:e F}.
+
+Definition god1_power_adjoin_containing : set -> set -> set :=
+  fun X a => {F :e Power (X :\/: {a})|a :e F}.
+
+Theorem god1_power_adjoin_avoiding_eq :
+  forall X a, a /:e X -> god1_power_adjoin_avoiding X a = Power X.
+let X a.
+assume haX.
+apply set_ext.
+- let F.
+  assume hF.
+  claim hFsub : F c= X :\/: {a}.
+  exact (PowerE (X :\/: {a}) F
+    (SepE1 (Power (X :\/: {a})) (fun A => a /:e A) F hF)).
+  claim haF : a /:e F.
+  exact (SepE2 (Power (X :\/: {a})) (fun A => a /:e A) F hF).
+  apply (PowerI X F).
+  let z.
+  assume hz.
+  apply (binunionE' X {a} z (z :e X)).
+  - exact (fun hzX => hzX).
+  - assume hza.
+    exact (FalseE
+      (haF (mem_eq_substR F z a (SingE a z hza) hz)) (z :e X)).
+  - exact (hFsub z hz).
+- let F.
+  assume hF.
+  claim hFsub : F c= X.
+  exact (PowerE X F hF).
+  claim hFpower : F :e Power (X :\/: {a}).
+  exact (PowerI (X :\/: {a}) F
+    (fun z hz => binunionI1 X {a} z (hFsub z hz))).
+  claim haF : a /:e F.
+  assume haF.
+  exact (haX (hFsub a haF)).
+  exact (SepI (Power (X :\/: {a})) (fun A => a /:e A) F
+    hFpower haF).
+Qed.
+
+Theorem god1_adjoin_injective_outside :
+  forall X a, a /:e X -> forall A B,
+    A c= X -> B c= X -> A :\/: {a} = B :\/: {a} -> A = B.
+let X a.
+assume haX.
+let A B.
+assume hAX hBX hAB.
+apply set_ext.
+- let z.
+  assume hz.
+  claim hzunion : z :e B :\/: {a}.
+  exact (mem_eq_set_subst
+    (A :\/: {a}) (B :\/: {a}) z hAB
+    (binunionI1 A {a} z hz)).
+  apply (binunionE' B {a} z (z :e B)).
+  - exact (fun hzB => hzB).
+  - assume hza.
+    exact (FalseE
+      (haX (mem_eq_substR X z a (SingE a z hza) (hAX z hz)))
+      (z :e B)).
+  - exact hzunion.
+- let z.
+  assume hz.
+  claim hzunion : z :e A :\/: {a}.
+  exact (mem_eq_set_subst
+    (B :\/: {a}) (A :\/: {a}) z
+    (eq_sym (A :\/: {a}) (B :\/: {a}) hAB)
+    (binunionI1 B {a} z hz)).
+  apply (binunionE' A {a} z (z :e A)).
+  - exact (fun hzA => hzA).
+  - assume hza.
+    exact (FalseE
+      (haX (mem_eq_substR X z a (SingE a z hza) (hBX z hz)))
+      (z :e A)).
+  - exact hzunion.
+Qed.
+
+Theorem god1_subset_adjoin_remove_new :
+  forall X a A, A c= X :\/: {a} -> A :\: {a} c= X.
+let X a A.
+assume hA.
+let z.
+assume hz.
+claim hzunion : z :e X :\/: {a}.
+exact (hA z (setminusE1 A {a} z hz)).
+apply (binunionE' X {a} z (z :e X)).
+- exact (fun hzX => hzX).
+- assume hza.
+  exact (FalseE ((setminusE2 A {a} z hz) hza) (z :e X)).
+- exact hzunion.
+Qed.
+
+Theorem god1_power_adjoin_containing_bijection :
+  forall X a, a /:e X ->
+    bij (Power X) (god1_power_adjoin_containing X a)
+      (fun F => F :\/: {a}).
+let X a.
+assume haX.
+apply (bijI (Power X) (god1_power_adjoin_containing X a)
+  (fun F => F :\/: {a})).
+- let F.
+  assume hF.
+  claim hFsub : F c= X.
+  exact (PowerE X F hF).
+  claim hunionpower : F :\/: {a} :e Power (X :\/: {a}).
+  exact (PowerI (X :\/: {a}) (F :\/: {a})
+    (binunion_Subq_min F {a} (X :\/: {a})
+      (fun z hz => binunionI1 X {a} z (hFsub z hz))
+      (binunion_Subq_2 X {a}))).
+  exact (SepI (Power (X :\/: {a})) (fun A => a :e A)
+    (F :\/: {a}) hunionpower
+    (binunionI2 F {a} a (SingI a))).
+- let F.
+  assume hF.
+  let H.
+  assume hH heq.
+  exact (god1_adjoin_injective_outside X a haX F H
+    (PowerE X F hF) (PowerE X H hH) heq).
+- let H.
+  assume hH.
+  claim hHpower : H :e Power (X :\/: {a}).
+  exact (SepE1 (Power (X :\/: {a})) (fun A => a :e A) H hH).
+  claim haH : a :e H.
+  exact (SepE2 (Power (X :\/: {a})) (fun A => a :e A) H hH).
+  claim hremoveSub : H :\: {a} c= X.
+  exact (god1_subset_adjoin_remove_new X a H
+    (PowerE (X :\/: {a}) H hHpower)).
+  apply (ex_intro
+    (fun F => F :e Power X /\ F :\/: {a} = H)
+    (H :\: {a})).
+  exact (andI
+    (H :\: {a} :e Power X)
+    ((H :\: {a}) :\/: {a} = H)
+    (PowerI X (H :\: {a}) hremoveSub)
+    (god1_setminus_singleton_readd H a haH)).
+Qed.
+
+Theorem god1_power_adjoin_containing_finite :
+  forall X a, finite X -> a /:e X ->
+    finite (god1_power_adjoin_containing X a).
+let X a.
+assume hfin haX.
+exact (god1_equip_preserves_finiteness
+  (Power X) (god1_power_adjoin_containing X a)
+  (ex_intro_setfun
+    (fun f => bij (Power X) (god1_power_adjoin_containing X a) f)
+    (fun F => F :\/: {a})
+    (god1_power_adjoin_containing_bijection X a haX))
+  (god1_power_finite X hfin)).
+Qed.
+
+Theorem god1_power_adjoin_avoiding_finite :
+  forall X a, finite X -> a /:e X ->
+    finite (god1_power_adjoin_avoiding X a).
+let X a.
+assume hfin haX.
+claim heq : god1_power_adjoin_avoiding X a = Power X.
+exact (god1_power_adjoin_avoiding_eq X a haX).
+claim hequip :
+  equip (Power X) (god1_power_adjoin_avoiding X a).
+exact (god1_equip_codomain_eq_subst
+  (Power X) (Power X) (god1_power_adjoin_avoiding X a)
+  (eq_sym (god1_power_adjoin_avoiding X a) (Power X) heq)
+  (equip_ref (Power X))).
+exact (god1_equip_preserves_finiteness
+  (Power X) (god1_power_adjoin_avoiding X a)
+  hequip (god1_power_finite X hfin)).
+Qed.
+
+Theorem god1_power_adjoin_partition :
+  forall X a,
+    god1_power_adjoin_avoiding X a
+      :\/: god1_power_adjoin_containing X a
+    = Power (X :\/: {a}).
+let X a.
+apply set_ext.
+- let F.
+  assume hF.
+  apply (binunionE'
+    (god1_power_adjoin_avoiding X a)
+    (god1_power_adjoin_containing X a) F
+    (F :e Power (X :\/: {a}))).
+  - exact (fun havoid => SepE1
+      (Power (X :\/: {a})) (fun A => a /:e A) F havoid).
+  - exact (fun hcontain => SepE1
+      (Power (X :\/: {a})) (fun A => a :e A) F hcontain).
+  - exact hF.
+- let F.
+  assume hF.
+  apply (orE (a :e F) (a /:e F) (xm (a :e F))
+    (F :e god1_power_adjoin_avoiding X a
+      :\/: god1_power_adjoin_containing X a)).
+  - assume haF.
+    exact (binunionI2
+      (god1_power_adjoin_avoiding X a)
+      (god1_power_adjoin_containing X a) F
+      (SepI (Power (X :\/: {a})) (fun A => a :e A) F hF haF)).
+  - assume haF.
+    exact (binunionI1
+      (god1_power_adjoin_avoiding X a)
+      (god1_power_adjoin_containing X a) F
+      (SepI (Power (X :\/: {a})) (fun A => a /:e A) F hF haF)).
+Qed.
+
+Theorem god1_power_adjoin_partition_disjoint :
+  forall X a, forall F :e god1_power_adjoin_containing X a,
+    F /:e god1_power_adjoin_avoiding X a.
+let X a.
+let F.
+assume hFcontain hFavoid.
+exact ((SepE2
+  (Power (X :\/: {a})) (fun A => a /:e A) F hFavoid)
+  (SepE2
+    (Power (X :\/: {a})) (fun A => a :e A) F hFcontain)).
+Qed.
+
+Theorem god1_ring_finite_sum_disjoint_union_zero :
+  forall K, forall add mul:set -> set -> set,
+    ring K add mul -> forall C, finite C ->
+    (forall z :e 0, z /:e C) -> forall g:set -> set,
+    (forall z :e C :\/: 0, g z :e K) ->
+    ring_finite_sum K add (C :\/: 0) g
+    = add (ring_finite_sum K add C g) (ring_finite_sum K add 0 g).
+let K add mul.
+assume hK.
+let C.
+assume hfinC hdis0.
+let g.
+assume hg.
+claim hgC : forall z :e C, g z :e K.
+exact (fun z hz => hg z (binunionI1 C 0 z hz)).
+claim hsumC : ring_finite_sum K add C g :e K.
+exact (god1_ring_finite_sum_in K add mul hK C hfinC g hgC).
+claim hright :
+  add (ring_finite_sum K add C g) (ring_finite_sum K add 0 g)
+  = ring_finite_sum K add C g.
+exact (eq_i_tra
+  (add (ring_finite_sum K add C g) (ring_finite_sum K add 0 g))
+  (add (ring_finite_sum K add C g) (group_identity K add))
+  (ring_finite_sum K add C g)
+  (f_eq_i (fun z => add (ring_finite_sum K add C g) z)
+    (ring_finite_sum K add 0 g) (group_identity K add)
+    (god1_ring_finite_sum_zero_natural K add g))
+  (andEL
+    (add (ring_finite_sum K add C g) (group_identity K add)
+      = ring_finite_sum K add C g)
+    (add (group_identity K add) (ring_finite_sum K add C g)
+      = ring_finite_sum K add C g)
+    ((andER
+      (group_identity K add :e K)
+      (forall z :e K,
+        add z (group_identity K add) = z
+        /\ add (group_identity K add) z = z)
+      (god1_group_identity_specification K add
+        (god1_ring_additive_group K add mul hK)))
+      (ring_finite_sum K add C g) hsumC))).
+exact (eq_i_tra
+  (ring_finite_sum K add (C :\/: 0) g)
+  (ring_finite_sum K add C g)
+  (add (ring_finite_sum K add C g) (ring_finite_sum K add 0 g))
+  (f_eq_i (fun S => ring_finite_sum K add S g)
+    (C :\/: 0) C (binunion_idr C))
+  (eq_sym
+    (add (ring_finite_sum K add C g) (ring_finite_sum K add 0 g))
+    (ring_finite_sum K add C g) hright)).
+Qed.
+
+Theorem god1_ring_finite_sum_disjoint_union_step :
+  forall K, forall add mul:set -> set -> set,
+    ring K add mul -> forall Y y,
+    finite Y -> y /:e Y ->
+    (forall C, finite C ->
+      (forall z :e Y, z /:e C) -> forall g:set -> set,
+      (forall z :e C :\/: Y, g z :e K) ->
+      ring_finite_sum K add (C :\/: Y) g
+      = add (ring_finite_sum K add C g)
+        (ring_finite_sum K add Y g)) ->
+    forall C, finite C ->
+    (forall z :e Y :\/: {y}, z /:e C) -> forall g:set -> set,
+    (forall z :e C :\/: (Y :\/: {y}), g z :e K) ->
+    ring_finite_sum K add (C :\/: (Y :\/: {y})) g
+    = add (ring_finite_sum K add C g)
+      (ring_finite_sum K add (Y :\/: {y}) g).
+let K add mul.
+assume hK.
+let Y y.
+assume hfinY hyY hind.
+let C.
+assume hfinC hdis.
+let g.
+assume hg.
+claim hdisC : forall z :e Y, z /:e C.
+exact (fun z hz => hdis z (binunionI1 Y {y} z hz)).
+claim hyC : y /:e C.
+exact (hdis y (binunionI2 Y {y} y (SingI y))).
+claim hfinCY : finite (C :\/: Y).
+exact (binunion_finite C hfinC Y hfinY).
+claim hyCY : y /:e C :\/: Y.
+assume hy.
+exact (binunionE' C Y y False
+  (fun hyc => hyC hyc) (fun hyy => hyY hyy) hy).
+claim hassoc : (C :\/: Y) :\/: {y} = C :\/: (Y :\/: {y}).
+exact (god1_binunion_associative C Y {y}).
+claim hgCY : forall z :e C :\/: Y, g z :e K.
+exact (fun z hz => hg z
+  (mem_eq_set_subst
+    ((C :\/: Y) :\/: {y}) (C :\/: (Y :\/: {y})) z
+    hassoc (binunionI1 (C :\/: Y) {y} z hz))).
+claim hgY : forall z :e Y, g z :e K.
+exact (fun z hz => hgCY z (binunionI2 C Y z hz)).
+claim hgC : forall z :e C, g z :e K.
+exact (fun z hz => hgCY z (binunionI1 C Y z hz)).
+claim hgy : g y :e K.
+exact (hg y
+  (binunionI2 C (Y :\/: {y}) y
+    (binunionI2 Y {y} y (SingI y)))).
+claim hsumC : ring_finite_sum K add C g :e K.
+exact (god1_ring_finite_sum_in K add mul hK C hfinC g hgC).
+claim hsumY : ring_finite_sum K add Y g :e K.
+exact (god1_ring_finite_sum_in K add mul hK Y hfinY g hgY).
+claim hleftAdjoin :
+  ring_finite_sum K add ((C :\/: Y) :\/: {y}) g
+  = add (ring_finite_sum K add (C :\/: Y) g) (g y).
+exact (god1_ring_finite_sum_adjoin K add mul hK
+  (C :\/: Y) hfinCY y hyCY g
+  (fun z hz => hg z
+    (mem_eq_set_subst
+      ((C :\/: Y) :\/: {y}) (C :\/: (Y :\/: {y})) z
+      hassoc hz))).
+claim hrightAdjoin :
+  ring_finite_sum K add (Y :\/: {y}) g
+  = add (ring_finite_sum K add Y g) (g y).
+exact (god1_ring_finite_sum_adjoin K add mul hK
+  Y hfinY y hyY g
+  (fun z hz => hg z (binunionI2 C (Y :\/: {y}) z hz))).
+exact (eq_i_tra
+  (ring_finite_sum K add (C :\/: (Y :\/: {y})) g)
+  (add
+    (add (ring_finite_sum K add C g) (ring_finite_sum K add Y g))
+    (g y))
+  (add (ring_finite_sum K add C g)
+    (ring_finite_sum K add (Y :\/: {y}) g))
+  (eq_i_tra
+    (ring_finite_sum K add (C :\/: (Y :\/: {y})) g)
+    (ring_finite_sum K add ((C :\/: Y) :\/: {y}) g)
+    (add
+      (add (ring_finite_sum K add C g) (ring_finite_sum K add Y g))
+      (g y))
+    (f_eq_i (fun S => ring_finite_sum K add S g)
+      (C :\/: (Y :\/: {y})) ((C :\/: Y) :\/: {y})
+      (eq_sym ((C :\/: Y) :\/: {y})
+        (C :\/: (Y :\/: {y})) hassoc))
+    (eq_i_tra
+      (ring_finite_sum K add ((C :\/: Y) :\/: {y}) g)
+      (add (ring_finite_sum K add (C :\/: Y) g) (g y))
+      (add
+        (add (ring_finite_sum K add C g) (ring_finite_sum K add Y g))
+        (g y))
+      hleftAdjoin
+      (f_eq_i (fun q => add q (g y))
+        (ring_finite_sum K add (C :\/: Y) g)
+        (add (ring_finite_sum K add C g) (ring_finite_sum K add Y g))
+        (hind C hfinC hdisC g hgCY))))
+  (eq_i_tra
+    (add
+      (add (ring_finite_sum K add C g) (ring_finite_sum K add Y g))
+      (g y))
+    (add (ring_finite_sum K add C g)
+      (add (ring_finite_sum K add Y g) (g y)))
+    (add (ring_finite_sum K add C g)
+      (ring_finite_sum K add (Y :\/: {y}) g))
+    (god1_group_associative_reverse K add
+      (god1_ring_additive_group K add mul hK)
+      (ring_finite_sum K add C g) hsumC
+      (ring_finite_sum K add Y g) hsumY
+      (g y) hgy)
+    (f_eq_i (fun q => add (ring_finite_sum K add C g) q)
+      (add (ring_finite_sum K add Y g) (g y))
+      (ring_finite_sum K add (Y :\/: {y}) g)
+      (eq_sym
+        (ring_finite_sum K add (Y :\/: {y}) g)
+        (add (ring_finite_sum K add Y g) (g y))
+        hrightAdjoin)))).
+Qed.
+
+Theorem god1_ring_finite_sum_disjoint_union :
+  forall K, forall add mul:set -> set -> set,
+    ring K add mul -> forall A, finite A -> forall B, finite B ->
+    (forall b :e B, b /:e A) -> forall f:set -> set,
+    (forall z :e A :\/: B, f z :e K) ->
+    ring_finite_sum K add (A :\/: B) f
+    = add (ring_finite_sum K add A f) (ring_finite_sum K add B f).
+let K add mul.
+assume hK.
+let A.
+assume hfinA.
+let B.
+assume hfinB hdis.
+let f.
+assume hf.
+exact (finite_ind
+  (fun Y =>
+    forall C, finite C ->
+    (forall y :e Y, y /:e C) -> forall g:set -> set,
+    (forall z :e C :\/: Y, g z :e K) ->
+    ring_finite_sum K add (C :\/: Y) g
+    = add (ring_finite_sum K add C g) (ring_finite_sum K add Y g))
+  (god1_ring_finite_sum_disjoint_union_zero K add mul hK)
+  (god1_ring_finite_sum_disjoint_union_step K add mul hK)
+  B hfinB A hfinA hdis f hf).
+Qed.
+
+Theorem god1_ring_finite_sum_congr_finite :
+  forall K, forall add:set -> set -> set, forall X,
+    finite X -> forall f g:set -> set,
+    (forall x :e X, f x = g x) ->
+    ring_finite_sum K add X f = ring_finite_sum K add X g.
+let K add X.
+assume hfin.
+let f g.
+assume hfg.
+claim hcardomega : finite_cardinality X :e omega.
+exact (andEL
+  (finite_cardinality X :e omega)
+  (equip X (finite_cardinality X))
+  (god1_finite_cardinality_specification X hfin)).
+claim henum :
+  bij (finite_cardinality X) X
+    (fun i => finite_enumeration X i).
+exact (andER
+  (finite_enumeration X :e X :^: finite_cardinality X)
+  (bij (finite_cardinality X) X
+    (fun i => finite_enumeration X i))
+  (god1_finite_enumeration_specification X hfin)).
+exact (eq_i_tra
+  (ring_finite_sum K add X f)
+  (ring_finite_sum K add (finite_cardinality X)
+    (fun i => f (finite_enumeration X i)))
+  (ring_finite_sum K add X g)
+  (god1_ring_finite_sum_enumerated K add X hfin f)
+  (eq_i_tra
+    (ring_finite_sum K add (finite_cardinality X)
+      (fun i => f (finite_enumeration X i)))
+    (ring_finite_sum K add (finite_cardinality X)
+      (fun i => g (finite_enumeration X i)))
+    (ring_finite_sum K add X g)
+    (god1_ring_finite_sum_congr_natural K add
+      (finite_cardinality X) hcardomega
+      (fun i => f (finite_enumeration X i))
+      (fun i => g (finite_enumeration X i))
+      (fun i hi => hfg (finite_enumeration X i)
+        (god1_bijection_maps_into
+          (finite_cardinality X) X
+          (fun j => finite_enumeration X j) henum i hi)))
+    (eq_sym
+      (ring_finite_sum K add X g)
+      (ring_finite_sum K add (finite_cardinality X)
+        (fun i => g (finite_enumeration X i)))
+      (god1_ring_finite_sum_enumerated K add X hfin g)))).
+Qed.
+
+Theorem god1_ring_finite_product_in :
+  forall K, forall add mul:set -> set -> set,
+    ring K add mul -> forall X, finite X -> forall f:set -> set,
+    (forall x :e X, f x :e K) ->
+    ring_finite_product K add mul X f :e K.
+let K add mul.
+assume hK.
+let X.
+assume hfin.
+let f.
+assume hf.
+claim hcardomega : finite_cardinality X :e omega.
+exact (andEL
+  (finite_cardinality X :e omega)
+  (equip X (finite_cardinality X))
+  (god1_finite_cardinality_specification X hfin)).
+claim henum :
+  bij (finite_cardinality X) X
+    (fun i => finite_enumeration X i).
+exact (andER
+  (finite_enumeration X :e X :^: finite_cardinality X)
+  (bij (finite_cardinality X) X
+    (fun i => finite_enumeration X i))
+  (god1_finite_enumeration_specification X hfin)).
+exact (god1_ring_word_product_in K add mul hK
+  (fun i => f (finite_enumeration X i))
+  (finite_cardinality X) hcardomega
+  (fun i hi => hf (finite_enumeration X i)
+    (god1_bijection_maps_into
+      (finite_cardinality X) X
+      (fun j => finite_enumeration X j) henum i hi))).
+Qed.
+
+Theorem god1_adjoin_setminus_avoiding :
+  forall X a F, a /:e X -> F c= X ->
+    (X :\/: {a}) :\: F = (X :\: F) :\/: {a}.
+let X a F.
+assume haX hFX.
+apply set_ext.
+- let z.
+  assume hz.
+  claim hzunion : z :e X :\/: {a}.
+  exact (setminusE1 (X :\/: {a}) F z hz).
+  claim hznotF : z /:e F.
+  exact (setminusE2 (X :\/: {a}) F z hz).
+  apply (binunionE' X {a} z (z :e (X :\: F) :\/: {a})).
+  - exact (fun hzX => binunionI1 (X :\: F) {a} z
+      (setminusI X F z hzX hznotF)).
+  - exact (fun hza => binunionI2 (X :\: F) {a} z hza).
+  - exact hzunion.
+- let z.
+  assume hz.
+  apply (binunionE' (X :\: F) {a} z (z :e (X :\/: {a}) :\: F)).
+  - assume hzleft.
+    exact (setminusI (X :\/: {a}) F z
+      (binunionI1 X {a} z (setminusE1 X F z hzleft))
+      (setminusE2 X F z hzleft)).
+  - assume hza.
+    claim hzaeq : z = a.
+    exact (SingE a z hza).
+    claim hznotF : z /:e F.
+    assume hzF.
+    exact (haX (mem_eq_substR X z a hzaeq (hFX z hzF))).
+    exact (setminusI (X :\/: {a}) F z
+      (binunionI2 X {a} z hza) hznotF).
+  - exact hz.
+Qed.
+
+Theorem god1_adjoin_setminus_containing :
+  forall X a F, a /:e X -> F c= X ->
+    (X :\/: {a}) :\: (F :\/: {a}) = X :\: F.
+let X a F.
+assume haX hFX.
+apply set_ext.
+- let z.
+  assume hz.
+  claim hzunion : z :e X :\/: {a}.
+  exact (setminusE1 (X :\/: {a}) (F :\/: {a}) z hz).
+  claim hznot : z /:e F :\/: {a}.
+  exact (setminusE2 (X :\/: {a}) (F :\/: {a}) z hz).
+  apply (binunionE' X {a} z (z :e X :\: F)).
+  - assume hzX.
+    apply (setminusI X F z hzX).
+    assume hzF.
+    exact (hznot (binunionI1 F {a} z hzF)).
+  - assume hza.
+    exact (FalseE (hznot (binunionI2 F {a} z hza)) (z :e X :\: F)).
+  - exact hzunion.
+- let z.
+  assume hz.
+  apply (setminusI (X :\/: {a}) (F :\/: {a}) z
+    (binunionI1 X {a} z (setminusE1 X F z hz))).
+  assume hzright.
+  apply (binunionE' F {a} z False).
+  - exact (fun hzF => (setminusE2 X F z hz) hzF).
+  - assume hza.
+    exact (haX (mem_eq_substR X z a (SingE a z hza)
+      (setminusE1 X F z hz))).
+  - exact hzright.
+Qed.
+
+Definition god1_product_choice_term :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set) -> (set -> set) -> set -> set :=
+  fun K add mul I x y F =>
+    mul
+      (ring_finite_product K add mul F x)
+      (ring_finite_product K add mul (I :\: F) y).
+
+Theorem god1_product_choice_term_avoiding_adjoin :
+  forall K, forall add mul:set -> set -> set,
+    commutative_ring K add mul -> forall X, finite X -> forall a,
+    a /:e X -> forall x y:set -> set,
+    (forall z :e X :\/: {a}, x z :e K /\ y z :e K) ->
+    forall F :e Power X,
+    god1_product_choice_term K add mul (X :\/: {a}) x y F
+    = mul (god1_product_choice_term K add mul X x y F) (y a).
+let K add mul.
+assume hK.
+let X.
+assume hfin.
+let a.
+assume haX.
+let x y.
+assume hxy.
+let F.
+assume hF.
+claim hring : ring K add mul.
+exact (andEL (ring K add mul) (commutative_on K mul) hK).
+claim hFsub : F c= X.
+exact (PowerE X F hF).
+claim hfinF : finite F.
+exact (Subq_finite X hfin F hFsub).
+claim hfinComp : finite (X :\: F).
+exact (Subq_finite X hfin (X :\: F) (setminus_Subq X F)).
+claim haComp : a /:e X :\: F.
+assume haComp.
+exact (haX (setminusE1 X F a haComp)).
+claim hxF : forall z :e F, x z :e K.
+exact (fun z hz => andEL (x z :e K) (y z :e K)
+  (hxy z (binunionI1 X {a} z (hFsub z hz)))).
+claim hyComp : forall z :e X :\: F, y z :e K.
+exact (fun z hz => andER (x z :e K) (y z :e K)
+  (hxy z (binunionI1 X {a} z (setminusE1 X F z hz)))).
+claim hya : y a :e K.
+exact (andER (x a :e K) (y a :e K)
+  (hxy a (binunionI2 X {a} a (SingI a)))).
+claim hprodF : ring_finite_product K add mul F x :e K.
+exact (god1_ring_finite_product_in K add mul hring F hfinF x hxF).
+claim hprodComp : ring_finite_product K add mul (X :\: F) y :e K.
+exact (god1_ring_finite_product_in K add mul hring
+  (X :\: F) hfinComp y hyComp).
+claim hcompEq :
+  (X :\/: {a}) :\: F = (X :\: F) :\/: {a}.
+exact (god1_adjoin_setminus_avoiding X a F haX hFsub).
+claim hcompProduct :
+  ring_finite_product K add mul ((X :\/: {a}) :\: F) y
+  = mul (ring_finite_product K add mul (X :\: F) y) (y a).
+exact (eq_i_tra
+  (ring_finite_product K add mul ((X :\/: {a}) :\: F) y)
+  (ring_finite_product K add mul ((X :\: F) :\/: {a}) y)
+  (mul (ring_finite_product K add mul (X :\: F) y) (y a))
+  (f_eq_i (fun S => ring_finite_product K add mul S y)
+    ((X :\/: {a}) :\: F) ((X :\: F) :\/: {a}) hcompEq)
+  (god1_ring_finite_product_adjoin K add mul hK
+    (X :\: F) hfinComp a haComp y
+    (fun z hz => andER (x z :e K) (y z :e K)
+      (hxy z
+        (setminusE1 (X :\/: {a}) F z
+          (mem_eq_set_subst
+            ((X :\: F) :\/: {a}) ((X :\/: {a}) :\: F) z
+            (eq_sym ((X :\/: {a}) :\: F) ((X :\: F) :\/: {a}) hcompEq)
+            hz)))))).
+exact (eq_i_tra
+  (god1_product_choice_term K add mul (X :\/: {a}) x y F)
+  (mul (ring_finite_product K add mul F x)
+    (mul (ring_finite_product K add mul (X :\: F) y) (y a)))
+  (mul (god1_product_choice_term K add mul X x y F) (y a))
+  (f_eq_i
+    (fun q => mul (ring_finite_product K add mul F x) q)
+    (ring_finite_product K add mul ((X :\/: {a}) :\: F) y)
+    (mul (ring_finite_product K add mul (X :\: F) y) (y a))
+    hcompProduct)
+  (god1_ring_multiplicative_associative K add mul hring
+    (ring_finite_product K add mul F x) hprodF
+    (ring_finite_product K add mul (X :\: F) y) hprodComp
+    (y a) hya)).
+Qed.
+
+Theorem god1_product_choice_term_containing_adjoin :
+  forall K, forall add mul:set -> set -> set,
+    commutative_ring K add mul -> forall X, finite X -> forall a,
+    a /:e X -> forall x y:set -> set,
+    (forall z :e X :\/: {a}, x z :e K /\ y z :e K) ->
+    forall F :e Power X,
+    god1_product_choice_term K add mul (X :\/: {a}) x y (F :\/: {a})
+    = mul (god1_product_choice_term K add mul X x y F) (x a).
+let K add mul.
+assume hK.
+let X.
+assume hfin.
+let a.
+assume haX.
+let x y.
+assume hxy.
+let F.
+assume hF.
+claim hring : ring K add mul.
+exact (andEL (ring K add mul) (commutative_on K mul) hK).
+claim hcomm : commutative_on K mul.
+exact (andER (ring K add mul) (commutative_on K mul) hK).
+claim hFsub : F c= X.
+exact (PowerE X F hF).
+claim hfinF : finite F.
+exact (Subq_finite X hfin F hFsub).
+claim hfinComp : finite (X :\: F).
+exact (Subq_finite X hfin (X :\: F) (setminus_Subq X F)).
+claim haF : a /:e F.
+assume haF.
+exact (haX (hFsub a haF)).
+claim hxF : forall z :e F, x z :e K.
+exact (fun z hz => andEL (x z :e K) (y z :e K)
+  (hxy z (binunionI1 X {a} z (hFsub z hz)))).
+claim hyComp : forall z :e X :\: F, y z :e K.
+exact (fun z hz => andER (x z :e K) (y z :e K)
+  (hxy z (binunionI1 X {a} z (setminusE1 X F z hz)))).
+claim hxa : x a :e K.
+exact (andEL (x a :e K) (y a :e K)
+  (hxy a (binunionI2 X {a} a (SingI a)))).
+claim hprodF : ring_finite_product K add mul F x :e K.
+exact (god1_ring_finite_product_in K add mul hring F hfinF x hxF).
+claim hprodComp : ring_finite_product K add mul (X :\: F) y :e K.
+exact (god1_ring_finite_product_in K add mul hring
+  (X :\: F) hfinComp y hyComp).
+claim hprodAdjoin :
+  ring_finite_product K add mul (F :\/: {a}) x
+  = mul (ring_finite_product K add mul F x) (x a).
+exact (god1_ring_finite_product_adjoin K add mul hK
+  F hfinF a haF x
+  (fun z hz => andEL (x z :e K) (y z :e K)
+    (hxy z
+      (binunionE' F {a} z (z :e X :\/: {a})
+        (fun hzF => binunionI1 X {a} z (hFsub z hzF))
+        (fun hza => binunionI2 X {a} z hza) hz)))).
+claim hcompEq :
+  (X :\/: {a}) :\: (F :\/: {a}) = X :\: F.
+exact (god1_adjoin_setminus_containing X a F haX hFsub).
+claim hcompProduct :
+  ring_finite_product K add mul ((X :\/: {a}) :\: (F :\/: {a})) y
+  = ring_finite_product K add mul (X :\: F) y.
+exact (f_eq_i (fun S => ring_finite_product K add mul S y)
+  ((X :\/: {a}) :\: (F :\/: {a})) (X :\: F) hcompEq).
+exact (eq_i_tra
+  (god1_product_choice_term K add mul
+    (X :\/: {a}) x y (F :\/: {a}))
+  (mul
+    (mul (ring_finite_product K add mul F x) (x a))
+    (ring_finite_product K add mul (X :\: F) y))
+  (mul (god1_product_choice_term K add mul X x y F) (x a))
+  (eq_i_tra
+    (mul
+      (ring_finite_product K add mul (F :\/: {a}) x)
+      (ring_finite_product K add mul
+        ((X :\/: {a}) :\: (F :\/: {a})) y))
+    (mul
+      (mul (ring_finite_product K add mul F x) (x a))
+      (ring_finite_product K add mul
+        ((X :\/: {a}) :\: (F :\/: {a})) y))
+    (mul
+      (mul (ring_finite_product K add mul F x) (x a))
+      (ring_finite_product K add mul (X :\: F) y))
+    (f_eq_i
+      (fun q => mul q
+        (ring_finite_product K add mul
+          ((X :\/: {a}) :\: (F :\/: {a})) y))
+      (ring_finite_product K add mul (F :\/: {a}) x)
+      (mul (ring_finite_product K add mul F x) (x a)) hprodAdjoin)
+    (f_eq_i
+      (fun q => mul
+        (mul (ring_finite_product K add mul F x) (x a)) q)
+      (ring_finite_product K add mul
+        ((X :\/: {a}) :\: (F :\/: {a})) y)
+      (ring_finite_product K add mul (X :\: F) y) hcompProduct))
+  (eq_i_tra
+    (mul
+      (mul (ring_finite_product K add mul F x) (x a))
+      (ring_finite_product K add mul (X :\: F) y))
+    (mul (ring_finite_product K add mul F x)
+      (mul (x a) (ring_finite_product K add mul (X :\: F) y)))
+    (mul (god1_product_choice_term K add mul X x y F) (x a))
+    (eq_sym
+      (mul (ring_finite_product K add mul F x)
+        (mul (x a) (ring_finite_product K add mul (X :\: F) y)))
+      (mul
+        (mul (ring_finite_product K add mul F x) (x a))
+        (ring_finite_product K add mul (X :\: F) y))
+      (god1_ring_multiplicative_associative K add mul hring
+        (ring_finite_product K add mul F x) hprodF
+        (x a) hxa
+        (ring_finite_product K add mul (X :\: F) y) hprodComp))
+    (eq_i_tra
+      (mul (ring_finite_product K add mul F x)
+        (mul (x a) (ring_finite_product K add mul (X :\: F) y)))
+      (mul (ring_finite_product K add mul F x)
+        (mul (ring_finite_product K add mul (X :\: F) y) (x a)))
+      (mul (god1_product_choice_term K add mul X x y F) (x a))
+      (f_eq_i (fun q => mul (ring_finite_product K add mul F x) q)
+        (mul (x a) (ring_finite_product K add mul (X :\: F) y))
+        (mul (ring_finite_product K add mul (X :\: F) y) (x a))
+        (hcomm (x a) hxa
+          (ring_finite_product K add mul (X :\: F) y) hprodComp))
+      (god1_ring_multiplicative_associative K add mul hring
+        (ring_finite_product K add mul F x) hprodF
+        (ring_finite_product K add mul (X :\: F) y) hprodComp
+        (x a) hxa)))).
+Qed.
+
+Theorem god1_product_choice_term_in :
+  forall K, forall add mul:set -> set -> set,
+    ring K add mul -> forall I, finite I -> forall x y:set -> set,
+    (forall i :e I, x i :e K /\ y i :e K) ->
+    forall F :e Power I,
+      god1_product_choice_term K add mul I x y F :e K.
+let K add mul.
+assume hK.
+let I.
+assume hfin.
+let x y.
+assume hxy.
+let F.
+assume hF.
+claim hFsub : F c= I.
+exact (PowerE I F hF).
+claim hfinF : finite F.
+exact (Subq_finite I hfin F hFsub).
+claim hfinComp : finite (I :\: F).
+exact (Subq_finite I hfin (I :\: F) (setminus_Subq I F)).
+exact (god1_ring_multiplicative_law K add mul hK
+  (ring_finite_product K add mul F x)
+  (god1_ring_finite_product_in K add mul hK F hfinF x
+    (fun z hz => andEL (x z :e K) (y z :e K)
+      (hxy z (hFsub z hz))))
+  (ring_finite_product K add mul (I :\: F) y)
+  (god1_ring_finite_product_in K add mul hK
+    (I :\: F) hfinComp y
+    (fun z hz => andER (x z :e K) (y z :e K)
+      (hxy z (setminusE1 I F z hz))))).
+Qed.
+
+Theorem god1_product_choice_sum_adjoin :
+  forall K, forall add mul:set -> set -> set,
+    commutative_ring K add mul -> forall X, finite X -> forall a,
+    a /:e X -> forall x y:set -> set,
+    (forall z :e X :\/: {a}, x z :e K /\ y z :e K) ->
+    ring_finite_sum K add (Power (X :\/: {a}))
+      (god1_product_choice_term K add mul (X :\/: {a}) x y)
+    = add
+      (mul
+        (ring_finite_sum K add (Power X)
+          (god1_product_choice_term K add mul X x y))
+        (y a))
+      (mul
+        (ring_finite_sum K add (Power X)
+          (god1_product_choice_term K add mul X x y))
+        (x a)).
+let K add mul.
+assume hK.
+let X.
+assume hfin.
+let a.
+assume haX.
+let x y.
+assume hxy.
+claim hring : ring K add mul.
+exact (andEL (ring K add mul) (commutative_on K mul) hK).
+claim hfinZ : finite (X :\/: {a}).
+exact (adjoin_finite X a hfin).
+claim hfinPowerX : finite (Power X).
+exact (god1_power_finite X hfin).
+claim hfinPowerZ : finite (Power (X :\/: {a})).
+exact (god1_power_finite (X :\/: {a}) hfinZ).
+claim hfinAvoid : finite (god1_power_adjoin_avoiding X a).
+exact (god1_power_adjoin_avoiding_finite X a hfin haX).
+claim hfinContain : finite (god1_power_adjoin_containing X a).
+exact (god1_power_adjoin_containing_finite X a hfin haX).
+claim htermX : forall F :e Power X,
+  god1_product_choice_term K add mul X x y F :e K.
+exact (god1_product_choice_term_in K add mul hring X hfin x y
+  (fun z hz => hxy z (binunionI1 X {a} z hz))).
+claim htermZ : forall F :e Power (X :\/: {a}),
+  god1_product_choice_term K add mul (X :\/: {a}) x y F :e K.
+exact (god1_product_choice_term_in K add mul hring
+  (X :\/: {a}) hfinZ x y hxy).
+claim hya : y a :e K.
+exact (andER (x a :e K) (y a :e K)
+  (hxy a (binunionI2 X {a} a (SingI a)))).
+claim hxa : x a :e K.
+exact (andEL (x a :e K) (y a :e K)
+  (hxy a (binunionI2 X {a} a (SingI a)))).
+claim hpartition :
+  god1_power_adjoin_avoiding X a
+    :\/: god1_power_adjoin_containing X a
+  = Power (X :\/: {a}).
+exact (god1_power_adjoin_partition X a).
+claim hsplit :
+  ring_finite_sum K add
+    (god1_power_adjoin_avoiding X a
+      :\/: god1_power_adjoin_containing X a)
+    (god1_product_choice_term K add mul (X :\/: {a}) x y)
+  = add
+    (ring_finite_sum K add (god1_power_adjoin_avoiding X a)
+      (god1_product_choice_term K add mul (X :\/: {a}) x y))
+    (ring_finite_sum K add (god1_power_adjoin_containing X a)
+      (god1_product_choice_term K add mul (X :\/: {a}) x y)).
+exact (god1_ring_finite_sum_disjoint_union K add mul hring
+  (god1_power_adjoin_avoiding X a) hfinAvoid
+  (god1_power_adjoin_containing X a) hfinContain
+  (god1_power_adjoin_partition_disjoint X a)
+  (god1_product_choice_term K add mul (X :\/: {a}) x y)
+  (fun F hF => htermZ F
+    (mem_eq_set_subst
+      (god1_power_adjoin_avoiding X a
+        :\/: god1_power_adjoin_containing X a)
+      (Power (X :\/: {a})) F hpartition hF))).
+claim havoidEq : god1_power_adjoin_avoiding X a = Power X.
+exact (god1_power_adjoin_avoiding_eq X a haX).
+claim havoid :
+  ring_finite_sum K add (god1_power_adjoin_avoiding X a)
+    (god1_product_choice_term K add mul (X :\/: {a}) x y)
+  = mul
+    (ring_finite_sum K add (Power X)
+      (god1_product_choice_term K add mul X x y))
+    (y a).
+exact (eq_i_tra
+  (ring_finite_sum K add (god1_power_adjoin_avoiding X a)
+    (god1_product_choice_term K add mul (X :\/: {a}) x y))
+  (ring_finite_sum K add (Power X)
+    (fun F => mul (god1_product_choice_term K add mul X x y F) (y a)))
+  (mul
+    (ring_finite_sum K add (Power X)
+      (god1_product_choice_term K add mul X x y))
+    (y a))
+  (eq_i_tra
+    (ring_finite_sum K add (god1_power_adjoin_avoiding X a)
+      (god1_product_choice_term K add mul (X :\/: {a}) x y))
+    (ring_finite_sum K add (Power X)
+      (god1_product_choice_term K add mul (X :\/: {a}) x y))
+    (ring_finite_sum K add (Power X)
+      (fun F => mul (god1_product_choice_term K add mul X x y F) (y a)))
+    (f_eq_i
+      (fun S => ring_finite_sum K add S
+        (god1_product_choice_term K add mul (X :\/: {a}) x y))
+      (god1_power_adjoin_avoiding X a) (Power X) havoidEq)
+    (god1_ring_finite_sum_congr_finite K add (Power X) hfinPowerX
+      (god1_product_choice_term K add mul (X :\/: {a}) x y)
+      (fun F => mul (god1_product_choice_term K add mul X x y F) (y a))
+      (god1_product_choice_term_avoiding_adjoin
+        K add mul hK X hfin a haX x y hxy)))
+  (eq_sym
+    (mul
+      (ring_finite_sum K add (Power X)
+        (god1_product_choice_term K add mul X x y))
+      (y a))
+    (ring_finite_sum K add (Power X)
+      (fun F => mul (god1_product_choice_term K add mul X x y F) (y a)))
+    (god1_ring_finite_sum_right_mul_finite K add mul hring
+      (Power X) hfinPowerX
+      (god1_product_choice_term K add mul X x y) htermX
+      (y a) hya))).
+claim hcontain :
+  ring_finite_sum K add (god1_power_adjoin_containing X a)
+    (god1_product_choice_term K add mul (X :\/: {a}) x y)
+  = mul
+    (ring_finite_sum K add (Power X)
+      (god1_product_choice_term K add mul X x y))
+    (x a).
+exact (eq_i_tra
+  (ring_finite_sum K add (god1_power_adjoin_containing X a)
+    (god1_product_choice_term K add mul (X :\/: {a}) x y))
+  (ring_finite_sum K add (Power X)
+    (fun F => mul (god1_product_choice_term K add mul X x y F) (x a)))
+  (mul
+    (ring_finite_sum K add (Power X)
+      (god1_product_choice_term K add mul X x y))
+    (x a))
+  (eq_i_tra
+    (ring_finite_sum K add (god1_power_adjoin_containing X a)
+      (god1_product_choice_term K add mul (X :\/: {a}) x y))
+    (ring_finite_sum K add (Power X)
+      (fun F => god1_product_choice_term K add mul
+        (X :\/: {a}) x y (F :\/: {a})))
+    (ring_finite_sum K add (Power X)
+      (fun F => mul (god1_product_choice_term K add mul X x y F) (x a)))
+    (god1_ring_finite_sum_bijection_invariant K add
+      (god1_ring_additive_abelian_group K add mul hring)
+      (Power X) (god1_power_adjoin_containing X a)
+      hfinPowerX hfinContain (fun F => F :\/: {a})
+      (god1_power_adjoin_containing_bijection X a haX)
+      (god1_product_choice_term K add mul (X :\/: {a}) x y)
+      (fun F hF => htermZ F
+        (SepE1 (Power (X :\/: {a})) (fun A => a :e A) F hF)))
+    (god1_ring_finite_sum_congr_finite K add (Power X) hfinPowerX
+      (fun F => god1_product_choice_term K add mul
+        (X :\/: {a}) x y (F :\/: {a}))
+      (fun F => mul (god1_product_choice_term K add mul X x y F) (x a))
+      (god1_product_choice_term_containing_adjoin
+        K add mul hK X hfin a haX x y hxy)))
+  (eq_sym
+    (mul
+      (ring_finite_sum K add (Power X)
+        (god1_product_choice_term K add mul X x y))
+      (x a))
+    (ring_finite_sum K add (Power X)
+      (fun F => mul (god1_product_choice_term K add mul X x y F) (x a)))
+    (god1_ring_finite_sum_right_mul_finite K add mul hring
+      (Power X) hfinPowerX
+      (god1_product_choice_term K add mul X x y) htermX
+      (x a) hxa))).
+exact (eq_i_tra
+  (ring_finite_sum K add (Power (X :\/: {a}))
+    (god1_product_choice_term K add mul (X :\/: {a}) x y))
+  (add
+    (ring_finite_sum K add (god1_power_adjoin_avoiding X a)
+      (god1_product_choice_term K add mul (X :\/: {a}) x y))
+    (ring_finite_sum K add (god1_power_adjoin_containing X a)
+      (god1_product_choice_term K add mul (X :\/: {a}) x y)))
+  (add
+    (mul
+      (ring_finite_sum K add (Power X)
+        (god1_product_choice_term K add mul X x y)) (y a))
+    (mul
+      (ring_finite_sum K add (Power X)
+        (god1_product_choice_term K add mul X x y)) (x a)))
+  (eq_i_tra
+    (ring_finite_sum K add (Power (X :\/: {a}))
+      (god1_product_choice_term K add mul (X :\/: {a}) x y))
+    (ring_finite_sum K add
+      (god1_power_adjoin_avoiding X a
+        :\/: god1_power_adjoin_containing X a)
+      (god1_product_choice_term K add mul (X :\/: {a}) x y))
+    (add
+      (ring_finite_sum K add (god1_power_adjoin_avoiding X a)
+        (god1_product_choice_term K add mul (X :\/: {a}) x y))
+      (ring_finite_sum K add (god1_power_adjoin_containing X a)
+        (god1_product_choice_term K add mul (X :\/: {a}) x y)))
+    (f_eq_i
+      (fun S => ring_finite_sum K add S
+        (god1_product_choice_term K add mul (X :\/: {a}) x y))
+      (Power (X :\/: {a}))
+      (god1_power_adjoin_avoiding X a
+        :\/: god1_power_adjoin_containing X a)
+      (eq_sym
+        (god1_power_adjoin_avoiding X a
+          :\/: god1_power_adjoin_containing X a)
+        (Power (X :\/: {a})) hpartition))
+    hsplit)
+  (eq_i_tra
+    (add
+      (ring_finite_sum K add (god1_power_adjoin_avoiding X a)
+        (god1_product_choice_term K add mul (X :\/: {a}) x y))
+      (ring_finite_sum K add (god1_power_adjoin_containing X a)
+        (god1_product_choice_term K add mul (X :\/: {a}) x y)))
+    (add
+      (mul
+        (ring_finite_sum K add (Power X)
+          (god1_product_choice_term K add mul X x y)) (y a))
+      (ring_finite_sum K add (god1_power_adjoin_containing X a)
+        (god1_product_choice_term K add mul (X :\/: {a}) x y)))
+    (add
+      (mul
+        (ring_finite_sum K add (Power X)
+          (god1_product_choice_term K add mul X x y)) (y a))
+      (mul
+        (ring_finite_sum K add (Power X)
+          (god1_product_choice_term K add mul X x y)) (x a)))
+    (f_eq_i
+      (fun q => add q
+        (ring_finite_sum K add (god1_power_adjoin_containing X a)
+          (god1_product_choice_term K add mul (X :\/: {a}) x y)))
+      (ring_finite_sum K add (god1_power_adjoin_avoiding X a)
+        (god1_product_choice_term K add mul (X :\/: {a}) x y))
+      (mul
+        (ring_finite_sum K add (Power X)
+          (god1_product_choice_term K add mul X x y)) (y a)) havoid)
+    (f_eq_i
+      (fun q => add
+        (mul
+          (ring_finite_sum K add (Power X)
+            (god1_product_choice_term K add mul X x y)) (y a)) q)
+      (ring_finite_sum K add (god1_power_adjoin_containing X a)
+        (god1_product_choice_term K add mul (X :\/: {a}) x y))
+      (mul
+        (ring_finite_sum K add (Power X)
+          (god1_product_choice_term K add mul X x y)) (x a)) hcontain))).
+Qed.
+
+Theorem god1_product_of_sums_expansion_empty :
+  forall K, forall add mul:set -> set -> set,
+    commutative_ring K add mul -> forall x y:set -> set,
+    (forall i :e 0, x i :e K /\ y i :e K) ->
+    ring_finite_product K add mul 0 (fun i => add (x i) (y i))
+    = ring_finite_sum K add (Power 0)
+      (god1_product_choice_term K add mul 0 x y).
+let K add mul.
+assume hK.
+let x y.
+assume hxy0.
+claim hring : ring K add mul.
+exact (andEL (ring K add mul) (commutative_on K mul) hK).
+claim hone : ring_one K mul :e K.
+exact (andEL
+  (ring_one K mul :e K)
+  (forall z :e K,
+    mul z (ring_one K mul) = z /\ mul (ring_one K mul) z = z)
+  (god1_ring_multiplicative_identity_specification K add mul hring)).
+claim hindex : Power 0 = 0 :\/: {0}.
+exact (eq_i_tra (Power 0) {0} (0 :\/: {0})
+  Power_0_Sing_0
+  (eq_sym (0 :\/: {0}) {0} (binunion_idl {0}))).
+claim htermzero :
+  god1_product_choice_term K add mul 0 x y 0 = ring_one K mul.
+exact (eq_i_tra
+  (god1_product_choice_term K add mul 0 x y 0)
+  (mul (ring_finite_product K add mul 0 x)
+    (ring_finite_product K add mul 0 y))
+  (ring_one K mul)
+  (f_eq_i
+    (fun S => mul (ring_finite_product K add mul 0 x)
+      (ring_finite_product K add mul S y))
+    (0 :\: 0) 0 (setminus_self_eq_Empty 0))
+  (eq_i_tra
+    (mul (ring_finite_product K add mul 0 x)
+      (ring_finite_product K add mul 0 y))
+    (mul (ring_one K mul) (ring_one K mul))
+    (ring_one K mul)
+    (eq_i_tra
+      (mul (ring_finite_product K add mul 0 x)
+        (ring_finite_product K add mul 0 y))
+      (mul (ring_one K mul) (ring_finite_product K add mul 0 y))
+      (mul (ring_one K mul) (ring_one K mul))
+      (f_eq_i
+        (fun q => mul q (ring_finite_product K add mul 0 y))
+        (ring_finite_product K add mul 0 x) (ring_one K mul)
+        (god1_ring_finite_product_empty K add mul x))
+      (f_eq_i (fun q => mul (ring_one K mul) q)
+        (ring_finite_product K add mul 0 y) (ring_one K mul)
+        (god1_ring_finite_product_empty K add mul y)))
+    (andER
+      (mul (ring_one K mul) (ring_one K mul) = ring_one K mul)
+      (mul (ring_one K mul) (ring_one K mul) = ring_one K mul)
+      ((andER
+        (ring_one K mul :e K)
+        (forall z :e K,
+          mul z (ring_one K mul) = z
+          /\ mul (ring_one K mul) z = z)
+        (god1_ring_multiplicative_identity_specification K add mul hring))
+        (ring_one K mul) hone)))).
+claim hmaps : forall F :e 0 :\/: {0},
+  god1_product_choice_term K add mul 0 x y F :e K.
+exact (fun F hF => god1_product_choice_term_in K add mul hring
+  0 finite_Empty x y
+  (fun i hi => FalseE (EmptyE i hi) (x i :e K /\ y i :e K))
+  F (mem_eq_set_subst
+    (0 :\/: {0}) (Power 0) F
+    (eq_sym (Power 0) (0 :\/: {0}) hindex) hF)).
+claim hsumone :
+  ring_finite_sum K add (Power 0)
+    (god1_product_choice_term K add mul 0 x y)
+  = ring_one K mul.
+exact (eq_i_tra
+  (ring_finite_sum K add (Power 0)
+    (god1_product_choice_term K add mul 0 x y))
+  (add
+    (ring_finite_sum K add 0
+      (god1_product_choice_term K add mul 0 x y))
+    (god1_product_choice_term K add mul 0 x y 0))
+  (ring_one K mul)
+  (eq_i_tra
+    (ring_finite_sum K add (Power 0)
+      (god1_product_choice_term K add mul 0 x y))
+    (ring_finite_sum K add (0 :\/: {0})
+      (god1_product_choice_term K add mul 0 x y))
+    (add
+      (ring_finite_sum K add 0
+        (god1_product_choice_term K add mul 0 x y))
+      (god1_product_choice_term K add mul 0 x y 0))
+    (f_eq_i
+      (fun S => ring_finite_sum K add S
+        (god1_product_choice_term K add mul 0 x y))
+      (Power 0) (0 :\/: {0}) hindex)
+    (god1_ring_finite_sum_adjoin K add mul hring
+      0 finite_Empty 0 (fun h => EmptyE 0 h)
+      (god1_product_choice_term K add mul 0 x y) hmaps))
+  (eq_i_tra
+    (add
+      (ring_finite_sum K add 0
+        (god1_product_choice_term K add mul 0 x y))
+      (god1_product_choice_term K add mul 0 x y 0))
+    (add (group_identity K add) (ring_one K mul))
+    (ring_one K mul)
+    (eq_i_tra
+      (add
+        (ring_finite_sum K add 0
+          (god1_product_choice_term K add mul 0 x y))
+        (god1_product_choice_term K add mul 0 x y 0))
+      (add (group_identity K add)
+        (god1_product_choice_term K add mul 0 x y 0))
+      (add (group_identity K add) (ring_one K mul))
+      (f_eq_i
+        (fun q => add q
+          (god1_product_choice_term K add mul 0 x y 0))
+        (ring_finite_sum K add 0
+          (god1_product_choice_term K add mul 0 x y))
+        (group_identity K add)
+        (god1_ring_finite_sum_zero_natural K add
+          (god1_product_choice_term K add mul 0 x y)))
+      (f_eq_i (fun q => add (group_identity K add) q)
+        (god1_product_choice_term K add mul 0 x y 0)
+        (ring_one K mul) htermzero))
+    (andER
+      (add (ring_one K mul) (group_identity K add) = ring_one K mul)
+      (add (group_identity K add) (ring_one K mul) = ring_one K mul)
+      ((andER
+        (group_identity K add :e K)
+        (forall z :e K,
+          add z (group_identity K add) = z
+          /\ add (group_identity K add) z = z)
+        (god1_group_identity_specification K add
+          (god1_ring_additive_group K add mul hring)))
+        (ring_one K mul) hone)))).
+exact (eq_i_tra
+  (ring_finite_product K add mul 0 (fun i => add (x i) (y i)))
+  (ring_one K mul)
+  (ring_finite_sum K add (Power 0)
+    (god1_product_choice_term K add mul 0 x y))
+  (god1_ring_finite_product_empty K add mul
+    (fun i => add (x i) (y i)))
+  (eq_sym
+    (ring_finite_sum K add (Power 0)
+      (god1_product_choice_term K add mul 0 x y))
+    (ring_one K mul) hsumone)).
+Qed.
+
+Theorem god1_product_of_sums_expansion_step :
+  forall K, forall add mul:set -> set -> set,
+    commutative_ring K add mul -> forall X a,
+    finite X -> a /:e X ->
+    (forall x y:set -> set,
+      (forall i :e X, x i :e K /\ y i :e K) ->
+      ring_finite_product K add mul X (fun i => add (x i) (y i))
+      = ring_finite_sum K add (Power X)
+        (god1_product_choice_term K add mul X x y)) ->
+    forall x y:set -> set,
+    (forall i :e X :\/: {a}, x i :e K /\ y i :e K) ->
+    ring_finite_product K add mul (X :\/: {a})
+      (fun i => add (x i) (y i))
+    = ring_finite_sum K add (Power (X :\/: {a}))
+      (god1_product_choice_term K add mul (X :\/: {a}) x y).
+let K add mul.
+assume hK.
+let X a.
+assume hfin haX hind.
+let x y.
+assume hxy.
+claim hring : ring K add mul.
+exact (andEL (ring K add mul) (commutative_on K mul) hK).
+claim hxyX : forall i :e X, x i :e K /\ y i :e K.
+exact (fun i hi => hxy i (binunionI1 X {a} i hi)).
+claim hxa : x a :e K.
+exact (andEL (x a :e K) (y a :e K)
+  (hxy a (binunionI2 X {a} a (SingI a)))).
+claim hya : y a :e K.
+exact (andER (x a :e K) (y a :e K)
+  (hxy a (binunionI2 X {a} a (SingI a)))).
+claim hsuma : add (x a) (y a) :e K.
+exact (god1_group_law_of_composition K add
+  (god1_ring_additive_group K add mul hring) (x a) hxa (y a) hya).
+claim hprodX :
+  ring_finite_product K add mul X (fun i => add (x i) (y i)) :e K.
+exact (god1_ring_finite_product_in K add mul hring X hfin
+  (fun i => add (x i) (y i))
+  (fun i hi => god1_group_law_of_composition K add
+    (god1_ring_additive_group K add mul hring)
+    (x i) (andEL (x i :e K) (y i :e K) (hxyX i hi))
+    (y i) (andER (x i :e K) (y i :e K) (hxyX i hi)))).
+claim htermX : forall F :e Power X,
+  god1_product_choice_term K add mul X x y F :e K.
+exact (god1_product_choice_term_in K add mul hring X hfin x y hxyX).
+claim hfinPowerX : finite (Power X).
+exact (god1_power_finite X hfin).
+claim hchoiceSum :
+  ring_finite_sum K add (Power X)
+    (god1_product_choice_term K add mul X x y) :e K.
+exact (god1_ring_finite_sum_in K add mul hring
+  (Power X) hfinPowerX
+  (god1_product_choice_term K add mul X x y) htermX).
+claim hIH :
+  ring_finite_product K add mul X (fun i => add (x i) (y i))
+  = ring_finite_sum K add (Power X)
+    (god1_product_choice_term K add mul X x y).
+exact (hind x y hxyX).
+claim hleft :
+  ring_finite_product K add mul (X :\/: {a})
+    (fun i => add (x i) (y i))
+  = add
+    (mul
+      (ring_finite_sum K add (Power X)
+        (god1_product_choice_term K add mul X x y))
+      (x a))
+    (mul
+      (ring_finite_sum K add (Power X)
+        (god1_product_choice_term K add mul X x y))
+      (y a)).
+exact (eq_i_tra
+  (ring_finite_product K add mul (X :\/: {a})
+    (fun i => add (x i) (y i)))
+  (mul
+    (ring_finite_product K add mul X (fun i => add (x i) (y i)))
+    (add (x a) (y a)))
+  (add
+    (mul
+      (ring_finite_sum K add (Power X)
+        (god1_product_choice_term K add mul X x y)) (x a))
+    (mul
+      (ring_finite_sum K add (Power X)
+        (god1_product_choice_term K add mul X x y)) (y a)))
+  (god1_ring_finite_product_adjoin K add mul hK X hfin a haX
+    (fun i => add (x i) (y i))
+    (fun i hi => god1_group_law_of_composition K add
+      (god1_ring_additive_group K add mul hring)
+      (x i) (andEL (x i :e K) (y i :e K) (hxy i hi))
+      (y i) (andER (x i :e K) (y i :e K) (hxy i hi))))
+  (eq_i_tra
+    (mul
+      (ring_finite_product K add mul X (fun i => add (x i) (y i)))
+      (add (x a) (y a)))
+    (add
+      (mul
+        (ring_finite_product K add mul X (fun i => add (x i) (y i)))
+        (x a))
+      (mul
+        (ring_finite_product K add mul X (fun i => add (x i) (y i)))
+        (y a)))
+    (add
+      (mul
+        (ring_finite_sum K add (Power X)
+          (god1_product_choice_term K add mul X x y)) (x a))
+      (mul
+        (ring_finite_sum K add (Power X)
+          (god1_product_choice_term K add mul X x y)) (y a)))
+    (andEL
+      ((mul
+        (ring_finite_product K add mul X (fun i => add (x i) (y i)))
+        (add (x a) (y a)))
+      = add
+        (mul
+          (ring_finite_product K add mul X (fun i => add (x i) (y i)))
+          (x a))
+        (mul
+          (ring_finite_product K add mul X (fun i => add (x i) (y i)))
+          (y a)))
+      ((mul
+        (add
+          (ring_finite_product K add mul X (fun i => add (x i) (y i)))
+          (x a))
+        (y a))
+      = add
+        (mul
+          (ring_finite_product K add mul X (fun i => add (x i) (y i)))
+          (y a))
+        (mul (x a) (y a)))
+      (god1_ring_distributive_laws K add mul hring
+        (ring_finite_product K add mul X (fun i => add (x i) (y i)))
+        hprodX (x a) hxa (y a) hya))
+    (eq_i_tra
+      (add
+        (mul
+          (ring_finite_product K add mul X (fun i => add (x i) (y i)))
+          (x a))
+        (mul
+          (ring_finite_product K add mul X (fun i => add (x i) (y i)))
+          (y a)))
+      (add
+        (mul
+          (ring_finite_sum K add (Power X)
+            (god1_product_choice_term K add mul X x y)) (x a))
+        (mul
+          (ring_finite_product K add mul X (fun i => add (x i) (y i)))
+          (y a)))
+      (add
+        (mul
+          (ring_finite_sum K add (Power X)
+            (god1_product_choice_term K add mul X x y)) (x a))
+        (mul
+          (ring_finite_sum K add (Power X)
+            (god1_product_choice_term K add mul X x y)) (y a)))
+      (f_eq_i
+        (fun q => add (mul q (x a))
+          (mul
+            (ring_finite_product K add mul X (fun i => add (x i) (y i)))
+            (y a)))
+        (ring_finite_product K add mul X (fun i => add (x i) (y i)))
+        (ring_finite_sum K add (Power X)
+          (god1_product_choice_term K add mul X x y)) hIH)
+      (f_eq_i
+        (fun q => add
+          (mul
+            (ring_finite_sum K add (Power X)
+              (god1_product_choice_term K add mul X x y)) (x a))
+          (mul q (y a)))
+        (ring_finite_product K add mul X (fun i => add (x i) (y i)))
+        (ring_finite_sum K add (Power X)
+          (god1_product_choice_term K add mul X x y)) hIH)))).
+claim hright :
+  ring_finite_sum K add (Power (X :\/: {a}))
+    (god1_product_choice_term K add mul (X :\/: {a}) x y)
+  = add
+    (mul
+      (ring_finite_sum K add (Power X)
+        (god1_product_choice_term K add mul X x y)) (y a))
+    (mul
+      (ring_finite_sum K add (Power X)
+        (god1_product_choice_term K add mul X x y)) (x a)).
+exact (god1_product_choice_sum_adjoin K add mul hK
+  X hfin a haX x y hxy).
+claim hxterm :
+  mul
+    (ring_finite_sum K add (Power X)
+      (god1_product_choice_term K add mul X x y)) (x a) :e K.
+exact (god1_ring_multiplicative_law K add mul hring
+  (ring_finite_sum K add (Power X)
+    (god1_product_choice_term K add mul X x y)) hchoiceSum
+  (x a) hxa).
+claim hyterm :
+  mul
+    (ring_finite_sum K add (Power X)
+      (god1_product_choice_term K add mul X x y)) (y a) :e K.
+exact (god1_ring_multiplicative_law K add mul hring
+  (ring_finite_sum K add (Power X)
+    (god1_product_choice_term K add mul X x y)) hchoiceSum
+  (y a) hya).
+exact (eq_i_tra
+  (ring_finite_product K add mul (X :\/: {a})
+    (fun i => add (x i) (y i)))
+  (add
+    (mul
+      (ring_finite_sum K add (Power X)
+        (god1_product_choice_term K add mul X x y)) (x a))
+    (mul
+      (ring_finite_sum K add (Power X)
+        (god1_product_choice_term K add mul X x y)) (y a)))
+  (ring_finite_sum K add (Power (X :\/: {a}))
+    (god1_product_choice_term K add mul (X :\/: {a}) x y))
+  hleft
+  (eq_i_tra
+    (add
+      (mul
+        (ring_finite_sum K add (Power X)
+          (god1_product_choice_term K add mul X x y)) (x a))
+      (mul
+        (ring_finite_sum K add (Power X)
+          (god1_product_choice_term K add mul X x y)) (y a)))
+    (add
+      (mul
+        (ring_finite_sum K add (Power X)
+          (god1_product_choice_term K add mul X x y)) (y a))
+      (mul
+        (ring_finite_sum K add (Power X)
+          (god1_product_choice_term K add mul X x y)) (x a)))
+    (ring_finite_sum K add (Power (X :\/: {a}))
+      (god1_product_choice_term K add mul (X :\/: {a}) x y))
+    (god1_ring_additive_commutative K add mul hring
+      (mul
+        (ring_finite_sum K add (Power X)
+          (god1_product_choice_term K add mul X x y)) (x a)) hxterm
+      (mul
+        (ring_finite_sum K add (Power X)
+          (god1_product_choice_term K add mul X x y)) (y a)) hyterm)
+    (eq_sym
+      (ring_finite_sum K add (Power (X :\/: {a}))
+        (god1_product_choice_term K add mul (X :\/: {a}) x y))
+      (add
+        (mul
+          (ring_finite_sum K add (Power X)
+            (god1_product_choice_term K add mul X x y)) (y a))
+        (mul
+          (ring_finite_sum K add (Power X)
+            (god1_product_choice_term K add mul X x y)) (x a)))
+      hright))).
+Qed.
+
+Theorem god1_product_of_sums_expansion_core :
+  forall K, forall add mul:set -> set -> set,
+    commutative_ring K add mul -> forall I,
+    finite I -> forall x y:set -> set,
+    (forall i :e I, x i :e K /\ y i :e K) ->
+    ring_finite_product K add mul I (fun i => add (x i) (y i))
+    = ring_finite_sum K add (Power I)
+      (god1_product_choice_term K add mul I x y).
+let K add mul.
+assume hK.
+let I.
+assume hfin.
+let x y.
+assume hxy.
+exact (finite_ind
+  (fun X => forall u v:set -> set,
+    (forall i :e X, u i :e K /\ v i :e K) ->
+    ring_finite_product K add mul X (fun i => add (u i) (v i))
+    = ring_finite_sum K add (Power X)
+      (god1_product_choice_term K add mul X u v))
+  (god1_product_of_sums_expansion_empty K add mul hK)
+  (god1_product_of_sums_expansion_step K add mul hK)
+  I hfin x y hxy).
+Qed.
+
 Theorem god1_product_of_sums_expansion :
   forall K, forall add mul:set -> set -> set,
     commutative_ring K add mul ->
@@ -62059,7 +67146,7 @@ assume hxy.
 //GOD1PRF:121701 To multiply the sums $x_{i}+y_{i}$ together, we have to choose one term in each sum in all possible ways, form the product of the chosen terms, and then add all these products together.
 claim h_s8_product_sums_choice_index :
   forall F :e Power I, F c= I.
-admit.
+exact (fun F hF => PowerE I F hF).
 //GOD1PRF:121887 The product of the $x_{i}+y_{i}$ will therefore be a sum of products obtained by multiplying the $x_{i}$ in some of the sums by the $y_{j}$ in the others.
 claim h_s8_product_sums_expansion_shape :
   ring_finite_product K add mul I (fun i => add (x i) (y i))
@@ -62067,12 +67154,16 @@ claim h_s8_product_sums_expansion_shape :
       (fun F => mul
         (ring_finite_product K add mul F x)
         (ring_finite_product K add mul (I :\: F) y)).
-admit.
+exact (god1_product_of_sums_expansion_core
+  K add mul hK I hfin x y hxy).
 //GOD1PRF:122042 For such a product, let F denote the set of values of $i$ for which we choose $x_{i}$, so that $\mathrm{I}-\mathrm{F}$ is the set of values of $i$ for which we choose $y_{i}$.
 claim h_s8_product_sums_partition_indices :
   forall F :e Power I,
     F c= I /\ I :\: F c= I.
-admit.
+exact (fun F hF => andI
+  (F c= I) (I :\: F c= I)
+  (h_s8_product_sums_choice_index F hF)
+  (setminus_Subq I F)).
 //GOD1PRF:122218 Clearly the product of the chosen terms is $x_{\mathrm{F}} y_{\mathrm{I}-\mathrm{F}}$, and so we arrive at the formula stated above.
 claim h_s8_product_sums_conclusion :
   ring_finite_product K add mul I (fun i => add (x i) (y i))
@@ -62080,8 +67171,9 @@ claim h_s8_product_sums_conclusion :
       (fun F => mul
         (ring_finite_product K add mul F x)
         (ring_finite_product K add mul (I :\: F) y)).
-admit.
-Admitted.
+exact h_s8_product_sums_expansion_shape.
+exact h_s8_product_sums_conclusion.
+Qed.
 
 //GOD1:122999 ring_homomorphism : "#7 is a homomorphism from the ring #1 to the ring #3" | $#7:#1\to #3$
 Definition ring_homomorphism :
