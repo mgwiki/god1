@@ -34500,9 +34500,17 @@ assume hop.
 let e1 e2.
 assume he1 he2.
 //GOD1PRF:8596 Suppose that $e^{\prime}, e^{\prime \prime}$ are neutral elements.
+claim h_s6_t1_neutral_data :
+  neutral_element X op e1 /\ neutral_element X op e2.
+admit.
 //GOD1PRF:8663 Then the formula $e^{\prime} \perp x=x$ applied to $x=e^{\prime \prime}$ gives $e^{\prime} \perp e^{\prime \prime}=e^{\prime \prime}$; and the formula $x \perp e^{\prime \prime}=x$ applied to $x=e^{\prime}$ gives $e^{\prime} \perp e^{\prime \prime} =e^{\prime}$.
+claim h_s6_t1_middle_values :
+  op e1 e2 = e2 /\ op e1 e2 = e1.
+admit.
 apply (eq_i_tra e1 (op e1 e2) e2).
 //GOD1PRF:8926 Hence $e^{\prime}=e^{\prime \prime}$.
+claim h_s6_t1_conclusion : e1 = e2.
+admit.
 Admitted.
 
 Theorem god1_s6_theorem2_reflection_characterization :
@@ -34526,12 +34534,65 @@ let X op e x.
 assume hop hassoc he hx.
 apply andI.
 - apply iffI.
+claim h_s6_t2_necessary :
+  reflexible X op e x ->
+  (exists l :e X, left_reflection X op e x l) /\
+  (exists r :e X, right_reflection X op e x r).
+admit.
 //GOD1PRF:14362 Let $x^{\prime}$ be a left reflection and $x^{\prime \prime}$ a right reflection of $x$.
+claim h_s6_t2_reflection_equations :
+  forall l r :e X,
+    left_reflection X op e x l ->
+    right_reflection X op e x r ->
+    op l x = e /\ op x r = e.
+admit.
 //GOD1PRF:14513 Using associativity, it follows that
+claim h_s6_t2_associativity_instance :
+  forall l r :e X,
+    op l (op x r) = op (op l x) r.
+let l.
+assume hl.
+let r.
+assume hr.
+apply hassoc.
+claim h_s6_t2_right_equals_left :
+  forall l r :e X,
+    left_reflection X op e x l ->
+    right_reflection X op e x r -> r = l.
+admit.
 //GOD1PRF:14745 Hence every right reflection of $x$ is equal to every left reflection of $x$, and therefore $x$ has only one left reflection and only one right reflection, and the two are equal.
+claim h_s6_t2_unique_one_sided_reflections :
+  forall l r :e X,
+    left_reflection X op e x l ->
+    right_reflection X op e x r ->
+    (forall l' :e X, left_reflection X op e x l' -> l' = l)
+    /\ (forall r' :e X, right_reflection X op e x r' -> r' = r)
+    /\ l = r.
+admit.
 //GOD1PRF:14924 If $x^{\prime}$ denotes their common value, we have
+claim h_s6_t2_common_value_is_two_sided :
+  forall u :e X,
+    left_reflection X op e x u ->
+    right_reflection X op e x u ->
+    reflection X op e x u.
+admit.
 //GOD1PRF:15024 so that $x$ is reflexible and $x^{\prime}$ is the reflection of $x$ (necessarily unique, because a reflection of $x$ is a fortiori a left reflection and a right reflection of $x$, and must therefore be equal to $x^{\prime}$ ).
+claim h_s6_t2_sufficient_and_unique :
+  ((exists l :e X, left_reflection X op e x l) /\
+    (exists r :e X, right_reflection X op e x r)) ->
+  reflexible X op e x
+  /\ exists u :e X,
+    reflection X op e x u
+    /\ (forall v :e X, reflection X op e x v -> v = u)
+    /\ (forall v :e X, left_reflection X op e x v -> v = u)
+    /\ (forall v :e X, right_reflection X op e x v -> v = u).
+admit.
 //GOD1PRF:15253 Q.E.D.
+claim h_s6_t2_book_conclusion :
+  reflexible X op e x <->
+  ((exists l :e X, left_reflection X op e x l) /\
+   (exists r :e X, right_reflection X op e x r)).
+admit.
 Admitted.
 
 Theorem god1_s6_theorem3_reflections_and_products :
@@ -34551,8 +34612,26 @@ let X op e.
 assume hop hassoc he.
 apply andI.
 //GOD1PRF:15889 The first part of the theorem follows immediately from the relations
+claim h_s6_t3_reflection_reverses :
+  forall x r :e X,
+    reflection X op e x r -> reflection X op e r x.
+admit.
 //GOD1PRF:16006 For the second part, we calculate
+claim h_s6_t3_product_calculation :
+  forall x y rx ry :e X,
+    reflection X op e x rx ->
+    reflection X op e y ry ->
+    op (op ry rx) (op x y) = e
+    /\ op (op x y) (op ry rx) = e.
+admit.
 //GOD1PRF:16409 This shows that $x \perp y$ is reflexible and that $y^{\prime} \perp x^{\prime}$ is its reflection.
+claim h_s6_t3_product_reflection :
+  forall x y rx ry :e X,
+    reflection X op e x rx ->
+    reflection X op e y ry ->
+    reflexible X op e (op x y)
+    /\ reflection X op e (op x y) (op ry rx).
+admit.
 Admitted.
 
 Theorem god1_s6_theorem4_equation_with_reflexible_left_factor :
@@ -34576,9 +34655,22 @@ assume harX href.
 let b.
 assume hb.
 //GOD1PRF:17285 For the relation $a \perp x=b$ implies
+claim h_s6_t4_left_multiply :
+  forall y :e X, op a y = b -> op ar (op a y) = op ar b.
+admit.
 //GOD1PRF:17380 i.e.,
+claim h_s6_t4_forced_solution :
+  forall y :e X, op a y = b -> y = op ar b.
+admit.
 //GOD1PRF:17465 conversely, from $x=a^{\prime} \perp b$ it follows that
+claim h_s6_t4_candidate_solves : op a (op ar b) = b.
+admit.
 witness (op ar b).
+claim h_s6_t4_candidate_membership : op ar b :e X.
+admit.
+claim h_s6_t4_uniqueness :
+  forall y :e X, op a y = b -> y = op ar b.
+admit.
 Admitted.
 
 (** § 7. Groups. **)
@@ -34615,7 +34707,14 @@ Theorem god1_group_identity_and_inverse_specifications :
 let G mul.
 assume hG.
 //GOD1PRF:18611 b) there exists an element $e \in \mathrm{G}$ such that $x e=e x=x$ for all $x \in \mathrm{G}$ (existence of a neutral element);
+claim h_s7_group_spec_identity :
+  neutral_element G mul (group_identity G mul).
+admit.
 //GOD1PRF:18742 c) for each $x \in \mathrm{G}$, there exists an element $x^{-1} \in \mathrm{G}$ such that $x^{-1} x=x x^{-1}=e$ (existence of an inverse for each element of G ).
+claim h_s7_group_spec_inverse :
+  forall x :e G,
+    reflection G mul (group_identity G mul) x (group_inverse G mul x).
+admit.
 apply andI.
 Admitted.
 
@@ -34635,13 +34734,64 @@ Theorem god1_indexed_direct_product_is_group :
 let I G mul.
 assume hgroups.
 //GOD1PRF:27181 Then the pair consisting of the set $\mathbf{G}$ and this law of composition is a group.
+claim h_s7_product_group_goal :
+  group (Pi_ i :e I, G i) (indexed_group_product_operation I mul).
+admit.
 //GOD1PRF:27272 To prove associativity, consider three elements
+claim h_s7_product_three_elements :
+  forall x y z :e (Pi_ i :e I, G i),
+    indexed_group_product_operation I mul
+      (indexed_group_product_operation I mul x y) z
+    = indexed_group_product_operation I mul
+      x (indexed_group_product_operation I mul y z).
+admit.
+//GOD1PRF:27458 then, by definition
+claim h_s7_product_definition_call :
+  forall x y :e (Pi_ i :e I, G i),
+    indexed_group_product_operation I mul x y
+      = (fun i :e I => mul i (x i) (y i)).
+let x.
+assume hx.
+let y.
+assume hy.
+apply (eq_ref (fun i :e I => mul i (x i) (y i))).
 //GOD1PRF:27805 Thus the associative law on G follows from the associativity of the laws of composition on the factors $\mathrm{G}_{1}, \ldots, \mathrm{G}_{n}$.
+claim h_s7_product_associative :
+  associative_on
+    (Pi_ i :e I, G i)
+    (indexed_group_product_operation I mul).
+admit.
 //GOD1PRF:27951 To show that G has a neutral element, consider the element
+claim h_s7_product_identity_exists :
+  exists e :e (Pi_ i :e I, G i),
+    neutral_element
+      (Pi_ i :e I, G i)
+      (indexed_group_product_operation I mul) e.
+admit.
 //GOD1PRF:28155 A trivial calculation shows immediately that $e$ is a neutral element for the law of composition on G.
+claim h_s7_product_identity_calculation :
+  neutral_element
+    (Pi_ i :e I, G i)
+    (indexed_group_product_operation I mul)
+    (fun i :e I => group_identity (G i) (mul i)).
+admit.
 //GOD1PRF:28258 Finally, if
+claim h_s7_product_arbitrary_element :
+  forall x :e (Pi_ i :e I, G i), x :e (Pi_ i :e I, G i).
+admit.
 //GOD1PRF:28314 is any element of G , it is immediate that $x$ has an inverse given by the formula
+claim h_s7_product_inverse_exists :
+  forall x :e (Pi_ i :e I, G i),
+    exists y :e (Pi_ i :e I, G i),
+      reflection
+        (Pi_ i :e I, G i)
+        (indexed_group_product_operation I mul)
+        (fun i :e I => group_identity (G i) (mul i)) x y.
+admit.
 //GOD1PRF:28458 Thus the product set $\mathrm{G}_{1} \times \ldots \times \mathrm{G}_{n}$, together with the law of composition defined above, is a group.
+claim h_s7_product_conclusion :
+  group (Pi_ i :e I, G i) (indexed_group_product_operation I mul).
+admit.
 Admitted.
 
 //GOD1:29275 group_direct_power : "the direct power of #1 indexed by #3" | $#1^{#3}$
@@ -34667,18 +34817,71 @@ let G mul H.
 assume hG hHG.
 apply iffI.
 //GOD1PRF:31594 Let H be a subgroup of a group G .
+claim h_s7_subgroup_forward_start :
+  subgroup G mul H -> H c= G.
+admit.
 //GOD1PRF:31629 Since H is not empty, it contains at least one element $a$.
+claim h_s7_subgroup_has_element :
+  subgroup G mul H -> exists a :e H, a :e H.
+admit.
 //GOD1PRF:31689 From the relations $a \in \mathrm{H}$ and $a \in \mathrm{H}$ it follows therefore that H contains
+claim h_s7_subgroup_contains_aa_inverse :
+  subgroup G mul H ->
+  forall a :e H, mul a (group_inverse G mul a) :e H.
+admit.
 //GOD1PRF:31808 in other words, a subgroup H of G always contains the neutral element of G .
+claim h_s7_subgroup_contains_identity :
+  subgroup G mul H -> group_identity G mul :e H.
+admit.
 //GOD1PRF:31885 Next, if H contains an element $x$, then since it contains $e$ and $x$ it also contains
+claim h_s7_subgroup_identity_times_inverse :
+  subgroup G mul H -> forall x :e H,
+    mul (group_identity G mul) (group_inverse G mul x) :e H.
+admit.
 //GOD1PRF:31997 and therefore the relation $x \in H$ implies the relation $x^{-1} \in H$.
+claim h_s7_subgroup_inverse_closed :
+  subgroup G mul H ->
+  forall x :e H, group_inverse G mul x :e H.
+admit.
 //GOD1PRF:32073 Let $x, y$ be any elements of H .
+claim h_s7_subgroup_two_elements :
+  forall x y :e H, x :e H /\ y :e H.
+admit.
 //GOD1PRF:32107 Since H contains $x$ and $y^{-1}$ (by what has just been proved), H must contain
+claim h_s7_subgroup_product_via_inverse_inverse :
+  subgroup G mul H -> forall x y :e H,
+    mul x (group_inverse G mul (group_inverse G mul y)) :e H.
+admit.
 //GOD1PRF:32228 and therefore the relations $x \in \mathrm{H}$ and $y \in \mathrm{H}$ imply the relation $x y \in \mathrm{H}$.
+claim h_s7_subgroup_product_closed :
+  subgroup G mul H -> forall x y :e H, mul x y :e H.
+admit.
 //GOD1PRF:32341 Conversely, let H be a subset of G which has the following three properties:
+claim h_s7_subgroup_reverse_hypotheses :
+  (group_identity G mul :e H
+    /\ (forall x y :e H, mul x y :e H)
+    /\ (forall x :e H, group_inverse G mul x :e H)) -> H c= G -> H <> 0.
+admit.
 //GOD1PRF:32620 Then H is a subgroup of G .
+claim h_s7_subgroup_reverse_conclusion :
+  (group_identity G mul :e H
+    /\ (forall x y :e H, mul x y :e H)
+    /\ (forall x :e H, group_inverse G mul x :e H)) -> subgroup G mul H.
+admit.
 //GOD1PRF:32648 For H is not empty, by $b$ ); and if $x, y$ are any two elements of H , then H contains $x$ and $y^{-1}$, by $c$ ), and hence also $x y^{-1}$, by a).
+claim h_s7_subgroup_reverse_closure :
+  (group_identity G mul :e H
+    /\ (forall x y :e H, mul x y :e H)
+    /\ (forall x :e H, group_inverse G mul x :e H)) ->
+  H <> 0 /\ forall x y :e H, mul x (group_inverse G mul y) :e H.
+admit.
 //GOD1PRF:32798 Hence the conditions a), b), c) above characterize subgroups ; in practice they are often used in place of the original definition.
+claim h_s7_subgroup_characterization_conclusion :
+  subgroup G mul H <->
+    group_identity G mul :e H
+    /\ (forall x y :e H, mul x y :e H)
+    /\ (forall x :e H, group_inverse G mul x :e H).
+admit.
 Admitted.
 
 Theorem god1_subgroup_induced_group :
@@ -34687,7 +34890,15 @@ Theorem god1_subgroup_induced_group :
 let G mul H.
 assume hH.
 //GOD1PRF:33511 The set H , endowed with this law of composition, is a group.
+claim h_s7_induced_group_goal : group H mul.
+admit.
 //GOD1PRF:33573 For since the law of composition is associative on G , a fortiori it is associative on H ; since H contains the neutral element $e$ of G , the law of composition on H clearly has $e$ as neutral element; and every $x \in H$ has an inverse in $H$, by condition $c$ ).
+claim h_s7_induced_group_components :
+  associative_on H mul
+  /\ neutral_element H mul (group_identity G mul)
+  /\ forall x :e H, exists y :e H,
+    reflection H mul (group_identity G mul) x y.
+admit.
 Admitted.
 
 //GOD1:39560 group_nat_power : "the natural-number power #4 of #3 in the group #1" | $#3^{#4}$
@@ -34722,6 +34933,17 @@ Theorem god1_group_integer_power_laws :
 let G mul x.
 assume hx hG.
 //GOD1PRF:40125 By means of the associativity of multiplication in G , the following rules of calculation are easily verified :
+claim h_s7_integer_power_calculation_rules :
+  (forall p q :e int,
+    mul (group_int_power G mul x p) (group_int_power G mul x q)
+    = group_int_power G mul x (add_SNo p q))
+  /\ (forall p :e int,
+    group_inverse G mul (group_int_power G mul x p)
+    = group_int_power G mul x (minus_SNo p))
+  /\ (forall p q :e int,
+    group_int_power G mul (group_int_power G mul x p) q
+    = group_int_power G mul x (mul_SNo p q)).
+admit.
 apply andI.
 Admitted.
 
@@ -34736,6 +34958,20 @@ Theorem god1_powers_form_cyclic_subgroup :
 let G mul x.
 assume hx hG.
 //GOD1PRF:40343 It follows that the set of elements $x^{p}$ (for fixed $x \in \mathrm{G}$ and variable $p \in \mathrm{Z}$ ) is a subgroup of G : for clearly it is not empty, and if it contains elements $u=x^{p}, v=x^{q}$, the formula $u v^{-1} =x^{p-q}$ shows that it contains $u v^{-1}$.
+claim h_s7_cyclic_power_laws :
+  (forall p q :e int,
+    mul (group_int_power G mul x p) (group_int_power G mul x q)
+    = group_int_power G mul x (add_SNo p q))
+  /\ (forall p :e int,
+    group_inverse G mul (group_int_power G mul x p)
+    = group_int_power G mul x (minus_SNo p))
+  /\ (forall p q :e int,
+    group_int_power G mul (group_int_power G mul x p) q
+    = group_int_power G mul x (mul_SNo p q)).
+apply (god1_group_integer_power_laws G mul x hx hG).
+claim h_s7_cyclic_subgroup_closure :
+  subgroup G mul (cyclic_subgroup G mul x).
+admit.
 Admitted.
 
 //GOD1:41978 cyclic_group : "#1 with multiplication #2 is a cyclic group" | $(#1,#2)\text{ is cyclic}$
@@ -34769,13 +35005,52 @@ let G mul I H.
 assume hG hH.
 apply andI.
 //GOD1PRF:42954 Let $M$ be the intersection of the $H_{i}$.
+claim h_s7_t1_intersection_membership :
+  forall x :e G,
+    (x :e group_family_intersection I H G <->
+      forall i :e I, x :e H i).
+admit.
 //GOD1PRF:42998 $M$ is not empty, because the neutral element of G belongs to all the $\mathrm{H}_{i}$ and therefore to M ; if M contains two elements $x, y$, then these two elements belong to each $\mathrm{H}_{i}$ and therefore so does $x y^{-1}$.
+claim h_s7_t1_intersection_identity_and_closure :
+  group_identity G mul :e group_family_intersection I H G
+  /\ forall x y :e group_family_intersection I H G,
+    mul x (group_inverse G mul y) :e group_family_intersection I H G.
+admit.
 //GOD1PRF:43231 Hence $x y^{-1}$ belongs to M , and therefore M is a subgroup of G .
+claim h_s7_t1_intersection_subgroup :
+  subgroup G mul (group_family_intersection I H G).
+admit.
 //GOD1PRF:43301 Now let U be the union of the $\mathrm{H}_{i}$.
+claim h_s7_t1_union_membership :
+  forall x,
+    (x :e group_family_union I H <->
+      exists i :e I, x :e H i).
+admit.
 //GOD1PRF:43349 Clearly U is not empty.
+claim h_s7_t1_directed_union_nonempty :
+  (exists i, i :e I) -> group_family_union I H <> 0.
+admit.
 //GOD1PRF:43373 Let $x, y$ be two elements of U , then there exist indices $i, j \in \mathrm{I}$ such that $x \in \mathrm{H}_{i}$ and $y \in \mathrm{H}_{j}$.
+claim h_s7_t1_union_indices :
+  forall x y :e group_family_union I H,
+    exists i j :e I, x :e H i /\ y :e H j.
+admit.
 //GOD1PRF:43515 By the hypothesis of the theorem, there exists an index $k \in \mathrm{I}$ such that $\mathrm{H}_{k}$ contains both $x$ and $y$, and therefore also contains $x y^{-1}$.
+claim h_s7_t1_directed_common_subgroup :
+  (forall i j :e I, exists k :e I,
+    H i c= H k /\ H j c= H k) ->
+  forall x y :e group_family_union I H,
+    exists k :e I,
+      x :e H k /\ y :e H k
+      /\ mul x (group_inverse G mul y) :e H k.
+admit.
 //GOD1PRF:43684 Hence $x y^{-1}$ belongs to U , and U is a subgroup of G .
+claim h_s7_t1_directed_union_subgroup :
+  ((exists i, i :e I)
+    /\ (forall i j :e I, exists k :e I,
+      H i c= H k /\ H j c= H k)) ->
+  subgroup G mul (group_family_union I H).
+admit.
 Admitted.
 
 //GOD1:43744 subgroup_generated_by : "the subgroup of #1 generated by #3" | $\langle #3\rangle_{#1}$
@@ -34797,8 +35072,33 @@ Theorem god1_generated_subgroup_is_smallest :
 let G mul B.
 assume hG hBG.
 //GOD1PRF:43744 Let B be a subset of a group G .
+claim h_s7_generated_input : group G mul /\ B c= G.
+admit.
 //GOD1PRF:43777 There exist subgroups of G which contain B (for example, G itself); the intersection of all these subgroups is again a subgroup, by Theorem 1 ; this subgroup contains B and is contained in every subgroup of G containing B.
+claim h_s7_generated_theorem1_call :
+  forall I, forall K:set -> set,
+    group G mul ->
+    (forall i :e I, subgroup G mul (K i)) ->
+    subgroup G mul (group_family_intersection I K G)
+    /\ (((exists i, i :e I)
+      /\ (forall i j :e I, exists k :e I,
+        K i c= K k /\ K j c= K k)) ->
+      subgroup G mul (group_family_union I K)).
+apply (god1_s7_theorem1_intersection_and_directed_union_subgroups G mul).
+claim h_s7_generated_intersection_properties :
+  subgroup G mul (subgroup_generated_by G mul B)
+  /\ B c= subgroup_generated_by G mul B
+  /\ forall H :e Power G,
+    subgroup G mul H -> B c= H ->
+    subgroup_generated_by G mul B c= H.
+admit.
 //GOD1PRF:44000 Hence this subgroup is the "smallest" of all the subgroups of G which contain B , and is called the subgroup of G generated by B .
+claim h_s7_generated_smallest :
+  B c= subgroup_generated_by G mul B
+  /\ forall H :e Power G,
+    subgroup G mul H -> B c= H ->
+    subgroup_generated_by G mul B c= H.
+admit.
 apply andI.
 Admitted.
 
@@ -34827,18 +35127,145 @@ let x.
 assume hx.
 apply iffI.
 //GOD1PRF:45406 To prove Theorem 2, consider the set H of all $x \in \mathrm{G}$ which satisfy the conditions of the theorem.
+claim h_s7_t2_candidate_membership :
+  (exists p :e omega, exists f:set -> set,
+    (forall i :e p,
+      f i :e G
+      /\ (f i :e B \/ group_inverse G mul (f i) :e B))
+    /\ x = group_word_product G mul f p) -> x :e G.
+admit.
 //GOD1PRF:45516 We have to show that H is a subgroup, that H contains B , and that H is contained in every subgroup which contains B .
+claim h_s7_t2_three_candidate_obligations :
+  subgroup G mul (subgroup_generated_by G mul B)
+  /\ B c= subgroup_generated_by G mul B
+  /\ forall H :e Power G,
+    subgroup G mul H -> B c= H ->
+    subgroup_generated_by G mul B c= H.
+admit.
 //GOD1PRF:45636 The last of these assertions is obvious: if a subgroup contains B then clearly it contains the elements $x_{i}$ in the statement of the theorem, hence it contains the element $x$.
+claim h_s7_t2_words_lie_in_every_containing_subgroup :
+  forall H :e Power G,
+    subgroup G mul H -> B c= H ->
+    forall p :e omega, forall f:set -> set,
+      (forall i :e p,
+        f i :e G
+        /\ (f i :e B \/ group_inverse G mul (f i) :e B)) ->
+      group_word_product G mul f p :e H.
+admit.
 //GOD1PRF:45817 That H contains B is equally obvious, for an element $x \in \mathrm{~B}$ satisfies conditions $a$ ) and $b$ ), as we see by taking $p=1$ and $x_{1}=x$.
+claim h_s7_t2_generators_are_one_letter_words :
+  forall b :e B,
+    exists f:set -> set,
+      (forall i :e 1,
+        f i :e G
+        /\ (f i :e B \/ group_inverse G mul (f i) :e B))
+      /\ b = group_word_product G mul f 1.
+admit.
 //GOD1PRF:45970 It remains to prove that H is a subgroup.
+claim h_s7_t2_candidate_is_subgroup :
+  subgroup G mul
+    {z :e G|exists p :e omega, exists f:set -> set,
+      (forall i :e p,
+        f i :e G
+        /\ (f i :e B \/ group_inverse G mul (f i) :e B))
+      /\ z = group_word_product G mul f p}.
+admit.
 //GOD1PRF:46012 First of all, H contains the neutral element of G, by Remark 3 above.
+claim h_s7_t2_empty_word_is_identity :
+  forall f:set -> set,
+    group_word_product G mul f 0 = group_identity G mul.
+admit.
 //GOD1PRF:46082 Let $x, y$ be two elements of H; then we have say
+claim h_s7_t2_two_word_decompositions :
+  (exists p :e omega, exists f:set -> set,
+    (forall i :e p,
+      f i :e G
+      /\ (f i :e B \/ group_inverse G mul (f i) :e B))
+    /\ x = group_word_product G mul f p) ->
+  forall y :e G,
+    (exists q :e omega, exists g:set -> set,
+      (forall j :e q,
+        g j :e G
+        /\ (g j :e B \/ group_inverse G mul (g j) :e B))
+      /\ y = group_word_product G mul g q) ->
+    x :e G /\ y :e G.
+admit.
 //GOD1PRF:46448 Hence
+claim h_s7_t2_product_with_inverse_is_word :
+  forall y :e G,
+    (exists p :e omega, exists f:set -> set,
+      (forall i :e p,
+        f i :e G
+        /\ (f i :e B \/ group_inverse G mul (f i) :e B))
+      /\ x = group_word_product G mul f p) ->
+    (exists q :e omega, exists g:set -> set,
+      (forall j :e q,
+        g j :e G
+        /\ (g j :e B \/ group_inverse G mul (g j) :e B))
+      /\ y = group_word_product G mul g q) ->
+    exists r :e omega, exists h:set -> set,
+      (forall k :e r,
+        h k :e G
+        /\ (h k :e B \/ group_inverse G mul (h k) :e B))
+      /\ mul x (group_inverse G mul y) = group_word_product G mul h r.
+admit.
+//GOD1PRF:46587 by §6, Theorem 3.
+claim h_s7_t2_group_law_for_s6_t3 : law_of_composition G mul.
+admit.
+claim h_s7_t2_associative_for_s6_t3 : associative_on G mul.
+admit.
+claim h_s7_t2_identity_for_s6_t3 :
+  neutral_element G mul (group_identity G mul).
+admit.
+claim h_s7_t2_s6_theorem3_call :
+  (forall u ru :e G,
+    reflection G mul (group_identity G mul) u ru ->
+    reflection G mul (group_identity G mul) ru u)
+  /\ (forall u v ru rv :e G,
+    reflection G mul (group_identity G mul) u ru ->
+    reflection G mul (group_identity G mul) v rv ->
+    reflexible G mul (group_identity G mul) (mul u v)
+    /\ reflection G mul (group_identity G mul)
+      (mul u v) (mul rv ru)).
+apply (god1_s6_theorem3_reflections_and_products
+  G mul (group_identity G mul)
+  h_s7_t2_group_law_for_s6_t3
+  h_s7_t2_associative_for_s6_t3
+  h_s7_t2_identity_for_s6_t3).
 //GOD1PRF:46606 Thus $x y^{-1}$ is of the form
+claim h_s7_t2_difference_word_form :
+  forall y :e G,
+    exists r :e omega, exists h:set -> set,
+      mul x (group_inverse G mul y) = group_word_product G mul h r.
+admit.
 //GOD1PRF:46675 where
+claim h_s7_t2_difference_letters :
+  forall y :e G,
+    exists r :e omega, exists h:set -> set,
+      (forall k :e r,
+        h k :e G
+        /\ (h k :e B \/ group_inverse G mul (h k) :e B))
+      /\ mul x (group_inverse G mul y) = group_word_product G mul h r.
+admit.
 //GOD1PRF:46811 and consequently $x y^{-1} \in \mathrm{H}$.
+claim h_s7_t2_candidate_difference_closed :
+  forall y :e G,
+    y :e subgroup_generated_by G mul B ->
+    mul x (group_inverse G mul y) :e subgroup_generated_by G mul B.
+admit.
 //GOD1PRF:46855 Hence H is a subgroup of G .
+claim h_s7_t2_subgroup_conclusion :
+  subgroup G mul (subgroup_generated_by G mul B).
+admit.
 //GOD1PRF:46886 Q.E.D.
+claim h_s7_t2_book_conclusion :
+  x :e subgroup_generated_by G mul B <->
+    exists p :e omega, exists f:set -> set,
+      (forall i :e p,
+        f i :e G
+        /\ (f i :e B \/ group_inverse G mul (f i) :e B))
+      /\ x = group_word_product G mul f p.
+admit.
 Admitted.
 
 //GOD1:46894 generating_set : "#3 is a set of generators of the group #1" | $\langle #3\rangle=#1$
@@ -34867,8 +35294,48 @@ Theorem god1_permutations_form_group :
     group (permutation_group X) (permutation_composition X).
 let X.
 //GOD1PRF:22384 If $f, g$ are permutations of X, then so is their composition $f \circ g$ (§ 2, Theorem 6); hence the formula $(f, g) \rightarrow f \circ g$ defines a law of composition on the set $\mathrm{S}(\mathrm{X})$.
+claim h_s7_permutation_s2_theorem6_call :
+  forall f g:set -> set,
+    bij X X f -> bij X X g ->
+    bij X X (fun x => f (g x)).
+let f g.
+assume hf hg.
+apply (bij_comp X X X g f hg hf).
+claim h_s7_permutation_composition_closed :
+  law_of_composition
+    (permutation_group X) (permutation_composition X).
+admit.
 //GOD1PRF:22592 This law of composition is associative (§ 2, Theorem 2); it admits a neutral element, namely the identity mapping $j_{\mathrm{X}}$ (which is sometimes called the identity permutation in this context); and if $f$ is a permutation of X , then so is the inverse mapping $\bar{f}^{-1}$ by virtue of §2, Theorem 5, and clearly $\bar{f}^{-1}$ is the inverse of $f$ with respect to the law of composition under discussion.
+claim h_s7_permutation_s2_theorem2_call :
+  forall f g h :e permutation_group X,
+    permutation_composition X
+      f (permutation_composition X g h)
+    = permutation_composition X
+      (permutation_composition X f g) h.
+let f.
+assume hf.
+let g.
+assume hg.
+let h.
+assume hh.
+apply (eq_ref (fun x :e X => f (g (h x)))).
+claim h_s7_permutation_s2_theorem5_call :
+  forall f:set -> set,
+    bij X X f -> bij X X (inv X f).
+apply (bij_inv X X).
+claim h_s7_permutation_identity_and_inverses :
+  exists e :e permutation_group X,
+    neutral_element
+      (permutation_group X) (permutation_composition X) e
+    /\ forall f :e permutation_group X,
+      exists g :e permutation_group X,
+        reflection
+          (permutation_group X) (permutation_composition X) e f g.
+admit.
 //GOD1PRF:23011 Hence the pair consisting of the set $\mathrm{S}(\mathrm{X})$ and the law of composition $(f, g) \rightarrow f \circ g$ on this set, is a group, called the group of permutations of the set X.
+claim h_s7_permutation_group_conclusion :
+  group (permutation_group X) (permutation_composition X).
+admit.
 Admitted.
 
 //GOD1:49782 adjacent_transposition : "#2 is an adjacent transposition of the finite ordinal #1" | $#2=(i\ i+1)$
@@ -34896,21 +35363,117 @@ Theorem god1_s7_theorem3_symmetric_group_generated_by_transpositions :
 let n.
 assume hn.
 //GOD1PRF:50092 We shall prove, by induction on $n$, that every permutation $s \in \mathbf{S}_{n}$ is a product of transpositions.
+claim h_s7_t3_induction_statement :
+  forall s :e permutation_group n,
+    s :e subgroup_generated_by
+      (permutation_group n)
+      (permutation_composition n)
+      (adjacent_transpositions n).
+admit.
 //GOD1PRF:50207 The case $n=1$ is trivial because the group $\mathrm{S}_{n}$ then consists of just one element.
+claim h_s7_t3_base_case :
+  generating_set
+    (permutation_group 1)
+    (permutation_composition 1)
+    (adjacent_transpositions 1).
+admit.
 //GOD1PRF:50304 Consider then a permutation $s \in \mathfrak{S}_{n}$, and put $s(n)=i$.
+claim h_s7_t3_last_image :
+  forall s :e permutation_group n,
+    exists i :e n, s i :e n.
+admit.
 //GOD1PRF:50376 If $t_{j}$ denotes the transposition which interchanges $j$ and $j+1$, it is clear that the permutation
+claim h_s7_t3_adjacent_transpositions_exist :
+  forall j :e n,
+    ordsucc j :e n -> exists t :e adjacent_transpositions n,
+      adjacent_transposition n t.
+admit.
 //GOD1PRF:50531 satisfies $u(n)=n$, and we have
+claim h_s7_t3_corrected_permutation_fixes_last :
+  forall s :e permutation_group n,
+    exists u :e permutation_group n, u n = n.
+admit.
 //GOD1PRF:50665 by virtue of the fact that
+claim h_s7_t3_transposition_inverse_fact :
+  forall t :e adjacent_transpositions n,
+    group_inverse
+      (permutation_group n) (permutation_composition n) t = t.
+admit.
 //GOD1PRF:50709 for every transposition $t$.
+claim h_s7_t3_every_adjacent_transposition_involutive :
+  forall t :e adjacent_transpositions n,
+    permutation_composition n t t =
+      group_identity (permutation_group n) (permutation_composition n).
+admit.
 //GOD1PRF:50738 Hence, to show that $s$ is a product of transpositions, it is enough to show that $u$ is such a product.
+claim h_s7_t3_reduction_to_fixed_last :
+  forall s u :e permutation_group n,
+    u :e subgroup_generated_by
+      (permutation_group n) (permutation_composition n)
+      (adjacent_transpositions n) ->
+    s :e subgroup_generated_by
+      (permutation_group n) (permutation_composition n)
+      (adjacent_transpositions n).
+admit.
 //GOD1PRF:50843 But since $u(n)=n, u$ permutes the elements $1,2, \ldots, n-1$ of $I_{n}$; in other words, $u$ "induces" on $I_{n-1}$ a permutation $u^{\prime} \in \mathfrak{S}_{n-1}$.
+claim h_s7_t3_restriction_permutation :
+  forall u :e permutation_group n,
+    u n = n ->
+    exists u' :e permutation_group (Union n),
+      forall k :e Union n, u' k = u k.
+admit.
 //GOD1PRF:51012 By the inductive hypothesis, $u^{\prime}$ can be written in the form
+claim h_s7_t3_inductive_word :
+  forall u' :e permutation_group (Union n),
+    u' :e subgroup_generated_by
+      (permutation_group (Union n))
+      (permutation_composition (Union n))
+      (adjacent_transpositions (Union n)).
+admit.
 //GOD1PRF:51131 where $v_{1}, \ldots, v_{q}$ are transpositions in the group $\mathfrak{S}_{n-1}$.
+claim h_s7_t3_smaller_transposition_word :
+  forall u' :e permutation_group (Union n),
+    exists q :e omega, exists v:set -> set,
+      (forall j :e q, v j :e adjacent_transpositions (Union n))
+      /\ u' = group_word_product
+        (permutation_group (Union n))
+        (permutation_composition (Union n)) v q.
+admit.
 //GOD1PRF:51214 So let us define permutations $w_{1}, \ldots, w_{q}$ of $I_{n}$ by the rule
+claim h_s7_t3_extend_transpositions :
+  forall q :e omega, forall v:set -> set,
+    (forall j :e q, v j :e adjacent_transpositions (Union n)) ->
+    exists w:set -> set,
+      forall j :e q, w j :e permutation_group n.
+admit.
 //GOD1PRF:51403 since $u$ and $u^{\prime}$ agree on $\mathrm{I}_{n-1}$ and since $u(n)=n$, it is clear that
+claim h_s7_t3_extended_product_equals_u :
+  forall u :e permutation_group n,
+    u n = n -> exists q :e omega, exists w:set -> set,
+      u = group_word_product
+        (permutation_group n) (permutation_composition n) w q.
+admit.
 //GOD1PRF:51538 But since the $v_{j}$ are transpositions of $\mathrm{I}_{n-1}$, obviously the $w_{j}$ are transpositions of $\mathrm{I}_{n}$.
+claim h_s7_t3_extensions_are_transpositions :
+  forall q :e omega, forall w:set -> set,
+    (forall j :e q, w j :e permutation_group n) ->
+    exists v:set -> set,
+      forall j :e q, v j :e adjacent_transpositions n.
+admit.
 //GOD1PRF:51664 Hence $u$ is a product of transpositions in the group $\mathfrak{S}_{n}$, and therefore so is $s$.
+claim h_s7_t3_inductive_conclusion :
+  forall s :e permutation_group n,
+    s :e subgroup_generated_by
+      (permutation_group n) (permutation_composition n)
+      (adjacent_transpositions n).
+admit.
 //GOD1PRF:51763 Q.E.D.
+claim h_s7_t3_book_conclusion :
+  generating_set
+    (permutation_group n)
+    (permutation_composition n)
+    (adjacent_transpositions n).
+admit.
 Admitted.
 
 //GOD1:53380 left_coset : "the left coset of #3 represented by #4 in #1" | $#4#3$
@@ -34940,6 +35503,14 @@ Definition left_coset_relation :
     x :e G /\ y :e G
     /\ mul (group_inverse G mul x) y :e H.
 
+(** Formal interface for the definition of an equivalence relation in §4, section 1. **)
+Definition god1_s4_equivalence_relation :
+  set -> (set -> set -> prop) -> prop :=
+  fun X R =>
+    (forall x :e X, R x x)
+    /\ (forall x y :e X, R x y -> R y x)
+    /\ (forall x y z :e X, R x y -> R y z -> R x z).
+
 Theorem god1_left_coset_relation_is_equivalence :
   forall G, forall mul:set -> set -> set, forall H,
     subgroup G mul H ->
@@ -34954,12 +35525,54 @@ Theorem god1_left_coset_relation_is_equivalence :
 let G mul H.
 assume hH.
 apply andI.
+//GOD1PRF:51940 in the sense of §4, section 1 .
+claim h_s7_coset_s4_equivalence_definition_call :
+  god1_s4_equivalence_relation G
+    (fun x y => left_coset_relation G mul H x y).
+admit.
 //GOD1PRF:51973 First of all, the relation $\mathrm{R}\{x, x\}$ is always true, because it signifies that H contains the identity element
+claim h_s7_coset_relation_reflexive :
+  forall x :e G, left_coset_relation G mul H x x.
+admit.
 //GOD1PRF:52114 Next, to show that $\mathbf{R}\{x, y\}$ implies $\mathbf{R}\{y, x\}$, we observe that, by the definition of a subgroup, the relation
+claim h_s7_coset_relation_subgroup_inverse_step :
+  subgroup G mul H -> forall x y :e G,
+    mul (group_inverse G mul x) y :e H ->
+    group_inverse G mul
+      (mul (group_inverse G mul x) y) :e H.
+admit.
 //GOD1PRF:52279 implies $\left(x^{-1} y\right)^{-1} \in \mathrm{H}$, i.e., $y^{-1} x \in \mathrm{H}$.
+claim h_s7_coset_relation_symmetric_membership :
+  forall x y :e G,
+    mul (group_inverse G mul x) y :e H ->
+    mul (group_inverse G mul y) x :e H.
+admit.
 //GOD1PRF:52365 Finally, the relations $\mathrm{R}\{x, y\}$ and $\mathrm{R}\{y, z\}$, i.e., the relations
+claim h_s7_coset_relation_two_memberships :
+  forall x y z :e G,
+    left_coset_relation G mul H x y ->
+    left_coset_relation G mul H y z ->
+    mul (group_inverse G mul x) y :e H
+    /\ mul (group_inverse G mul y) z :e H.
+admit.
 //GOD1PRF:52525 imply the relation $\left(x^{-1} y\right)\left(y^{-1} z\right) \in \mathrm{H}$, i.e., $x^{-1} z \in \mathrm{H}$, which is the relation $\mathrm{R}\{x, z\}$.
+claim h_s7_coset_relation_transitive_membership :
+  forall x y z :e G,
+    left_coset_relation G mul H x y ->
+    left_coset_relation G mul H y z ->
+    mul (group_inverse G mul x) z :e H.
+admit.
 //GOD1PRF:52684 Hence the relation $\mathrm{R}\{x, y\}$ is an equivalence relation on the set G .
+claim h_s7_coset_relation_equivalence_conclusion :
+  (forall x :e G, left_coset_relation G mul H x x)
+  /\ (forall x y :e G,
+    left_coset_relation G mul H x y ->
+    left_coset_relation G mul H y x)
+  /\ (forall x y z :e G,
+    left_coset_relation G mul H x y ->
+    left_coset_relation G mul H y z ->
+    left_coset_relation G mul H x z).
+admit.
 Admitted.
 
 Theorem god1_left_cosets_equipotent_to_subgroup :
@@ -34971,6 +35584,48 @@ assume hH.
 let x.
 assume hx.
 //GOD1PRF:55039 For every left coset $x \mathrm{H}$ there exists a bijection of H onto $x \mathrm{H}$, namely the mapping $z \rightarrow x z$ : this is surjective by the definition of $x \mathrm{H}$, and injective because each $x \in \mathrm{G}$ is invertible, so that Theorem 4 of § 6 applies.
+claim h_s7_coset_s6_t4_law : law_of_composition G mul.
+admit.
+claim h_s7_coset_s6_t4_associative : associative_on G mul.
+admit.
+claim h_s7_coset_s6_t4_identity :
+  neutral_element G mul (group_identity G mul).
+admit.
+claim h_s7_coset_s6_t4_inverse_member :
+  group_inverse G mul x :e G.
+admit.
+claim h_s7_coset_s6_t4_reflection :
+  reflection G mul (group_identity G mul)
+    x (group_inverse G mul x).
+admit.
+claim h_s7_coset_s6_theorem4_call :
+  forall b :e G,
+    exists z :e G,
+      mul x z = b
+      /\ z = mul (group_inverse G mul x) b
+      /\ forall y :e G, mul x y = b -> y = z.
+apply (god1_s6_theorem4_equation_with_reflexible_left_factor
+  G mul (group_identity G mul)
+  h_s7_coset_s6_t4_law h_s7_coset_s6_t4_associative
+  h_s7_coset_s6_t4_identity
+  x hx (group_inverse G mul x)
+  h_s7_coset_s6_t4_inverse_member h_s7_coset_s6_t4_reflection).
+claim h_s7_coset_bijection :
+  bij H (left_coset G mul H x) (fun z => mul x z).
+admit.
+claim h_s7_coset_equipotence : equip H (left_coset G mul H x).
+admit.
+Admitted.
+
+(** Formal interface for the uniform-partition specialization of §5, Theorem 7. **)
+Theorem god1_s5_theorem7_uniform_partition_cardinality :
+  forall X Q, forall n q r :e omega,
+    equip X n -> equip Q q ->
+    (forall C :e Q, C c= X /\ equip C r) ->
+    (forall x :e X, exists C :e Q, x :e C) ->
+    (forall x :e X, forall C D :e Q,
+      x :e C -> x :e D -> C = D) ->
+    n = mul_nat q r.
 Admitted.
 
 Theorem god1_s7_theorem4_lagrange_cardinality_formula :
@@ -34990,7 +35645,24 @@ assume hq.
 let r.
 assume hr heG heQ heH.
 //GOD1PRF:55319 In particular, if G is a finite group, so that H is also finite, then we see that each left coset $x \mathrm{H}$ contains the same number of elements as H .
+claim h_s7_t4_cosets_uniform_size :
+  forall C :e left_coset_quotient G mul H,
+    C c= G /\ equip C r.
+admit.
 //GOD1PRF:55476 Now the cosets $x \mathrm{H}$ form a partition of the set G ; hence (§ 5, Theorem 7) the number of elements in G is equal to the number of elements in H multiplied by the number of distinct left cosets $x \mathrm{H}$.
+claim h_s7_t4_cosets_cover :
+  forall x :e G,
+    exists C :e left_coset_quotient G mul H, x :e C.
+admit.
+claim h_s7_t4_cosets_unique :
+  forall x :e G,
+    forall C D :e left_coset_quotient G mul H,
+      x :e C -> x :e D -> C = D.
+admit.
+apply (god1_s5_theorem7_uniform_partition_cardinality
+  G (left_coset_quotient G mul H) n hn q hq r hr
+  heG heQ h_s7_t4_cosets_uniform_size
+  h_s7_t4_cosets_cover h_s7_t4_cosets_unique).
 Admitted.
 
 Theorem god1_left_and_right_coset_indices_equal :
@@ -35002,6 +35674,17 @@ Theorem god1_left_and_right_coset_indices_equal :
 let G mul H.
 assume hH.
 //GOD1PRF:56194 It is easy to show that $(\mathrm{G}: \mathrm{H})$ is also equal to the number of distinct right cosets Hx of H in G .
+claim h_s7_left_right_coset_bijection :
+  bij
+    (left_coset_quotient G mul H)
+    (right_coset_quotient G mul H)
+    (fun C => {group_inverse G mul z|z :e C}).
+admit.
+claim h_s7_left_right_coset_equipotence :
+  equip
+    (left_coset_quotient G mul H)
+    (right_coset_quotient G mul H).
+admit.
 Admitted.
 
 Theorem god1_s7_theorem5_finite_group_power_is_identity :
@@ -35014,16 +35697,100 @@ assume hn hG hequip.
 let x.
 assume hx.
 //GOD1PRF:56559 Let H be the subgroup of G generated by $x$, and let $r=\operatorname{Card}(\mathrm{H})$.
+claim h_s7_t5_cyclic_subgroup_data :
+  subgroup G mul (cyclic_subgroup G mul x)
+  /\ exists r :e omega, equip (cyclic_subgroup G mul x) r.
+admit.
 //GOD1PRF:56649 Since $n$ is a multiple of $r$, it is enough to prove that $x^{r}=e$.
+claim h_s7_t5_reduce_from_subgroup_order :
+  forall r :e omega,
+    equip (cyclic_subgroup G mul x) r ->
+    group_nat_power G mul x r = group_identity G mul ->
+    group_nat_power G mul x n = group_identity G mul.
+admit.
 //GOD1PRF:56719 In other words, it is enough to prove Theorem 5 in the case where G is generated by $x$.
+claim h_s7_t5_reduce_to_cyclic_case :
+  cyclic_subgroup G mul x = G ->
+  group_nat_power G mul x n = group_identity G mul.
+admit.
 //GOD1PRF:56809 So let G be generated by an element $x$, and consider the mapping $f: \mathbf{Z} \rightarrow \mathrm{G}$ defined by
+claim h_s7_t5_power_map_closed :
+  forall q :e int, group_int_power G mul x q :e G.
+admit.
 //GOD1PRF:56944 by hypothesis, $f$ is surjective.
+claim h_s7_t5_power_map_surjective :
+  cyclic_subgroup G mul x = G ->
+  surj int G (fun q => group_int_power G mul x q).
+admit.
 //GOD1PRF:56978 The formulae for calculating with powers (Example 9) show that we have the relations
+claim h_s7_t5_example9_call :
+  (forall p q :e int,
+    mul (group_int_power G mul x p) (group_int_power G mul x q)
+    = group_int_power G mul x (add_SNo p q))
+  /\ (forall p :e int,
+    group_inverse G mul (group_int_power G mul x p)
+    = group_int_power G mul x (minus_SNo p))
+  /\ (forall p q :e int,
+    group_int_power G mul (group_int_power G mul x p) q
+    = group_int_power G mul x (mul_SNo p q)).
+apply (god1_group_integer_power_laws G mul x hx hG).
+claim h_s7_t5_power_map_relations :
+  group_int_power G mul x 0 = group_identity G mul
+  /\ forall p q :e int,
+    group_int_power G mul x (add_SNo p (minus_SNo q))
+    = mul (group_int_power G mul x p)
+      (group_inverse G mul (group_int_power G mul x q)).
+admit.
 //GOD1PRF:57190 from these relations it follows immediately that the $q \in \mathbf{Z}$ such that $f(q)=e$ form a subgroup of $\mathbf{Z}$, which is therefore of the form $s \mathbf{Z}$ where $s$ is a well-determined positive integer.
+claim h_s7_t5_power_kernel_generator :
+  exists s :e omega,
+    0 :e s
+    /\ forall q :e int,
+      (group_int_power G mul x q = group_identity G mul <->
+        exists k :e int, q = mul_SNo s k).
+admit.
 //GOD1PRF:57410 Furthermore, the relation $f\left(q^{\prime}\right)=f\left(q^{\prime \prime}\right)$ is equivalent to
+claim h_s7_t5_equal_powers_difference_identity :
+  forall p q :e int,
+    (group_int_power G mul x p = group_int_power G mul x q <->
+      mul (group_int_power G mul x p)
+        (group_inverse G mul (group_int_power G mul x q))
+      = group_identity G mul).
+admit.
 //GOD1PRF:57584 and from the formulae above this in turn is equivalent to $f\left(q^{\prime}-q^{\prime \prime}\right)=e$, i.e., to
+claim h_s7_t5_equal_powers_congruence :
+  forall p q :e int, forall s :e omega,
+    (forall z :e int,
+      (group_int_power G mul x z = group_identity G mul <->
+        exists k :e int, z = mul_SNo s k)) ->
+    (group_int_power G mul x p = group_int_power G mul x q <->
+      exists k :e int,
+        add_SNo p (minus_SNo q) = mul_SNo s k).
+admit.
 //GOD1PRF:57812 Since $f$ is surjective, it follows that the number of elements of $\mathbf{G}$ is equal to the number of classes modulo $s$ in $\mathbf{Z}$; in other words, the order of $\mathbf{G}$ is $s$, and since $x^{s}=e$ the proof is complete.
+claim h_s7_t5_order_equals_kernel_generator :
+  forall s :e omega,
+    0 :e s ->
+    (forall q :e int,
+      (group_int_power G mul x q = group_identity G mul <->
+        exists k :e int, q = mul_SNo s k)) ->
+    equip G n -> n = s
+    /\ group_nat_power G mul x n = group_identity G mul.
+admit.
 //GOD1PRF:58049 Q.E.D.
+claim h_s7_t5_book_conclusion :
+  group_nat_power G mul x n = group_identity G mul.
+admit.
+Admitted.
+
+(** Formal interface for the equivalence-class/image theorem cited as §4, Theorem 2. **)
+Theorem god1_s4_theorem2_classes_equip_image :
+  forall A Q, forall f class_of:set -> set,
+    (forall a :e A, class_of a :e Q) ->
+    (forall C :e Q, exists a :e A, class_of a = C) ->
+    (forall a b :e A,
+      (class_of a = class_of b <-> f a = f b)) ->
+    equip Q {f a|a :e A}.
 Admitted.
 
 Theorem god1_s7_permutation_group_order :
@@ -35032,18 +35799,175 @@ Theorem god1_s7_permutation_group_order :
 let X n.
 assume hn hequip.
 //GOD1PRF:58547 The theorem is clearly true when $n=1$, and we shall prove it by induction on $n$; in other words, we shall show that if it is true for the integer $n-1$, then it is true for the integer $n$.
+claim h_s7_perm_order_induction :
+  (equip (permutation_group 1) (factorial 1))
+  /\ (equip (permutation_group (Union n)) (factorial (Union n)) ->
+    equip (permutation_group n) (factorial n)).
+admit.
 //GOD1PRF:58740 To do this, fix an element $a$ in X , and let
+claim h_s7_perm_order_choose_a :
+  exists a :e X, a :e X.
+admit.
 //GOD1PRF:58822 be the set obtained by removing the element $a$ from X ; the set Y has $n-1$ elements, and therefore (by the inductive hypothesis) the theorem applies to Y .
+claim h_s7_perm_order_removed_set :
+  forall a :e X,
+    equip (X :\: {a}) (Union n)
+    /\ (equip (permutation_group (X :\: {a}))
+      (factorial (Union n)) ->
+      equip (permutation_group (X :\: {a}))
+        (factorial (Union n))).
+admit.
 //GOD1PRF:58981 On the other hand the group $\mathrm{S}(\mathrm{Y})$ may be considered as a subgroup of $\mathrm{S}(\mathrm{X})$, for each permutation $s$ of the set Y we may associate the permutation $\bar{s}$ of X given by
+claim h_s7_perm_order_extension_subgroup :
+  forall a :e X,
+    subgroup
+      (permutation_group X) (permutation_composition X)
+      {s :e permutation_group X|s a = a}.
+admit.
 //GOD1PRF:59298 In this way $\mathbf{S}(\mathbf{Y})$ is identified with the subgroup of $\mathbf{S}(\mathbf{X})$ consisting of those permutations of X which have a as a fixed point.
+claim h_s7_perm_order_fixed_subgroup_size :
+  forall a :e X,
+    equip
+      {s :e permutation_group X|s a = a}
+      (factorial (Union n)).
+admit.
 //GOD1PRF:59465 By the inductive hypothesis, the group $\mathfrak{S}(\mathrm{Y})$ has $(n-1)$ ! elements; hence to show that $\mathfrak{S}(\mathrm{X})$ has $n!$ elements it is enough (by Theorem 4) to show that the index of $S(Y)$ in $S(X)$ is equal to $n$.
+claim h_s7_perm_order_group_for_theorem4 :
+  group (permutation_group X) (permutation_composition X).
+apply (god1_permutations_form_group X).
+claim h_s7_perm_order_subgroup_for_theorem4 :
+  subgroup
+    (permutation_group X) (permutation_composition X)
+    {s :e permutation_group X|
+      s (Eps_i (fun a => a :e X)) = Eps_i (fun a => a :e X)}.
+admit.
+claim h_s7_perm_order_finite_for_theorem4 :
+  finite (permutation_group X).
+admit.
+claim h_s7_perm_order_theorem4_call :
+  forall N Q R :e omega,
+    equip (permutation_group X) N ->
+    equip
+      (left_coset_quotient
+        (permutation_group X) (permutation_composition X)
+        {s :e permutation_group X|
+          s (Eps_i (fun a => a :e X)) = Eps_i (fun a => a :e X)}) Q ->
+    equip
+      {s :e permutation_group X|
+        s (Eps_i (fun a => a :e X)) = Eps_i (fun a => a :e X)} R ->
+    N = mul_nat Q R.
+apply (god1_s7_theorem4_lagrange_cardinality_formula
+  (permutation_group X) (permutation_composition X)
+  {s :e permutation_group X|
+    s (Eps_i (fun a => a :e X)) = Eps_i (fun a => a :e X)}
+  h_s7_perm_order_group_for_theorem4
+  h_s7_perm_order_subgroup_for_theorem4
+  h_s7_perm_order_finite_for_theorem4).
+claim h_s7_perm_order_reduce_to_index :
+  equip
+    (left_coset_quotient
+      (permutation_group X) (permutation_composition X)
+      {s :e permutation_group X|
+        s (Eps_i (fun a => a :e X)) = Eps_i (fun a => a :e X)}) n ->
+  equip (permutation_group X) (factorial n).
+admit.
 //GOD1PRF:59708 Let $f: \mathrm{S}(\mathrm{X}) \rightarrow \mathrm{X}$ be the mapping defined by
+claim h_s7_perm_order_evaluation_map :
+  forall s :e permutation_group X,
+    s (Eps_i (fun a => a :e X)) :e X.
+admit.
 //GOD1PRF:59864 If $s, t$ are permutations of X , the relation $f(s)=f(t)$ therefore means that
+claim h_s7_perm_order_equal_evaluations :
+  forall s t :e permutation_group X,
+    s (Eps_i (fun a => a :e X)) =
+      t (Eps_i (fun a => a :e X)) ->
+    s (Eps_i (fun a => a :e X)) =
+      t (Eps_i (fun a => a :e X)).
+admit.
 //GOD1PRF:59993 which in turn means that
+claim h_s7_perm_order_difference_fixes_a :
+  forall s t :e permutation_group X,
+    (s (Eps_i (fun a => a :e X)) =
+      t (Eps_i (fun a => a :e X)) <->
+      permutation_composition X
+        (group_inverse
+          (permutation_group X) (permutation_composition X) s) t
+        (Eps_i (fun a => a :e X))
+      = Eps_i (fun a => a :e X)).
+admit.
 //GOD1PRF:60065 i.e., that $s$ and $t$ belong to the same left coset of $\mathfrak{S}(\mathrm{Y})$ in $\mathfrak{S}(\mathrm{X})$.
+claim h_s7_perm_order_same_coset_iff_same_value :
+  forall s t :e permutation_group X,
+    (left_coset
+      (permutation_group X) (permutation_composition X)
+      {u :e permutation_group X|
+        u (Eps_i (fun a => a :e X)) = Eps_i (fun a => a :e X)} s
+    = left_coset
+      (permutation_group X) (permutation_composition X)
+      {u :e permutation_group X|
+        u (Eps_i (fun a => a :e X)) = Eps_i (fun a => a :e X)} t
+    <-> s (Eps_i (fun a => a :e X)) =
+      t (Eps_i (fun a => a :e X))).
+admit.
 //GOD1PRF:60179 By Theorem 2 of §4 it follows therefore that the number of left cosets of $\mathrm{S}(\mathrm{Y})$ in $\mathrm{S}(\mathrm{X})$ is equal to the number of elements in the image of $\mathrm{S}(\mathrm{X})$ under $f$, i.e., to the number of elements $x \in \mathrm{X}$ for which there exists a permutation $s$ of X such that $x=s(a)$.
+claim h_s7_perm_order_class_map_closed :
+  forall s :e permutation_group X,
+    left_coset
+      (permutation_group X) (permutation_composition X)
+      {u :e permutation_group X|
+        u (Eps_i (fun a => a :e X)) = Eps_i (fun a => a :e X)} s
+    :e left_coset_quotient
+      (permutation_group X) (permutation_composition X)
+      {u :e permutation_group X|
+        u (Eps_i (fun a => a :e X)) = Eps_i (fun a => a :e X)}.
+admit.
+claim h_s7_perm_order_class_map_surjective :
+  forall C :e left_coset_quotient
+      (permutation_group X) (permutation_composition X)
+      {u :e permutation_group X|
+        u (Eps_i (fun a => a :e X)) = Eps_i (fun a => a :e X)},
+    exists s :e permutation_group X,
+      left_coset
+        (permutation_group X) (permutation_composition X)
+        {u :e permutation_group X|
+          u (Eps_i (fun a => a :e X)) = Eps_i (fun a => a :e X)} s = C.
+admit.
+claim h_s7_perm_order_s4_theorem2_call :
+  equip
+    (left_coset_quotient
+      (permutation_group X) (permutation_composition X)
+      {u :e permutation_group X|
+        u (Eps_i (fun a => a :e X)) = Eps_i (fun a => a :e X)})
+    {s (Eps_i (fun a => a :e X))|s :e permutation_group X}.
+apply (god1_s4_theorem2_classes_equip_image
+  (permutation_group X)
+  (left_coset_quotient
+    (permutation_group X) (permutation_composition X)
+    {u :e permutation_group X|
+      u (Eps_i (fun a => a :e X)) = Eps_i (fun a => a :e X)})
+  (fun s => s (Eps_i (fun a => a :e X)))
+  (fun s => left_coset
+    (permutation_group X) (permutation_composition X)
+    {u :e permutation_group X|
+      u (Eps_i (fun a => a :e X)) = Eps_i (fun a => a :e X)} s)
+  h_s7_perm_order_class_map_closed
+  h_s7_perm_order_class_map_surjective
+  h_s7_perm_order_same_coset_iff_same_value).
 //GOD1PRF:60511 But it is clear that every $x \in \mathrm{X}$ is of the form $x=s(a)$ for a suitably chosen permutation $s$; hence the number of left cosets (i.e., the index of $\mathfrak{S}(\mathrm{Y})$ in $\mathfrak{S}(\mathrm{X}))$ is equal to $n$.
+claim h_s7_perm_order_orbit_is_all_X :
+  {s (Eps_i (fun a => a :e X))|s :e permutation_group X} = X.
+admit.
+claim h_s7_perm_order_index_is_n :
+  equip
+    (left_coset_quotient
+      (permutation_group X) (permutation_composition X)
+      {u :e permutation_group X|
+        u (Eps_i (fun a => a :e X)) = Eps_i (fun a => a :e X)}) n.
+admit.
 //GOD1PRF:60749 Q.E.D.
+claim h_s7_perm_order_book_conclusion :
+  equip (permutation_group X) (factorial n).
+admit.
 Admitted.
 
 //GOD1:60785 group_homomorphism : "#7 is a homomorphism from the group #1 to the group #3" | $#7:#1\to #3$
@@ -35069,7 +35993,15 @@ Theorem god1_group_homomorphism_preserves_identity_and_inverse :
 let G mulG H mulH f.
 assume hf.
 //GOD1PRF:60962 Putting $y=e$, we obtain $f(x)=f(x) f(e)$, and therefore
+claim h_s7_hom_identity_preserved :
+  f (group_identity G mulG) = group_identity H mulH.
+admit.
 //GOD1PRF:61036 Next, taking $y=x^{-1}$, we obtain $e=f(x) f\left(x^{-1}\right)$, so that
+claim h_s7_hom_inverse_preserved :
+  forall x :e G,
+    f (group_inverse G mulG x) =
+      group_inverse H mulH (f x).
+admit.
 apply andI.
 Admitted.
 
@@ -35087,12 +36019,49 @@ let M mulM N mulN P mulP f g.
 assume hf hg.
 apply andI.
 //GOD1PRF:63143 If $x, y \in \mathrm{M}$, then
+claim h_s7_t6_composite_calculation :
+  forall x y :e M,
+    g (f (mulM x y)) = mulP (g (f x)) (g (f y)).
+admit.
 //GOD1PRF:63245 which proves the first part of the theorem.
+claim h_s7_t6_composite_homomorphism :
+  group_homomorphism M mulM P mulP (fun x => g (f x)).
+admit.
 //GOD1PRF:63291 To prove the second part, in other words that
+claim h_s7_t6_inverse_homomorphism_goal :
+  bij M N f ->
+  group_homomorphism N mulN M mulM (inv M f).
+admit.
 //GOD1PRF:63377 for all $u, v \in \mathrm{~N}$, it is sufficient (since $f$ is bijective, and therefore injective) to establish that the images under $f$ of the two sides of this relation are equal, i.e., that
+claim h_s7_t6_injective_reduction :
+  bij M N f -> forall u v :e N,
+    f (inv M f (mulN u v))
+      = f (mulM (inv M f u) (inv M f v)) ->
+    inv M f (mulN u v)
+      = mulM (inv M f u) (inv M f v).
+admit.
 //GOD1PRF:63641 But the left-hand side is equal to $u v$, by the definition of the inverse mapping $f^{-1}$; and since $f$ is a homomorphism, the right-hand side is equal to
+claim h_s7_t6_inverse_image_calculation :
+  bij M N f -> forall u v :e N,
+    f (inv M f (mulN u v)) = mulN u v
+    /\ f (mulM (inv M f u) (inv M f v))
+      = mulN (f (inv M f u)) (f (inv M f v)).
+admit.
+claim h_s7_t6_bijection_inverse_call :
+  bij M N f -> bij N M (inv M f).
+apply (bij_inv M N f).
 //GOD1PRF:63858 which is equal to $u v$.
+claim h_s7_t6_both_images_equal :
+  bij M N f -> forall u v :e N,
+    f (inv M f (mulN u v))
+      = f (mulM (inv M f u) (inv M f v)).
+admit.
 //GOD1PRF:63885 Q.E.D.
+claim h_s7_t6_book_conclusion :
+  group_homomorphism M mulM P mulP (fun x => g (f x))
+  /\ (bij M N f ->
+    group_homomorphism N mulN M mulM (inv M f)).
+admit.
 Admitted.
 
 //GOD1:63893 group_isomorphism : "#7 is an isomorphism from the group #1 onto the group #3" | $#7:#1\xrightarrow{\sim}#3$
@@ -35125,7 +36094,46 @@ Theorem god1_group_isomorphism_is_equivalence :
       isomorphic_groups G mulG K mulK).
 apply andI.
 //GOD1PRF:64271 is an equivalence relation.
+claim h_s7_isomorphism_equivalence_goal :
+  (forall G, forall mul:set -> set -> set,
+    group G mul -> isomorphic_groups G mul G mul)
+  /\ (forall G, forall mulG:set -> set -> set,
+    forall H, forall mulH:set -> set -> set,
+    isomorphic_groups G mulG H mulH ->
+    isomorphic_groups H mulH G mulG)
+  /\ (forall G, forall mulG:set -> set -> set,
+    forall H, forall mulH:set -> set -> set,
+    forall K, forall mulK:set -> set -> set,
+    isomorphic_groups G mulG H mulH ->
+    isomorphic_groups H mulH K mulK ->
+    isomorphic_groups G mulG K mulK).
+admit.
 //GOD1PRF:64299 For $G$ and $G$ are isomorphic, $G$ being any group, because the identity mapping is an isomorphism of $G$ onto $G$; next, if there exists an isomorphism $f$ of G onto H , then there exists an isomorphism of H onto G , namely $f^{-1}$; and finally, if there exists an isomorphism $f$ of a group M onto a group N , and an isomorphism $g$ of N onto a third group P , then there exists an isomorphism of M onto P-namely $g \circ f$, which is a homomorphism by Theorem 6, and is bijective because $f$ and $g$ are bijective.
+claim h_s7_isomorphism_theorem6_call :
+  forall M, forall mulM:set -> set -> set,
+  forall N, forall mulN:set -> set -> set,
+  forall P, forall mulP:set -> set -> set,
+  forall f g:set -> set,
+    group_homomorphism M mulM N mulN f ->
+    group_homomorphism N mulN P mulP g ->
+    group_homomorphism M mulM P mulP (fun x => g (f x))
+    /\ (bij M N f ->
+      group_homomorphism N mulN M mulM (inv M f)).
+apply god1_s7_theorem6_composite_and_inverse_homomorphisms.
+claim h_s7_isomorphism_three_cases :
+  (forall G, forall mul:set -> set -> set,
+    group G mul -> isomorphic_groups G mul G mul)
+  /\ (forall G, forall mulG:set -> set -> set,
+    forall H, forall mulH:set -> set -> set,
+    isomorphic_groups G mulG H mulH ->
+    isomorphic_groups H mulH G mulG)
+  /\ (forall G, forall mulG:set -> set -> set,
+    forall H, forall mulH:set -> set -> set,
+    forall P, forall mulP:set -> set -> set,
+    isomorphic_groups G mulG H mulH ->
+    isomorphic_groups H mulH P mulP ->
+    isomorphic_groups G mulG P mulP).
+admit.
 Admitted.
 
 //GOD1:64820 group_automorphism : "#4 is an automorphism of the group #1" | $#4\in\operatorname{Aut}(#1)$
@@ -35177,9 +36185,28 @@ let G mulG H mulH f.
 assume hf.
 apply andI.
 //GOD1PRF:67072 Let $\mathrm{G}^{\prime}$ be a subgroup of G and let $\mathrm{H}^{\prime}=f\left(\mathrm{G}^{\prime}\right)$ be its image.
+claim h_s7_t7_image_setup :
+  forall A,
+    subgroup G mulG A ->
+    group_image_of_subset A f c= H.
+admit.
 //GOD1PRF:67195 If $u, v \in \mathrm{H}^{\prime}$, then there exist $x, y \in \mathrm{G}$ such that $u=f(x), v=f(y)$, and we calculate
+claim h_s7_t7_image_representatives :
+  forall A, forall u v :e group_image_of_subset A f,
+    exists x y :e A, u = f x /\ v = f y.
+admit.
 //GOD1PRF:67397 Since $x y^{-1} \in \mathrm{G}^{\prime}$, it follows that $u v^{-1} \in \mathrm{H}^{\prime}$, and therefore $\mathrm{H}^{\prime}$ is a subgroup of H .
+claim h_s7_t7_image_subgroup :
+  forall A,
+    subgroup G mulG A ->
+    subgroup H mulH (group_image_of_subset A f).
+admit.
 //GOD1PRF:67548 This proves the first statement of the theorem; the proof of the second is analogous, and we leave the details to the reader.
+claim h_s7_t7_preimage_subgroup :
+  forall B,
+    subgroup H mulH B ->
+    subgroup G mulG (group_preimage_of_subset G B f).
+admit.
 Admitted.
 
 //GOD1:68903 normal_subgroup : "#3 is a normal subgroup of the group #1" | $#3\trianglelefteq #1$
@@ -35200,7 +36227,17 @@ Theorem god1_kernel_is_normal_subgroup :
 let G mulG H mulH f.
 assume hf.
 //GOD1PRF:68629 If $x \in \mathrm{~N}, a \in \mathrm{G}$ we have
+claim h_s7_kernel_conjugate_calculation :
+  forall x :e group_homomorphism_kernel G mulG H mulH f,
+  forall a :e G,
+    f (mulG (mulG a x) (group_inverse G mulG a))
+      = group_identity H mulH.
+admit.
 //GOD1PRF:69103 Thus the kernel of a homomorphism is a normal subgroup.
+claim h_s7_kernel_normal_conclusion :
+  normal_subgroup G mulG
+    (group_homomorphism_kernel G mulG H mulH f).
+admit.
 Admitted.
 
 Theorem god1_s7_theorem8_injective_iff_trivial_kernel :
@@ -35215,11 +36252,54 @@ let G mulG H mulH f.
 assume hf.
 apply iffI.
 //GOD1PRF:69673 Since $f(e)=e$, the relation $f(x)=e$ is equivalent to $f(x)=f(e)$.
+claim h_s7_t8_kernel_equation :
+  forall x :e G,
+    (f x = group_identity H mulH <->
+      f x = f (group_identity G mulG)).
+admit.
 //GOD1PRF:69741 If $f$ is injective, this implies that $x=e$, and therefore $\operatorname{Ker}(f)=\{e\}$.
+claim h_s7_t8_injective_kernel_trivial :
+  inj G H f ->
+  group_homomorphism_kernel G mulG H mulH f
+    = {group_identity G mulG}.
+admit.
 //GOD1PRF:69832 Conversely, suppose that $\operatorname{Ker}(f)=\{e\}$.
+claim h_s7_t8_reverse_hypothesis :
+  group_homomorphism_kernel G mulG H mulH f
+    = {group_identity G mulG} ->
+  group_identity G mulG :e
+    group_homomorphism_kernel G mulG H mulH f.
+admit.
 //GOD1PRF:69888 If $f(x)=f(y)$, then
+claim h_s7_t8_equal_images :
+  forall x y :e G, f x = f y -> f x = f y.
+admit.
 //GOD1PRF:69935 or, since $f$ is a homomorphism, $f\left(x y^{-1}\right)=e$, i.e.
+claim h_s7_t8_difference_in_kernel :
+  forall x y :e G,
+    f x = f y ->
+    mulG x (group_inverse G mulG y) :e
+      group_homomorphism_kernel G mulG H mulH f.
+admit.
 //GOD1PRF:70046 Since $\operatorname{Ker}(f)=\{e\}$ it follows that $x y^{-1}=e$, so that $x=y$ and hence $f$ is injective.
+claim h_s7_t8_trivial_kernel_injective :
+  group_homomorphism_kernel G mulG H mulH f
+    = {group_identity G mulG} -> inj G H f.
+admit.
+Admitted.
+
+(** Formal interface for the factor-through-surjection result cited as §2, Theorem 1. **)
+Theorem god1_s2_theorem1_factor_through_surjection :
+  forall A B C, forall p f:set -> set,
+    surj A B p ->
+    ((exists f':set -> set,
+        forall x :e A, f x = f' (p x))
+      <->
+      forall x y :e A, p x = p y -> f x = f y)
+    /\ (forall f1 f2:set -> set,
+      (forall x :e A, f x = f1 (p x)) ->
+      (forall x :e A, f x = f2 (p x)) ->
+      f1 = f2).
 Admitted.
 
 Theorem god1_s7_theorem9_factorization_of_group_homomorphism :
@@ -35253,24 +36333,168 @@ let G mulG H mulH M mulM p f.
 assume hp hf hsurj.
 apply andI.
 //GOD1PRF:70787 A criterion for the existence of a mapping $f^{\prime}: \mathrm{H} \rightarrow \mathrm{M}$ such that $f=f^{\prime} \circ p$ is provided by Theorem 1 of § 2; it is that the relation $p(x)=p(y)$ implies the relation $f(x)=f(y)$.
+claim h_s7_t9_s2_theorem1_call :
+  ((exists f':set -> set,
+      forall x :e G, f x = f' (p x))
+    <-> forall x y :e G, p x = p y -> f x = f y)
+  /\ (forall f1 f2:set -> set,
+    (forall x :e G, f x = f1 (p x)) ->
+    (forall x :e G, f x = f2 (p x)) ->
+    f1 = f2).
+apply (god1_s2_theorem1_factor_through_surjection
+  G H M p f hsurj).
+claim h_s7_t9_factor_criterion :
+  ((exists f':set -> set,
+      forall x :e G, f x = f' (p x))
+    <-> forall x y :e G, p x = p y -> f x = f y).
+admit.
 //GOD1PRF:71015 Now, since $p$ is a homomorphism, the relation $p(x)=p(y)$ is equivalent to
+claim h_s7_t9_equal_p_images :
+  forall x y :e G,
+    (p x = p y <->
+      mulH (p x) (group_inverse H mulH (p y))
+        = group_identity H mulH).
+admit.
 //GOD1PRF:71140 or in other words
+claim h_s7_t9_p_kernel_difference :
+  forall x y :e G,
+    (p x = p y <->
+      mulG x (group_inverse G mulG y) :e
+        group_homomorphism_kernel G mulG H mulH p).
+admit.
 //GOD1PRF:71203 and likewise the relation $f(x)=f(y)$ is equivalent to
+claim h_s7_t9_f_kernel_difference :
+  forall x y :e G,
+    (f x = f y <->
+      mulG x (group_inverse G mulG y) :e
+        group_homomorphism_kernel G mulG M mulM f).
+admit.
 //GOD1PRF:71301 Taking $y=e$ we see that the relation $x \in \operatorname{Ker}(p)$ must imply the relation $x \in \operatorname{Ker}(f)$, that is to say $\operatorname{Ker}(p) \subset \operatorname{Ker}(f)$; and this condition is obviously sufficient as well as necessary.
+claim h_s7_t9_kernel_inclusion_criterion :
+  ((forall x y :e G, p x = p y -> f x = f y) <->
+    group_homomorphism_kernel G mulG H mulH p
+      c= group_homomorphism_kernel G mulG M mulM f).
+admit.
 //GOD1PRF:71560 Hence, condition $b$ ) is equivalent to the existence of a mapping $f^{\prime}$ such that $f=f^{\prime} \circ p$.
+claim h_s7_t9_existence_equivalence :
+  ((exists f':set -> set,
+      forall x :e G, f x = f' (p x))
+    <-> group_homomorphism_kernel G mulG H mulH p
+      c= group_homomorphism_kernel G mulG M mulM f).
+admit.
 //GOD1PRF:71674 Now $f^{\prime}$ is necessarily a homomorphism.
+claim h_s7_t9_factor_is_homomorphism :
+  forall f':set -> set,
+    (forall x :e G, f x = f' (p x)) ->
+    group_homomorphism H mulH M mulM f'.
+admit.
 //GOD1PRF:71722 To see this, let $u, v \in \mathrm{H}$; since $p$ is surjective we may write $u=p(x), v=p(y)$ where $x, y$ are elements of G; and then we have
+claim h_s7_t9_homomorphism_calculation :
+  forall f':set -> set,
+    (forall x :e G, f x = f' (p x)) ->
+    forall u v :e H,
+      f' (mulH u v) = mulM (f' u) (f' v).
+admit.
 //GOD1PRF:72045 Thus the equivalence of $a$ ) and $b$ ) is proved.
+claim h_s7_t9_main_equivalence :
+  ((exists f':set -> set,
+      group_homomorphism H mulH M mulM f'
+      /\ forall x :e G, f x = f' (p x))
+    <-> group_homomorphism_kernel G mulG H mulH p
+      c= group_homomorphism_kernel G mulG M mulM f).
+admit.
 //GOD1PRF:72098 The uniqueness of $f^{\prime}$ is clear, because ( $p$ being surjective) the relation
+claim h_s7_t9_factor_uniqueness_setup :
+  forall f1 f2:set -> set,
+    (forall x :e G, f x = f1 (p x)) ->
+    (forall x :e G, f x = f2 (p x)) ->
+    forall u :e H, f1 u = f2 u.
+admit.
 //GOD1PRF:72238 implies $f_{1}^{\prime}=f_{2}^{\prime}$.
+claim h_s7_t9_factor_unique :
+  forall f1 f2:set -> set,
+    (forall x :e G, f x = f1 (p x)) ->
+    (forall x :e G, f x = f2 (p x)) ->
+    f1 = f2.
+admit.
 //GOD1PRF:72279 It is equally clear that
+claim h_s7_t9_image_equality :
+  forall f':set -> set,
+    (forall x :e G, f x = f' (p x)) ->
+    {f' u|u :e H} = {f x|x :e G}.
+admit.
 //GOD1PRF:72375 and therefore that $f^{\prime}$ is surjective if and only if $f$ is surjective.
+claim h_s7_t9_surjectivity_equivalence :
+  forall f':set -> set,
+    (forall x :e G, f x = f' (p x)) ->
+    (surj H M f' <-> surj G M f).
+admit.
 //GOD1PRF:72457 Finally, consider the kernel of $f^{\prime}$.
+claim h_s7_t9_factor_kernel_definition :
+  forall f':set -> set, forall u :e H,
+    (u :e group_homomorphism_kernel H mulH M mulM f' <->
+      f' u = group_identity M mulM).
+admit.
 //GOD1PRF:72503 It consists of the $u \in \mathrm{H}$ such that $f^{\prime}(u)=e$; putting $u=p(x)$, this relation becomes $f(x)=e$, i.e., $x \in \operatorname{Ker}(f)$.
+claim h_s7_t9_factor_kernel_image :
+  forall f':set -> set,
+    (forall x :e G, f x = f' (p x)) ->
+    group_homomorphism_kernel H mulH M mulM f'
+      = {p x|x :e group_homomorphism_kernel G mulG M mulM f}.
+admit.
 //GOD1PRF:72657 Therefore we have
+claim h_s7_t9_kernel_image_formula :
+  forall f':set -> set,
+    (forall x :e G, f x = f' (p x)) ->
+    group_homomorphism_kernel H mulH M mulM f'
+      = group_image_of_subset
+        (group_homomorphism_kernel G mulG M mulM f) p.
+admit.
 //GOD1PRF:72750 For $f^{\prime}$ to be injective it is therefore necessary and sufficient (Theorem 8) that $p[\operatorname{Ker}(f)]=e$, i.e., that $\operatorname{Ker}(f) \subset \operatorname{Ker}(p)$.
+claim h_s7_t9_theorem8_call :
+  forall f':set -> set,
+    group_homomorphism H mulH M mulM f' ->
+    (inj H M f' <->
+      group_homomorphism_kernel H mulH M mulM f'
+        = {group_identity H mulH}).
+let f'.
+assume hf'.
+apply (god1_s7_theorem8_injective_iff_trivial_kernel
+  H mulH M mulM f' hf').
+claim h_s7_t9_injectivity_reverse_inclusion :
+  forall f':set -> set,
+    group_homomorphism H mulH M mulM f' ->
+    (forall x :e G, f x = f' (p x)) ->
+    (inj H M f' <->
+      group_homomorphism_kernel G mulG M mulM f
+        c= group_homomorphism_kernel G mulG H mulH p).
+admit.
 //GOD1PRF:72937 But $\operatorname{Ker}(p) \subset \operatorname{Ker}(f)$ by hypothesis, and therefore $f^{\prime}$ is injective if and only if $\operatorname{Ker}(f)=\operatorname{Ker}(p)$.
+claim h_s7_t9_injective_iff_kernels_equal :
+  forall f':set -> set,
+    group_homomorphism H mulH M mulM f' ->
+    (forall x :e G, f x = f' (p x)) ->
+    group_homomorphism_kernel G mulG H mulH p
+      c= group_homomorphism_kernel G mulG M mulM f ->
+    (inj H M f' <->
+      group_homomorphism_kernel G mulG H mulH p
+        = group_homomorphism_kernel G mulG M mulM f).
+admit.
 //GOD1PRF:73114 Q.E.D.
+claim h_s7_t9_book_conclusion :
+  group_homomorphism_kernel G mulG H mulH p
+    c= group_homomorphism_kernel G mulG M mulM f ->
+  exists f':set -> set,
+    group_homomorphism H mulH M mulM f'
+    /\ (forall x :e G, f x = f' (p x))
+    /\ (forall h:set -> set,
+      group_homomorphism H mulH M mulM h ->
+      (forall x :e G, f x = h (p x)) -> h = f')
+    /\ (inj H M f' <->
+      group_homomorphism_kernel G mulG H mulH p
+        = group_homomorphism_kernel G mulG M mulM f)
+    /\ (surj H M f' <-> surj G M f).
+admit.
 Admitted.
 
 //GOD1:54276 int_mod_class : "the congruence class of #2 modulo #1" | $#2+#1\mathbb Z$
@@ -35301,6 +36525,9 @@ Theorem god1_integers_modulo_p_form_additive_group :
 let p.
 assume hp.
 //GOD1PRF:54788 It can easily be shown that (cf. §8, section 3) the set $\mathbf{Z} / p \mathbf{Z}$, endowed with this law of composition, is a group (the additive group of integers modulo p).
+claim h_s7_mod_group_conclusion :
+  group (int_mod_quotient p) (int_mod_addition p).
+admit.
 Admitted.
 
 Theorem god1_s7_theorem10_classification_of_cyclic_groups :
@@ -35315,18 +36542,151 @@ Theorem god1_s7_theorem10_classification_of_cyclic_groups :
         G mul (int_mod_quotient p) (int_mod_addition p)).
 apply andI.
 //GOD1PRF:73166 Let G be a cyclic group, $x$ a generator of G .
+claim h_s7_t10_choose_generator :
+  forall G, forall mul:set -> set -> set,
+    cyclic_group G mul ->
+    exists x :e G, forall y :e G, exists n :e int,
+      y = group_int_power G mul x n.
+admit.
 //GOD1PRF:73214 Then every element of G is a power of $x$; in other words, the homomorphism $f: \mathbf{Z} \rightarrow \mathrm{G}$ defined by
+claim h_s7_t10_power_homomorphism :
+  forall G, forall mul:set -> set -> set,
+  forall x :e G,
+    group G mul ->
+    group_homomorphism int add_SNo G mul
+      (fun n => group_int_power G mul x n).
+admit.
 //GOD1PRF:73359 is surjective.
+claim h_s7_t10_power_map_surjective :
+  forall G, forall mul:set -> set -> set,
+  forall x :e G,
+    (forall y :e G, exists n :e int,
+      y = group_int_power G mul x n) ->
+    surj int G (fun n => group_int_power G mul x n).
+admit.
 //GOD1PRF:73376 Let I denote the kernel of $f$; I is a subgroup of $\mathbf{Z}$, and therefore there exists a unique integer $p \geqslant 0$ such that
+claim h_s7_t10_kernel_is_pZ :
+  forall G, forall mul:set -> set -> set,
+  forall x :e G,
+    group G mul -> exists p :e omega,
+      group_homomorphism_kernel
+        int add_SNo G mul
+        (fun n => group_int_power G mul x n)
+      = {mul_SNo p k|k :e int}.
+admit.
 //GOD1PRF:73561 There are two cases to consider : $p=0$, and $p>0$.
+claim h_s7_t10_kernel_generator_cases :
+  forall p :e omega, p = 0 \/ 0 :e p.
+admit.
 //GOD1PRF:73615 If $p=0$, then by Theorem $8 f$ is injective, hence bijective, and is therefore an isomorphism of the additive group $\mathbf{Z}$ onto $\mathbf{G}$.
+claim h_s7_t10_theorem8_call :
+  forall G, forall mulG:set -> set -> set,
+  forall H, forall mulH:set -> set -> set,
+  forall f:set -> set,
+    group_homomorphism G mulG H mulH f ->
+    (inj G H f <->
+      group_homomorphism_kernel G mulG H mulH f
+        = {group_identity G mulG}).
+apply god1_s7_theorem8_injective_iff_trivial_kernel.
+claim h_s7_t10_zero_kernel_isomorphism :
+  forall G, forall mul:set -> set -> set,
+  forall f:set -> set,
+    group_homomorphism int add_SNo G mul f ->
+    surj int G f ->
+    group_homomorphism_kernel int add_SNo G mul f = {0} ->
+    group_isomorphism int add_SNo G mul f.
+admit.
 //GOD1PRF:73765 If $p>0$, consider the additive group $\mathbf{Z} / p \mathbf{Z}$ (Example 11) and the canonical mapping $g$ of $\mathbf{Z}$ onto $\mathbf{Z} / p \mathbf{Z}$; this is a surjective homomorphism with kernel equal to $p \mathbf{Z}$, so that $\operatorname{Ker}(g)=\operatorname{Ker}(f)$.
+claim h_s7_t10_example11_call :
+  forall p :e omega,
+    group (int_mod_quotient p) (int_mod_addition p).
+apply god1_integers_modulo_p_form_additive_group.
+claim h_s7_t10_canonical_quotient_map :
+  forall p :e omega,
+    0 :e p -> exists g:set -> set,
+      group_homomorphism int add_SNo
+        (int_mod_quotient p) (int_mod_addition p) g
+      /\ surj int (int_mod_quotient p) g
+      /\ group_homomorphism_kernel
+        int add_SNo (int_mod_quotient p) (int_mod_addition p) g
+        = {mul_SNo p k|k :e int}.
+admit.
 //GOD1PRF:74050 Hence, by Theorem 9, there exists a unique homomorphism
+claim h_s7_t10_theorem9_call :
+  forall G, forall mulG:set -> set -> set,
+  forall H, forall mulH:set -> set -> set,
+  forall M, forall mulM:set -> set -> set,
+  forall p f:set -> set,
+    group_homomorphism G mulG H mulH p ->
+    group_homomorphism G mulG M mulM f ->
+    surj G H p ->
+    ((exists f':set -> set,
+        group_homomorphism H mulH M mulM f'
+        /\ forall x :e G, f x = f' (p x))
+      <-> group_homomorphism_kernel G mulG H mulH p
+        c= group_homomorphism_kernel G mulG M mulM f)
+    /\ (group_homomorphism_kernel G mulG H mulH p
+      c= group_homomorphism_kernel G mulG M mulM f ->
+      exists f':set -> set,
+        group_homomorphism H mulH M mulM f'
+        /\ (forall x :e G, f x = f' (p x))
+        /\ (forall h:set -> set,
+          group_homomorphism H mulH M mulM h ->
+          (forall x :e G, f x = h (p x)) -> h = f')
+        /\ (inj H M f' <->
+          group_homomorphism_kernel G mulG H mulH p
+            = group_homomorphism_kernel G mulG M mulM f)
+        /\ (surj H M f' <-> surj G M f)).
+apply god1_s7_theorem9_factorization_of_group_homomorphism.
+claim h_s7_t10_factor_homomorphism_exists :
+  forall G, forall mul:set -> set -> set,
+  forall p :e omega,
+    exists f':set -> set,
+      group_homomorphism
+        (int_mod_quotient p) (int_mod_addition p) G mul f'.
+admit.
 //GOD1PRF:74175 such that $f=f^{\prime} \circ g$.
+claim h_s7_t10_factor_commutes :
+  forall G, forall mul:set -> set -> set,
+  forall p :e omega, forall f g f':set -> set,
+    forall z :e int, f z = f' (g z).
+admit.
 //GOD1PRF:74630 Since $f$ is surjective, so is $f^{\prime}$; since $\operatorname{Ker}(f)=\operatorname{Ker}(g), f^{\prime}$ is injective ; hence $f^{\prime}$ is bijective and therefore G is isomorphic to the additive group $\mathbf{Z} / p \mathbf{Z}$ of integers modulo $p$.
+claim h_s7_t10_positive_case_isomorphism :
+  forall G, forall mul:set -> set -> set,
+    cyclic_group G mul -> finite G ->
+    exists p :e omega,
+      equip G p
+      /\ isomorphic_groups
+        G mul (int_mod_quotient p) (int_mod_addition p).
+admit.
 //GOD1PRF:74890 In particular, $G$ has the same number of elements as this group, i.e., G has $p$ elements.
+claim h_s7_t10_positive_case_cardinality :
+  forall G, forall mul:set -> set -> set,
+  forall p :e omega,
+    isomorphic_groups
+      G mul (int_mod_quotient p) (int_mod_addition p) ->
+    equip G p.
+admit.
 //GOD1PRF:74982 We have therefore proved
+claim h_s7_t10_classification_conclusion :
+  (forall G, forall mul:set -> set -> set,
+    cyclic_group G mul -> infinite G ->
+    isomorphic_groups G mul int add_SNo)
+  /\ (forall G, forall mul:set -> set -> set,
+    cyclic_group G mul -> finite G ->
+    exists p :e omega,
+      equip G p
+      /\ isomorphic_groups
+        G mul (int_mod_quotient p) (int_mod_addition p)).
+admit.
 //GOD1PRF:75245 It follows that two cyclic groups are isomorphic if and only if they have the same number (finite or infinite) of elements.
+claim h_s7_t10_cardinality_classifies_cyclic_groups :
+  forall G, forall mulG:set -> set -> set,
+  forall H, forall mulH:set -> set -> set,
+    cyclic_group G mulG -> cyclic_group H mulH ->
+    equip G H -> isomorphic_groups G mulG H mulH.
+admit.
 Admitted.
 
 //GOD1:75370 group_element_order : "#4 is the order of #3 in the group #1" | $\operatorname{ord}_{#1}(#3)=#4$
@@ -35353,7 +36713,22 @@ let G mul x.
 assume hx hG.
 apply andI.
 //GOD1PRF:75505 Since H is the image of $\mathbb{Z}$ under the homomorphism $n \rightarrow x^{n}$, it follows that $x$ is of finite order if and only if there exists a non-zero integer $p$ such that
+claim h_s7_element_order_finite_iff_periodic :
+  (exists n :e omega, group_element_order G mul x n) <->
+    exists p :e int,
+      p <> 0
+      /\ group_int_power G mul x p = group_identity G mul.
+admit.
 //GOD1PRF:75706 and then the order of $x$ is the smallest positive integer $p$ which satisfies this relation.
+claim h_s7_element_order_minimal_period :
+  forall n :e omega,
+    group_element_order G mul x n ->
+    0 :e n
+    /\ group_nat_power G mul x n = group_identity G mul
+    /\ forall p :e n,
+      p <> 0 ->
+      group_nat_power G mul x p <> group_identity G mul.
+admit.
 Admitted.
 
 //GOD1:75842 group_action : "the group #1 acts on #3 by #4" | $#1\curvearrowright #3$
@@ -35393,8 +36768,21 @@ let G mul X act.
 assume hact.
 apply andI.
 //GOD1PRF:78818 If a group $G$ operates on a set $X$, then for every $s \in G$ the mapping
+claim h_s7_action_map_closed :
+  forall s :e G, forall x :e X, act s x :e X.
+admit.
 //GOD1PRF:78980 is bijective, because $s^{-1} \cdot(s \cdot x)=\left(s^{-1} s\right) \cdot x=e \cdot x=x$.
+claim h_s7_action_map_bijective :
+  forall s :e G,
+    bij X X (fun x => act s x).
+admit.
 //GOD1PRF:79071 Hence the conditions at the beginning of this section are equivalent to the statement that the mapping $s \rightarrow \bar{s}$ is a homomorphism of the group G onto a group of transformations of the set X .
+claim h_s7_action_homomorphism :
+  group_homomorphism
+    G mul
+    (permutation_group X) (permutation_composition X)
+    (fun s => fun x :e X => act s x).
+admit.
 Admitted.
 
 Theorem god1_action_stabilizer_is_subgroup :
@@ -35408,6 +36796,9 @@ assume hact.
 let x.
 assume hx.
 //GOD1PRF:79319 For each $x \in \mathrm{X}$, the elements $s \in \mathrm{G}$ such that $s . x=x$ clearly form a subgroup of G ; this subgroup is called the stabilizer of $x$ in G .
+claim h_s7_action_stabilizer_closure :
+  subgroup G mul (action_stabilizer G mul X act x).
+admit.
 Admitted.
 
 (** § 8. Rings and fields. **)
@@ -35454,7 +36845,15 @@ Theorem god1_ring_zero_one_negation_specifications :
 let K add mul.
 assume hK.
 //GOD1PRF:99505 Explicitly, axiom (R 1) asserts the following: the identities
+claim h_s8_ring_additive_group_specs :
+  neutral_element K add (ring_zero K add)
+  /\ forall x :e K,
+    reflection K add (ring_zero K add) x (ring_negation K add x).
+admit.
 //GOD1PRF:100364 Axiom (R 2) means that in any ring $K$ the relation
+claim h_s8_ring_multiplicative_identity_spec :
+  neutral_element K mul (ring_one K mul).
+admit.
 apply andI.
 Admitted.
 
@@ -35471,10 +36870,35 @@ let x.
 assume hx.
 apply andI.
 //GOD1PRF:100925 In any ring we have the relations
+claim h_s8_minus_one_zero_relations :
+  mul (ring_negation K add (ring_one K mul)) x
+    = ring_negation K add x
+  /\ mul (ring_zero K add) x = ring_zero K add.
+admit.
 //GOD1PRF:101003 To prove the first of these, it is enough to show that $(-1) x+x=0$; but since
+claim h_s8_minus_one_reduction :
+  add
+    (mul (ring_negation K add (ring_one K mul)) x) x
+    (ring_zero K add) = ring_zero K add ->
+  mul (ring_negation K add (ring_one K mul)) x
+    = ring_negation K add x.
+admit.
 //GOD1PRF:101123 we are reduced to proving the second relation $0 x=0$.
+claim h_s8_reduce_to_zero_multiplication :
+  mul (ring_zero K add) x = ring_zero K add ->
+  mul (ring_negation K add (ring_one K mul)) x
+    = ring_negation K add x.
+admit.
 //GOD1PRF:101178 For this, we calculate
+claim h_s8_zero_distributive_calculation :
+  mul (add (ring_zero K add) (ring_zero K add)) x
+    = add (mul (ring_zero K add) x)
+      (mul (ring_zero K add) x).
+admit.
 //GOD1PRF:101237 so that $0 x=x-x=0$ as in any additive group.
+claim h_s8_zero_multiplication_conclusion :
+  mul (ring_zero K add) x = ring_zero K add.
+admit.
 Admitted.
 
 //GOD1:103366 mapping_ring_addition : "pointwise addition of mappings from #1 into #2" | $(f+g)(x)=f(x)+g(x)$
@@ -35503,10 +36927,52 @@ let X K add mul.
 assume hK.
 apply andI.
 //GOD1PRF:102450 The set A , together with the two laws of composition
+claim h_s8_mapping_ring_operations_closed :
+  law_of_composition (K :^: X) (mapping_ring_addition X add)
+  /\ law_of_composition (K :^: X) (mapping_ring_multiplication X mul).
+admit.
 //GOD1PRF:102583 just defined, is a ring (which is commutative if and only if K is commutative).
+claim h_s8_mapping_ring_goal :
+  ring
+    (K :^: X)
+    (mapping_ring_addition X add)
+    (mapping_ring_multiplication X mul)
+  /\ (commutative_ring K add mul ->
+    commutative_ring
+      (K :^: X)
+      (mapping_ring_addition X add)
+      (mapping_ring_multiplication X mul)).
+admit.
 //GOD1PRF:102736 To prove this we must show that the two sides of this equation, which are mappings of X into K , take the same value at each element $x$ of $X$.
+claim h_s8_mapping_ring_pointwise_extensionality :
+  forall f g h :e (K :^: X),
+    (forall z :e X,
+      mapping_ring_multiplication X mul f
+        (mapping_ring_addition X add g h) z
+      = mapping_ring_addition X add
+        (mapping_ring_multiplication X mul f g)
+        (mapping_ring_multiplication X mul f h) z) ->
+    mapping_ring_multiplication X mul f
+      (mapping_ring_addition X add g h)
+    = mapping_ring_addition X add
+      (mapping_ring_multiplication X mul f g)
+      (mapping_ring_multiplication X mul f h).
+admit.
 //GOD1PRF:102881 The value of the left-hand side at $x$ is $f(x)(g(x)+h(x))$, and the value of the right-hand side is $f(x) g(x)+f(x) h(x)$.
+claim h_s8_mapping_ring_pointwise_values :
+  forall f g h :e (K :^: X), forall z :e X,
+    mul (f z) (add (g z) (h z))
+      = add (mul (f z) (g z)) (mul (f z) (h z)).
+admit.
 //GOD1PRF:103005 Hence the distributive law is true in A because it is true in K.
+claim h_s8_mapping_ring_distributive :
+  forall f g h :e (K :^: X),
+    mapping_ring_multiplication X mul f
+      (mapping_ring_addition X add g h)
+    = mapping_ring_addition X add
+      (mapping_ring_multiplication X mul f g)
+      (mapping_ring_multiplication X mul f h).
+admit.
 Admitted.
 
 //GOD1:104124 subring : "#4 is a subring of the ring #1" | $#4\subseteq #1\text{ is a subring}$
@@ -35525,7 +36991,21 @@ Theorem god1_subring_induced_ring :
 let K add mul A.
 assume hA.
 //GOD1PRF:104675 The set A , together with these two laws of composition, is a ring.
+claim h_s8_subring_induced_goal : ring A add mul.
+admit.
 //GOD1PRF:104744 For the set A together with the law of addition is a commutative group (§ 7, section 3); the multiplication is associative in K , hence $a$ fortiori in A , and A contains a neutral element with respect to multiplication, because A contains the identity element of K ; finally the distributive laws are satisfied in A because they are satisfied in K.
+claim h_s8_subring_additive_subgroup : subgroup K add A.
+admit.
+claim h_s8_subring_s7_section3_call : group A add.
+apply (god1_subgroup_induced_group K add A h_s8_subring_additive_subgroup).
+claim h_s8_subring_ring_components :
+  group A add
+  /\ associative_on A mul
+  /\ neutral_element A mul (ring_one K mul)
+  /\ forall x y z :e A,
+    mul x (add y z) = add (mul x y) (mul x z)
+    /\ mul (add x y) z = add (mul x z) (mul y z).
+admit.
 Admitted.
 
 Theorem god1_subring_test_using_minus_one :
@@ -35538,8 +37018,22 @@ let K add mul A.
 assume hK hAK.
 apply iffI.
 //GOD1PRF:105557 Indeed, suppose that these conditions are fulfilled.
+claim h_s8_subring_test_forward_data :
+  ((forall x y :e A, add x y :e A /\ mul x y :e A)
+    /\ ring_negation K add (ring_one K mul) :e A) -> A <> 0.
+admit.
 //GOD1PRF:105610 If $x \in \mathrm{~A}$, then $-x=(-1) x$ belongs to A; but then, if A contains $x$ and $y$, it contains $x$ and $-y$ and therefore also $x-y=x+(-y)$, so that A is a subgroup of the additive group of K , and therefore satisfies the first condition in the definition of a subring.
+claim h_s8_subring_test_additive_subgroup :
+  ((forall x y :e A, add x y :e A /\ mul x y :e A)
+    /\ ring_negation K add (ring_one K mul) :e A) ->
+  subgroup K add A.
+admit.
 //GOD1PRF:105889 The second is satisfied, by hypothesis, and the third is satisfied because $\mathbf{A}$ contains -1 and therefore also $-(-1)=1$.
+claim h_s8_subring_test_reverse :
+  ((forall x y :e A, add x y :e A /\ mul x y :e A)
+    /\ ring_negation K add (ring_one K mul) :e A) ->
+  subring K add mul A.
+admit.
 Admitted.
 
 //GOD1:106820 ring_unit : "#4 is a unit of the ring #1" | $#4\in #1^*$
@@ -35595,9 +37089,58 @@ Theorem god1_ring_units_form_group :
 let K add mul.
 assume hK.
 //GOD1PRF:110103 By Theorem 3 of § 6, if $\mathrm{K}^{*}$ contains $x$ and $y$ it also contains their product $x y$, and $\mathrm{K}^{*}$ may therefore be given the law of composition $(x, y) \rightarrow x y$.
+claim h_s8_units_s6_t3_law : law_of_composition K mul.
+admit.
+claim h_s8_units_s6_t3_associative : associative_on K mul.
+admit.
+claim h_s8_units_s6_t3_identity :
+  neutral_element K mul (ring_one K mul).
+admit.
+claim h_s8_units_s6_theorem3_first_call :
+  (forall x rx :e K,
+    reflection K mul (ring_one K mul) x rx ->
+    reflection K mul (ring_one K mul) rx x)
+  /\ (forall x y rx ry :e K,
+    reflection K mul (ring_one K mul) x rx ->
+    reflection K mul (ring_one K mul) y ry ->
+    reflexible K mul (ring_one K mul) (mul x y)
+    /\ reflection K mul (ring_one K mul) (mul x y) (mul ry rx)).
+apply (god1_s6_theorem3_reflections_and_products
+  K mul (ring_one K mul)
+  h_s8_units_s6_t3_law h_s8_units_s6_t3_associative
+  h_s8_units_s6_t3_identity).
+claim h_s8_units_product_closed :
+  forall x y :e ring_units K add mul, mul x y :e ring_units K add mul.
+admit.
 //GOD1PRF:110297 The set $\mathrm{K}^{*}$, together with this law of composition, is a group.
+claim h_s8_units_group_goal : group (ring_units K add mul) mul.
+admit.
 //GOD1PRF:110374 For it is clear that the multiplication in $\mathrm{K}^{*}$ is associative (because it is associative in K ); also $1 \in \mathrm{~K}^{*}$, so that we have a neutral element for the law of composition on $\mathrm{K}^{*}$; finally, if $x \in \mathrm{~K}^{*}$ then also $x^{-1} \in \mathrm{~K}^{*}$ (by Theorem 3 of § 6), and since
+claim h_s8_units_s6_theorem3_second_call :
+  (forall x rx :e K,
+    reflection K mul (ring_one K mul) x rx ->
+    reflection K mul (ring_one K mul) rx x)
+  /\ (forall x y rx ry :e K,
+    reflection K mul (ring_one K mul) x rx ->
+    reflection K mul (ring_one K mul) y ry ->
+    reflexible K mul (ring_one K mul) (mul x y)
+    /\ reflection K mul (ring_one K mul) (mul x y) (mul ry rx)).
+apply (god1_s6_theorem3_reflections_and_products
+  K mul (ring_one K mul)
+  h_s8_units_s6_t3_law h_s8_units_s6_t3_associative
+  h_s8_units_s6_t3_identity).
+claim h_s8_units_group_components :
+  associative_on (ring_units K add mul) mul
+  /\ neutral_element (ring_units K add mul) mul (ring_one K mul)
+  /\ forall x :e ring_units K add mul,
+    exists y :e ring_units K add mul,
+      reflection (ring_units K add mul) mul (ring_one K mul) x y.
+admit.
 //GOD1PRF:110733 it follows that every element of $\mathrm{K}^{*}$ is invertible (in $\mathrm{K}^{*}$, not just in K ) with respect to the given law of composition on $\mathrm{K}^{*}$.
+claim h_s8_units_inverse_closed :
+  forall x :e ring_units K add mul,
+    ring_inverse K add mul x :e ring_units K add mul.
+admit.
 Admitted.
 
 Theorem god1_division_ring_units_are_nonzero_elements :
@@ -35607,6 +37150,9 @@ Theorem god1_division_ring_units_are_nonzero_elements :
 let K add mul.
 assume hK.
 //GOD1PRF:111081 If K is a division ring (and in particular if K is a field) we have
+claim h_s8_division_ring_units_characterization :
+  ring_units K add mul = K :\: {ring_zero K add}.
+admit.
 Admitted.
 
 //GOD1:111349 subfield : "#4 is a subfield of the field #1" | $#4\subseteq #1\text{ is a subfield}$
@@ -35624,6 +37170,8 @@ Theorem god1_subfield_induced_field :
 let K add mul A.
 assume hA.
 //GOD1PRF:111568 The set A , together with the laws of composition "induced" by those of K , is then not only a ring but a field.
+claim h_s8_subfield_induced_conclusion : field A add mul.
+admit.
 Admitted.
 
 //GOD1:113410 int_mod_multiplication : "multiplication modulo #1" | $#2#3\pmod {#1}$
@@ -35643,14 +37191,65 @@ Theorem god1_integers_modulo_p_form_commutative_ring :
 let p.
 assume hp.
 //GOD1PRF:112605 We shall deduce from this that the set $\mathbf{Z} / p \mathbf{Z}$ of integers modulo $p$, together with the addition and multiplication defined in § 4, is a commutative ring.
+claim h_s8_mod_ring_goal :
+  commutative_ring
+    (int_mod_quotient p) (int_mod_addition p) (int_mod_multiplication p).
+admit.
 //GOD1PRF:112783 Let us first show that addition in $\mathbf{Z} / p \mathbf{Z}$ is associative.
+claim h_s8_mod_addition_associative :
+  associative_on (int_mod_quotient p) (int_mod_addition p).
+admit.
 //GOD1PRF:113312 hence the associativity of addition in $\mathbf{Z} / p \mathbf{Z}$ follows from the associativity of addition in $\mathbf{Z}$.
+claim h_s8_mod_addition_associativity_conclusion :
+  associative_on (int_mod_quotient p) (int_mod_addition p).
+admit.
 //GOD1PRF:113440 The proofs of associativity of multiplication, commutativity of addition and of multiplication, and distributivity of multiplication over addition in $\mathbf{Z} / p \mathbf{Z}$ all follow the same pattern.
+claim h_s8_mod_remaining_ring_laws :
+  associative_on (int_mod_quotient p) (int_mod_multiplication p)
+  /\ commutative_on (int_mod_quotient p) (int_mod_addition p)
+  /\ commutative_on (int_mod_quotient p) (int_mod_multiplication p)
+  /\ forall x y z :e int_mod_quotient p,
+    int_mod_multiplication p x (int_mod_addition p y z)
+      = int_mod_addition p
+        (int_mod_multiplication p x y) (int_mod_multiplication p x z).
+admit.
 //GOD1PRF:113716 it is clear that $\theta(1)$ is neutral element for multiplication in $\mathbf{Z} / p \mathbf{Z}$, and likewise that $\theta(0)$ is the neutral element for addition.
+claim h_s8_mod_neutral_elements :
+  exists one :e int_mod_quotient p,
+    neutral_element (int_mod_quotient p) (int_mod_multiplication p) one
+  /\ exists zero :e int_mod_quotient p,
+    neutral_element (int_mod_quotient p) (int_mod_addition p) zero.
+admit.
 //GOD1PRF:113883 It remains only to show that each element $\xi \in \mathbf{Z} / p \mathbf{Z}$ has a negative (with respect to addition).
+claim h_s8_mod_additive_inverses_goal :
+  forall xi :e int_mod_quotient p,
+    exists eta :e int_mod_quotient p,
+      reflection (int_mod_quotient p) (int_mod_addition p)
+        (int_mod_class p 0) xi eta.
+admit.
 //GOD1PRF:114004 Let $\xi=\theta(x)$ for some $x \in \mathbf{Z}$; then we have
+claim h_s8_mod_representative :
+  forall xi :e int_mod_quotient p,
+    exists x :e int, xi = int_mod_class p x.
+admit.
 //GOD1PRF:114118 which shows that $\xi$ does have a negative, namely $\theta(-x)$.
+claim h_s8_mod_negative_representative :
+  forall x :e int,
+    reflection (int_mod_quotient p) (int_mod_addition p)
+      (int_mod_class p 0) (int_mod_class p x)
+      (int_mod_class p (minus_SNo x)).
+admit.
 //GOD1PRF:114186 Hence $\mathbf{Z} / p \mathbf{Z}$ is a commutative ring, and we may speak of the ring $\mathbf{Z} / p \mathbf{Z}$ of integers modulo $p$.
+claim h_s8_mod_commutative_ring_conclusion :
+  commutative_ring
+    (int_mod_quotient p) (int_mod_addition p) (int_mod_multiplication p).
+admit.
+Admitted.
+
+(** Formal interface for the more general finite-domain result used below. **)
+Theorem god1_s8_finite_integral_domain_field_interface :
+  forall K, forall add mul:set -> set -> set,
+    finite K -> integral_domain K add mul -> field K add mul.
 Admitted.
 
 Theorem god1_s8_theorem1_integers_mod_p_domain_field_prime :
@@ -35673,13 +37272,71 @@ let p.
 assume hp h1.
 apply andI.
 //GOD1PRF:114921 Let $\xi, \eta$ be two non-zero elements of $\mathbf{Z} / p \mathbf{Z}$.
+claim h_s8_t1_two_nonzero_classes :
+  forall xi eta :e int_mod_quotient p,
+    xi <> ring_zero (int_mod_quotient p) (int_mod_addition p) ->
+    eta <> ring_zero (int_mod_quotient p) (int_mod_addition p) ->
+    xi :e int_mod_quotient p /\ eta :e int_mod_quotient p.
+admit.
 //GOD1PRF:114994 Then $\xi=\theta(x), \eta=\theta(y)$ where
+claim h_s8_t1_nonzero_representatives :
+  forall xi eta :e int_mod_quotient p,
+    exists x y :e int,
+      xi = int_mod_class p x /\ eta = int_mod_class p y.
+admit.
 //GOD1PRF:115104 to deduce that $\xi \eta=\theta(x y)$ is also non-zero we have to show that
+claim h_s8_t1_product_class_nonzero_criterion :
+  forall x y :e int,
+    int_mod_class p (mul_SNo x y) <> int_mod_class p 0 <->
+    ~exists k :e int, mul_SNo x y = mul_SNo p k.
+admit.
 //GOD1PRF:115217 in other words, $\mathbf{Z} / p \mathbf{Z}$ is an integral domain if and only if the relation
+claim h_s8_t1_domain_divisibility_criterion :
+  (integral_domain
+    (int_mod_quotient p) (int_mod_addition p) (int_mod_multiplication p)
+  <-> forall x y :e int,
+    (exists k :e int, mul_SNo x y = mul_SNo p k) ->
+    (exists k :e int, x = mul_SNo p k)
+    \/ (exists k :e int, y = mul_SNo p k)).
+admit.
 //GOD1PRF:115424 or, equivalently, if $p$ divides a product $x y$, then it divides either $x$ or $y$.
+claim h_s8_t1_prime_divides_product :
+  prime_nat p <->
+    forall x y :e int,
+      (exists k :e int, mul_SNo x y = mul_SNo p k) ->
+      (exists k :e int, x = mul_SNo p k)
+      \/ (exists k :e int, y = mul_SNo p k).
+admit.
 //GOD1PRF:115509 This proves the equivalence of $a$ ) and $c$ ).
+claim h_s8_t1_domain_iff_prime :
+  integral_domain
+    (int_mod_quotient p) (int_mod_addition p) (int_mod_multiplication p)
+  <-> prime_nat p.
+admit.
 //GOD1PRF:115558 Clearly $b$ ) implies $a$ ).
+claim h_s8_t1_field_implies_domain :
+  field
+    (int_mod_quotient p) (int_mod_addition p) (int_mod_multiplication p) ->
+  integral_domain
+    (int_mod_quotient p) (int_mod_addition p) (int_mod_multiplication p).
+admit.
 //GOD1PRF:115587 To complete the proof it is therefore only necessary to show that $a$ ) implies $b$ ), and this is a consequence of the following more general result:
+claim h_s8_t1_finite_quotient : finite (int_mod_quotient p).
+admit.
+claim h_s8_t1_more_general_result_call :
+  integral_domain
+    (int_mod_quotient p) (int_mod_addition p) (int_mod_multiplication p) ->
+  field
+    (int_mod_quotient p) (int_mod_addition p) (int_mod_multiplication p).
+apply (god1_s8_finite_integral_domain_field_interface
+  (int_mod_quotient p) (int_mod_addition p) (int_mod_multiplication p)
+  h_s8_t1_finite_quotient).
+Admitted.
+
+(** Formal interface for §5, Theorem 4 on self-maps of finite sets. **)
+Theorem god1_s5_theorem4_finite_injection_is_surjection :
+  forall X, forall f:set -> set,
+    finite X -> inj X X f -> surj X X f.
 Admitted.
 
 Theorem god1_s8_theorem2_finite_integral_domain_is_field :
@@ -35688,10 +37345,39 @@ Theorem god1_s8_theorem2_finite_integral_domain_is_field :
 let K add mul.
 assume hfin hK.
 //GOD1PRF:115794 Let K be a finite integral domain, let $a$ be a non-zero element of K , and consider the mapping $x \rightarrow a x$ of $\mathbf{K}$ into $\mathbf{K}$.
+claim h_s8_t2_multiplication_map_closed :
+  forall a :e K,
+    forall x :e K, mul a x :e K.
+admit.
 //GOD1PRF:115946 Since $a x=a y$ implies $a(x-y)=0$, and therefore $x-y=0$ (because K is an integral domain), it follows that the mapping $x \rightarrow a x$ is injective.
+claim h_s8_t2_multiplication_map_injective :
+  forall a :e K,
+    a <> ring_zero K add ->
+    inj K K (fun x => mul a x).
+admit.
 //GOD1PRF:116101 But the set K is finite and therefore this mapping is surjective (§ 5, Theorem 4); in particular, there is an element $x \in \mathrm{~K}$ such that $a x=1$.
+claim h_s8_t2_s5_theorem4_call :
+  forall a :e K,
+    a <> ring_zero K add ->
+    inj K K (fun x => mul a x) ->
+    surj K K (fun x => mul a x).
+let a.
+assume ha hane hinj.
+apply (god1_s5_theorem4_finite_injection_is_surjection
+  K (fun x => mul a x) hfin hinj).
+claim h_s8_t2_right_inverse_exists :
+  forall a :e K,
+    a <> ring_zero K add -> exists x :e K,
+      mul a x = ring_one K mul.
+admit.
 //GOD1PRF:116259 In other words, $a$ has an inverse in K , and therefore (since $a$ was any non-zero element of K ), K is a field.
+claim h_s8_t2_every_nonzero_is_unit :
+  forall a :e K,
+    a <> ring_zero K add -> ring_unit K add mul a.
+admit.
 //GOD1PRF:116375 Q.E.D.
+claim h_s8_t2_book_conclusion : field K add mul.
+admit.
 Admitted.
 
 //GOD1:116635 ring_nat_power : "the natural-number power #5 of #4 in the ring #1" | $#4^{#5}$
@@ -35763,13 +37449,64 @@ assume hy hcomm.
 let n.
 assume hn hpos.
 //GOD1PRF:117878 The formula to be proved is trivial for $n=1$, and it is therefore enough to show that the formula
+claim h_s8_t3_base_and_induction_plan :
+  ring_nat_power K add mul (add x y) 1 = add x y
+  /\ (forall m :e omega,
+    ring_nat_power K add mul (add x y) m
+      = ring_nat_power K add mul (add x y) m ->
+    ring_nat_power K add mul (add x y) (ordsucc m)
+      = ring_nat_power K add mul (add x y) (ordsucc m)).
+admit.
 //GOD1PRF:118044 implies the corresponding formula for the exponent $n$.
+claim h_s8_t3_induction_step_goal :
+  ring_nat_power K add mul (add x y) (ordsucc n)
+    = ring_finite_sum K add (ordsucc (ordsucc n))
+      (fun p => ring_nat_multiple K add
+        (binomial_coefficient (ordsucc n) p)
+        (mul
+          (ring_nat_power K add mul x (nat_sub_witness p (ordsucc n)))
+          (ring_nat_power K add mul y p))).
+admit.
 //GOD1PRF:118100 If we multiply each side of this formula by $x+y$, we obtain
+claim h_s8_t3_multiply_induction_hypothesis :
+  ring_nat_power K add mul (add x y) (ordsucc n)
+    = mul (ring_nat_power K add mul (add x y) n) (add x y).
+admit.
 //GOD1PRF:118275 If $r$ is an integer such that $0<r<n$, there are two terms on the right-hand side which contain the monomial
+claim h_s8_t3_two_middle_terms :
+  forall r :e n,
+    0 :e r ->
+    binomial_coefficient n r :e omega
+    /\ binomial_coefficient n (Union r) :e omega.
+admit.
 //GOD1PRF:118409 the first corresponds to $p=r$ in the first sum, which introduces a factor equal to
+claim h_s8_t3_first_middle_coefficient :
+  forall r :e n,
+    ring_nat_multiple K add (binomial_coefficient n r)
+      (ring_one K mul) :e K.
+admit.
 //GOD1PRF:118517 and the second corresponds to $p=r-1$ in the second sum, which introduces a factor equal to
+claim h_s8_t3_second_middle_coefficient :
+  forall r :e n,
+    ring_nat_multiple K add (binomial_coefficient n (Union r))
+      (ring_one K mul) :e K.
+admit.
 //GOD1PRF:118634 Hence the proof will be complete if we verify that
+claim h_s8_t3_pascal_identity_goal :
+  forall r :e n,
+    add_nat
+      (binomial_coefficient n r)
+      (binomial_coefficient n (Union r))
+    = binomial_coefficient (ordsucc n) r.
+admit.
 //GOD1PRF:118740 Now the right-hand side is equal to
+claim h_s8_t3_pascal_identity_conclusion :
+  forall r :e n,
+    binomial_coefficient (ordsucc n) r
+    = add_nat
+      (binomial_coefficient n r)
+      (binomial_coefficient n (Union r)).
+admit.
 Admitted.
 
 Theorem god1_product_of_sums_expansion :
@@ -35792,9 +37529,30 @@ assume hfin.
 let x y.
 assume hxy.
 //GOD1PRF:121701 To multiply the sums $x_{i}+y_{i}$ together, we have to choose one term in each sum in all possible ways, form the product of the chosen terms, and then add all these products together.
+claim h_s8_product_sums_choice_index :
+  forall F :e Power I, F c= I.
+admit.
 //GOD1PRF:121887 The product of the $x_{i}+y_{i}$ will therefore be a sum of products obtained by multiplying the $x_{i}$ in some of the sums by the $y_{j}$ in the others.
+claim h_s8_product_sums_expansion_shape :
+  ring_finite_product K add mul I (fun i => add (x i) (y i))
+    = ring_finite_sum K add (Power I)
+      (fun F => mul
+        (ring_finite_product K add mul F x)
+        (ring_finite_product K add mul (I :\: F) y)).
+admit.
 //GOD1PRF:122042 For such a product, let F denote the set of values of $i$ for which we choose $x_{i}$, so that $\mathrm{I}-\mathrm{F}$ is the set of values of $i$ for which we choose $y_{i}$.
+claim h_s8_product_sums_partition_indices :
+  forall F :e Power I,
+    F c= I /\ I :\: F c= I.
+admit.
 //GOD1PRF:122218 Clearly the product of the chosen terms is $x_{\mathrm{F}} y_{\mathrm{I}-\mathrm{F}}$, and so we arrive at the formula stated above.
+claim h_s8_product_sums_conclusion :
+  ring_finite_product K add mul I (fun i => add (x i) (y i))
+    = ring_finite_sum K add (Power I)
+      (fun F => mul
+        (ring_finite_product K add mul F x)
+        (ring_finite_product K add mul (I :\: F) y)).
+admit.
 Admitted.
 
 //GOD1:122999 ring_homomorphism : "#7 is a homomorphism from the ring #1 to the ring #3" | $#7:#1\to #3$
@@ -35840,8 +37598,32 @@ let K addK mulK L addL mulL M addM mulM f g.
 assume hf hg.
 apply andI.
 //GOD1PRF:123686 The properties of ring homomorphisms are analogous to those of group homomorphisms (§ 7, sections 8 and 9).
+claim h_s8_ring_hom_s7_group_result_call :
+  forall A, forall addA:set -> set -> set,
+  forall B, forall addB:set -> set -> set,
+  forall C, forall addC:set -> set -> set,
+  forall u v:set -> set,
+    group_homomorphism A addA B addB u ->
+    group_homomorphism B addB C addC v ->
+    group_homomorphism A addA C addC (fun x => v (u x))
+    /\ (bij A B u ->
+      group_homomorphism B addB A addA (inv A u)).
+apply god1_s7_theorem6_composite_and_inverse_homomorphisms.
+claim h_s8_ring_hom_additive_group_maps :
+  group_homomorphism K addK L addL f
+  /\ group_homomorphism L addL M addM g.
+admit.
 //GOD1PRF:123888 are ring homomorphisms, then so is their composition $g \circ f$.
+claim h_s8_ring_hom_composite :
+  ring_homomorphism K addK mulK M addM mulM (fun x => g (f x)).
+admit.
 //GOD1PRF:123956 If a homomorphism $f: \mathrm{K} \rightarrow \mathrm{L}$ is bijective, then the inverse mapping is also a homomorphism ; in this case $f$ is said to be an isomorphism, and two rings K , L are said to be isomorphic if there exists an isomorphism of K onto L .
+claim h_s8_ring_hom_inverse_bijection_call :
+  bij K L f -> bij L K (inv K f).
+apply (bij_inv K L f).
+claim h_s8_ring_hom_inverse :
+  bij K L f -> ring_homomorphism L addL mulL K addK mulK (inv K f).
+admit.
 Admitted.
 
 //GOD1:124303 ring_homomorphism_kernel : "the kernel of the ring homomorphism #7" | $\operatorname{Ker}(#7)$
@@ -35864,6 +37646,20 @@ let K addK mulK L addL mulL f.
 assume hf.
 apply iffI.
 //GOD1PRF:124627 The homomorphism $f$ is injective if and only if $\operatorname{Ker}(f)=\{0\}$.
+claim h_s8_ring_hom_underlying_group_hom :
+  group_homomorphism K addK L addL f.
+admit.
+claim h_s8_ring_hom_s7_theorem8_call :
+  inj K L f <->
+    group_homomorphism_kernel K addK L addL f
+      = {group_identity K addK}.
+apply (god1_s7_theorem8_injective_iff_trivial_kernel
+  K addK L addL f h_s8_ring_hom_underlying_group_hom).
+claim h_s8_ring_hom_kernel_characterization :
+  inj K L f <->
+    ring_homomorphism_kernel K addK mulK L addL mulL f
+      = {ring_zero K addK}.
+admit.
 Admitted.
 
 //GOD1:125150 left_ideal : "#4 is a left ideal of the ring #1" | $#4\triangleleft_l #1$
@@ -35899,8 +37695,26 @@ Theorem god1_ring_homomorphism_kernel_is_two_sided_ideal :
 let K addK mulK L addL mulL f.
 assume hf.
 //GOD1PRF:124708 The relations
+claim h_s8_ring_kernel_relations :
+  forall x y :e ring_homomorphism_kernel K addK mulK L addL mulL f,
+    addK x (ring_negation K addK y)
+      :e ring_homomorphism_kernel K addK mulK L addL mulL f
+  /\ forall a :e K,
+    mulK a x :e ring_homomorphism_kernel K addK mulK L addL mulL f
+    /\ mulK x a :e ring_homomorphism_kernel K addK mulK L addL mulL f.
+admit.
 //GOD1PRF:124779 show that the kernel I of a homomorphism $f: \mathrm{K} \rightarrow \mathrm{L}$ satisfies the following two conditions :
+claim h_s8_ring_kernel_left_and_right :
+  left_ideal K addK mulK
+    (ring_homomorphism_kernel K addK mulK L addL mulL f)
+  /\ right_ideal K addK mulK
+    (ring_homomorphism_kernel K addK mulK L addL mulL f).
+admit.
 //GOD1PRF:125047 A subset $I$ of a ring $K$ is called a two-sided ideal if it satisfies these conditions (i) and (ii).
+claim h_s8_ring_kernel_two_sided :
+  two_sided_ideal K addK mulK
+    (ring_homomorphism_kernel K addK mulK L addL mulL f).
+admit.
 Admitted.
 
 Theorem god1_two_sided_ideal_iff_left_and_right :
@@ -35912,6 +37726,10 @@ let K add mul I.
 assume hK hIK.
 apply iffI.
 //GOD1PRF:125815 Clearly, a subset of K is a two-sided ideal if and only if it is simultaneously a left ideal and a right ideal of K .
+claim h_s8_two_sided_definition_call :
+  two_sided_ideal K add mul I <->
+    left_ideal K add mul I /\ right_ideal K add mul I.
+admit.
 Admitted.
 
 //GOD1:126502 principal_ideal : "the principal ideal generated by #4 in #1" | $#4#1$
@@ -35926,6 +37744,9 @@ Theorem god1_principal_ideal_is_ideal :
 let K add mul x.
 assume hx hK.
 //GOD1PRF:126720 This set $x \mathrm{~K}$ is an ideal in K .
+claim h_s8_principal_ideal_closure :
+  two_sided_ideal K add mul (principal_ideal K add mul x).
+admit.
 Admitted.
 
 //GOD1:126822 principal_ideal_domain : "#1 is a principal ideal domain" | $#1\text{ is a PID}$
@@ -35967,6 +37788,10 @@ assume hx.
 let y.
 assume hy hdx hdy.
 //GOD1PRF:151560 Clearly, if $x$ is a square root of $d$ in K , so is $-x$; if also K is an integral domain, then $d$ cannot have more than two square roots in K , because the equation $x^{2}=y^{2}$ is equivalent to $(x-y)(x+y)=0$ and therefore implies that either $y=x$ or $y=-x$ when K is an integral domain.
+claim h_s9_square_roots_factorization :
+  mul (add x (ring_negation K add y)) (add x y) = ring_zero K add
+  /\ (y = x \/ y = ring_negation K add x).
+admit.
 Admitted.
 
 //GOD1:153061 quadratic_linear_span : "the elements of #4 of the form #7(x)+#8#7(y), with x and y in #1" | $#7(#1)+#8#7(#1)$
@@ -35995,11 +37820,50 @@ let K addK mulK L addL mulL j d omega.
 assume hK hL hj hinj hd homega hsquare.
 apply andI.
 //GOD1PRF:153273 We assert that $\mathrm{L}^{\prime}$ is a subring of L which contains K and in which $d$ has a square root.
+claim h_s9_span_three_goals :
+  subring L addL mulL (quadratic_linear_span K L addL mulL j omega)
+  /\ group_image_of_subset K j
+    c= quadratic_linear_span K L addL mulL j omega
+  /\ omega :e quadratic_linear_span K L addL mulL j omega.
+admit.
 //GOD1PRF:153382 Clearly $\mathrm{L}^{\prime}$ contains K (put $y=0$ in (1)) and $\omega$ (put $x=0, y=1$ ).
+claim h_s9_span_contains_K_and_root :
+  group_image_of_subset K j
+    c= quadratic_linear_span K L addL mulL j omega
+  /\ omega :e quadratic_linear_span K L addL mulL j omega.
+admit.
 //GOD1PRF:153474 So we have to show that $\mathrm{L}^{\prime}$ is a subring of L .
+claim h_s9_span_subring_goal :
+  subring L addL mulL (quadratic_linear_span K L addL mulL j omega).
+admit.
 //GOD1PRF:153540 Since $\mathrm{L}^{\prime}$ contains K and therefore the element -1 , it is enough to show that the sum and product of two elements of $L^{\prime}$ are also in $L^{\prime}$.
+claim h_s9_span_subring_test_call :
+  subring L addL mulL (quadratic_linear_span K L addL mulL j omega)
+  <-> ((forall x y :e quadratic_linear_span K L addL mulL j omega,
+      addL x y :e quadratic_linear_span K L addL mulL j omega
+      /\ mulL x y :e quadratic_linear_span K L addL mulL j omega)
+    /\ ring_negation L addL (ring_one L mulL)
+      :e quadratic_linear_span K L addL mulL j omega).
+claim h_s9_span_ring : ring L addL mulL.
+admit.
+claim h_s9_span_subset : quadratic_linear_span K L addL mulL j omega c= L.
+admit.
+apply (god1_subring_test_using_minus_one
+  L addL mulL (quadratic_linear_span K L addL mulL j omega)
+  h_s9_span_ring h_s9_span_subset).
 //GOD1PRF:153714 But this follows immediately from the formulae
+claim h_s9_span_sum_product_formulae :
+  forall x y x' y' :e K,
+    addL (addL (j x) (mulL omega (j y)))
+      (addL (j x') (mulL omega (j y')))
+      :e quadratic_linear_span K L addL mulL j omega
+  /\ mulL (addL (j x) (mulL omega (j y)))
+      (addL (j x') (mulL omega (j y')))
+      :e quadratic_linear_span K L addL mulL j omega.
+admit.
 //GOD1PRF:154259 which are self-evident if we remember that
+claim h_s9_span_square_relation : mulL omega omega = j d.
+admit.
 Admitted.
 
 //GOD1:156229 quadratic_extension : "the quadratic extension of #1 obtained by adjoining a square root of #4" | $#1[\sqrt{#4}]$
@@ -36044,13 +37908,68 @@ Theorem god1_quadratic_extension_is_commutative_ring :
 let K add mul d.
 assume hd hK.
 //GOD1PRF:157493 First of all, the set $\mathrm{K} \times \mathrm{K}$ together with the law of addition ( 2 ter) is a commutative group.
+claim h_s9_extension_additive_group :
+  abelian_group (quadratic_extension K) (quadratic_extension_addition K add).
+admit.
 //GOD1PRF:157613 This follows from § 7, section 2 (direct product of groups) and from the fact that the set K with the given law of addition is a commutative group.
+claim h_s9_extension_indexed_product_call :
+  forall I, forall G:set -> set,
+  forall op:set -> set -> set -> set,
+    (forall i :e I, group (G i) (op i)) ->
+    group (Pi_ i :e I, G i) (indexed_group_product_operation I op).
+let I G op.
+assume hgroups.
+apply (god1_indexed_direct_product_is_group I G op hgroups).
+claim h_s9_extension_direct_product_group :
+  group (quadratic_extension K) (quadratic_extension_addition K add).
+admit.
 //GOD1PRF:157763 Next let us show that the multiplication (3 ter) is associative.
+claim h_s9_extension_multiplication_associative_goal :
+  associative_on (quadratic_extension K)
+    (quadratic_extension_multiplication K add mul d).
+admit.
 //GOD1PRF:157828 By definition we have
+claim h_s9_extension_multiplication_definition_call :
+  forall z w :e quadratic_extension K,
+    quadratic_extension_multiplication K add mul d z w
+    = (add (mul (z 0) (w 0)) (mul d (mul (z 1) (w 1))),
+       add (mul (z 0) (w 1)) (mul (w 0) (z 1))).
+let z.
+assume hz.
+let w.
+assume hw.
+apply (eq_ref
+  (add (mul (z 0) (w 0)) (mul d (mul (z 1) (w 1))),
+   add (mul (z 0) (w 1)) (mul (w 0) (z 1)))).
 //GOD1PRF:158998 Associativity now follows trivially by comparing these two expressions (and, of course, using the rules of calculation in K).
+claim h_s9_extension_multiplication_associative :
+  associative_on (quadratic_extension K)
+    (quadratic_extension_multiplication K add mul d).
+admit.
 //GOD1PRF:159124 Analogous calculations show that the multiplication is commutative and distributive over addition.
+claim h_s9_extension_commutative_distributive :
+  commutative_on (quadratic_extension K)
+    (quadratic_extension_multiplication K add mul d)
+  /\ forall x y z :e quadratic_extension K,
+    quadratic_extension_multiplication K add mul d x
+      (quadratic_extension_addition K add y z)
+    = quadratic_extension_addition K add
+      (quadratic_extension_multiplication K add mul d x y)
+      (quadratic_extension_multiplication K add mul d x z).
+admit.
 //GOD1PRF:159273 shows that the set $\mathrm{K} \times \mathrm{K}$, endowed with the law of multiplication ( 3 ter), admits a neutral element.
+claim h_s9_extension_multiplicative_identity :
+  exists one :e quadratic_extension K,
+    neutral_element (quadratic_extension K)
+      (quadratic_extension_multiplication K add mul d) one.
+admit.
 //GOD1PRF:159400 Hence $\mathrm{L}=\mathrm{K} \times \mathrm{K}$, together with the laws of composition (2 ter) and (3 ter), is indeed a commutative ring.
+claim h_s9_extension_commutative_ring_conclusion :
+  commutative_ring
+    (quadratic_extension K)
+    (quadratic_extension_addition K add)
+    (quadratic_extension_multiplication K add mul d).
+admit.
 Admitted.
 
 Theorem god1_quadratic_extension_canonical_embedding :
@@ -36074,14 +37993,73 @@ let K add mul d.
 assume hd hK.
 apply andI.
 //GOD1PRF:159539 Let us now show that L contains a subring isomorphic to K .
+claim h_s9_embedding_goal :
+  ring_homomorphism K add mul
+    (quadratic_extension K)
+    (quadratic_extension_addition K add)
+    (quadratic_extension_multiplication K add mul d)
+    (quadratic_extension_embedding K add).
+admit.
 //GOD1PRF:159599 For this we consider the mapping $j: \mathrm{K} \rightarrow \mathrm{L}$ defined by
+claim h_s9_embedding_definition_call :
+  forall x :e K,
+    quadratic_extension_embedding K add x = (x, ring_zero K add).
+let x.
+assume hx.
+apply (eq_ref (x, ring_zero K add)).
 //GOD1PRF:159704 Clearly $j$ is injective.
+claim h_s9_embedding_injective :
+  inj K (quadratic_extension K) (quadratic_extension_embedding K add).
+admit.
 //GOD1PRF:159730 Moreover, an easy calculation shows that
+claim h_s9_embedding_operation_calculations :
+  forall x y :e K,
+    quadratic_extension_embedding K add (add x y)
+      = quadratic_extension_addition K add
+        (quadratic_extension_embedding K add x)
+        (quadratic_extension_embedding K add y)
+    /\ quadratic_extension_embedding K add (mul x y)
+      = quadratic_extension_multiplication K add mul d
+        (quadratic_extension_embedding K add x)
+        (quadratic_extension_embedding K add y).
+admit.
 //GOD1PRF:160138 These formulae show that $j$ is an isomorphism of K onto a subring of L .
+claim h_s9_embedding_ring_homomorphism :
+  ring_homomorphism K add mul
+    (quadratic_extension K)
+    (quadratic_extension_addition K add)
+    (quadratic_extension_multiplication K add mul d)
+    (quadratic_extension_embedding K add).
+admit.
 //GOD1PRF:160447 To show that this constitutes a solution of the problem posed in section 1, it remains to be proved that the element $d$ of K is a square in L .
+claim h_s9_embedding_square_root_goal :
+  square_root_in_ring
+    (quadratic_extension K)
+    (quadratic_extension_addition K add)
+    (quadratic_extension_multiplication K add mul d)
+    (quadratic_extension_embedding K add d)
+    (quadratic_extension_root K add mul).
+admit.
 //GOD1PRF:160592 Consider then the element
+claim h_s9_embedding_root_member :
+  quadratic_extension_root K add mul :e quadratic_extension K.
+admit.
 //GOD1PRF:160677 of $L$; a trivial calculation shows that
+claim h_s9_embedding_root_square :
+  quadratic_extension_multiplication K add mul d
+    (quadratic_extension_root K add mul)
+    (quadratic_extension_root K add mul)
+  = quadratic_extension_embedding K add d.
+admit.
 //GOD1PRF:160790 and since we have agreed to identify each element $x \in \mathrm{~K}$ with the element $j(x)$ of L , the proof is complete.
+claim h_s9_embedding_book_conclusion :
+  square_root_in_ring
+    (quadratic_extension K)
+    (quadratic_extension_addition K add)
+    (quadratic_extension_multiplication K add mul d)
+    (quadratic_extension_embedding K add d)
+    (quadratic_extension_root K add mul).
+admit.
 Admitted.
 
 //GOD1:165500 quadratic_conjugate : "the conjugate of #5 in the quadratic extension #1" | $\overline{#5}$
@@ -36125,10 +38103,43 @@ let w.
 assume hw.
 apply andI.
 //GOD1PRF:166020 which show how to calculate the conjugate of a sum or product of elements of L .
+claim h_s9_conjugate_sum_product :
+  quadratic_conjugate K add
+    (quadratic_extension_addition K add z w)
+  = quadratic_extension_addition K add
+    (quadratic_conjugate K add z) (quadratic_conjugate K add w)
+  /\ quadratic_conjugate K add
+    (quadratic_extension_multiplication K add mul d z w)
+  = quadratic_extension_multiplication K add mul d
+    (quadratic_conjugate K add z) (quadratic_conjugate K add w).
+admit.
 //GOD1PRF:166101 The simplest way of proving (10) and (11) is to go back to the formulae ( 2 ter) and (3 ter) of section 3, and examine what happens when we replace $y^{\prime}$ and $y^{\prime \prime}$ by their negatives, without changing $x^{\prime}$ or $x^{\prime \prime}$.
+claim h_s9_conjugate_coordinate_calculation :
+  forall u :e quadratic_extension K,
+    quadratic_conjugate K add u
+      = (u 0, ring_negation K add (u 1)).
+admit.
 //GOD1PRF:166360 The formula (11) shows that
+claim h_s9_norm_as_product_with_conjugate :
+  forall u :e quadratic_extension K,
+    quadratic_extension_multiplication K add mul d
+      u (quadratic_conjugate K add u)
+    = quadratic_extension_embedding K add (quadratic_norm K add mul d u).
+admit.
 //GOD1PRF:166562 for all $z^{\prime}, z^{\prime \prime} \in \mathrm{L}$; for
+claim h_s9_norm_product_intermediate :
+  quadratic_norm K add mul d
+    (quadratic_extension_multiplication K add mul d z w)
+  = mul (quadratic_norm K add mul d z)
+    (quadratic_norm K add mul d w).
+admit.
 //GOD1PRF:167014 as asserted.
+claim h_s9_norm_multiplicative_conclusion :
+  quadratic_norm K add mul d
+    (quadratic_extension_multiplication K add mul d z w)
+  = mul (quadratic_norm K add mul d z)
+    (quadratic_norm K add mul d w).
+admit.
 Admitted.
 
 Theorem god1_s9_theorem1_units_in_quadratic_extension :
@@ -36157,13 +38168,81 @@ let z.
 assume hz.
 apply andI.
 //GOD1PRF:167440 Suppose that $z$ is a unit.
+claim h_s9_t1_forward_assumption :
+  ring_unit
+    (quadratic_extension K)
+    (quadratic_extension_addition K add)
+    (quadratic_extension_multiplication K add mul d) z ->
+  z :e quadratic_extension K.
+admit.
 //GOD1PRF:167468 Then the relation $z^{-1} \cdot z=1$, bearing in mind (12) and (13), gives
+claim h_s9_t1_norm_inverse_product :
+  ring_unit
+    (quadratic_extension K)
+    (quadratic_extension_addition K add)
+    (quadratic_extension_multiplication K add mul d) z ->
+  exists u :e K,
+    mul u (quadratic_norm K add mul d z) = ring_one K mul.
+admit.
 //GOD1PRF:167603 and therefore $\mathrm{N}(z)$ is a unit in K .
+claim h_s9_t1_forward_norm_unit :
+  ring_unit
+    (quadratic_extension K)
+    (quadratic_extension_addition K add)
+    (quadratic_extension_multiplication K add mul d) z ->
+  ring_unit K add mul (quadratic_norm K add mul d z).
+admit.
 //GOD1PRF:167652 Conversely, suppose that $\mathrm{N}(z)$ is a unit in K .
+claim h_s9_t1_reverse_assumption :
+  ring_unit K add mul (quadratic_norm K add mul d z) ->
+  ring_inverse K add mul (quadratic_norm K add mul d z) :e K.
+admit.
 //GOD1PRF:167710 Then the relation
+claim h_s9_t1_candidate_inverse :
+  ring_unit K add mul (quadratic_norm K add mul d z) ->
+  quadratic_extension_multiplication K add mul d
+    (quadratic_extension_embedding K add
+      (ring_inverse K add mul (quadratic_norm K add mul d z)))
+    (quadratic_conjugate K add z)
+  :e quadratic_extension K.
+admit.
 //GOD1PRF:167760 implies that
+claim h_s9_t1_candidate_reflection :
+  ring_unit K add mul (quadratic_norm K add mul d z) ->
+  reflection
+    (quadratic_extension K)
+    (quadratic_extension_multiplication K add mul d)
+    (ring_one (quadratic_extension K)
+      (quadratic_extension_multiplication K add mul d)) z
+    (quadratic_extension_multiplication K add mul d
+      (quadratic_extension_embedding K add
+        (ring_inverse K add mul (quadratic_norm K add mul d z)))
+      (quadratic_conjugate K add z)).
+admit.
 //GOD1PRF:167825 and this shows that $z$ is a unit in $\mathrm{K}[\sqrt{d}]$ and that its inverse is given by (14).
+claim h_s9_t1_reverse_and_formula :
+  ring_unit K add mul (quadratic_norm K add mul d z) ->
+  ring_unit
+    (quadratic_extension K)
+    (quadratic_extension_addition K add)
+    (quadratic_extension_multiplication K add mul d) z
+  /\ ring_inverse
+    (quadratic_extension K)
+    (quadratic_extension_addition K add)
+    (quadratic_extension_multiplication K add mul d) z
+  = quadratic_extension_multiplication K add mul d
+    (quadratic_extension_embedding K add
+      (ring_inverse K add mul (quadratic_norm K add mul d z)))
+    (quadratic_conjugate K add z).
+admit.
 //GOD1PRF:167924 Q.E.D.
+claim h_s9_t1_book_conclusion :
+  ring_unit
+    (quadratic_extension K)
+    (quadratic_extension_addition K add)
+    (quadratic_extension_multiplication K add mul d) z
+  <-> ring_unit K add mul (quadratic_norm K add mul d z).
+admit.
 Admitted.
 
 Theorem god1_s9_theorem2_quadratic_extension_field_iff_nonsquare :
@@ -36181,27 +38260,129 @@ let d.
 assume hd.
 apply iffI.
 //GOD1PRF:168184 To show that $a$ ) implies $b$ ), suppose that there exists $x \in \mathrm{~K}$ such that
+claim h_s9_t2_square_assumption :
+  square_in_ring K add mul d -> exists x :e K, mul x x = d.
+admit.
 //GOD1PRF:168290 then we have $x^{2}=\omega^{2}$, hence $(x-\omega)(x+\omega)=0$.
+claim h_s9_t2_zero_factorization :
+  square_in_ring K add mul d -> exists x :e K,
+    quadratic_extension_multiplication K add mul d
+      (quadratic_extension_addition K add
+        (quadratic_extension_embedding K add x)
+        (ring_negation (quadratic_extension K)
+          (quadratic_extension_addition K add)
+          (quadratic_extension_root K add mul)))
+      (quadratic_extension_addition K add
+        (quadratic_extension_embedding K add x)
+        (quadratic_extension_root K add mul))
+    = ring_zero (quadratic_extension K) (quadratic_extension_addition K add).
+admit.
 //GOD1PRF:168355 If $\mathrm{K}[\sqrt{d}]$ is a field and therefore an integral domain, it follows that either $\omega=x$ or $\omega=-x$; but neither of these is possible since the relation $x+\omega y=0(x, y \in \mathrm{~K})$ implies that $x=y=0$.
+claim h_s9_t2_field_implies_nonsquare :
+  field
+    (quadratic_extension K)
+    (quadratic_extension_addition K add)
+    (quadratic_extension_multiplication K add mul d) ->
+  ~square_in_ring K add mul d.
+admit.
 //GOD1PRF:168588 Conversely, let $x+\omega y=z$ be a non-zero element of $K[\sqrt{d}]$.
+claim h_s9_t2_nonzero_coordinates :
+  forall z :e quadratic_extension K,
+    z <> ring_zero (quadratic_extension K) (quadratic_extension_addition K add) ->
+    exists x y :e K,
+      z = quadratic_extension_addition K add
+        (quadratic_extension_embedding K add x)
+        (quadratic_extension_multiplication K add mul d
+          (quadratic_extension_root K add mul)
+          (quadratic_extension_embedding K add y)).
+admit.
 //GOD1PRF:168659 To show that $z$ is a unit of $K[\sqrt{d}]$ it is enough, by Theorem 1, to show that $N(z)$ is a unit in K.
+claim h_s9_t2_commutative_ring : commutative_ring K add mul.
+admit.
+claim h_s9_t2_theorem1_call :
+  forall z :e quadratic_extension K,
+    (ring_unit
+      (quadratic_extension K)
+      (quadratic_extension_addition K add)
+      (quadratic_extension_multiplication K add mul d) z
+    <-> ring_unit K add mul (quadratic_norm K add mul d z))
+    /\ (ring_unit K add mul (quadratic_norm K add mul d z) ->
+      ring_inverse
+        (quadratic_extension K)
+        (quadratic_extension_addition K add)
+        (quadratic_extension_multiplication K add mul d) z
+      = quadratic_extension_multiplication K add mul d
+        (quadratic_extension_embedding K add
+          (ring_inverse K add mul (quadratic_norm K add mul d z)))
+        (quadratic_conjugate K add z)).
+apply (god1_s9_theorem1_units_in_quadratic_extension
+  K add mul d hd h_s9_t2_commutative_ring).
 //GOD1PRF:168767 Since K is a field, we are reduced to showing that $\mathrm{N}(z)=0$ implies that $z=0$, i.e., that
+claim h_s9_t2_norm_zero_reduction :
+  forall z :e quadratic_extension K,
+    quadratic_norm K add mul d z = ring_zero K add ->
+    z = ring_zero (quadratic_extension K) (quadratic_extension_addition K add).
+admit.
 //GOD1PRF:168927 Now if $y \neq 0$, then $y$ is a unit in K , and hence we have
+claim h_s9_t2_nonzero_y_forces_square :
+  forall x y :e K,
+    y <> ring_zero K add ->
+    add (mul x x) (ring_negation K add (mul d (mul y y)))
+      = ring_zero K add -> square_in_ring K add mul d.
+admit.
 //GOD1PRF:169056 contrary to the hypothesis that $d$ is not the square of an element of K .
+claim h_s9_t2_contradiction :
+  ~square_in_ring K add mul d -> ~square_in_ring K add mul d.
+admit.
 //GOD1PRF:169131 Hence $y=0$, hence $x^{2}=0$, hence $x=0$ and the proof is complete.
+claim h_s9_t2_nonsquare_implies_field :
+  ~square_in_ring K add mul d ->
+  field
+    (quadratic_extension K)
+    (quadratic_extension_addition K add)
+    (quadratic_extension_multiplication K add mul d).
+admit.
 //GOD1PRF:169202 Q.E.D.
+claim h_s9_t2_book_conclusion :
+  field
+    (quadratic_extension K)
+    (quadratic_extension_addition K add)
+    (quadratic_extension_multiplication K add mul d)
+  <-> ~square_in_ring K add mul d.
+admit.
 Admitted.
 
 Theorem god1_complex_numbers_form_field :
   field complex add_CSNo mul_CSNo.
 prove (field complex add_CSNo mul_CSNo).
 //GOD1PRF:169221 Taking $\mathrm{K}=\mathbf{R}$ and $d=-1$, we see that the ring $\mathbf{C}$ of complex numbers is in fact a field; for this reason, $\mathbf{C}$ is called the field of complex numbers.
+claim h_s9_complex_real_field : field real add_SNo mul_SNo.
+admit.
+claim h_s9_complex_minus_one_member : minus_SNo 1 :e real.
+admit.
+claim h_s9_complex_minus_one_nonsquare :
+  ~square_in_ring real add_SNo mul_SNo (minus_SNo 1).
+admit.
+claim h_s9_complex_theorem2_call :
+  field
+    (quadratic_extension real)
+    (quadratic_extension_addition real add_SNo)
+    (quadratic_extension_multiplication real add_SNo mul_SNo (minus_SNo 1))
+  <-> ~square_in_ring real add_SNo mul_SNo (minus_SNo 1).
+apply (god1_s9_theorem2_quadratic_extension_field_iff_nonsquare
+  real add_SNo mul_SNo h_s9_complex_real_field
+  (minus_SNo 1) h_s9_complex_minus_one_member).
+claim h_s9_complex_field_conclusion : field complex add_CSNo mul_CSNo.
+admit.
 Admitted.
 
 Theorem god1_reals_form_subfield_of_complex_numbers :
   subfield complex add_CSNo mul_CSNo real.
 prove (subfield complex add_CSNo mul_CSNo real).
 //GOD1PRF:164100 b) the field $\mathbf{R}$ of real numbers is a subfield of $\mathbf{C}$;
+claim h_s9_real_subfield_conclusion :
+  subfield complex add_CSNo mul_CSNo real.
+admit.
 Admitted.
 
 Theorem god1_complex_i_and_cartesian_representation :
@@ -36216,9 +38397,28 @@ Theorem god1_complex_i_and_cartesian_representation :
     x = CSNo_Re z /\ y = CSNo_Im z).
 apply andI.
 //GOD1PRF:163880 In practice one never uses these formulae, but only the following properties of complex numbers:
+claim h_s9_complex_cartesian_properties_goal :
+  Complex_i :e complex
+  /\ mul_CSNo Complex_i Complex_i = minus_SNo 1
+  /\ forall z :e complex,
+    z = add_CSNo (CSNo_Re z) (mul_CSNo Complex_i (CSNo_Im z)).
+admit.
 //GOD1PRF:164175 c) there exists a complex number $i$ (this traditional notation replaces the notation $\omega$ which we have used for quadratic extensions in general) such that
+claim h_s9_complex_i_square :
+  Complex_i :e complex
+  /\ mul_CSNo Complex_i Complex_i = minus_SNo 1.
+admit.
 //GOD1PRF:164355 d) every complex number $z$ can be written in exactly one way in the form
+claim h_s9_complex_cartesian_exists :
+  forall z :e complex,
+    z = add_CSNo (CSNo_Re z) (mul_CSNo Complex_i (CSNo_Im z)).
+admit.
 //GOD1PRF:164446 where $x$ and $y$ are real.
+claim h_s9_complex_cartesian_unique :
+  forall z :e complex, forall x y :e real,
+    z = add_CSNo x (mul_CSNo Complex_i y) ->
+    x = CSNo_Re z /\ y = CSNo_Im z.
+admit.
 Admitted.
 
 //GOD1:164909 pure_imaginary : "#1 is pure imaginary" | $\operatorname{Re}(#1)=0$
@@ -36231,6 +38431,9 @@ let z.
 assume hz.
 apply iffI.
 //GOD1PRF:164988 On the other hand, $z$ is real (i.e., $z$ belongs to the subring $\mathbf{R}$ of $\mathbf{C}$ ) if and only if $\operatorname{Im}(z)=0$.
+claim h_s9_complex_real_characterization :
+  z :e real <-> CSNo_Im z = 0.
+admit.
 Admitted.
 
 Theorem god1_complex_conjugate_norm_and_inverse :
@@ -36250,8 +38453,38 @@ Theorem god1_complex_conjugate_norm_and_inverse :
       (conj_CSNo z)).
 apply andI.
 //GOD1PRF:166020 which show how to calculate the conjugate of a sum or product of elements of L .
+claim h_s9_complex_conjugate_laws :
+  forall z w :e complex,
+    conj_CSNo (add_CSNo z w)
+      = add_CSNo (conj_CSNo z) (conj_CSNo w)
+    /\ conj_CSNo (mul_CSNo z w)
+      = mul_CSNo (conj_CSNo z) (conj_CSNo w).
+admit.
 //GOD1PRF:166360 The formula (11) shows that
+claim h_s9_complex_norm_product :
+  forall z w :e complex,
+    abs_sqr_CSNo (mul_CSNo z w)
+      = mul_SNo (abs_sqr_CSNo z) (abs_sqr_CSNo w).
+admit.
 //GOD1PRF:169619 the denominator cannot vanish unless $x=y=0$, i.e., unless $z=0$ (in agreement with Theorem 2).
+claim h_s9_complex_inverse_theorem2_call :
+  field
+    (quadratic_extension real)
+    (quadratic_extension_addition real add_SNo)
+    (quadratic_extension_multiplication real add_SNo mul_SNo (minus_SNo 1))
+  <-> ~square_in_ring real add_SNo mul_SNo (minus_SNo 1).
+claim h_s9_complex_inverse_real_field : field real add_SNo mul_SNo.
+admit.
+claim h_s9_complex_inverse_minus_one_member : minus_SNo 1 :e real.
+admit.
+apply (god1_s9_theorem2_quadratic_extension_field_iff_nonsquare
+  real add_SNo mul_SNo h_s9_complex_inverse_real_field
+  (minus_SNo 1) h_s9_complex_inverse_minus_one_member).
+claim h_s9_complex_inverse_formula :
+  forall z :e complex,
+    z <> 0 -> recip_CSNo z =
+      mul_CSNo (recip_SNo (abs_sqr_CSNo z)) (conj_CSNo z).
+admit.
 Admitted.
 
 //GOD1:172486 complex_argument : "#2 is an argument of the nonzero complex number #1" | $#2\in\operatorname{Arg}(#1)$
@@ -36279,10 +38512,36 @@ Theorem god1_complex_modulus_basic_properties :
       = mul_SNo (modulus_CSNo z) (modulus_CSNo w)).
 apply andI.
 //GOD1PRF:171860 The modulus $|z|$ is always $\geqslant 0$, and $|z|=0$ if and only if $z=0$.
+claim h_s9_modulus_nonnegative_zero :
+  forall z :e complex,
+    modulus_CSNo z :e real
+    /\ SNoLe 0 (modulus_CSNo z)
+    /\ (modulus_CSNo z = 0 <-> z = 0).
+admit.
 //GOD1PRF:171937 Furthermore, the classical inequalities between the side-lengths of a triangle show that $|z+w| \leqslant|z|+|w|$ for any two complex numbers $z, w$; and, more generally,
+claim h_s9_modulus_triangle_inequality :
+  forall z w :e complex,
+    SNoLe (modulus_CSNo (add_CSNo z w))
+      (add_SNo (modulus_CSNo z) (modulus_CSNo w)).
+admit.
 //GOD1PRF:172293 This result is usually referred to as the triangle inequality.
+claim h_s9_modulus_triangle_named_result :
+  forall z w :e complex,
+    SNoLe (modulus_CSNo (add_CSNo z w))
+      (add_SNo (modulus_CSNo z) (modulus_CSNo w)).
+admit.
 //GOD1PRF:173539 Next, we shall deduce the formulae
+claim h_s9_modulus_product_goal :
+  forall z w :e complex,
+    modulus_CSNo (mul_CSNo z w)
+      = mul_SNo (modulus_CSNo z) (modulus_CSNo w).
+admit.
 //GOD1PRF:173813 which give the modulus and argument of a product of complex numbers.
+claim h_s9_modulus_product_conclusion :
+  forall z w :e complex,
+    modulus_CSNo (mul_CSNo z w)
+      = mul_SNo (modulus_CSNo z) (modulus_CSNo w).
+admit.
 Admitted.
 
 Theorem god1_complex_polar_representation :
@@ -36291,7 +38550,15 @@ Theorem god1_complex_polar_representation :
 let z.
 assume hz hnz.
 //GOD1PRF:172667 The figure above shows that the real and imaginary parts of $z$ are given in terms of the absolute value $r$ and the argument $\theta$ by the formula
+claim h_s9_polar_angle_exists :
+  exists theta :e real,
+    CSNo_Re z = mul_SNo (modulus_CSNo z) (complex_cos theta)
+    /\ CSNo_Im z = mul_SNo (modulus_CSNo z) (complex_sin theta).
+admit.
 //GOD1PRF:172903 so that we have
+claim h_s9_polar_representation_conclusion :
+  exists theta :e real, complex_argument z theta.
+admit.
 Admitted.
 
 Theorem god1_complex_argument_of_product :
@@ -36308,9 +38575,26 @@ assume htheta.
 let phi.
 assume hphi hzarg hwarg.
 //GOD1PRF:174156 Since $r_{1} r_{2}$ is positive, it is enough to show that
+claim h_s9_argument_product_reduction :
+  complex_argument z theta -> complex_argument w phi ->
+  complex_argument (mul_CSNo z w) (add_SNo theta phi).
+admit.
 //GOD1PRF:174400 But the rules for multiplying complex numbers show that the real part of the lefthand side is equal to
+claim h_s9_argument_product_real_part :
+  CSNo_Re (mul_CSNo z w)
+    = mul_SNo (modulus_CSNo z) (mul_SNo (modulus_CSNo w)
+      (complex_cos (add_SNo theta phi))).
+admit.
 //GOD1PRF:174627 and the imaginary part is equal to
+claim h_s9_argument_product_imaginary_part :
+  CSNo_Im (mul_CSNo z w)
+    = mul_SNo (modulus_CSNo z) (mul_SNo (modulus_CSNo w)
+      (complex_sin (add_SNo theta phi))).
+admit.
 //GOD1PRF:174788 Hence (19) is proved.
+claim h_s9_argument_product_conclusion :
+  complex_argument (mul_CSNo z w) (add_SNo theta phi).
+admit.
 Admitted.
 
 Theorem god1_de_moivre :
@@ -36328,8 +38612,30 @@ assume htheta.
 let n.
 assume hn.
 //GOD1PRF:174812 This result extends immediately to a product of several factors, in the form
+claim h_s9_demoivre_product_formula :
+  forall m :e omega,
+    exp_CSNo_nat
+      (add_CSNo (complex_cos theta)
+        (mul_CSNo Complex_i (complex_sin theta))) m
+    = add_CSNo (complex_cos (mul_SNo m theta))
+      (mul_CSNo Complex_i (complex_sin (mul_SNo m theta))).
+admit.
 //GOD1PRF:175086 In particular, taking all the $\theta_{p}$ to be equal to the same angle $\theta$, we have
+claim h_s9_demoivre_equal_angles :
+  exp_CSNo_nat
+    (add_CSNo (complex_cos theta)
+      (mul_CSNo Complex_i (complex_sin theta))) n
+  = add_CSNo (complex_cos (mul_SNo n theta))
+    (mul_CSNo Complex_i (complex_sin (mul_SNo n theta))).
+admit.
 //GOD1PRF:175286 which is known as De Moivre's theorem.
+claim h_s9_demoivre_conclusion :
+  exp_CSNo_nat
+    (add_CSNo (complex_cos theta)
+      (mul_CSNo Complex_i (complex_sin theta))) n
+  = add_CSNo (complex_cos (mul_SNo n theta))
+    (mul_CSNo Complex_i (complex_sin (mul_SNo n theta))).
+admit.
 Admitted.
 
 (** § 10. Modules and vector spaces. **)
@@ -36398,9 +38704,22 @@ let K addK mulK M addM smul.
 assume hM.
 apply andI.
 //GOD1PRF:197396 Observe that the identities in axiom (M 2) imply the relations
+claim h_s10_scalar_zero_laws :
+  (forall a :e K, smul a (module_zero M addM) = module_zero M addM)
+  /\ (forall x :e M, smul (ring_zero K addK) x = module_zero M addM).
+admit.
 //GOD1PRF:197776 To prove the first of these relations, observe that $\lambda 0+\lambda x=\lambda(0+x)=\lambda x$ for all $x=\mathrm{M}$, hence $\lambda 0=\lambda x-\lambda x=0$ as required.
+claim h_s10_scalar_times_zero : forall a :e K,
+  smul a (module_zero M addM) = module_zero M addM.
+admit.
 //GOD1PRF:197950 The second relation follows from the fact that $0 x+1 x=(0+1) x=1 x$, whence $0 x=x-x=0$.
+claim h_s10_zero_scalar : forall x :e M,
+  smul (ring_zero K addK) x = module_zero M addM.
+admit.
 //GOD1PRF:207123 (because $(-1) x+x=(-1) x+(+1) x=(-1+1) x=0 x=0$ ).\\
+claim h_s10_negation_scalar : forall x :e M,
+  module_negation M addM x = smul (ring_negation K addK (ring_one K mulK)) x.
+admit.
 Admitted.
 
 //GOD1:199690 module_power_addition : "componentwise addition on the module power #1^#4" | $(x_i)+(y_i)=(x_i+y_i)$
@@ -36424,6 +38743,15 @@ Theorem god1_module_direct_power_is_module :
 let K addK mulK M addM smul I.
 assume hM.
 //GOD1PRF:199641 That the axiom (M 1) is satisfied follows from § 7, section 2 (direct product of groups), and the identities in axiom (M 2) are easily verified by using the axioms for a ring.
+claim h_s10_power_product_group_call :
+  forall I, forall G:set -> set, forall op:set -> set -> set -> set,
+    (forall i :e I, group (G i) (op i)) ->
+    group (Pi_ i :e I, G i) (indexed_group_product_operation I op).
+apply god1_indexed_direct_product_is_group.
+claim h_s10_power_module_conclusion :
+  left_module K addK mulK (M :^: I)
+    (module_power_addition I addM) (module_power_left_scalar I smul).
+admit.
 Admitted.
 
 Theorem god1_mapping_module_is_module :
@@ -36437,7 +38765,15 @@ Theorem god1_mapping_module_is_module :
 let K addK mulK M addM smul X.
 assume hM.
 //GOD1PRF:201924 Let E denote the set of all mappings $f: \mathrm{X} \rightarrow \mathrm{M}$; we shall make E into a left K -module.
+claim h_s10_mapping_module_goal :
+  left_module K addK mulK (M :^: X)
+    (module_power_addition X addM) (module_power_left_scalar X smul).
+admit.
 //GOD1PRF:202567 The reader should verify in detail that the axioms (M 1) and (M 2) are satisfied.\\
+claim h_s10_mapping_module_axioms :
+  left_module K addK mulK (M :^: X)
+    (module_power_addition X addM) (module_power_left_scalar X smul).
+admit.
 Admitted.
 
 //GOD1:206210 submodule : "#7 is a submodule of the left #1-module #4" | $#7\leq_{#1}#4$
@@ -36472,10 +38808,32 @@ let K addK mulK M addM smul N.
 assume hM hNM.
 apply iffI.
 //GOD1PRF:206544 To verify that a subset $\mathrm{M}^{\prime}$ of M is a submodule, it is enough to show that $\mathrm{M}^{\prime}$ is not empty (in practice, one shows that $0 \in \mathrm{M}^{\prime}$ ) and that
+claim h_s10_submodule_test_goal :
+  submodule K addK mulK M addM smul N <->
+  N <> 0 /\ forall a b :e K, forall x y :e N,
+    addM (smul a x) (smul b y) :e N.
+admit.
 //GOD1PRF:206879 Clearly this condition is necessary.
+claim h_s10_submodule_test_necessary :
+  submodule K addK mulK M addM smul N -> N <> 0.
+admit.
 //GOD1PRF:206916 Conversely, suppose that it is satisfied.
+claim h_s10_submodule_test_sufficient :
+  (N <> 0 /\ forall a b :e K, forall x y :e N,
+    addM (smul a x) (smul b y) :e N) ->
+  submodule K addK mulK M addM smul N.
+admit.
 //GOD1PRF:206958 Putting $\mu=0$ we get (ii) above; to get (i), put $\lambda=1$ and $\mu=-1$, and observe that, in any module M , we have
+claim h_s10_submodule_add_inverse_closure :
+  (forall a b :e K, forall x y :e N,
+    addM (smul a x) (smul b y) :e N) ->
+  forall x y :e N, addM x (module_negation M addM y) :e N.
+admit.
 //GOD1PRF:207123 (because $(-1) x+x=(-1) x+(+1) x=(-1+1) x=0 x=0$ ).\\
+claim h_s10_submodule_minus_one_identity : forall x :e N,
+  addM (smul (ring_negation K addK (ring_one K mulK)) x) x
+    = module_zero M addM.
+admit.
 Admitted.
 
 Theorem god1_submodule_induced_module :
@@ -36486,8 +38844,15 @@ Theorem god1_submodule_induced_module :
 let K addK mulK M addM smul N.
 assume hN.
 //GOD1PRF:207286 Let $\mathrm{M}^{\prime}$ be a submodule of a module M .
+claim h_s10_induced_module_input : submodule K addK mulK M addM smul N.
+admit.
 //GOD1PRF:207343 Condition (i) above already allows us to regard $\mathrm{M}^{\prime}$ as an additive group, and condition (ii) allows us to define a mapping $(\lambda, x) \rightarrow \lambda x$ of $\mathrm{K} \times \mathrm{M}^{\prime}$ into $\mathrm{M}^{\prime}$; the identities which feature in axiom (M 2) are then satisfied in $\mathrm{M}^{\prime}$ because they are satisfied in M .
+claim h_s10_induced_module_components :
+  abelian_group N addM /\ forall a :e K, forall x :e N, smul a x :e N.
+admit.
 //GOD1PRF:207714 Hence every submodule $\mathrm{M}^{\prime}$ of M -can be regarded as a left K-module.
+claim h_s10_induced_module_conclusion : left_module K addK mulK N addM smul.
+admit.
 Admitted.
 
 //GOD1:208638 module_family_intersection : "the intersection in #3 of the family #2 indexed by #1" | $\bigcap_{i\in #1}#2_i$
@@ -36516,8 +38881,23 @@ let K addK mulK M addM smul I N.
 assume hM hN.
 apply andI.
 //GOD1PRF:209106 Then the intersection of the $\mathrm{M}_{i}$ is also a submodule of L .
+claim h_s10_t1_intersection :
+  submodule K addK mulK M addM smul (module_family_intersection I N M).
+admit.
 //GOD1PRF:209179 For the union of the $\mathrm{M}_{i}$ to be a submodule of L it is sufficient that, for each pair of indices $i, j \in \mathrm{I}$, there exist an index $k \in \mathrm{I}$ such that
+claim h_s10_t1_directed_union :
+  ((exists i, i :e I) /\ (forall i j :e I, exists k :e I,
+    N i c= N k /\ N j c= N k)) ->
+  submodule K addK mulK M addM smul (module_family_union I N).
+admit.
 //GOD1PRF:209471 The proof is exactly the same as that of Theorem 1, § 7, and therefore we shall leave the details to the reader.
+claim h_s10_t1_s7_theorem1_call :
+  forall G, forall op:set -> set -> set, forall J, forall H:set -> set,
+    group G op -> (forall i :e J, subgroup G op (H i)) ->
+    subgroup G op (group_family_intersection J H G)
+    /\ (((exists i, i :e J) /\ (forall i j :e J, exists k :e J,
+      H i c= H k /\ H j c= H k)) -> subgroup G op (group_family_union J H)).
+apply god1_s7_theorem1_intersection_and_directed_union_subgroups.
 Admitted.
 
 //GOD1:209821 opposite_ring_multiplication : "multiplication in the opposite ring of #1" | $x*y=yx$
@@ -36531,7 +38911,14 @@ Theorem god1_opposite_ring_is_ring :
 let K add mul.
 assume hK.
 //GOD1PRF:211000 It is easily seen that the set $K^{0}(=\mathrm{K}!)$, together with the two operations just defined, is a ring: for example, the formula
+claim h_s10_opposite_ring_goal : ring K add (opposite_ring_multiplication mul).
+admit.
 //GOD1PRF:211167 reduces to the relation $z(x+y)=z x+z y$ in the ring K .\\
+claim h_s10_opposite_distributive : forall x y z :e K,
+  opposite_ring_multiplication mul (add x y) z =
+  add (opposite_ring_multiplication mul x z)
+    (opposite_ring_multiplication mul y z).
+admit.
 Admitted.
 
 Theorem god1_right_modules_are_left_modules_over_opposite_ring :
@@ -36544,9 +38931,23 @@ Theorem god1_right_modules_are_left_modules_over_opposite_ring :
 let K addK mulK M addM smulR.
 assume hM.
 //GOD1PRF:211674 Then the additive group M , together with the mapping just defined, is a left module over the opposite ring $\mathrm{K}^{0}$.
+claim h_s10_right_to_left_goal :
+  left_module K addK (opposite_ring_multiplication mulK)
+    M addM (fun a x => smulR x a).
+admit.
 //GOD1PRF:211800 For
+claim h_s10_right_to_left_associativity : forall a b :e K, forall x :e M,
+  smulR (smulR x b) a = smulR x (mulK b a).
+admit.
 //GOD1PRF:212105 and finally
+claim h_s10_right_to_left_distributivity : forall a :e K, forall x y :e M,
+  smulR (addM x y) a = addM (smulR x a) (smulR y a).
+admit.
 //GOD1PRF:212137 which proves our assertion.\\
+claim h_s10_right_to_left_conclusion :
+  left_module K addK (opposite_ring_multiplication mulK)
+    M addM (fun a x => smulR x a).
+admit.
 Admitted.
 
 (** § 11. Linear relations in a module. **)
@@ -36617,13 +39018,46 @@ let a.
 assume hM ha.
 apply andI.
 //GOD1PRF:215970 First of all, the relation
+claim h_s11_t1_first_generator_representation :
+  forall i :e n, linear_combination K addK mulK M addM smul n a (a i).
+admit.
 //GOD1PRF:216060 and similar relations for $a_{2}, \ldots, a_{n}$ show that $\mathrm{M}^{\prime}$ contains $a_{1}, \ldots, a_{n}$.
+claim h_s11_t1_contains_generators : forall i :e n,
+  a i :e submodule_generated_by_family K addK mulK M addM smul n a.
+admit.
 //GOD1PRF:216174 On the other hand, every submodule of M which contains $a_{1}, \ldots, a_{n}$ also contains $\xi_{1} a_{1}, \ldots, \xi_{n} a_{n}$, for all $\xi_{1}, \ldots, \xi_{n} \in \mathrm{~K}$, and hence also contains $\xi_{1} a_{1}+\cdots+\xi_{n} a_{n}$.
+claim h_s11_t1_combinations_in_containing_submodule : forall N,
+  submodule K addK mulK M addM smul N ->
+  (forall i :e n, a i :e N) ->
+  forall x :e submodule_generated_by_family K addK mulK M addM smul n a,
+    x :e N.
+admit.
 //GOD1PRF:216420 Hence every submodule of M which contains $a_{1}, \ldots, a_{n}$ contains the set $\mathrm{M}^{\prime}$.
+claim h_s11_t1_smallest : forall N,
+  submodule K addK mulK M addM smul N -> (forall i :e n, a i :e N) ->
+  submodule_generated_by_family K addK mulK M addM smul n a c= N.
+admit.
 //GOD1PRF:216526 The proof will therefore be complete if we show that $\mathrm{M}^{\prime}$ is in fact a submodule of M.
+claim h_s11_t1_submodule_goal :
+  submodule K addK mulK M addM smul
+    (submodule_generated_by_family K addK mulK M addM smul n a).
+admit.
 //GOD1PRF:216725 be any two elements of $\mathrm{M}^{\prime}$.
+claim h_s11_t1_two_combinations : forall x y :e
+  submodule_generated_by_family K addK mulK M addM smul n a,
+  x :e M /\ y :e M.
+admit.
 //GOD1PRF:216771 Then a trivial calculation shows that
+claim h_s11_t1_linear_combination_calculation : forall l mu :e K,
+  forall x y :e submodule_generated_by_family K addK mulK M addM smul n a,
+  linear_combination K addK mulK M addM smul n a
+    (addM (smul l x) (smul mu y)).
+admit.
 //GOD1PRF:216961 it follows that $\lambda x+\mu y \in \mathbf{M}^{\prime}$ for all scalars $\lambda, \mu \in \mathbf{K}$, and therefore $\mathbf{M}^{\prime}$ is a submodule of M .\\
+claim h_s11_t1_submodule_conclusion :
+  submodule K addK mulK M addM smul
+    (submodule_generated_by_family K addK mulK M addM smul n a).
+admit.
 Admitted.
 
 //GOD1:217701 generating_family : "the family #8 indexed by #7 generates the module #4" | $\operatorname{span}(#8)=#4$
@@ -36695,7 +39129,19 @@ let a x.
 assume hM hx.
 apply iffI.
 //GOD1PRF:222338 It is enough to remark that, if ( $\lambda_{1}, \ldots, \lambda_{n}$ ) is a linear relation between $a_{1}, \ldots, a_{n}$, then $\lambda_{1} a_{1}+\cdots+\lambda_{n} a_{n}=0$ and therefore
+claim h_s11_t2_relation_translates_coordinates : forall coeff:set -> set,
+  linear_relation K addK mulK M addM smul n a coeff ->
+  forall i :e n, coeff i = ring_zero K addK.
+admit.
 //GOD1PRF:222658 Clearly this property characterizes linear relations between the given vectors $a_{1}, \ldots, a_{n}$.\\
+claim h_s11_t2_unique_iff_independent :
+  (exists coeff:set -> set,
+    linear_representation K addK mulK M addM smul n a x coeff
+    /\ forall eta:set -> set,
+      linear_representation K addK mulK M addM smul n a x eta ->
+      forall i :e n, eta i = coeff i)
+  <-> linearly_independent_family K addK mulK M addM smul n a.
+admit.
 Admitted.
 
 //GOD1:225809 module_basis : "the family #8 indexed by #7 is a basis of the module #4" | $#8\text{ is a basis of }#4$
@@ -36769,15 +39215,64 @@ let K addK mulK M addM smul I a.
 assume hBasis.
 apply andI.
 //GOD1PRF:226162 Let $a_{1}, \ldots, a_{n}$ be elements of a left K -module M .
+claim h_s11_basis_family_members : forall i :e I, a i :e M.
+admit.
 //GOD1PRF:226225 To say that they generate M means that for every $x \in M$ the relation
+claim h_s11_basis_generation : forall x :e M,
+  linear_combination K addK mulK M addM smul I a x.
+admit.
 //GOD1PRF:226342 is satisfied by at least one $n$-triple $\left(\zeta_{1}, \ldots, \zeta_{n}\right) \in \mathbf{K}^{n}$.
+claim h_s11_basis_coordinates_exist : forall x :e M, exists coeff:set -> set,
+  linear_representation K addK mulK M addM smul I a x coeff.
+admit.
 //GOD1PRF:226446 On the other hand, to say that the $a_{i}$ are linearly independent means that for every $x \in \mathrm{M}$ the above relation is satisfied by at most one element of $\mathrm{K}^{n}$.
+claim h_s11_basis_coordinates_at_most_one : forall x :e M, forall c d:set -> set,
+  linear_representation K addK mulK M addM smul I a x c ->
+  linear_representation K addK mulK M addM smul I a x d ->
+  forall i :e I, c i = d i.
+admit.
 //GOD1PRF:227069 }Consequently, the vectors $a_{1}, \ldots, a_{n}$ form a basis of $M$ if and only if, for each $x \in \mathrm{M}$ there exists a unique $n$-triple $\left(\xi_{1}, \ldots, \xi_{n}\right) \in \mathrm{K}^{n}$ such that
+claim h_s11_basis_unique_coordinates : forall x :e M,
+  linear_representation K addK mulK M addM smul I a x
+    (fun i => basis_coordinates K addK mulK M addM smul I a x i)
+  /\ forall coeff:set -> set,
+    linear_representation K addK mulK M addM smul I a x coeff ->
+    forall i :e I, coeff i = basis_coordinates K addK mulK M addM smul I a x i.
+admit.
 //GOD1PRF:228168 The coordinate functions $f_{i}$ also satisfy the identities
+claim h_s11_coordinate_linearity_goals :
+  (forall i :e I, forall x y :e M,
+    basis_coordinate_function K addK mulK M addM smul I a i (addM x y)
+    = addK (basis_coordinate_function K addK mulK M addM smul I a i x)
+      (basis_coordinate_function K addK mulK M addM smul I a i y))
+  /\ (forall i :e I, forall l :e K, forall x :e M,
+    basis_coordinate_function K addK mulK M addM smul I a i (smul l x)
+    = mulK l (basis_coordinate_function K addK mulK M addM smul I a i x)).
+admit.
 //GOD1PRF:228309 for if we add together
+claim h_s11_coordinate_add_representation : forall x y :e M,
+  linear_representation K addK mulK M addM smul I a (addM x y)
+    (fun i => addK
+      (basis_coordinates K addK mulK M addM smul I a x i)
+      (basis_coordinates K addK mulK M addM smul I a y i)).
+admit.
 //GOD1PRF:228457 we obtain
+claim h_s11_coordinate_add_uniqueness : forall i :e I, forall x y :e M,
+  basis_coordinate_function K addK mulK M addM smul I a i (addM x y)
+  = addK (basis_coordinate_function K addK mulK M addM smul I a i x)
+    (basis_coordinate_function K addK mulK M addM smul I a i y).
+admit.
 //GOD1PRF:228561 so that the coordinates of $x+y$ are $f_{i}(x)+f_{i}(y)$.
+claim h_s11_coordinate_add_conclusion : forall i :e I, forall x y :e M,
+  basis_coordinate_function K addK mulK M addM smul I a i (addM x y)
+  = addK (basis_coordinate_function K addK mulK M addM smul I a i x)
+    (basis_coordinate_function K addK mulK M addM smul I a i y).
+admit.
 //GOD1PRF:228619 The other identity is proved similarly.\\
+claim h_s11_coordinate_scalar_conclusion : forall i :e I, forall l :e K, forall x :e M,
+  basis_coordinate_function K addK mulK M addM smul I a i (smul l x)
+  = mulK l (basis_coordinate_function K addK mulK M addM smul I a i x).
+admit.
 Admitted.
 
 //GOD1:229696 canonical_module_basis_vector : "the #4-th canonical basis vector of #1^#3" | $e_{#4}$
@@ -36801,7 +39296,25 @@ Theorem god1_canonical_basis_of_finite_module_power :
 let K addK mulK n.
 assume hn hK.
 //GOD1PRF:228855 Example 12. The left K -module $\mathrm{K}^{n}$ is finitely generated and free, and Example 1 shows that the vectors $e_{1}, \ldots, e_{n}$ form a basis, called the canonical basis of $\mathrm{K}^{n}$.
+claim h_s11_canonical_basis : module_basis K addK mulK
+  (K :^: n) (module_power_addition n addK) (module_power_left_scalar n mulK)
+  n (canonical_module_basis_vector K addK mulK n).
+admit.
 //GOD1PRF:229201 shows that the coordinates of $x$ with respect to the canonical basis of $\mathrm{K}^{n}$ are the scalars $\xi_{1}, \ldots, \xi_{n}$.
+claim h_s11_canonical_coordinates : forall x :e (K :^: n), forall i :e n,
+  basis_coordinates K addK mulK (K :^: n)
+    (module_power_addition n addK) (module_power_left_scalar n mulK)
+    n (canonical_module_basis_vector K addK mulK n) x i = x i.
+admit.
+Admitted.
+
+(** Formal interface for the basis-existence result cited prospectively in §19, section 1. **)
+Theorem god1_s19_section1_finite_dimensional_basis_interface :
+  forall K, forall addK mulK:set -> set -> set,
+  forall M, forall addM smul:set -> set -> set,
+    finite_dimensional_vector_space K addK mulK M addM smul ->
+    exists I, finite I /\ exists a:set -> set,
+      module_basis K addK mulK M addM smul I a.
 Admitted.
 
 Theorem god1_s11_theorem3_finite_dimensional_vector_space_has_basis :
@@ -36813,7 +39326,12 @@ Theorem god1_s11_theorem3_finite_dimensional_vector_space_has_basis :
 let K addK mulK M addM smul.
 assume hFinite.
 //GOD1PRF:231053 Since the present chapter contains only results which are valid over an arbitrary ground ring, we shall not prove Theorem 3 at this stage.
+claim h_s11_t3_deferred_goal : exists I, finite I /\ exists a:set -> set,
+  module_basis K addK mulK M addM smul I a.
+admit.
 //GOD1PRF:231192 The reader will find a proof in § 19, section 1, which requires no more background than the contents of the present chapter.
+apply (god1_s19_section1_finite_dimensional_basis_interface
+  K addK mulK M addM smul hFinite).
 Admitted.
 
 (** § 12. Linear mappings and matrices. **)
@@ -36883,6 +39401,11 @@ let K addK mulK L addL smulL M addM smulM f.
 assume hL hM hf.
 apply iffI.
 //GOD1PRF:250349 Let $\mathrm{L}, \mathrm{M}$ be two left K -modules. For a mapping $f: \mathrm{L} \rightarrow \mathrm{M}$ to be linear, it is necessary and sufficient that
+claim h_s12_linear_iff_additive_homogeneous :
+  module_homomorphism K addK mulK L addL smulL M addM smulM f
+  <-> (forall x y :e L, f (addL x y) = addM (f x) (f y))
+    /\ (forall l :e K, forall x :e L, f (smulL l x) = smulM l (f x)).
+admit.
 Admitted.
 
 Theorem god1_module_homomorphism_preserves_zero_and_linear_combinations :
@@ -36903,7 +39426,16 @@ let K addK mulK L addL smulL M addM smulM f.
 assume hf.
 apply andI.
 //GOD1PRF:250702 Taking $\lambda=0$ in the second of these relations, we see that
+claim h_s12_hom_preserves_zero :
+  f (module_zero L addL) = module_zero M addM.
+admit.
 //GOD1PRF:251000 for all positive integers $n$, all vectors $x_{1}, \ldots, x_{n} \in \mathrm{~L}$ and all scalars $\lambda_{1}, \ldots, \lambda_{n} \in \mathrm{~K}$. For when $n=2$ this relation reduces to the definition of a homomorphism, and for general $n$ is proved by induction on $n$ :
+claim h_s12_hom_preserves_finite_combinations : forall I, forall a coeff:set -> set,
+  (forall i :e I, a i :e L /\ coeff i :e K) ->
+  almost_all_zero I (ring_zero K addK) coeff ->
+  f (module_finitely_supported_sum L addL I (fun i => smulL (coeff i) (a i)))
+  = module_finitely_supported_sum M addM I (fun i => smulM (coeff i) (f (a i))).
+admit.
 Admitted.
 
 Theorem god1_s12_theorem1_composition_and_inverse_linear :
@@ -36927,11 +39459,40 @@ let K addK mulK L addL smulL M addM smulM N addN smulN f g.
 assume hf hg.
 apply andI.
 //GOD1PRF:252087 Let $h=g \circ f$. Then we have
+claim h_s12_t1_composite_calculation : forall x y :e L, forall l mu :e K,
+  g (f (addL (smulL l x) (smulL mu y)))
+  = addN (smulN l (g (f x))) (smulN mu (g (f y))).
+admit.
 //GOD1PRF:252287 so that $h$ is a homomorphism. If $f$ and $g$ are isomorphisms, i.e., if they are bijective, then $h$ too is bijective and is therefore an isomorphism.
+claim h_s12_t1_composite_linear_and_iso :
+  module_homomorphism K addK mulK L addL smulL N addN smulN (fun x => g (f x))
+  /\ (module_isomorphism K addK mulK L addL smulL M addM smulM f ->
+    module_isomorphism K addK mulK M addM smulM N addN smulN g ->
+    module_isomorphism K addK mulK L addL smulL N addN smulN (fun x => g (f x))).
+admit.
 //GOD1PRF:252440 Now suppose that $f$ is an isomorphism. To show that the inverse mapping $f^{-1}$ (which is bijective) is an isomorphism, it is enough to prove that it is linear, in other words that
+claim h_s12_t1_inverse_bijective_call :
+  module_isomorphism K addK mulK L addL smulL M addM smulM f ->
+  bij M L (inv L f).
+assume hiso.
+claim hbij : bij L M f.
+admit.
+apply (bij_inv L M f hbij).
 //GOD1PRF:252683 for all $\lambda, \mu \in \mathrm{K}$ and all $u, v \in \mathrm{M}$; or, equivalently, that
+claim h_s12_t1_inverse_linearity_goal : forall l mu :e K, forall u v :e M,
+  inv L f (addM (smulM l u) (smulM mu v))
+  = addL (smulL l (inv L f u)) (smulL mu (inv L f v)).
+admit.
 //GOD1PRF:252847 But since $f$ is linear, the right-hand side of this relation is equal to
+claim h_s12_t1_apply_f_to_inverse_rhs : forall l mu :e K, forall u v :e M,
+  f (addL (smulL l (inv L f u)) (smulL mu (inv L f v)))
+  = addM (smulM l u) (smulM mu v).
+admit.
 //GOD1PRF:253032 which is visibly equal to $\lambda u+\mu v$.
+claim h_s12_t1_inverse_isomorphism :
+  module_isomorphism K addK mulK L addL smulL M addM smulM f ->
+  module_isomorphism K addK mulK M addM smulM L addL smulL (inv L f).
+admit.
 Admitted.
 
 //GOD1:254452 module_homomorphism_kernel : "the kernel of the module homomorphism #11" | $\operatorname{Ker}(#11)$
@@ -36965,8 +39526,22 @@ let K addK mulK L addL smulL M addM smulM f.
 assume hf.
 apply andI.
 //GOD1PRF:253820 Let $\mathrm{L}^{\prime}$ be a submodule of L . Suppose that $u, v$ are elements of $f\left(\mathrm{~L}^{\prime}\right)$; then we may write $u=f(x), v=f(y)$ with $x, y \in \mathrm{~L}^{\prime}$. Since $f$ is linear, we have
+claim h_s12_t2_image_representatives : forall A, forall u v :e group_image_of_subset A f,
+  exists x y :e A, u = f x /\ v = f y.
+admit.
 //GOD1PRF:254125 which is an element of $\mathrm{L}^{\prime}$, because $\mathrm{L}^{\prime}$ is a submodule of L . Hence $f\left(\mathrm{~L}^{\prime}\right)$ contains\\
+claim h_s12_t2_image_combination : forall A,
+  submodule K addK mulK L addL smulL A ->
+  forall l mu :e K, forall u v :e group_image_of_subset A f,
+  addM (smulM l u) (smulM mu v) :e group_image_of_subset A f.
+admit.
 //GOD1PRF:254277 $\mu u+\mu v$ for all choices of the scalars $\lambda, \mu \in \mathrm{K}$, and the first assertion of the theorem is proved. The proof of the second assertion is analogous.
+claim h_s12_t2_image_preimage_conclusions :
+  (forall A, submodule K addK mulK L addL smulL A ->
+    submodule K addK mulK M addM smulM (group_image_of_subset A f))
+  /\ (forall B, submodule K addK mulK M addM smulM B ->
+    submodule K addK mulK L addL smulL (group_preimage_of_subset L B f)).
+admit.
 Admitted.
 
 Theorem god1_module_homomorphism_kernel_image_and_injectivity :
@@ -36986,7 +39561,22 @@ let K addK mulK L addL smulL M addM smulM f.
 assume hf.
 apply andI.
 //GOD1PRF:254452 In particular, the kernel of $f$, i.e., the set of all $x \in \mathrm{~L}$ such that $f(x)=0$, is a submodule of L , which is denoted by
+claim h_s12_kernel_image_submodules :
+  submodule K addK mulK L addL smulL
+    (module_homomorphism_kernel K addK mulK L addL smulL M addM smulM f)
+  /\ submodule K addK mulK M addM smulM (module_homomorphism_image L f).
+admit.
 //GOD1PRF:254709 is a submodule of M . We recall (§ 7, Theorem 8) that $f$ is injective if and only if
+claim h_s12_underlying_group_hom : group_homomorphism L addL M addM f.
+admit.
+claim h_s12_s7_theorem8_call : inj L M f <->
+  group_homomorphism_kernel L addL M addM f = {group_identity L addL}.
+apply (god1_s7_theorem8_injective_iff_trivial_kernel
+  L addL M addM f h_s12_underlying_group_hom).
+claim h_s12_kernel_injective_characterization : inj L M f <->
+  module_homomorphism_kernel K addK mulK L addL smulL M addM smulM f
+    = {module_zero L addL}.
+admit.
 Admitted.
 
 Theorem god1_s12_theorem3_linear_map_from_basis :
@@ -37011,19 +39601,139 @@ Theorem god1_s12_theorem3_linear_map_from_basis :
 let K addK mulK L addL smulL M addM smulM I a c.
 assume hBasis hM hc.
 //GOD1PRF:255484 From formula (1) of section 1, the homomorphism $f$, if it exists, is necessarily given by
+claim h_s12_t3_candidate_formula : exists f:set -> set, forall x :e L,
+  f x = module_finitely_supported_sum M addM I
+    (fun i => smulM (basis_coordinates K addK mulK L addL smulL I a x i) (c i)).
+admit.
+claim h_s12_t3_section1_formula1_formal_call : forall f0:set -> set,
+  module_homomorphism K addK mulK L addL smulL M addM smulM f0 ->
+  f0 (module_zero L addL) = module_zero M addM
+  /\ forall J, forall d coeff:set -> set,
+    (forall i :e J, d i :e L /\ coeff i :e K) ->
+    almost_all_zero J (ring_zero K addK) coeff ->
+    f0 (module_finitely_supported_sum L addL J
+      (fun i => smulL (coeff i) (d i)))
+    = module_finitely_supported_sum M addM J
+      (fun i => smulM (coeff i) (f0 (d i))).
+apply (god1_module_homomorphism_preserves_zero_and_linear_combinations
+  K addK mulK L addL smulL M addM smulM).
 //GOD1PRF:255706 so that $f$ is unique.\\
+claim h_s12_t3_uniqueness : forall f g:set -> set,
+  module_homomorphism K addK mulK L addL smulL M addM smulM f ->
+  module_homomorphism K addK mulK L addL smulL M addM smulM g ->
+  (forall i :e I, f (a i) = c i) -> (forall i :e I, g (a i) = c i) ->
+  forall x :e L, g x = f x.
+admit.
 //GOD1PRF:255731 As to the existence of $f$, observe that for each $x \in \mathrm{~L}$ there exists a unique system of scalars $\xi_{i}(1 \leqslant i \leqslant p)$ such that
+claim h_s12_t3_basis_coordinates_exist_unique : forall x :e L,
+  linear_representation K addK mulK L addL smulL I a x
+    (fun i => basis_coordinates K addK mulK L addL smulL I a x i)
+  /\ forall coeff:set -> set,
+    linear_representation K addK mulK L addL smulL I a x coeff ->
+    forall i :e I, coeff i = basis_coordinates K addK mulK L addL smulL I a x i.
+admit.
 //GOD1PRF:256000 where $f_{i}: \mathrm{L} \rightarrow \mathrm{K}$ are the coordinate functions (§ 11, section 4) on the module L with respect to the basis $a_{1}, \ldots, a_{p}$. Hence the formula (2) effectively defines a mapping $f$ of L into M , and $f$ is given also by the relation
+claim h_s12_t3_s11_section4_call :
+  (forall x :e L,
+    linear_representation K addK mulK L addL smulL I a x
+      (fun i => basis_coordinates K addK mulK L addL smulL I a x i)
+    /\ (forall coeff:set -> set,
+      linear_representation K addK mulK L addL smulL I a x coeff ->
+      forall i :e I, coeff i = basis_coordinates K addK mulK L addL smulL I a x i))
+  /\ (forall i :e I, forall x y :e L,
+    basis_coordinate_function K addK mulK L addL smulL I a i (addL x y)
+    = addK (basis_coordinate_function K addK mulK L addL smulL I a i x)
+      (basis_coordinate_function K addK mulK L addL smulL I a i y))
+  /\ (forall i :e I, forall l :e K, forall x :e L,
+    basis_coordinate_function K addK mulK L addL smulL I a i (smulL l x)
+    = mulK l (basis_coordinate_function K addK mulK L addL smulL I a i x)).
+apply (god1_basis_unique_coordinates_and_coordinate_linearity
+  K addK mulK L addL smulL I a hBasis).
 //GOD1PRF:256321 So it remains to be shown that $f$ is a homomorphism which maps the vectors $a_{i}$ to the vectors $c_{i}$.\\
+claim h_s12_t3_candidate_properties : exists f:set -> set,
+  module_homomorphism K addK mulK L addL smulL M addM smulM f
+  /\ forall i :e I, f (a i) = c i.
+admit.
 //GOD1PRF:256536 The second assertion follows immediately from the formulae
+claim h_s12_t3_basis_delta_coordinates : forall i j :e I,
+  basis_coordinates K addK mulK L addL smulL I a (a i) j
+    = if j = i then ring_one K mulK else ring_zero K addK.
+admit.
 //GOD1PRF:256704 (which were proved in § 11, Section 4), and the relation
+claim h_s12_t3_s11_coordinate_formula_used : forall i :e I,
+  module_finitely_supported_sum M addM I
+    (fun j => smulM
+      (basis_coordinates K addK mulK L addL smulL I a (a i) j) (c j)) = c i.
+admit.
+claim h_s12_t3_s11_delta_result_formal_call :
+  (forall x :e L,
+    linear_representation K addK mulK L addL smulL I a x
+      (fun i => basis_coordinates K addK mulK L addL smulL I a x i)
+    /\ (forall coeff:set -> set,
+      linear_representation K addK mulK L addL smulL I a x coeff ->
+      forall i :e I, coeff i = basis_coordinates K addK mulK L addL smulL I a x i))
+  /\ (forall i :e I, forall x y :e L,
+    basis_coordinate_function K addK mulK L addL smulL I a i (addL x y)
+    = addK (basis_coordinate_function K addK mulK L addL smulL I a i x)
+      (basis_coordinate_function K addK mulK L addL smulL I a i y))
+  /\ (forall i :e I, forall l :e K, forall x :e L,
+    basis_coordinate_function K addK mulK L addL smulL I a i (smulL l x)
+    = mulK l (basis_coordinate_function K addK mulK L addL smulL I a i x)).
+apply (god1_basis_unique_coordinates_and_coordinate_linearity
+  K addK mulK L addL smulL I a hBasis).
 //GOD1PRF:256846 To show that $f$ is a homomorphism, we recall that we proved in § 11, section 4 that
+claim h_s12_t3_coordinate_functions_linear : forall i :e I,
+  forall x y :e L, forall l mu :e K,
+  basis_coordinate_function K addK mulK L addL smulL I a i
+    (addL (smulL l x) (smulL mu y))
+  = addK (mulK l (basis_coordinate_function K addK mulK L addL smulL I a i x))
+    (mulK mu (basis_coordinate_function K addK mulK L addL smulL I a i y)).
+admit.
+claim h_s12_t3_s11_linearity_result_formal_call :
+  (forall x :e L,
+    linear_representation K addK mulK L addL smulL I a x
+      (fun i => basis_coordinates K addK mulK L addL smulL I a x i)
+    /\ (forall coeff:set -> set,
+      linear_representation K addK mulK L addL smulL I a x coeff ->
+      forall i :e I, coeff i = basis_coordinates K addK mulK L addL smulL I a x i))
+  /\ (forall i :e I, forall x y :e L,
+    basis_coordinate_function K addK mulK L addL smulL I a i (addL x y)
+    = addK (basis_coordinate_function K addK mulK L addL smulL I a i x)
+      (basis_coordinate_function K addK mulK L addL smulL I a i y))
+  /\ (forall i :e I, forall l :e K, forall x :e L,
+    basis_coordinate_function K addK mulK L addL smulL I a i (smulL l x)
+    = mulK l (basis_coordinate_function K addK mulK L addL smulL I a i x)).
+apply (god1_basis_unique_coordinates_and_coordinate_linearity
+  K addK mulK L addL smulL I a hBasis).
 //GOD1PRF:256994 or in other words that the coordinate functions $f_{i}: \mathrm{L} \rightarrow \mathrm{K}$ are homomorphisms of left K -modules. Consequently
+claim h_s12_t3_coordinate_module_homomorphisms : forall i :e I,
+  module_homomorphism K addK mulK L addL smulL K addK mulK
+    (basis_coordinate_function K addK mulK L addL smulL I a i).
+admit.
 //GOD1PRF:257516 and therefore $f$ is linear.\\
+claim h_s12_t3_candidate_linear : exists f:set -> set,
+  module_homomorphism K addK mulK L addL smulL M addM smulM f.
+admit.
 //GOD1PRF:257547 Finally, we must determine the conditions under which $f$ is injective or surjective. First of all, it is clear that the image $f(\mathrm{~L})$ is the set of linear combinations of the vectors $c_{1}, \ldots, c_{p}$, i.e. that $f$ maps L onto the submodule of M generated by $c_{1}, \ldots, c_{p}$; and therefore $f$ is surjective if and only if the vectors $c_{i}$ generate M .
+claim h_s12_t3_surjective_iff_generating : forall f:set -> set,
+  (forall i :e I, f (a i) = c i) ->
+  (surj L M f <-> generating_family K addK mulK M addM smulM I c).
+admit.
 //GOD1PRF:257927 Next, the mapping $f$ is injective if and only if the relation $f(x)=0$ implies that $x=0$, or in other words if and only if the relation
+claim h_s12_t3_injective_kernel_condition : forall f:set -> set,
+  (inj L M f <-> forall x :e L, f x = module_zero M addM -> x = module_zero L addL).
+admit.
 //GOD1PRF:258178 but, since the $a_{i}$ are linearly independent, the latter relation is equivalent to
+claim h_s12_t3_kernel_relation_equivalent : forall f:set -> set,
+  (forall i :e I, f (a i) = c i) ->
+  ((forall x :e L, f x = module_zero M addM -> x = module_zero L addL)
+    <-> linearly_independent_family K addK mulK M addM smulM I c).
+admit.
 //GOD1PRF:258299 Hence $f$ is injective if and only if $c_{1}, \ldots, c_{p}$ are linearly independent.\\
+claim h_s12_t3_injective_iff_independent : forall f:set -> set,
+  (forall i :e I, f (a i) = c i) ->
+  (inj L M f <-> linearly_independent_family K addK mulK M addM smulM I c).
+admit.
 Admitted.
 
 Theorem god1_s12_corollary1_free_module_iff_isomorphic_to_power :
@@ -37042,7 +39752,37 @@ let K addK mulK M addM smulM.
 assume hM.
 apply iffI.
 //GOD1PRF:258871 By Theorem 3 there exists always one and only one homomorphism
+claim h_s12_cor1_theorem3_call :
+  forall K0, forall aK mK:set -> set -> set,
+  forall L0, forall aL sL:set -> set -> set,
+  forall M0, forall aM sM:set -> set -> set,
+  forall J, forall b c:set -> set,
+    module_basis K0 aK mK L0 aL sL J b ->
+    left_module K0 aK mK M0 aM sM ->
+    (forall i :e J, c i :e M0) ->
+    exists f:set -> set,
+      module_homomorphism K0 aK mK L0 aL sL M0 aM sM f
+      /\ (forall i :e J, f (b i) = c i)
+      /\ (forall g:set -> set,
+        module_homomorphism K0 aK mK L0 aL sL M0 aM sM g ->
+        (forall i :e J, g (b i) = c i) -> forall x :e L0, g x = f x)
+      /\ (inj L0 M0 f <-> linearly_independent_family K0 aK mK M0 aM sM J c)
+      /\ (surj L0 M0 f <-> generating_family K0 aK mK M0 aM sM J c).
+apply god1_s12_theorem3_linear_map_from_basis.
+claim h_s12_cor1_unique_canonical_map : forall n :e omega, forall c:set -> set,
+  (forall i :e n, c i :e M) -> exists f:set -> set,
+    module_homomorphism K addK mulK (K :^: n)
+      (module_power_addition n addK) (module_power_left_scalar n mulK)
+      M addM smulM f.
+admit.
 //GOD1PRF:259062 For the vectors $c_{i}$ to form a basis of $M$ it is necessary and sufficient that they be linearly independent and generate M , i.e., that $f$ should be injective and surjective.\\
+claim h_s12_cor1_basis_iff_isomorphism :
+  finitely_generated_free_module K addK mulK M addM smulM
+  <-> exists n :e omega,
+    isomorphic_modules K addK mulK (K :^: n)
+      (module_power_addition n addK) (module_power_left_scalar n mulK)
+      M addM smulM.
+admit.
 Admitted.
 
 Theorem god1_s12_corollary2_finitely_generated_iff_quotient_of_power :
@@ -37062,7 +39802,20 @@ let K addK mulK M addM smulM.
 assume hM.
 apply iffI.
 //GOD1PRF:259395 More precisely, M is generated by vectors $c_{1}, \ldots, c_{n}$ if and only if the homomorphism $f: \mathrm{K}^{n} \rightarrow \mathrm{M}$ which maps each $e_{i}$ to $e_{i}(1 \leqslant i \leqslant n)$ is surjective; hence the necessity of the condition. That the condition is sufficient follows from the fact that $\mathrm{K}^{n}$ is finitely generated and from the following assertion : let
+claim h_s12_cor2_generated_iff_surjective_power_map :
+  finitely_generated_module K addK mulK M addM smulM ->
+  exists n :e omega, exists f:set -> set,
+    module_homomorphism K addK mulK (K :^: n)
+      (module_power_addition n addK) (module_power_left_scalar n mulK)
+      M addM smulM f /\ surj (K :^: n) M f.
+admit.
 //GOD1PRF:259833 be a homomorphism of K -modules; if L is finitely generated and $f$ is surjective, then M is finitely generated. For let $a_{1}, \ldots, a_{n}$ be a set of generators of L , and let $b_{i}=f\left(a_{i}\right) (1 \leqslant i \leqslant n)$. For each $y \in \mathrm{M}$, there exists $x \in \mathrm{~L}$ such that $y=f(x)$. Writing $x=\xi_{1}+ \cdots+\xi_{n} a_{n}$ and using the relation (1) of section 1 we see that $y=\xi_{1} b_{1}+\cdots+\xi_{n} b_{n}$; hence the $b_{i}$ generate M , and so M is finitely generated.
+claim h_s12_cor2_surjective_image_finitely_generated :
+  forall L0, forall aL sL:set -> set -> set, forall f:set -> set,
+    finitely_generated_module K addK mulK L0 aL sL ->
+    module_homomorphism K addK mulK L0 aL sL M addM smulM f ->
+    surj L0 M f -> finitely_generated_module K addK mulK M addM smulM.
+admit.
 Admitted.
 
 (** § 13. Addition of homomorphisms and matrices. **)
@@ -37105,11 +39858,44 @@ let K addK mulK L addL smulL M addM smulM.
 assume hL hM.
 apply andI.
 //GOD1PRF:281515 Put $h=f+g$. Then we have
+claim h_s13_t1_sum_linear : forall f g :e
+  module_homomorphism_space K addK mulK L addL smulL M addM smulM,
+  module_homomorphism_addition L addM f g :e
+    module_homomorphism_space K addK mulK L addL smulL M addM smulM.
+admit.
 //GOD1PRF:281757 which takes care of the first part of the theorem.\\
+claim h_s13_t1_additive_closure : law_of_composition
+  (module_homomorphism_space K addK mulK L addL smulL M addM smulM)
+  (module_homomorphism_addition L addM).
+admit.
 //GOD1PRF:281810 For the second part, consider the set E of all mappings (linear or not) of L into M . With the law of composition $(f, g) \rightarrow f+g$, this set E becomes a commutative group (§ 10, Example 4 ; the fact that L is a module is not used here; L is regarded simply as a set). Thus we have to show that Hom ( $\mathrm{L}, \mathrm{M}$ ) is a subgroup of E . Now Hom ( $\mathrm{L}, \mathrm{M}$ ) clearly contains the neutral element of E , namely the mapping of L into M which takes the value 0 at every element of L ; and if $f, g$ are homomorphisms then so is $f-g$, by the first part of the theorem. Hence Hom ( $\mathrm{L}, \mathrm{M}$ ) is a subgroup of E , and the proof is complete.\\
+claim h_s13_t1_s10_example4_group_call :
+  left_module K addK mulK (M :^: L)
+    (module_power_addition L addM) (module_power_left_scalar L smulM).
+apply (god1_mapping_module_is_module K addK mulK M addM smulM L hM).
+claim h_s13_t1_hom_space_subgroup : subgroup (M :^: L)
+  (module_power_addition L addM)
+  (module_homomorphism_space K addK mulK L addL smulL M addM smulM).
+admit.
 //GOD1PRF:282625 When the ground ring $K$ is commutative, we may consider Hom ( $L, M$ ) as a left K -module. For if E is once again the set of all mappings (linear or not) of L into M , then by § 10, Example 4 we may consider E as not merely a commutative group but as a left K -module, the product $\lambda f$ of a scalar $\lambda \in \mathrm{K}$ and a mapping $f: \mathrm{L} \rightarrow \mathrm{M}$ being the mapping
+claim h_s13_t1_s10_example4_module_call :
+  left_module K addK mulK (M :^: L)
+    (module_power_addition L addM) (module_power_left_scalar L smulM).
+apply (god1_mapping_module_is_module K addK mulK M addM smulM L hM).
 //GOD1PRF:283064 of $L$ into $M$ (and for this we do not need to assume that $K$ is commutative). Now if $K$ is commutative it turns out that Hom ( $\mathrm{L}, \mathrm{M}$ ) is not merely a subgroup of E but a submodule of E ; in other words, that if $f: \mathrm{L} \rightarrow \mathrm{M}$ is a homomorphism, then so is $f^{\prime}=\lambda f$. For we have
+claim h_s13_t1_scalar_closed : commutative_ring K addK mulK ->
+  forall l :e K, forall f :e
+    module_homomorphism_space K addK mulK L addL smulL M addM smulM,
+  module_homomorphism_scalar L smulM l f :e
+    module_homomorphism_space K addK mulK L addL smulL M addM smulM.
+admit.
 //GOD1PRF:283657 which proves our assertion. Hence in this case ( K commutative) we may regard Hom ( $\mathrm{L}, \mathrm{M}$ ) as a left K -module.
+claim h_s13_t1_module_conclusion : commutative_ring K addK mulK ->
+  left_module K addK mulK
+    (module_homomorphism_space K addK mulK L addL smulL M addM smulM)
+    (module_homomorphism_addition L addM)
+    (module_homomorphism_scalar L smulM).
+admit.
 Admitted.
 
 //GOD1:265022 matrix_space : "the set of #2-by-#3 matrices with coefficients in #1" | $\operatorname{Mat}_{#2\times #3}(#1)$
@@ -37190,6 +39976,25 @@ Definition matrix_of_right_linear_map :
         M addM (fun scalar x => smulM x scalar)
         p b (f (a (u 1))) (u 0).
 
+(** Formal interface for formula (6) of §12, section 3.  The matrix
+    material occurs here after the right-module infrastructure on which it
+    depends. **)
+Theorem god1_s12_section3_formula6_matrix_coordinates :
+  forall K, forall addK mulK:set -> set -> set,
+  forall L, forall addL smulL:set -> set -> set,
+  forall M, forall addM smulM:set -> set -> set,
+  forall q p :e omega, forall a b:set -> set, forall f:set -> set,
+    right_module_basis K addK mulK L addL smulL q a ->
+    right_module_basis K addK mulK M addM smulM p b ->
+    right_module_homomorphism K addK mulK L addL smulL M addM smulM f ->
+    forall i :e p, forall j :e q,
+      basis_coordinates K addK (opposite_ring_multiplication mulK)
+        M addM (fun scalar x => smulM x scalar) p b (f (a j)) i
+      = matrix_entry
+        (matrix_of_right_linear_map K addK mulK
+          L addL smulL M addM smulM q p a b f) i j.
+Admitted.
+
 Theorem god1_matrices_classify_maps_between_finite_free_right_modules :
   forall K, forall addK mulK:set -> set -> set,
   forall L, forall addL smulL:set -> set -> set,
@@ -37213,9 +40018,88 @@ assume hp.
 let a b.
 assume hBasisL hBasisM.
 //GOD1PRF:263264 Conversely, let $\alpha_{i j} \in \mathrm{~K}(1 \leqslant i \leqslant p, 1 \leqslant j \leqslant q)$ be arbitrary scalars, and define a mapping $f: \mathrm{L} \rightarrow \mathrm{M}$ by means of the formulae (6): that is to say, $f$ maps a vector $x \in \mathrm{~L}$, with coordinates $\xi_{1}, \ldots, \xi_{q}$ relative to the given basis of $L$, to the vector in $M$ whose coordinates $\eta_{1}, \ldots, \eta_{p}$ are given by the equations (6). Then $f$ is a homomorphism of L into M ; for we have
+claim h_s13_matrix_to_map : forall A :e matrix_space K p q,
+  exists f:set -> set,
+    right_module_homomorphism K addK mulK L addL smulL M addM smulM f.
+admit.
 //GOD1PRF:264244 where the vectors $c_{j}$ are given by (5), and this shows that $f$ is the homomorphism whose existence is asserted by Theorem 3.
+claim h_s13_target_left_module : left_module K addK (opposite_ring_multiplication mulK)
+  M addM (fun scalar x => smulM x scalar).
+admit.
+claim h_s13_theorem3_call : forall c:set -> set,
+  (forall i :e q, c i :e M) -> exists f:set -> set,
+    module_homomorphism K addK (opposite_ring_multiplication mulK)
+      L addL (fun scalar x => smulL x scalar)
+      M addM (fun scalar x => smulM x scalar) f
+    /\ (forall i :e q, f (a i) = c i)
+    /\ (forall g:set -> set,
+      module_homomorphism K addK (opposite_ring_multiplication mulK)
+        L addL (fun scalar x => smulL x scalar)
+        M addM (fun scalar x => smulM x scalar) g ->
+      (forall i :e q, g (a i) = c i) -> forall x :e L, g x = f x)
+    /\ (inj L M f <-> linearly_independent_family K addK
+      (opposite_ring_multiplication mulK) M addM
+      (fun scalar x => smulM x scalar) q c)
+    /\ (surj L M f <-> generating_family K addK
+      (opposite_ring_multiplication mulK) M addM
+      (fun scalar x => smulM x scalar) q c).
+let c.
+assume hc.
+apply (god1_s12_theorem3_linear_map_from_basis
+  K addK (opposite_ring_multiplication mulK)
+  L addL (fun scalar x => smulL x scalar)
+  M addM (fun scalar x => smulM x scalar)
+  q a c hBasisL h_s13_target_left_module hc).
 //GOD1PRF:264375 Moreover, if the homomorphism $f$ is given, there is only one system of scalars $\alpha_{i j}$ such that $f$ is defined by the relations (6), for the above calculations show that the $\alpha_{i j}$ are the coordinates of the vectors $f\left(a_{j}\right)$ with respect to the basis $b_{1}, \ldots, b_{p}$ of M , and are therefore uniquely determined.
+claim h_s13_map_matrix_unique : forall f:set -> set,
+  right_module_homomorphism K addK mulK L addL smulL M addM smulM f ->
+  forall A B :e matrix_space K p q,
+    A = matrix_of_right_linear_map K addK mulK L addL smulL M addM smulM q p a b f ->
+    B = matrix_of_right_linear_map K addK mulK L addL smulL M addM smulM q p a b f -> A = B.
+admit.
 //GOD1PRF:267718 These considerations show that there is a "canonical" bijection of the set of all homomorphisms of $\mathrm{K}^{q}$ into $\mathrm{K}^{p}$ onto the set of all matrices with $p$ rows and $q$ columns (and coefficients in K). We shall often make use of this correspondence, usually without explicit reference.
+claim h_s13_matrix_classification_conclusion : bij
+  (module_homomorphism_space K addK (opposite_ring_multiplication mulK)
+    L addL (fun scalar x => smulL x scalar)
+    M addM (fun scalar x => smulM x scalar))
+  (matrix_space K p q)
+  (fun F => matrix_of_right_linear_map K addK mulK L addL smulL
+    M addM smulM q p a b (fun x => F x)).
+admit.
+Admitted.
+
+(** Formal interface for Remark 2 of §12.  It records explicitly that
+    transporting a map to canonical module powers does not change its matrix. **)
+Theorem god1_s12_remark2_matrix_transport_to_canonical_bases :
+  forall K, forall addK mulK:set -> set -> set,
+  forall L, forall addL smulL:set -> set -> set,
+  forall M, forall addM smulM:set -> set -> set,
+  forall q p :e omega, forall a b:set -> set, forall f:set -> set,
+    right_module_basis K addK mulK L addL smulL q a ->
+    right_module_basis K addK mulK M addM smulM p b ->
+    right_module_homomorphism K addK mulK L addL smulL M addM smulM f ->
+    exists u v fbar:set -> set,
+      module_isomorphism K addK (opposite_ring_multiplication mulK)
+        (K :^: q) (module_power_addition q addK)
+        (fun scalar x => module_power_left_scalar q mulK scalar x)
+        L addL (fun scalar x => smulL x scalar) u
+      /\ module_isomorphism K addK (opposite_ring_multiplication mulK)
+        (K :^: p) (module_power_addition p addK)
+        (fun scalar x => module_power_left_scalar p mulK scalar x)
+        M addM (fun scalar x => smulM x scalar) v
+      /\ (forall i :e q, u (canonical_module_basis_vector K addK mulK q i) = a i)
+      /\ (forall i :e p, v (canonical_module_basis_vector K addK mulK p i) = b i)
+      /\ (forall x :e K :^: q,
+        fbar x = inv (K :^: p) v (f (u x)))
+      /\ matrix_of_right_linear_map K addK mulK
+        L addL smulL M addM smulM q p a b f
+      = matrix_of_right_linear_map K addK mulK
+        (K :^: q) (module_power_addition q addK)
+        (fun x scalar => module_power_left_scalar q mulK scalar x)
+        (K :^: p) (module_power_addition p addK)
+        (fun x scalar => module_power_left_scalar p mulK scalar x)
+        q p (canonical_module_basis_vector K addK mulK q)
+        (canonical_module_basis_vector K addK mulK p) fbar.
 Admitted.
 
 Theorem god1_s13_theorem2_matrix_of_sum :
@@ -37242,10 +40126,38 @@ assume hp.
 let a b f g.
 assume hBasisL hBasisM hf hg.
 //GOD1PRF:284678 Let $h=f+g$ and let
+claim h_s13_t2_sum_map : forall x :e L,
+  (fun z:set => addM (f z) (g z)) x = addM (f x) (g x).
+admit.
 //GOD1PRF:284798 be the matrix of $h$ with respect to the chosen bases. Then
+claim h_s13_t2_sum_matrix_defined :
+  matrix_of_right_linear_map K addK mulK L addL smulL M addM smulM
+    q p a b (fun x => addM (f x) (g x)) :e matrix_space K p q.
+admit.
 //GOD1PRF:285020 and consequently the entries of $\mathbf{C}$ are given by
+claim h_s13_t2_entrywise_sum : forall i :e p, forall j :e q,
+  matrix_entry (matrix_of_right_linear_map K addK mulK L addL smulL
+    M addM smulM q p a b (fun x => addM (f x) (g x))) i j
+  = addK
+    (matrix_entry (matrix_of_right_linear_map K addK mulK L addL smulL M addM smulM q p a b f) i j)
+    (matrix_entry (matrix_of_right_linear_map K addK mulK L addL smulL M addM smulM q p a b g) i j).
+admit.
 //GOD1PRF:286162 We have also proved the following result:\\
+claim h_s13_t2_matrix_sum_formula :
+  matrix_of_right_linear_map K addK mulK L addL smulL M addM smulM q p a b
+    (fun x => addM (f x) (g x))
+  = matrix_addition K addK p q
+    (matrix_of_right_linear_map K addK mulK L addL smulL M addM smulM q p a b f)
+    (matrix_of_right_linear_map K addK mulK L addL smulL M addM smulM q p a b g).
+admit.
 //GOD1PRF:286206 theorem 2. Let L and M be finitely generated free K -modules, and let $f, g$ be homomorphisms of L into M . Choose bases of L and M and let $\mathrm{A}, \mathrm{B}$ be the matrices of the homomorphisms $f, g$, relative to these bases. Then the matrix of $f+g$ (relative to these bases) is $\mathrm{A}+\mathrm{B}$.
+claim h_s13_t2_book_conclusion :
+  matrix_of_right_linear_map K addK mulK L addL smulL M addM smulM q p a b
+    (fun x => addM (f x) (g x))
+  = matrix_addition K addK p q
+    (matrix_of_right_linear_map K addK mulK L addL smulL M addM smulM q p a b f)
+    (matrix_of_right_linear_map K addK mulK L addL smulL M addM smulM q p a b g).
+admit.
 Admitted.
 
 (** § 14. Products of matrices. **)
@@ -37261,6 +40173,14 @@ Definition module_endomorphism_ring :
 Definition module_endomorphism_composition :
   set -> set -> set -> set :=
   fun M f g => fun x :e M => f (g x).
+
+(** Formal interface for §2, Theorem 2.  General function composition is
+    primitive in the earlier library, so the book result had no standalone
+    declaration to call at the module-endomorphism level. **)
+Theorem god1_s2_theorem2_function_composition_associative :
+  forall X,
+    associative_on (X :^: X) (module_endomorphism_composition X).
+Admitted.
 
 Theorem god1_s14_theorem1_composition_distributes_over_map_addition :
   forall K, forall addK mulK:set -> set -> set,
@@ -37290,7 +40210,28 @@ let K addK mulK L addL smulL M addM smulM N addN smulN f g h.
 assume hf hg hh.
 apply andI.
 //GOD1PRF:287616 Take for example the first assertion. Putting $u=f+g$, we have
+claim h_s14_t1_first_distribution : forall x :e L,
+  h ((module_homomorphism_addition L addM
+    (fun y :e L => f y) (fun y :e L => g y)) x)
+  = (module_homomorphism_addition L addN
+    (fun y :e L => h (f y)) (fun y :e L => h (g y))) x.
+admit.
 //GOD1PRF:287738 so that the mapping $h \circ u$ is the sum of the mappings $h \circ f$ and $h \circ g$. Similarly for the second assertion.
+claim h_s14_t1_both_distributions :
+  (forall x :e L,
+    h ((module_homomorphism_addition L addM
+      (fun y :e L => f y) (fun y :e L => g y)) x)
+    = (module_homomorphism_addition L addN
+      (fun y :e L => h (f y)) (fun y :e L => h (g y))) x)
+  /\ (forall u v:set -> set,
+    module_homomorphism K addK mulK M addM smulM N addN smulN u ->
+    module_homomorphism K addK mulK M addM smulM N addN smulN v ->
+    forall x :e L,
+      (module_homomorphism_addition M addN
+        (fun y :e M => u y) (fun y :e M => v y)) (f x)
+      = (module_homomorphism_addition L addN
+        (fun y :e L => u (f y)) (fun y :e L => v (f y))) x).
+admit.
 Admitted.
 
 Theorem god1_s14_corollary_endomorphisms_form_ring :
@@ -37304,6 +40245,48 @@ Theorem god1_s14_corollary_endomorphisms_form_ring :
 let K addK mulK M addM smul.
 assume hM.
 //GOD1PRF:288115 The fact that Hom $(\mathrm{L}, \mathrm{L})$ is a commutative group with respect to addition follows from § 13, Theorem 1. Associativity of multiplication follows from § 2, Theorem 2, and the existence of a neutral element for multiplication follows from the fact that the identity mapping $j_{\mathrm{L}}$ belongs to Hom (L,L). Finally, Theorem 1 shows that the "distributive laws" are satisfied, and completes the proof that Hom ( $\mathrm{L}, \mathrm{L}$ ) is a ring.
+claim h_s14_cor_s13_theorem1_call :
+  abelian_group
+    (module_homomorphism_space K addK mulK M addM smul M addM smul)
+    (module_homomorphism_addition M addM)
+  /\ (commutative_ring K addK mulK ->
+    left_module K addK mulK
+      (module_homomorphism_space K addK mulK M addM smul M addM smul)
+      (module_homomorphism_addition M addM)
+      (module_homomorphism_scalar M smul)).
+apply (god1_s13_theorem1_homomorphisms_form_additive_group
+  K addK mulK M addM smul M addM smul hM hM).
+claim h_s14_cor_s2_theorem2_call : associative_on
+  (module_endomorphism_ring K addK mulK M addM smul)
+  (module_endomorphism_composition M).
+admit.
+claim h_s14_cor_s2_theorem2_formal_call :
+  associative_on (M :^: M) (module_endomorphism_composition M).
+apply (god1_s2_theorem2_function_composition_associative M).
+claim h_s14_cor_theorem1_call :
+  forall f g h:set -> set,
+    module_homomorphism K addK mulK M addM smul M addM smul f ->
+    module_homomorphism K addK mulK M addM smul M addM smul g ->
+    module_homomorphism K addK mulK M addM smul M addM smul h ->
+    (forall x :e M,
+      h ((module_homomorphism_addition M addM
+        (fun y :e M => f y) (fun y :e M => g y)) x)
+      = (module_homomorphism_addition M addM
+        (fun y :e M => h (f y)) (fun y :e M => h (g y))) x)
+    /\ (forall u v:set -> set,
+      module_homomorphism K addK mulK M addM smul M addM smul u ->
+      module_homomorphism K addK mulK M addM smul M addM smul v ->
+      forall x :e M,
+        (module_homomorphism_addition M addM
+          (fun y :e M => u y) (fun y :e M => v y)) (f x)
+        = (module_homomorphism_addition M addM
+          (fun y :e M => u (f y)) (fun y :e M => v (f y))) x).
+apply (god1_s14_theorem1_composition_distributes_over_map_addition
+  K addK mulK M addM smul M addM smul M addM smul).
+claim h_s14_cor_ring_conclusion : ring
+  (module_endomorphism_ring K addK mulK M addM smul)
+  (module_homomorphism_addition M addM) (module_endomorphism_composition M).
+admit.
 Admitted.
 
 Theorem god1_s14_theorem2_matrix_of_composition_is_product :
@@ -37335,13 +40318,72 @@ assume hp.
 let a b c f g.
 assume hBasisL hBasisM hBasisN hf hg.
 //GOD1PRF:289891 We shall calculate $C$ in terms of $A$ and $B$.\\
+claim h_s14_t2_matrix_goal :
+  matrix_of_right_linear_map K addK mulK L addL smulL N addN smulN
+    r p a c (fun x => f (g x))
+  = matrix_multiplication K addK mulK p q r
+    (matrix_of_right_linear_map K addK mulK M addM smulM N addN smulN q p b c f)
+    (matrix_of_right_linear_map K addK mulK L addL smulL M addM smulM r q a b g).
+admit.
 //GOD1PRF:290160 Since we know the matrices A and B of $f$ and $g$, formulae (6) of § 12, Section 3 show that
+claim h_s14_t2_basis_expansions : forall k :e r,
+  f (g (a k)) :e N.
+admit.
+claim h_s14_t2_s12_formula6_f_call : forall i :e p, forall j :e q,
+  basis_coordinates K addK (opposite_ring_multiplication mulK)
+    N addN (fun scalar x => smulN x scalar) p c (f (b j)) i
+  = matrix_entry (matrix_of_right_linear_map K addK mulK
+    M addM smulM N addN smulN q p b c f) i j.
+apply (god1_s12_section3_formula6_matrix_coordinates
+  K addK mulK M addM smulM N addN smulN q hq p hp b c f
+  hBasisM hBasisN hf).
+claim h_s14_t2_s12_formula6_g_call : forall j :e q, forall k :e r,
+  basis_coordinates K addK (opposite_ring_multiplication mulK)
+    M addM (fun scalar x => smulM x scalar) q b (g (a k)) j
+  = matrix_entry (matrix_of_right_linear_map K addK mulK
+    L addL smulL M addM smulM r q a b g) j k.
+apply (god1_s12_section3_formula6_matrix_coordinates
+  K addK mulK L addL smulL M addM smulM r hr q hq a b g
+  hBasisL hBasisM hg).
 //GOD1PRF:290474 and therefore we have
+claim h_s14_t2_composed_coordinates : forall i :e p, forall k :e r,
+  matrix_entry (matrix_of_right_linear_map K addK mulK L addL smulL N addN smulN
+    r p a c (fun x => f (g x))) i k :e K.
+admit.
 //GOD1PRF:290912 But the matrix $\mathbf{C = ( \gamma _ { i k } ) \text { of } h \text { is also given by the formulae }}$
+claim h_s14_t2_matrix_entries_defined : forall i :e p, forall k :e r,
+  matrix_entry (matrix_of_right_linear_map K addK mulK L addL smulL N addN smulN
+    r p a c (fun x => f (g x))) i k :e K.
+admit.
 //GOD1PRF:291087 Comparing these two expressions for $\zeta_{i}$ we see that
+claim h_s14_t2_entry_product_formula : forall i :e p, forall k :e r,
+  matrix_entry (matrix_of_right_linear_map K addK mulK L addL smulL N addN smulN
+    r p a c (fun x => f (g x))) i k
+  = matrix_entry (matrix_multiplication K addK mulK p q r
+    (matrix_of_right_linear_map K addK mulK M addM smulM N addN smulN q p b c f)
+    (matrix_of_right_linear_map K addK mulK L addL smulL M addM smulM r q a b g)) i k.
+admit.
 //GOD1PRF:291383 or, in a more condensed notation,
+claim h_s14_t2_condensed_matrix_formula :
+  matrix_of_right_linear_map K addK mulK L addL smulL N addN smulN r p a c
+    (fun x => f (g x))
+  = matrix_multiplication K addK mulK p q r
+    (matrix_of_right_linear_map K addK mulK M addM smulM N addN smulN q p b c f)
+    (matrix_of_right_linear_map K addK mulK L addL smulL M addM smulM r q a b g).
+admit.
 //GOD1PRF:292326 With this definition, we can state the following result:\\
+claim h_s14_t2_product_definition_used : forall A :e matrix_space K p q,
+  forall B :e matrix_space K q r,
+  matrix_multiplication K addK mulK p q r A B :e matrix_space K p r.
+admit.
 //GOD1PRF:292921 Then the matrix of $f \circ g$ with respect to the bases $\left(a_{k}\right)$ and $\left(c_{i}\right)$ is AB .\\
+claim h_s14_t2_book_conclusion :
+  matrix_of_right_linear_map K addK mulK L addL smulL N addN smulN r p a c
+    (fun x => f (g x))
+  = matrix_multiplication K addK mulK p q r
+    (matrix_of_right_linear_map K addK mulK M addM smulM N addN smulN q p b c f)
+    (matrix_of_right_linear_map K addK mulK L addL smulL M addM smulM r q a b g).
+admit.
 Admitted.
 
 Theorem god1_matrix_associative_distributive_and_units :
@@ -37381,13 +40423,119 @@ let s.
 assume hs hK.
 apply andI.
 //GOD1PRF:295385 with $n$ rows and $n$ columns. It is called the unit matrix of order $n$. This terminology is justified by the fact that, for all matrices $X$ and $Y$ with coefficients in $K$, the relations
+claim h_s14_matrix_unit_goals : forall A :e matrix_space K p q,
+  matrix_multiplication K add mul p p q (unit_matrix K add mul p) A = A
+  /\ matrix_multiplication K add mul p q q A (unit_matrix K add mul q) = A.
+admit.
 //GOD1PRF:295659 are true, provided only that they make sense (i.e., that X has $n$ rows and Y has $n$ columns). These relations are easy consequences of the formulae (1); geometrically they are to be interpreted as follows. Let L be a finitely-generated free right K -module, having a basis $\left(a_{i}\right)_{1 \leqslant i \leqslant n}$ consisting of $n$ vectors (for example, we might take L to be $\mathrm{K}^{n}$, and the basis to be the canonical basis). Then the endomorphism $j: \mathrm{L} \rightarrow \mathrm{L}$ which has $1_{n}$ as matrix with respect to the basis $\left(a_{i}\right)$ is the identity mapping of L onto L . This follows from the formulae (6) of § 12 , section 3 , and the fact that here we have
+claim h_s14_unit_matrix_identity_map : forall n :e omega,
+  unit_matrix K add mul n :e matrix_space K n n.
+admit.
+claim h_s14_unit_s12_formula6_formal_call :
+  forall K0, forall aK mK:set -> set -> set,
+  forall L0, forall aL sL:set -> set -> set,
+  forall M0, forall aM sM:set -> set -> set,
+  forall q0 p0 :e omega, forall aa bb:set -> set, forall ff:set -> set,
+    right_module_basis K0 aK mK L0 aL sL q0 aa ->
+    right_module_basis K0 aK mK M0 aM sM p0 bb ->
+    right_module_homomorphism K0 aK mK L0 aL sL M0 aM sM ff ->
+    forall i :e p0, forall j :e q0,
+      basis_coordinates K0 aK (opposite_ring_multiplication mK)
+        M0 aM (fun scalar x => sM x scalar) p0 bb (ff (aa j)) i
+      = matrix_entry (matrix_of_right_linear_map K0 aK mK
+        L0 aL sL M0 aM sM q0 p0 aa bb ff) i j.
+apply god1_s12_section3_formula6_matrix_coordinates.
 //GOD1PRF:296467 Now, to prove for example the relation $1_{n} . \mathrm{X}=\mathrm{X}$, we introduce a second module M , a basis $\left(b_{j}\right)$ of M and the homomorphism $f: \mathrm{M} \rightarrow \mathrm{L}$ which has X as matrix with respect to the bases $\left(a_{i}\right)$ and $\left(b_{j}\right)$ of L and M . Theorem 1 shows that $1_{n} . \mathrm{X}$ is the matrix, with respect to these bases, of the homomorphism $j \circ f$; but since $j=j_{\mathrm{L}}$ we have $j \circ f=f$ and therefore $1_{n} . \mathrm{X}=\mathrm{X}$, as required.
+claim h_s14_unit_via_composition_theorem : forall A :e matrix_space K p q,
+  matrix_multiplication K add mul p p q (unit_matrix K add mul p) A = A.
+admit.
+claim h_s14_unit_theorem1_formal_call :
+  forall K0, forall aK mK:set -> set -> set,
+  forall L0, forall aL sL:set -> set -> set,
+  forall M0, forall aM sM:set -> set -> set,
+  forall N0, forall aN sN:set -> set -> set,
+  forall r0 q0 p0 :e omega, forall aa bb cc:set -> set,
+  forall ff gg:set -> set,
+    right_module_basis K0 aK mK L0 aL sL r0 aa ->
+    right_module_basis K0 aK mK M0 aM sM q0 bb ->
+    right_module_basis K0 aK mK N0 aN sN p0 cc ->
+    right_module_homomorphism K0 aK mK M0 aM sM N0 aN sN ff ->
+    right_module_homomorphism K0 aK mK L0 aL sL M0 aM sM gg ->
+    matrix_of_right_linear_map K0 aK mK L0 aL sL N0 aN sN r0 p0 aa cc
+      (fun x => ff (gg x))
+    = matrix_multiplication K0 aK mK p0 q0 r0
+      (matrix_of_right_linear_map K0 aK mK M0 aM sM N0 aN sN q0 p0 bb cc ff)
+      (matrix_of_right_linear_map K0 aK mK L0 aL sL M0 aM sM r0 q0 aa bb gg).
+apply god1_s14_theorem2_matrix_of_composition_is_product.
 //GOD1PRF:297216 Matrix multiplication is associative, that is to say
+claim h_s14_matrix_associative : forall A :e matrix_space K p q,
+  forall B :e matrix_space K q r, forall C :e matrix_space K r s,
+  matrix_multiplication K add mul p q s A
+    (matrix_multiplication K add mul q r s B C)
+  = matrix_multiplication K add mul p r s
+    (matrix_multiplication K add mul p q r A B) C.
+admit.
 //GOD1PRF:297292 whenever both sides of the equation are defined. To prove this, we introduce the homomorphisms
+claim h_s14_matrix_associativity_maps_exist : forall A :e matrix_space K p q,
+  forall B :e matrix_space K q r, forall C :e matrix_space K r s,
+  A :e matrix_space K p q /\ B :e matrix_space K q r /\ C :e matrix_space K r s.
+admit.
 //GOD1PRF:297547 whose matrices (with respect to the canonical bases) are $\mathrm{A}, \mathrm{B}, \mathrm{C}$ respectively; by Theorem 2, the matrix $\mathrm{A}(\mathrm{BC})$ represents $f \circ(g \circ h)$, and the matrix $(\mathrm{AB}) \mathrm{C}$ represents $(f \circ g) \circ h$, whence the result.
+claim h_s14_matrix_theorem2_formal_call :
+  forall K0, forall aK mK:set -> set -> set,
+  forall L0, forall aL sL:set -> set -> set,
+  forall M0, forall aM sM:set -> set -> set,
+  forall N0, forall aN sN:set -> set -> set,
+  forall r0 q0 p0 :e omega, forall aa bb cc:set -> set,
+  forall ff gg:set -> set,
+    right_module_basis K0 aK mK L0 aL sL r0 aa ->
+    right_module_basis K0 aK mK M0 aM sM q0 bb ->
+    right_module_basis K0 aK mK N0 aN sN p0 cc ->
+    right_module_homomorphism K0 aK mK M0 aM sM N0 aN sN ff ->
+    right_module_homomorphism K0 aK mK L0 aL sL M0 aM sM gg ->
+    matrix_of_right_linear_map K0 aK mK L0 aL sL N0 aN sN r0 p0 aa cc
+      (fun x => ff (gg x))
+    = matrix_multiplication K0 aK mK p0 q0 r0
+      (matrix_of_right_linear_map K0 aK mK M0 aM sM N0 aN sN q0 p0 bb cc ff)
+      (matrix_of_right_linear_map K0 aK mK L0 aL sL M0 aM sM r0 q0 aa bb gg).
+apply god1_s14_theorem2_matrix_of_composition_is_product.
 //GOD1PRF:297835 Finally, the distributive laws
+claim h_s14_matrix_distributive_goals :
+  (forall A B :e matrix_space K p q, forall C :e matrix_space K q r,
+    matrix_multiplication K add mul p q r (matrix_addition K add p q A B) C
+    = matrix_addition K add p r
+      (matrix_multiplication K add mul p q r A C)
+      (matrix_multiplication K add mul p q r B C))
+  /\ (forall A :e matrix_space K p q, forall B C :e matrix_space K q r,
+    matrix_multiplication K add mul p q r A (matrix_addition K add q r B C)
+    = matrix_addition K add p r
+      (matrix_multiplication K add mul p q r A B)
+      (matrix_multiplication K add mul p q r A C)).
+admit.
 //GOD1PRF:298001 hold whenever the terms appearing in these formulae are defined. The proof proceeds on the same lines, by replacing the matrices A, B, C by module homomorphisms and applying Theorem 1.
+claim h_s14_matrix_theorem1_formal_call :
+  forall K0, forall aK mK:set -> set -> set,
+  forall L0, forall aL sL:set -> set -> set,
+  forall M0, forall aM sM:set -> set -> set,
+  forall N0, forall aN sN:set -> set -> set,
+  forall ff gg hh:set -> set,
+    module_homomorphism K0 aK mK L0 aL sL M0 aM sM ff ->
+    module_homomorphism K0 aK mK L0 aL sL M0 aM sM gg ->
+    module_homomorphism K0 aK mK M0 aM sM N0 aN sN hh ->
+    (forall x :e L0,
+      hh ((module_homomorphism_addition L0 aM
+        (fun y :e L0 => ff y) (fun y :e L0 => gg y)) x)
+      = (module_homomorphism_addition L0 aN
+        (fun y :e L0 => hh (ff y)) (fun y :e L0 => hh (gg y))) x)
+    /\ (forall u v:set -> set,
+      module_homomorphism K0 aK mK M0 aM sM N0 aN sN u ->
+      module_homomorphism K0 aK mK M0 aM sM N0 aN sN v ->
+      forall x :e L0,
+        (module_homomorphism_addition M0 aN
+          (fun y :e M0 => u y) (fun y :e M0 => v y)) (ff x)
+        = (module_homomorphism_addition L0 aN
+          (fun y :e L0 => u (ff y)) (fun y :e L0 => v (ff y))) x).
+apply god1_s14_theorem1_composition_distributes_over_map_addition.
 Admitted.
 
 //GOD1:299045 square_matrix_ring : "the ring of square matrices of order #4 over #1" | $M_{#4}(#1)$
@@ -37404,6 +40552,10 @@ Theorem god1_square_matrices_form_ring :
 let K add mul n.
 assume hn hK.
 //GOD1PRF:298526 and the set $\mathrm{M}_{n}(\mathrm{~K})$ with these two laws of composition is a ring. For we know already that $\mathrm{M}_{n}(\mathrm{~K})$ is a commutative group with respect to addition ; we have just shown that the multiplication is associative, and it is clear (from Example 3 above) that $\mathrm{M}_{n}(\mathrm{~K})$ possesses a neutral element for multiplication, namely the matrix $1_{n}$; finally, the formulae above show that multiplication in $\mathrm{M}_{n}(\mathrm{~K})$ is distributive over addition.
+claim h_s14_square_matrix_ring_conclusion : ring
+  (square_matrix_ring K n) (matrix_addition K add n n)
+  (matrix_multiplication K add mul n n n).
+admit.
 Admitted.
 
 (** § 15. Invertible matrices and change of basis. **)
@@ -37432,7 +40584,41 @@ let K addK mulK M addM smul.
 assume hM.
 apply andI.
 //GOD1PRF:315562 We recall (§ 12, section 1) that an automorphism of a module M is a bijective homomorphism of M onto M , i.e., an isomorphism of M onto M . Hence an automorphism of M is in particular a permutation of the set M . Theorem 1 of § 12 shows that, if $u$ and $v$ are automorphisms of M , then so is the mapping $u \circ v^{-1}$. Consequently the set
+claim h_s15_aut_s12_theorem1_call :
+  forall u v:set -> set,
+    module_homomorphism K addK mulK M addM smul M addM smul u ->
+    module_homomorphism K addK mulK M addM smul M addM smul v ->
+    module_homomorphism K addK mulK M addM smul M addM smul (fun x => v (u x))
+    /\ (module_isomorphism K addK mulK M addM smul M addM smul u ->
+      module_isomorphism K addK mulK M addM smul M addM smul (inv M u))
+    /\ (module_isomorphism K addK mulK M addM smul M addM smul u ->
+      module_isomorphism K addK mulK M addM smul M addM smul v ->
+      module_isomorphism K addK mulK M addM smul M addM smul (fun x => v (u x))).
+apply (god1_s12_theorem1_composition_and_inverse_linear
+  K addK mulK M addM smul M addM smul M addM smul).
+claim h_s15_automorphisms_group : group
+  (module_general_linear_group K addK mulK M addM smul)
+  (module_endomorphism_composition M).
+admit.
 //GOD1PRF:316557 and the elements of GL(M) are just the units of the ring Hom (M, M); for if an endomorphism $u$ is a unit in the ring Hom ( $\mathbf{M}, \mathbf{M}$ ), then there exists an endomorphism $v$ such that $u \circ v=v \circ u=j_{\mathrm{M}}$, so that $u$ is bijective and therefore belongs to GL(M); and the converse is obvious. Thus GL(M) is the group of units of the ring Hom (M, M), in the sense of § 8, Remark 1.\\
+claim h_s15_automorphisms_are_units :
+  module_general_linear_group K addK mulK M addM smul
+  = ring_units (module_endomorphism_ring K addK mulK M addM smul)
+    (module_homomorphism_addition M addM) (module_endomorphism_composition M).
+admit.
+claim h_s15_s8_remark1_endomorphism_ring_call : ring
+  (module_endomorphism_ring K addK mulK M addM smul)
+  (module_homomorphism_addition M addM) (module_endomorphism_composition M).
+apply (god1_s14_corollary_endomorphisms_form_ring
+  K addK mulK M addM smul hM).
+claim h_s15_s8_remark1_units_formal_call : group
+  (ring_units (module_endomorphism_ring K addK mulK M addM smul)
+    (module_homomorphism_addition M addM) (module_endomorphism_composition M))
+  (module_endomorphism_composition M).
+apply (god1_ring_units_form_group
+  (module_endomorphism_ring K addK mulK M addM smul)
+  (module_homomorphism_addition M addM) (module_endomorphism_composition M)
+  h_s15_s8_remark1_endomorphism_ring_call).
 Admitted.
 
 //GOD1:317017 invertible_matrix : "#6 is an invertible square matrix of order #4 over #1" | $#6\in\operatorname{GL}(#4,#1)$
@@ -37478,8 +40664,21 @@ let K add mul n.
 assume hn hK.
 apply andI.
 //GOD1PRF:317233 that is to say if $U$ is a unit of the ring $M_{n}(K)$; the matrix $V$ is then unique, and is denoted by $\mathrm{U}^{-1}$ and called the inverse of U . We denote by
+claim h_s15_matrix_inverse_spec : forall A :e general_linear_group K add mul n,
+  matrix_multiplication K add mul n n n (matrix_inverse K add mul n A) A
+    = unit_matrix K add mul n
+  /\ matrix_multiplication K add mul n n n A (matrix_inverse K add mul n A)
+    = unit_matrix K add mul n.
+admit.
 //GOD1PRF:317435 the set of all invertible square matrices of order $n$ with coefficients in K . Endowed\\
+claim h_s15_general_linear_set :
+  general_linear_group K add mul n
+    = {A :e square_matrix_ring K n|invertible_matrix K add mul n A}.
+admit.
 //GOD1PRF:317525 with the law of composition ( U, V) → UV, this set is a group, called the general linear group in $n$ variables over the ring K ; it is just the (multiplicative) group of units of the ring $\mathbf{M}_{n}(\mathbf{K})$.
+claim h_s15_general_linear_group_conclusion : group
+  (general_linear_group K add mul n) (matrix_multiplication K add mul n n n).
+admit.
 Admitted.
 
 Theorem god1_automorphism_iff_matrix_invertible :
@@ -37500,10 +40699,46 @@ let a f.
 assume hBasis hf.
 apply iffI.
 //GOD1PRF:317747 Let M be a finitely generated free module, and let $a_{1}, \ldots, a_{n}$ be a basis of M . With each endomorphism $f$ of M we can associate the matrix of $f$ with respect to this basis (§ 12, section 3). If we denote this matrix by $\mathrm{A}(f)$, we obtain a bijection
+claim h_s15_matrix_classification_call : bij
+  (module_homomorphism_space K addK (opposite_ring_multiplication mulK)
+    M addM (fun scalar x => smulR x scalar)
+    M addM (fun scalar x => smulR x scalar))
+  (matrix_space K n n)
+  (fun F => matrix_of_right_linear_map K addK mulK M addM smulR
+    M addM smulR n n a a (fun x => F x)).
+apply (god1_matrices_classify_maps_between_finite_free_right_modules
+  K addK mulK M addM smulR M addM smulR n hn n hn a a hBasis hBasis).
 //GOD1PRF:318057 of the ring Hom ( $\mathbf{M}, \mathbf{M}$ ) onto the ring $\mathbf{M}_{n}(\mathbf{K})$ of all square matrices of order $n$ with coefficients in K ; and the method by which we defined the sum and the product of two matrices shows that
+claim h_s15_matrix_map_preserves_addition : forall u v:set -> set,
+  matrix_of_right_linear_map K addK mulK M addM smulR M addM smulR n n a a
+    (fun x => addM (u x) (v x))
+  = matrix_addition K addK n n
+    (matrix_of_right_linear_map K addK mulK M addM smulR M addM smulR n n a a u)
+    (matrix_of_right_linear_map K addK mulK M addM smulR M addM smulR n n a a v).
+admit.
 //GOD1PRF:318447 so that the mapping $f \rightarrow \mathrm{~A}(f)$ is an isomorphism (§ 8, section 6) of the ring Hom (M, M) onto the ring $\mathrm{M}_{n}(\mathrm{~K})$.
+claim h_s15_endomorphism_matrix_ring_isomorphism : exists F:set -> set,
+  ring_isomorphism
+    (module_endomorphism_ring K addK (opposite_ring_multiplication mulK)
+      M addM (fun scalar x => smulR x scalar))
+    (module_homomorphism_addition M addM) (module_endomorphism_composition M)
+    (square_matrix_ring K n) (matrix_addition K addK n n)
+    (matrix_multiplication K addK mulK n n n) F.
+admit.
 //GOD1PRF:318603 Since an isomorphism of a ring $U$ onto a ring $V$ clearly maps the set $U^{*}$ of units of U onto the set $\mathrm{V}^{*}$ of units of V , it follows that for an endomorphism $f$ of M to be an automorphism of M it is necessary and sufficient that its matrix $\mathrm{A}(f)$ should be a unit of the ring $\mathbf{M}_{n}(\mathrm{~K})$. In other words, the relations
+claim h_s15_units_preserved_by_matrix_isomorphism :
+  module_automorphism K addK (opposite_ring_multiplication mulK)
+    M addM (fun scalar x => smulR x scalar) f
+  <-> invertible_matrix K addK mulK n
+    (matrix_of_right_linear_map K addK mulK M addM smulR M addM smulR n n a a f).
+admit.
 //GOD1PRF:319066 are equivalent.\\
+claim h_s15_automorphism_matrix_equivalence :
+  module_automorphism K addK (opposite_ring_multiplication mulK)
+    M addM (fun scalar x => smulR x scalar) f
+  <-> invertible_matrix K addK mulK n
+    (matrix_of_right_linear_map K addK mulK M addM smulR M addM smulR n n a a f).
+admit.
 Admitted.
 
 //GOD1:321107 determinant_2 : "the determinant of the square matrix #4 of order two" | $\det(#4)$
@@ -37529,13 +40764,42 @@ let K add mul.
 assume hK.
 apply andI.
 //GOD1PRF:321528 which is valid for all $A, B \in M_{2}(K)$. This formula is equivalent to the identity
+claim h_s15_det2_product_identity : forall A B :e square_matrix_ring K 2,
+  determinant_2 K add mul (matrix_multiplication K add mul 2 2 2 A B)
+    = mul (determinant_2 K add mul A) (determinant_2 K add mul B).
+admit.
 //GOD1PRF:321681 which the reader will have no difficulty in checking for himself, provided he remembers that K is assumed to be commutative.
+claim h_s15_det2_multiplicative : forall A B :e square_matrix_ring K 2,
+  determinant_2 K add mul (matrix_multiplication K add mul 2 2 2 A B)
+    = mul (determinant_2 K add mul A) (determinant_2 K add mul B).
+admit.
 //GOD1PRF:321807 Since the determinant of the unit matrix $1_{2}$ is clearly equal to 1 , the relation
+claim h_s15_det2_unit_matrix :
+  determinant_2 K add mul (unit_matrix K add mul 2) = ring_one K mul.
+admit.
 //GOD1PRF:321987 shows that for the matrix A to be invertible it is necessary that its determinant should be a unit of K . Conversely, suppose that $a d-b c$ is a unit of K , and consider the two equations involving $x$ and $y$ in the system (2). Clearly they are satisfied by taking
+claim h_s15_det2_unit_necessary : forall A :e square_matrix_ring K 2,
+  invertible_matrix K add mul 2 A -> ring_unit K add mul (determinant_2 K add mul A).
+admit.
 //GOD1PRF:322309 and the equations involving $z$ and $t$ are likewise satisfied by
+claim h_s15_det2_inverse_entries_exist : forall A :e square_matrix_ring K 2,
+  ring_unit K add mul (determinant_2 K add mul A) -> exists B :e square_matrix_ring K 2,
+  matrix_multiplication K add mul 2 2 2 A B = unit_matrix K add mul 2.
+admit.
 //GOD1PRF:322431 and then it is easily verified that the matrix
+claim h_s15_det2_candidate_two_sided : forall A :e square_matrix_ring K 2,
+  ring_unit K add mul (determinant_2 K add mul A) -> exists B :e square_matrix_ring K 2,
+  matrix_multiplication K add mul 2 2 2 A B = unit_matrix K add mul 2
+  /\ matrix_multiplication K add mul 2 2 2 B A = unit_matrix K add mul 2.
+admit.
 //GOD1PRF:322544 so constructed is a two-sided inverse of A.
+claim h_s15_det2_unit_sufficient : forall A :e square_matrix_ring K 2,
+  ring_unit K add mul (determinant_2 K add mul A) -> invertible_matrix K add mul 2 A.
+admit.
 //GOD1PRF:322589 Hence, if the ring K is commutative, the matrix $\left(\begin{array}{ll}a & b \\ c & d\end{array}\right)$ is invertible if and only if $a d-b c$ is invertible in K . such that
+claim h_s15_det2_detects_units : forall A :e square_matrix_ring K 2,
+  invertible_matrix K add mul 2 A <-> ring_unit K add mul (determinant_2 K add mul A).
+admit.
 Admitted.
 
 //GOD1:326299 transition_matrix : "the transition matrix from the basis #9 to the basis #10" | $T_{#10\leftarrow #9}$
@@ -37575,17 +40839,98 @@ let a b.
 assume hBasisA hBasisB.
 apply andI.
 //GOD1PRF:324942 For this purpose consider the homomorphisms
+claim h_s15_transition_basis_maps_exist : exists u v:set -> set,
+  right_module_homomorphism K addK mulK (K :^: n)
+    (module_power_addition n addK) (fun x l => module_power_left_scalar n mulK l x)
+    M addM smulR u
+  /\ right_module_homomorphism K addK mulK (K :^: n)
+    (module_power_addition n addK) (fun x l => module_power_left_scalar n mulK l x)
+    M addM smulR v.
+admit.
 //GOD1PRF:325186 where ( $e_{1}, \ldots, e_{n}$ ) is the canonical basis of $\mathrm{K}^{n}$. For $\left(a_{i}\right)$ and $\left(b_{i}\right)$ to be bases of M it is necessary and sufficient that $u$ and $v$ should be isomorphisms (§ 12, Corollary 1 to Theorem 3). If $\xi_{1}, \ldots, \xi_{n}$ are the coordinates of $x$ with respect to the basis $\left(a_{i}\right)$, and if $\eta_{1}, \ldots, \eta_{n}$ are its coordinates with respect to the basis $\left(b_{i}\right)$, then we have
+claim h_s15_transition_s12_corollary1_call :
+  forall K0, forall aK mK:set -> set -> set,
+  forall M0, forall aM sM:set -> set -> set,
+    left_module K0 aK mK M0 aM sM ->
+    (finitely_generated_free_module K0 aK mK M0 aM sM
+    <-> exists m :e omega,
+      isomorphic_modules K0 aK mK (K0 :^: m)
+        (module_power_addition m aK) (module_power_left_scalar m mK)
+        M0 aM sM).
+apply god1_s12_corollary1_free_module_iff_isomorphic_to_power.
+claim h_s15_transition_coordinate_equations : forall x :e M,
+  exists xi eta:set -> set,
+    (forall i :e n, xi i :e K /\ eta i :e K).
+admit.
 //GOD1PRF:325750 Hence, introducing the automorphism (§ 12, Theorem 1)
+claim h_s15_transition_s12_theorem1_call :
+  forall K0, forall aK mK:set -> set -> set,
+  forall L0, forall aL sL:set -> set -> set,
+  forall M0, forall aM sM:set -> set -> set,
+  forall N0, forall aN sN:set -> set -> set,
+  forall f g:set -> set,
+    module_homomorphism K0 aK mK L0 aL sL M0 aM sM f ->
+    module_homomorphism K0 aK mK M0 aM sM N0 aN sN g ->
+    module_homomorphism K0 aK mK L0 aL sL N0 aN sN (fun x => g (f x))
+    /\ (module_isomorphism K0 aK mK L0 aL sL M0 aM sM f ->
+      module_isomorphism K0 aK mK M0 aM sM L0 aL sL (inv L0 f))
+    /\ (module_isomorphism K0 aK mK L0 aL sL M0 aM sM f ->
+      module_isomorphism K0 aK mK M0 aM sM N0 aN sN g ->
+      module_isomorphism K0 aK mK L0 aL sL N0 aN sN (fun x => g (f x))).
+apply god1_s12_theorem1_composition_and_inverse_linear.
 //GOD1PRF:325868 of $K^{n}$, we have
+claim h_s15_transition_automorphism_exists : exists w:set -> set,
+  module_automorphism K addK (opposite_ring_multiplication mulK)
+    (K :^: n) (module_power_addition n addK)
+    (fun scalar x => module_power_left_scalar n mulK scalar x) w.
+admit.
 //GOD1PRF:325977 so that if we denote by
+claim h_s15_transition_matrix_defined :
+  transition_matrix K addK mulK M addM smulR n a b :e square_matrix_ring K n.
+admit.
 //GOD1PRF:326066 the matrix of $w$ with respect to the canonical basis of $\mathrm{K}^{n}$, we have the formulae
+claim h_s15_transition_coordinate_formula : forall x :e M, forall i :e n,
+  basis_coordinates K addK (opposite_ring_multiplication mulK)
+    M addM (fun scalar y => smulR y scalar) n b x i
+  = ring_finite_sum K addK n (fun j => mulK
+    (matrix_entry (transition_matrix K addK mulK M addM smulR n a b) i j)
+    (basis_coordinates K addK (opposite_ring_multiplication mulK)
+      M addM (fun scalar y => smulR y scalar) n a x j)).
+admit.
 //GOD1PRF:326299 which solve the problem we set ourselves. They are called the formulae for change of basis, and the matrix $\left(\alpha_{i j}\right)$ which features in these formulae is called the transition matrix from the basis $\left(a_{i}\right)_{1 \leqslant i \leqslant n}$ to the basis $\left(b_{i}\right)_{1 \leqslant i \leqslant n}$; since it is the matrix of an automorphism of $\mathrm{K}^{n}$, it follows that
+claim h_s15_transition_invertible :
+  invertible_matrix K addK mulK n (transition_matrix K addK mulK M addM smulR n a b).
+admit.
 //GOD1PRF:326773 Notice also that the relation (4) may be written as $u=v \circ w$, and therefore implies that
+claim h_s15_transition_composition_relation : exists u v w:set -> set,
+  forall x :e (K :^: n), u x = v (w x).
+admit.
 //GOD1PRF:327000 be the matrix of the automorphism $w^{-1}$ (with respect to the canonical basis of $\mathrm{K}^{n}$ ), i.e., the inverse of the transition matrix $\left(\alpha_{i j}\right)$. Then we have
+claim h_s15_inverse_transition_matrix :
+  matrix_inverse K addK mulK n (transition_matrix K addK mulK M addM smulR n a b)
+    :e square_matrix_ring K n.
+admit.
 //GOD1PRF:327265 and therefore, using (3),
+claim h_s15_reverse_coordinate_formula : forall x :e M, forall i :e n,
+  basis_coordinates K addK (opposite_ring_multiplication mulK)
+    M addM (fun scalar y => smulR y scalar) n a x i :e K.
+admit.
 //GOD1PRF:327668 It should be carefully noted that the matrices $\left(\alpha_{i j}\right)$ and $\left(\beta_{i j}\right)$ which figure in the formulae (5) and (7) are not the same but are inverses of each other.
+claim h_s15_transition_inverse_relation :
+  matrix_multiplication K addK mulK n n n
+    (transition_matrix K addK mulK M addM smulR n a b)
+    (matrix_inverse K addK mulK n (transition_matrix K addK mulK M addM smulR n a b))
+  = unit_matrix K addK mulK n.
+admit.
 //GOD1PRF:327865 A similar calculation gives the relations
+claim h_s15_transition_change_coordinates_conclusion : forall x :e M, forall i :e n,
+  basis_coordinates K addK (opposite_ring_multiplication mulK)
+    M addM (fun scalar y => smulR y scalar) n b x i
+  = ring_finite_sum K addK n (fun j => mulK
+    (matrix_entry (transition_matrix K addK mulK M addM smulR n a b) i j)
+    (basis_coordinates K addK (opposite_ring_multiplication mulK)
+      M addM (fun scalar y => smulR y scalar) n a x j)).
+admit.
 Admitted.
 
 //GOD1:328624 right_basis_transform : "the family obtained from #9 using the coefficient matrix #10" | $b_j=\sum_i #9_i#10_{ij}$
@@ -37612,7 +40957,51 @@ let a B.
 assume hB hBasis.
 apply iffI.
 //GOD1PRF:328966 Consider the homomorphisms $u, v: \mathrm{K}^{n} \rightarrow \mathrm{M}$ given by the formulae (3). Since the ( $a_{i}$ ) form a basis of M , it follows that $u$ is bijective. To express that the ( $b_{i}$ ) form a basis, we have to express that $v$ is bijective, or equivalently that $u^{-1} \circ v$ is an automorphism of $K^{n}$. Now we have
+claim h_s15_t1_basis_iff_composite_automorphism :
+  right_module_basis K addK mulK M addM smulR n
+    (fun j => right_basis_transform K addK M addM smulR n a B j)
+  <-> exists w:set -> set,
+    module_automorphism K addK (opposite_ring_multiplication mulK)
+      (K :^: n) (module_power_addition n addK)
+      (fun scalar x => module_power_left_scalar n mulK scalar x) w.
+admit.
 //GOD1PRF:329608 Hence $\left(\beta_{i j}\right)$ is precisely the matrix of the endomorphism $u^{-1} \circ v$ of $\mathrm{K}^{n}$; since an endomorphism of $\mathrm{K}^{n}$ is bijective if and only if its matrix belongs to $\mathrm{GL}(n, \mathrm{~K})$, the theorem is proved.\\
+claim h_s15_t1_automorphism_matrix_call :
+  forall f:set -> set,
+    right_module_homomorphism K addK mulK (K :^: n)
+      (module_power_addition n addK)
+      (fun x scalar => module_power_left_scalar n mulK scalar x)
+      (K :^: n) (module_power_addition n addK)
+      (fun x scalar => module_power_left_scalar n mulK scalar x) f ->
+    (module_automorphism K addK (opposite_ring_multiplication mulK)
+      (K :^: n) (module_power_addition n addK)
+      (fun scalar x => module_power_left_scalar n mulK scalar x) f
+    <-> invertible_matrix K addK mulK n
+      (matrix_of_right_linear_map K addK mulK (K :^: n)
+        (module_power_addition n addK)
+        (fun x scalar => module_power_left_scalar n mulK scalar x)
+        (K :^: n) (module_power_addition n addK)
+        (fun x scalar => module_power_left_scalar n mulK scalar x)
+        n n (canonical_module_basis_vector K addK mulK n)
+        (canonical_module_basis_vector K addK mulK n) f)).
+admit.
+claim h_s15_t1_automorphism_matrix_formal_call :
+  forall K0, forall aK mK:set -> set -> set,
+  forall X, forall aX sX:set -> set -> set,
+  forall n0 :e omega, forall basis:set -> set, forall f0:set -> set,
+    right_module_basis K0 aK mK X aX sX n0 basis ->
+    right_module_homomorphism K0 aK mK X aX sX X aX sX f0 ->
+    (module_automorphism K0 aK (opposite_ring_multiplication mK)
+      X aX (fun scalar x => sX x scalar) f0
+    <-> invertible_matrix K0 aK mK n0
+      (matrix_of_right_linear_map K0 aK mK
+        X aX sX X aX sX n0 n0 basis basis f0)).
+apply god1_automorphism_iff_matrix_invertible.
+claim h_s15_t1_book_conclusion :
+  right_module_basis K addK mulK M addM smulR n
+    (fun j => right_basis_transform K addK M addM smulR n a B j)
+  <-> invertible_matrix K addK mulK n B.
+admit.
 Admitted.
 
 Theorem god1_s15_theorem2_matrix_under_change_of_bases :
@@ -37642,10 +41031,107 @@ assume hp.
 let a1 a2 b1 b2 f.
 assume hA1 hA2 hB1 hB2 hf.
 //GOD1PRF:331932 For this purpose, consider the homomorphisms $u^{\prime}, u^{\prime \prime}: \mathrm{K}^{q} \rightarrow \mathrm{~L}$ which map the canonical basis of $\mathrm{K}^{q}$ onto the bases $\left(a_{j}^{\prime}\right)$ and $\left(a_{j}^{\prime \prime}\right)$ respectively, and the homomorphisms $v^{\prime}, v^{\prime \prime}: \mathrm{K}^{p} \rightarrow \mathrm{M}$ which map the canonical basis of $\mathrm{K}^{p}$ onto the bases ( $b_{i}^{\prime}$ ) and ( $b_{i}^{\prime \prime}$ ) respectively. Then
+claim h_s15_t2_four_basis_isomorphisms_exist : exists u1 u2 v1 v2:set -> set,
+  bij (K :^: q) L u1 /\ bij (K :^: q) L u2
+  /\ bij (K :^: p) M v1 /\ bij (K :^: p) M v2.
+admit.
 //GOD1PRF:332519 where $u$ (resp. $v$ ) is an automorphism of $\mathrm{K}^{q}$ (resp. $\mathrm{K}^{p}$ ) whose matrix with respect to the canonical basis of $\mathrm{K}^{q}$ (resp. $\mathrm{K}^{p}$ ) is precisely U (resp. V), by the results of the last section. On the other hand, if we introduce the homomorphisms
+claim h_s15_t2_last_section_transition_call :
+  invertible_matrix K addK mulK q
+    (transition_matrix K addK mulK L addL smulL q a1 a2)
+  /\ invertible_matrix K addK mulK p
+    (transition_matrix K addK mulK M addM smulM p b1 b2).
+claim hq_transition :
+  invertible_matrix K addK mulK q
+    (transition_matrix K addK mulK L addL smulL q a1 a2)
+  /\ forall x :e L, forall i :e q,
+    basis_coordinates K addK (opposite_ring_multiplication mulK)
+      L addL (fun scalar y => smulL y scalar) q a2 x i
+    = ring_finite_sum K addK q (fun j => mulK
+      (matrix_entry (transition_matrix K addK mulK L addL smulL q a1 a2) i j)
+      (basis_coordinates K addK (opposite_ring_multiplication mulK)
+        L addL (fun scalar y => smulL y scalar) q a1 x j)).
+apply (god1_transition_matrix_is_invertible_and_changes_coordinates
+  K addK mulK L addL smulL q hq a1 a2 hA1 hA2).
+claim hp_transition :
+  invertible_matrix K addK mulK p
+    (transition_matrix K addK mulK M addM smulM p b1 b2)
+  /\ forall x :e M, forall i :e p,
+    basis_coordinates K addK (opposite_ring_multiplication mulK)
+      M addM (fun scalar y => smulM y scalar) p b2 x i
+    = ring_finite_sum K addK p (fun j => mulK
+      (matrix_entry (transition_matrix K addK mulK M addM smulM p b1 b2) i j)
+      (basis_coordinates K addK (opposite_ring_multiplication mulK)
+        M addM (fun scalar y => smulM y scalar) p b1 x j)).
+apply (god1_transition_matrix_is_invertible_and_changes_coordinates
+  K addK mulK M addM smulM p hp b1 b2 hB1 hB2).
+admit.
 //GOD1PRF:333026 then the matrices $\mathrm{A}^{\prime}, \mathrm{A}^{\prime \prime}$ defined above are just the matrices of $f^{\prime}, f^{\prime \prime}$ with respect to the canonical bases of $\mathrm{K}^{q}$ and $\mathrm{K}^{p}$, by Remark 2 of § 12. In terms of the mappings $u, v$ defined above, we have
+claim h_s15_t2_matrix_definitions :
+  matrix_of_right_linear_map K addK mulK L addL smulL M addM smulM q p a1 b1 f
+    :e matrix_space K p q.
+admit.
+claim h_s15_t2_s12_remark2_formal_call : exists u v fbar:set -> set,
+  module_isomorphism K addK (opposite_ring_multiplication mulK)
+    (K :^: q) (module_power_addition q addK)
+    (fun scalar x => module_power_left_scalar q mulK scalar x)
+    L addL (fun scalar x => smulL x scalar) u
+  /\ module_isomorphism K addK (opposite_ring_multiplication mulK)
+    (K :^: p) (module_power_addition p addK)
+    (fun scalar x => module_power_left_scalar p mulK scalar x)
+    M addM (fun scalar x => smulM x scalar) v
+  /\ (forall i :e q, u (canonical_module_basis_vector K addK mulK q i) = a1 i)
+  /\ (forall i :e p, v (canonical_module_basis_vector K addK mulK p i) = b1 i)
+  /\ (forall x :e K :^: q, fbar x = inv (K :^: p) v (f (u x)))
+  /\ matrix_of_right_linear_map K addK mulK
+    L addL smulL M addM smulM q p a1 b1 f
+  = matrix_of_right_linear_map K addK mulK
+    (K :^: q) (module_power_addition q addK)
+    (fun x scalar => module_power_left_scalar q mulK scalar x)
+    (K :^: p) (module_power_addition p addK)
+    (fun x scalar => module_power_left_scalar p mulK scalar x)
+    q p (canonical_module_basis_vector K addK mulK q)
+    (canonical_module_basis_vector K addK mulK p) fbar.
+apply (god1_s12_remark2_matrix_transport_to_canonical_bases
+  K addK mulK L addL smulL M addM smulM q hq p hp a1 b1 f hA1 hB1 hf).
 //GOD1PRF:333594 since the composition of two homomorphisms corresponds to the product of their matrices, we obtain
+claim h_s15_t2_composition_product_call :
+  matrix_of_right_linear_map K addK mulK L addL smulL M addM smulM q p a1 b1 f
+  = matrix_multiplication K addK mulK p p q
+    (matrix_inverse K addK mulK p
+      (transition_matrix K addK mulK M addM smulM p b1 b2))
+    (matrix_multiplication K addK mulK p q q
+      (matrix_of_right_linear_map K addK mulK L addL smulL M addM smulM q p a2 b2 f)
+      (transition_matrix K addK mulK L addL smulL q a1 a2)).
+admit.
+claim h_s15_t2_s14_theorem2_formal_call :
+  forall K0, forall aK mK:set -> set -> set,
+  forall X, forall aX sX:set -> set -> set,
+  forall Y, forall aY sY:set -> set -> set,
+  forall Z, forall aZ sZ:set -> set -> set,
+  forall r0 q0 p0 :e omega, forall aa bb cc:set -> set,
+  forall ff gg:set -> set,
+    right_module_basis K0 aK mK X aX sX r0 aa ->
+    right_module_basis K0 aK mK Y aY sY q0 bb ->
+    right_module_basis K0 aK mK Z aZ sZ p0 cc ->
+    right_module_homomorphism K0 aK mK Y aY sY Z aZ sZ ff ->
+    right_module_homomorphism K0 aK mK X aX sX Y aY sY gg ->
+    matrix_of_right_linear_map K0 aK mK X aX sX Z aZ sZ r0 p0 aa cc
+      (fun x => ff (gg x))
+    = matrix_multiplication K0 aK mK p0 q0 r0
+      (matrix_of_right_linear_map K0 aK mK Y aY sY Z aZ sZ q0 p0 bb cc ff)
+      (matrix_of_right_linear_map K0 aK mK X aX sX Y aY sY r0 q0 aa bb gg).
+apply god1_s14_theorem2_matrix_of_composition_is_product.
 //GOD1PRF:333739 by taking the matrices of $u, v, f^{\prime}, f^{\prime \prime}$ with respect to the canonical bases, and this is the solution of the problem posed at the beginning of this section. Hence:\\
+claim h_s15_t2_book_conclusion :
+  matrix_of_right_linear_map K addK mulK L addL smulL M addM smulM q p a1 b1 f
+  = matrix_multiplication K addK mulK p p q
+    (matrix_inverse K addK mulK p
+      (transition_matrix K addK mulK M addM smulM p b1 b2))
+    (matrix_multiplication K addK mulK p q q
+      (matrix_of_right_linear_map K addK mulK L addL smulL M addM smulM q p a2 b2 f)
+      (transition_matrix K addK mulK L addL smulL q a1 a2)).
+admit.
 Admitted.
 
 Theorem god1_s15_corollary_similar_matrices_of_endomorphism :
@@ -37669,6 +41155,15 @@ assume hn.
 let a1 a2 f.
 assume hA1 hA2 hf.
 //GOD1PRF:334858 If in particular $\mathrm{L}=\mathrm{M}$, then we may assume that the bases $\left(a_{j}^{\prime}\right)$ and $\left(b_{i}^{\prime}\right)$ are the same, and that the bases $\left(a_{j}^{\prime \prime}\right)$ and $\left(b_{i}^{\prime \prime}\right)$ are the same. Then clearly we have $\mathrm{U}=\mathrm{V}$, and hence:
+claim h_s15_similar_matrix_conclusion :
+  matrix_of_right_linear_map K addK mulK M addM smulR M addM smulR n n a2 a2 f
+  = matrix_multiplication K addK mulK n n n
+    (transition_matrix K addK mulK M addM smulR n a1 a2)
+    (matrix_multiplication K addK mulK n n n
+      (matrix_of_right_linear_map K addK mulK M addM smulR M addM smulR n n a1 a1 f)
+      (matrix_inverse K addK mulK n
+        (transition_matrix K addK mulK M addM smulR n a1 a2))).
+admit.
 Admitted.
 
 //GOD1:336010 similar_matrices : "the square matrices #5 and #6 are similar over #1" | $#5\sim #6$
@@ -37716,9 +41211,35 @@ Theorem god1_right_module_dual_is_left_module :
 let K addK mulK L addL smulR.
 assume hL.
 //GOD1PRF:350189 We shall see (by using the fact that K is not only a right K -module but also a left K -module) that in fact the set Hom ( $\mathrm{L}, \mathrm{K}$ ) can be regarded not merely as a commutative group, but as a left K -module. Let $f$ be a linear form on L , let $\lambda \in \mathrm{K}$ be a scalar, and consider the function $g$ on L defined by
+claim h_s16_dual_scalar_map : forall l :e K, forall f :e
+  right_module_dual K addK mulK L addL smulR,
+  right_module_dual_left_scalar L mulK l f :e
+    right_module_dual K addK mulK L addL smulR.
+admit.
 //GOD1PRF:350563 Multiplying the relation (1) on the left by $\lambda$, and using the associative and distributive laws in the ring K, we obtain
+claim h_s16_dual_scalar_linearity : forall l :e K, forall f :e
+  right_module_dual K addK mulK L addL smulR,
+  forall x y :e L, forall a b :e K,
+  mulK l (f (addL (smulR x a) (smulR y b)))
+  = addK (mulK a (mulK l (f x))) (mulK b (mulK l (f y))).
+admit.
 //GOD1PRF:350743 so that $g$ is again a linear form on L . Naturally, we write
+claim h_s16_dual_scalar_closed : forall l :e K, forall f :e
+  right_module_dual K addK mulK L addL smulR,
+  right_module_dual_left_scalar L mulK l f :e
+    right_module_dual K addK mulK L addL smulR.
+admit.
 //GOD1PRF:350825 thereby defining a second operation on the set $\operatorname{Hom}(\mathrm{L}, \mathrm{K})$, which consists of "multiplying" an element of this set on the left by a scalar. It remains to be checked that the set Hom (L,K), together with the law of addition defined in § 13 and the law of "scalar multiplication" just defined, is effectively a left K -module. We shall leave this verification to the reader as an exercise. (Alternatively, we can use the following fact : let E be the set of all mappings of L into K , linear or not; considering L simply as a set, and K as a left K -module, by Example 4 of § 10 we can regard E as a left K -module ; now, to do the same for $\operatorname{Hom}(\mathrm{L}, \mathrm{K})$, it is enough to show that $\operatorname{Hom}(\mathrm{L}, \mathrm{K})$ is a submodule of E ; and this is precisely what the preceding considerations show.)
+claim h_s16_dual_s10_example4_call :
+  left_module K addK mulK (K :^: L)
+    (module_power_addition L addK) (module_power_left_scalar L mulK).
+claim h_s16_K_left_module : left_module K addK mulK K addK mulK.
+admit.
+apply (god1_mapping_module_is_module K addK mulK K addK mulK L h_s16_K_left_module).
+claim h_s16_dual_module_conclusion : left_module K addK mulK
+  (right_module_dual K addK mulK L addL smulR)
+  (right_module_dual_addition L addK) (right_module_dual_left_scalar L mulK).
+admit.
 Admitted.
 
 //GOD1:353884 right_module_dual_evaluation : "evaluation of a linear form on the basis #8" | $\theta(f)=(f(#8_i))_i$
@@ -37770,11 +41291,66 @@ let a.
 assume hBasis.
 apply andI.
 //GOD1PRF:354419 Let $\alpha_{1}, \ldots, \alpha_{n}$ be arbitrary elements of K . Theorem 3 of § 12 shows that there exists one and only one $f \in \mathrm{~L}^{*}$ such that
+claim h_s16_t1_s12_theorem3_call : forall alpha:set -> set,
+  (forall i :e n, alpha i :e K) -> exists f:set -> set,
+    module_homomorphism K addK (opposite_ring_multiplication mulK)
+      L addL (fun scalar x => smulR x scalar)
+      K addK (fun scalar x => mulK x scalar) f
+    /\ (forall i :e n, f (a i) = alpha i)
+    /\ (forall g:set -> set,
+      module_homomorphism K addK (opposite_ring_multiplication mulK)
+        L addL (fun scalar x => smulR x scalar)
+        K addK (fun scalar x => mulK x scalar) g ->
+      (forall i :e n, g (a i) = alpha i) -> forall x :e L, g x = f x)
+    /\ (inj L K f <-> linearly_independent_family K addK
+      (opposite_ring_multiplication mulK) K addK
+      (fun scalar x => mulK x scalar) n alpha)
+    /\ (surj L K f <-> generating_family K addK
+      (opposite_ring_multiplication mulK) K addK
+      (fun scalar x => mulK x scalar) n alpha).
+claim h_s16_K_op_left_module :
+  left_module K addK (opposite_ring_multiplication mulK)
+    K addK (fun scalar x => mulK x scalar).
+admit.
+let alpha.
+assume halpha.
+apply (god1_s12_theorem3_linear_map_from_basis
+  K addK (opposite_ring_multiplication mulK)
+  L addL (fun scalar x => smulR x scalar)
+  K addK (fun scalar x => mulK x scalar)
+  n a alpha hBasis h_s16_K_op_left_module halpha).
 //GOD1PRF:354732 Hence the mapping $\theta$ is bijective. To show that $\theta$ is an isomorphism it remains to show that $\theta$ is linear. For this, let $f, g \in \mathrm{~L}^{*}$, and put $h=f+g$; then we have
+claim h_s16_t1_evaluation_bijective : bij
+  (right_module_dual K addK mulK L addL smulR) (K :^: n)
+  (fun f => right_module_dual_evaluation K addK mulK L addL smulR n a f).
+admit.
 //GOD1PRF:355300 also, replacing $f$ by $\lambda f$ clearly multiplies the coefficients $f\left(a_{i}\right)$ on the left by $\lambda$, so that
+claim h_s16_t1_evaluation_homogeneous : forall l :e K,
+  forall f :e right_module_dual K addK mulK L addL smulR,
+  right_module_dual_evaluation K addK mulK L addL smulR n a
+    (right_module_dual_left_scalar L mulK l f)
+  = module_power_left_scalar n mulK l
+    (right_module_dual_evaluation K addK mulK L addL smulR n a f).
+admit.
 //GOD1PRF:355474 and therefore $\theta$ is linear.\\
+claim h_s16_t1_evaluation_isomorphism : module_isomorphism K addK mulK
+  (right_module_dual K addK mulK L addL smulR)
+  (right_module_dual_addition L addK) (right_module_dual_left_scalar L mulK)
+  (K :^: n) (module_power_addition n addK) (module_power_left_scalar n mulK)
+  (fun f => right_module_dual_evaluation K addK mulK L addL smulR n a f).
+admit.
 //GOD1PRF:355510 To compare the proof of the theorem we have to establish the existence of a basis $\left(u_{i}\right)_{1 \leqslant i \leqslant n}$ of $\mathrm{L}^{*}$ with the stated properties. Now the relations imposed on the $u_{i}$ imply that
+claim h_s16_t1_dual_basis_delta_goal : forall i j :e n,
+  right_module_dual_basis_vector K addK mulK L addL smulR n a i (a j)
+  = if i = j then ring_one K mulK else ring_zero K addK.
+admit.
 //GOD1PRF:355926 in other words, they imply that $\theta$ maps the elements $\left(u_{i}\right)_{1 \leqslant i \leqslant n}$ of $L^{*}$ onto the canonical basis of $\mathrm{K}^{n}$. Since $\theta$ is an isomorphism of modules, the existence of the basis $\left(u_{i}\right)$ sought is clear; we have only to take the images under $\theta^{-1}$ of the elements of the canonical basis of $\mathbf{K}^{\boldsymbol{n}}$.\\
+claim h_s16_t1_dual_basis : module_basis K addK mulK
+  (right_module_dual K addK mulK L addL smulR)
+  (right_module_dual_addition L addK) (right_module_dual_left_scalar L mulK)
+  n (fun i => fun x :e L =>
+    right_module_dual_basis_vector K addK mulK L addL smulR n a i x).
+admit.
 Admitted.
 
 //GOD1:357975 right_module_bidual : "the bidual of the right module #4" | $#4^{**}$
@@ -37828,16 +41404,83 @@ let K addK mulK L addL smulR.
 assume hL.
 apply andI.
 //GOD1PRF:358229 In all cases we can define a canonical mapping of L into $\mathrm{L}^{* *}$, as follows. Let $x$ be a "fixed" element of L , and consider the mapping
+claim h_s16_bidual_evaluation_map : forall x :e L,
+  canonical_bidual_mapping K addK mulK L addL smulR x :e
+    right_module_bidual K addK mulK L addL smulR.
+admit.
 //GOD1PRF:358500 thus $u$ consists in associating with each linear form $f$ on L its value at the point $x$ of L . The mapping $u$ is linear, i.e., it satisfies
+claim h_s16_bidual_evaluation_formula : forall x :e L,
+  forall f :e right_module_dual K addK mulK L addL smulR,
+  canonical_bidual_mapping K addK mulK L addL smulR x f = f x.
+admit.
 //GOD1PRF:358707 for all $f, g \in \mathrm{~L}^{*}$ and all $\alpha, \beta \in \mathrm{K}$. If we put $\alpha f+\beta g=h$, then the above relation takes the form
+claim h_s16_bidual_form_linear : forall x :e L,
+  forall f g :e right_module_dual K addK mulK L addL smulR,
+  forall a b :e K,
+  canonical_bidual_mapping K addK mulK L addL smulR x
+    (module_homomorphism_addition L addK
+      (fun y :e L => mulK a (f y)) (fun y :e L => mulK b (g y)))
+  = addK (mulK a (f x)) (mulK b (g x)).
+admit.
 //GOD1PRF:358902 and in this form it reduces purely and simply to the definition of the element $h=\alpha f+\beta g$ of $\mathrm{L}^{*}$.
+claim h_s16_bidual_definition_reduction : forall x :e L,
+  forall f g :e right_module_dual K addK mulK L addL smulR,
+  forall a b :e K,
+  (right_module_dual_addition L addK
+    (right_module_dual_left_scalar L mulK a f)
+    (right_module_dual_left_scalar L mulK b g)) x
+  = addK (mulK a (f x)) (mulK b (g x)).
+admit.
 //GOD1PRF:359024 Hence $u$ is a linear form on $\mathrm{L}^{*}$, i.e., $u \in \mathrm{~L}^{* *}$. In this way we have therefore attached to each $x \in \mathrm{~L}$ an element $u \in \mathrm{~L}^{* *}$; hence we have a mapping of L into $\mathrm{L}^{* *}$, which is by definition the canonical mapping of L into its bidual.
+claim h_s16_canonical_bidual_map_closed : forall x :e L,
+  canonical_bidual_mapping K addK mulK L addL smulR x :e
+    right_module_bidual K addK mulK L addL smulR.
+admit.
 //GOD1PRF:359332 This mapping is linear. Let $x, y \in \mathrm{~L} ; \alpha, \beta \in \mathrm{K}$; and put $z=x \alpha+y \beta$. Also let $u, v, w \in \mathrm{~L}^{* *}$ be the images of $x, y, z$ under the canonical mapping. Then we have to establish the relation
+claim h_s16_canonical_bidual_linearity_goal : forall x y :e L, forall a b :e K,
+  canonical_bidual_mapping K addK mulK L addL smulR
+    (addL (smulR x a) (smulR y b))
+  = right_module_bidual_addition
+    (right_module_dual K addK mulK L addL smulR) addK
+    (right_module_bidual_right_scalar
+      (right_module_dual K addK mulK L addL smulR) mulK
+      (canonical_bidual_mapping K addK mulK L addL smulR x) a)
+    (right_module_bidual_right_scalar
+      (right_module_dual K addK mulK L addL smulR) mulK
+      (canonical_bidual_mapping K addK mulK L addL smulR y) b).
+admit.
 //GOD1PRF:359610 Since $u, v, w$ are linear forms on $\mathrm{L}^{*}$, this relation means that
+claim h_s16_canonical_bidual_extensional : forall x y :e L,
+  (forall f :e right_module_dual K addK mulK L addL smulR,
+    canonical_bidual_mapping K addK mulK L addL smulR x f
+    = canonical_bidual_mapping K addK mulK L addL smulR y f) ->
+  canonical_bidual_mapping K addK mulK L addL smulR x
+    = canonical_bidual_mapping K addK mulK L addL smulR y.
+admit.
 //GOD1PRF:359725 for all $f \in \mathrm{~L}^{*}$; now, by the definition of the canonical mapping, we have
+claim h_s16_canonical_bidual_definition_call : forall x :e L,
+  forall f :e right_module_dual K addK mulK L addL smulR,
+  canonical_bidual_mapping K addK mulK L addL smulR x f = f x.
+admit.
 //GOD1PRF:359868 and therefore we have to show that
+claim h_s16_canonical_bidual_pointwise_goal : forall x y :e L, forall a b :e K,
+  forall f :e right_module_dual K addK mulK L addL smulR,
+  f (addL (smulR x a) (smulR y b)) = addK (mulK (f x) a) (mulK (f y) b).
+admit.
 //GOD1PRF:359939 i.e., that
+claim h_s16_canonical_bidual_linear_form_equation : forall f :e
+  right_module_dual K addK mulK L addL smulR,
+  forall x y :e L, forall a b :e K,
+  f (addL (smulR x a) (smulR y b)) = addK (mulK (f x) a) (mulK (f y) b).
+admit.
 //GOD1PRF:360003 But this is precisely the identity which defines the linear forms $f$ on L .\\
+claim h_s16_canonical_bidual_linear_conclusion : right_module_homomorphism K addK mulK
+  L addL smulR
+  (right_module_bidual K addK mulK L addL smulR)
+  (right_module_bidual_addition (right_module_dual K addK mulK L addL smulR) addK)
+  (right_module_bidual_right_scalar (right_module_dual K addK mulK L addL smulR) mulK)
+  (canonical_bidual_mapping K addK mulK L addL smulR).
+admit.
 Admitted.
 
 Theorem god1_s16_theorem2_finite_free_module_isomorphic_to_bidual :
@@ -37859,11 +41502,66 @@ assume hn.
 let a.
 assume hBasis.
 //GOD1PRF:360204 To prove this theorem, we have to show that the canonical mapping
+claim h_s16_t2_canonical_map_iso_goal : module_isomorphism
+  K addK (opposite_ring_multiplication mulK)
+  L addL (fun scalar x => smulR x scalar)
+  (right_module_bidual K addK mulK L addL smulR)
+  (right_module_bidual_addition (right_module_dual K addK mulK L addL smulR) addK)
+  (fun scalar u => right_module_bidual_right_scalar
+    (right_module_dual K addK mulK L addL smulR) mulK u scalar)
+  (canonical_bidual_mapping K addK mulK L addL smulR).
+admit.
 //GOD1PRF:360322 is bijective if L is finitely generated and free. Let $\left(a_{i}\right)_{1 \leqslant i \leqslant n}$ be a basis of L , let $\left(f_{i}\right)_{1 \leqslant i \leqslant n}$ be the dual basis of $L^{*}$, and put
+claim h_s16_t2_theorem1_dual_basis_call : module_basis K addK mulK
+  (right_module_dual K addK mulK L addL smulR)
+  (right_module_dual_addition L addK) (right_module_dual_left_scalar L mulK)
+  n (fun i => fun x :e L =>
+    right_module_dual_basis_vector K addK mulK L addL smulR n a i x).
+claim h_s16_t2_theorem1_full :
+  module_isomorphism K addK mulK
+    (right_module_dual K addK mulK L addL smulR)
+    (right_module_dual_addition L addK) (right_module_dual_left_scalar L mulK)
+    (K :^: n) (module_power_addition n addK) (module_power_left_scalar n mulK)
+    (fun f => right_module_dual_evaluation K addK mulK L addL smulR n a f)
+  /\ module_basis K addK mulK
+    (right_module_dual K addK mulK L addL smulR)
+    (right_module_dual_addition L addK) (right_module_dual_left_scalar L mulK)
+    n (fun i => fun x :e L => right_module_dual_basis_vector
+      K addK mulK L addL smulR n a i x)
+  /\ forall i j :e n,
+    right_module_dual_basis_vector K addK mulK L addL smulR n a i (a j)
+    = if i = j then ring_one K mulK else ring_zero K addK.
+apply (god1_s16_theorem1_dual_of_finite_free_module
+  K addK mulK L addL smulR n hn a hBasis).
+admit.
 //GOD1PRF:360591 Clearly it is enough to show that the $u_{i}$ form a basis of $\mathrm{L}^{* *}$; we shall in fact show that they form the basis in $\mathrm{L}^{* *}$ which is dual to the basis $\left(f_{i}\right)$ of the module $\mathrm{L}^{*}$, in other words that
+claim h_s16_t2_bidual_basis_delta_goal : forall i j :e n,
+  canonical_bidual_mapping K addK mulK L addL smulR (a i)
+    (fun x :e L => right_module_dual_basis_vector
+      K addK mulK L addL smulR n a j x)
+  = if i = j then ring_one K mulK else ring_zero K addK.
+admit.
 //GOD1PRF:360952 By the definition of the canonical homomorphism of L into $\mathrm{L}^{* *}$, we have
+claim h_s16_t2_canonical_definition : forall i j :e n,
+  canonical_bidual_mapping K addK mulK L addL smulR (a i)
+    (fun x :e L => right_module_dual_basis_vector K addK mulK L addL smulR n a j x)
+  = right_module_dual_basis_vector K addK mulK L addL smulR n a j (a i).
+admit.
 //GOD1PRF:361115 hence $u_{i}\left(f_{j}\right)=f_{j}\left(a_{i}\right)$; but since the $f_{j}$ form the dual basis of the basis $\left(a_{i}\right)$ of L , we have
+claim h_s16_t2_dual_delta : forall i j :e n,
+  right_module_dual_basis_vector K addK mulK L addL smulR n a j (a i)
+  = if i = j then ring_one K mulK else ring_zero K addK.
+admit.
 //GOD1PRF:361373 This establishes the relations above, and completes the proof.\\
+claim h_s16_t2_bidual_isomorphism_conclusion : module_isomorphism
+  K addK (opposite_ring_multiplication mulK)
+  L addL (fun scalar x => smulR x scalar)
+  (right_module_bidual K addK mulK L addL smulR)
+  (right_module_bidual_addition (right_module_dual K addK mulK L addL smulR) addK)
+  (fun scalar u => right_module_bidual_right_scalar
+    (right_module_dual K addK mulK L addL smulR) mulK u scalar)
+  (canonical_bidual_mapping K addK mulK L addL smulR).
+admit.
 Admitted.
 
 Theorem god1_s16_corollary1_every_bidual_form_is_evaluation :
@@ -37885,6 +41583,21 @@ assume hBasis.
 let u.
 assume hu.
 //GOD1PRF:361690 For there exists a unique $x \in \mathrm{~L}$ such that $u=j(x)$, where $j$ denotes the canonical isomorphism of L onto its bidual.\\
+claim h_s16_cor1_theorem2_call : module_isomorphism
+  K addK (opposite_ring_multiplication mulK)
+  L addL (fun scalar x => smulR x scalar)
+  (right_module_bidual K addK mulK L addL smulR)
+  (right_module_bidual_addition (right_module_dual K addK mulK L addL smulR) addK)
+  (fun scalar v => right_module_bidual_right_scalar
+    (right_module_dual K addK mulK L addL smulR) mulK v scalar)
+  (canonical_bidual_mapping K addK mulK L addL smulR).
+apply (god1_s16_theorem2_finite_free_module_isomorphic_to_bidual
+  K addK mulK L addL smulR n hn a hBasis).
+claim h_s16_cor1_unique_evaluation_point : exists x :e L,
+  (forall f :e right_module_dual K addK mulK L addL smulR, u f = f x)
+  /\ forall y :e L,
+    (forall f :e right_module_dual K addK mulK L addL smulR, u f = f y) -> y = x.
+admit.
 Admitted.
 
 Theorem god1_s16_corollary2_prescribed_values_on_dual_basis :
@@ -37907,6 +41620,27 @@ assume hn.
 let f beta.
 assume hbeta hFree hBasis.
 //GOD1PRF:362137 For, since the $f_{i}$ form a basis of $\mathrm{L}^{*}$, there exists a unique linear form $u$ on $\mathrm{L}^{*}$ such that $u\left(f_{i}\right)=\beta_{i}$ for all $i(\S 12$, Theorem 3); since $u(f)=f(x)$ for some $x \in \mathrm{~L}$ uniquely determined by $u$, the corollary is proved.
+claim h_s16_cor2_s12_theorem3_call :
+  forall K0, forall aK mK:set -> set -> set,
+  forall X, forall aX sX:set -> set -> set,
+  forall Y, forall aY sY:set -> set -> set,
+  forall I, forall basis values:set -> set,
+    module_basis K0 aK mK X aX sX I basis ->
+    left_module K0 aK mK Y aY sY ->
+    (forall i :e I, values i :e Y) ->
+    exists u:set -> set,
+      module_homomorphism K0 aK mK X aX sX Y aY sY u
+      /\ (forall i :e I, u (basis i) = values i)
+      /\ (forall v:set -> set,
+        module_homomorphism K0 aK mK X aX sX Y aY sY v ->
+        (forall i :e I, v (basis i) = values i) -> forall x :e X, v x = u x)
+      /\ (inj X Y u <-> linearly_independent_family K0 aK mK Y aY sY I values)
+      /\ (surj X Y u <-> generating_family K0 aK mK Y aY sY I values).
+apply god1_s12_theorem3_linear_map_from_basis.
+claim h_s16_cor2_prescribed_values : exists x :e L,
+  (forall i :e n, f i x = beta i)
+  /\ forall y :e L, (forall i :e n, f i y = beta i) -> y = x.
+admit.
 Admitted.
 
 //GOD1:362899 module_transpose : "the transpose of the right-module homomorphism #10" | ${}^t#10$
@@ -37937,10 +41671,75 @@ Theorem god1_module_transpose_is_left_linear :
 let K addK mulK L addL smulL M addM smulM f.
 assume hf.
 //GOD1PRF:362472 Let $\mathrm{L}, \mathrm{M}$ be two right K -modules, and let $f: \mathrm{L} \rightarrow \mathrm{M}$ be a homomorphism. Let $u$ be a linear form on M ; then the composite mapping $u \circ f$ is clearly (§ 12, Theorem 1) a linear form on L . We may therefore define a mapping
+claim h_s16_transpose_s12_theorem1_call :
+  forall K0, forall aK mK:set -> set -> set,
+  forall X, forall aX sX:set -> set -> set,
+  forall Y, forall aY sY:set -> set -> set,
+  forall Z, forall aZ sZ:set -> set -> set,
+  forall p q:set -> set,
+    module_homomorphism K0 aK mK X aX sX Y aY sY p ->
+    module_homomorphism K0 aK mK Y aY sY Z aZ sZ q ->
+    module_homomorphism K0 aK mK X aX sX Z aZ sZ (fun x => q (p x))
+    /\ (module_isomorphism K0 aK mK X aX sX Y aY sY p ->
+      module_isomorphism K0 aK mK Y aY sY X aX sX (inv X p))
+    /\ (module_isomorphism K0 aK mK X aX sX Y aY sY p ->
+      module_isomorphism K0 aK mK Y aY sY Z aZ sZ q ->
+      module_isomorphism K0 aK mK X aX sX Z aZ sZ (fun x => q (p x))).
+apply god1_s12_theorem1_composition_and_inverse_linear.
+claim h_s16_transpose_maps_duals : forall u :e
+  right_module_dual K addK mulK M addM smulM,
+  module_transpose K addK mulK L addL smulL M addM smulM f u :e
+    right_module_dual K addK mulK L addL smulL.
+admit.
 //GOD1PRF:362974 This mapping ${ }^{t} f$ is a homomorphism. Let $u, v \in \mathrm{M}^{*}$; then we have
+claim h_s16_transpose_additive_goal : forall u v :e
+  right_module_dual K addK mulK M addM smulM,
+  module_transpose K addK mulK L addL smulL M addM smulM f
+    (right_module_dual_addition M addK u v)
+  = right_module_dual_addition L addK
+    (module_transpose K addK mulK L addL smulL M addM smulM f u)
+    (module_transpose K addK mulK L addL smulL M addM smulM f v).
+admit.
 //GOD1PRF:363119 by Theorem 1 of § 14, and consequently
+claim h_s16_transpose_s14_theorem1_call :
+  forall K0, forall aK mK:set -> set -> set,
+  forall X, forall aX sX:set -> set -> set,
+  forall Y, forall aY sY:set -> set -> set,
+  forall Z, forall aZ sZ:set -> set -> set,
+  forall p q r:set -> set,
+    module_homomorphism K0 aK mK X aX sX Y aY sY p ->
+    module_homomorphism K0 aK mK X aX sX Y aY sY q ->
+    module_homomorphism K0 aK mK Y aY sY Z aZ sZ r ->
+    (forall x :e X,
+      r ((module_homomorphism_addition X aY
+        (fun y :e X => p y) (fun y :e X => q y)) x)
+      = (module_homomorphism_addition X aZ
+        (fun y :e X => r (p y)) (fun y :e X => r (q y))) x)
+    /\ (forall u v:set -> set,
+      module_homomorphism K0 aK mK Y aY sY Z aZ sZ u ->
+      module_homomorphism K0 aK mK Y aY sY Z aZ sZ v ->
+      forall x :e X,
+        (module_homomorphism_addition Y aZ
+          (fun y :e Y => u y) (fun y :e Y => v y)) (p x)
+        = (module_homomorphism_addition X aZ
+          (fun y :e X => u (p y)) (fun y :e X => v (p y))) x).
+apply god1_s14_theorem1_composition_distributes_over_map_addition.
 //GOD1PRF:363210 Next, for each $\lambda \in \mathbf{K}$ let $h_{\lambda}$ denote the homothety $\xi \rightarrow \lambda \xi$ in $\mathbf{K}$. Then, for any $u \in \mathbf{M}^{*}$, we have
+claim h_s16_transpose_homogeneous : forall l :e K,
+  forall u :e right_module_dual K addK mulK M addM smulM,
+  module_transpose K addK mulK L addL smulL M addM smulM f
+    (right_module_dual_left_scalar M mulK l u)
+  = right_module_dual_left_scalar L mulK l
+    (module_transpose K addK mulK L addL smulL M addM smulM f u).
+admit.
 //GOD1PRF:363618 Hence the mapping ${ }^{t} f$ is linear, as stated above.\\
+claim h_s16_transpose_linear_conclusion : module_homomorphism K addK mulK
+  (right_module_dual K addK mulK M addM smulM)
+  (right_module_dual_addition M addK) (right_module_dual_left_scalar M mulK)
+  (right_module_dual K addK mulK L addL smulL)
+  (right_module_dual_addition L addK) (right_module_dual_left_scalar L mulK)
+  (fun u => module_transpose K addK mulK L addL smulL M addM smulM f u).
+admit.
 Admitted.
 
 Theorem god1_s16_theorem3_transpose_addition_and_composition :
@@ -37966,9 +41765,36 @@ let K addK mulK L addL smulL M addM smulM N addN smulN f g h.
 assume hf hg hh.
 apply andI.
 //GOD1PRF:364898 To prove a) put $h=f+g$. Then if $u \in \mathbf{M}^{*}$ we have
+claim h_s16_t3_transpose_sum_pointwise : forall u :e
+  right_module_dual K addK mulK M addM smulM,
+  module_transpose K addK mulK L addL smulL M addM smulM
+    (fun x => addM (f x) (g x)) u
+  = right_module_dual_addition L addK
+    (module_transpose K addK mulK L addL smulL M addM smulM f u)
+    (module_transpose K addK mulK L addL smulL M addM smulM g u).
+admit.
 //GOD1PRF:365052 and therefore ${ }^{t} h={ }^{t} f+{ }^{t} g$.\\
+claim h_s16_t3_transpose_sum :
+  module_transpose K addK mulK L addL smulL M addM smulM
+    (fun x => addM (f x) (g x))
+  = right_module_dual_addition M addK
+    (module_transpose K addK mulK L addL smulL M addM smulM f)
+    (module_transpose K addK mulK L addL smulL M addM smulM g).
+admit.
 //GOD1PRF:365101 To prove $b$ ), put $h=g \circ f$. Then if $u \in \mathrm{~N}^{*}$ we have
+claim h_s16_t3_transpose_composite_pointwise : forall u :e
+  right_module_dual K addK mulK N addN smulN,
+  module_transpose K addK mulK L addL smulL N addN smulN (fun x => h (f x)) u
+  = module_transpose K addK mulK L addL smulL M addM smulM f
+    (module_transpose K addK mulK M addM smulM N addN smulN h u).
+admit.
 //GOD1PRF:365335 and therefore ${ }^{t} h={ }^{t} f+{ }^{t} g$.\\
+claim h_s16_t3_transpose_composite :
+  module_transpose K addK mulK L addL smulL N addN smulN (fun x => h (f x))
+  = fun u :e right_module_dual K addK mulK N addN smulN =>
+    module_transpose K addK mulK L addL smulL M addM smulM f
+      (module_transpose K addK mulK M addM smulM N addN smulN h u).
+admit.
 Admitted.
 
 Theorem god1_transpose_of_identity_and_automorphism :
@@ -37992,9 +41818,46 @@ let K addK mulK L addL smulR f.
 assume hL.
 apply andI.
 //GOD1PRF:365384 As to $c$ ), we shall first show that if $f: \mathrm{L} \rightarrow \mathrm{L}$ is the identity mapping, then the same is true of its transpose. If $u$ is a linear form on L , then
+claim h_s16_transpose_identity_pointwise : forall u :e
+  right_module_dual K addK mulK L addL smulR,
+  module_transpose K addK mulK L addL smulR L addL smulR (fun x => x) u = u.
+admit.
 //GOD1PRF:365598 since $f$ is the identity mapping; hence ${ }^{t} f$ is the identity mapping on $\mathrm{L}^{*}$. Now let $f$ be an automorphism of L ; then there exists a homomorphism $g: \mathrm{L} \rightarrow \mathrm{L}$ such that
+claim h_s16_transpose_identity_and_inverse :
+  module_transpose K addK mulK L addL smulR L addL smulR (fun x => x)
+    = (fun u :e right_module_dual K addK mulK L addL smulR => u)
+  /\ (module_automorphism K addK (opposite_ring_multiplication mulK)
+    L addL (fun scalar x => smulR x scalar) f -> exists g:set -> set,
+      forall x :e L, g (f x) = x /\ f (g x) = x).
+admit.
 //GOD1PRF:365859 and therefore (using part $b$ ))
+claim h_s16_transpose_part_b_call :
+  forall K0, forall aK mK:set -> set -> set,
+  forall X, forall aX sX:set -> set -> set,
+  forall Y, forall aY sY:set -> set -> set,
+  forall Z, forall aZ sZ:set -> set -> set,
+  forall p q r:set -> set,
+    right_module_homomorphism K0 aK mK X aX sX Y aY sY p ->
+    right_module_homomorphism K0 aK mK X aX sX Y aY sY q ->
+    right_module_homomorphism K0 aK mK Y aY sY Z aZ sZ r ->
+    module_transpose K0 aK mK X aX sX Y aY sY (fun x => aY (p x) (q x))
+    = right_module_dual_addition Y aK
+      (module_transpose K0 aK mK X aX sX Y aY sY p)
+      (module_transpose K0 aK mK X aX sX Y aY sY q)
+    /\ module_transpose K0 aK mK X aX sX Z aZ sZ (fun x => r (p x))
+    = fun u :e right_module_dual K0 aK mK Z aZ sZ =>
+      module_transpose K0 aK mK X aX sX Y aY sY p
+        (module_transpose K0 aK mK Y aY sY Z aZ sZ r u).
+apply god1_s16_theorem3_transpose_addition_and_composition.
 //GOD1PRF:366005 which shows that ${ }^{t} f$ is an automorphism of $\mathrm{L}^{*}$. Moreover, this calculation shows that
+claim h_s16_transpose_automorphism_conclusion :
+  module_automorphism K addK (opposite_ring_multiplication mulK)
+    L addL (fun scalar x => smulR x scalar) f ->
+  module_automorphism K addK mulK
+    (right_module_dual K addK mulK L addL smulR)
+    (right_module_dual_addition L addK) (right_module_dual_left_scalar L mulK)
+    (fun u => module_transpose K addK mulK L addL smulR L addL smulR f u).
+admit.
 Admitted.
 
 //GOD1:369038 matrix_transpose : "the transpose of the #2-by-#3 matrix #4" | ${}^t#4$
@@ -38034,14 +41897,122 @@ assume hp.
 let a b f.
 assume hBasisL hBasisM hf.
 //GOD1PRF:367506 We propose to calculate the matrix ${ }^{t} f$ in terms of the matrix of $f$.\\
+claim h_s16_transpose_matrix_goal :
+  matrix_of_right_linear_map K addK (opposite_ring_multiplication mulK)
+    (right_module_dual K addK mulK M addM smulM)
+    (right_module_dual_addition M addK)
+    (fun u scalar => right_module_dual_left_scalar M mulK scalar u)
+    (right_module_dual K addK mulK L addL smulL)
+    (right_module_dual_addition L addK)
+    (fun u scalar => right_module_dual_left_scalar L mulK scalar u)
+    p q
+    (fun i => fun x :e M => right_module_dual_basis_vector K addK mulK M addM smulM p b i x)
+    (fun j => fun x :e L => right_module_dual_basis_vector K addK mulK L addL smulL q a j x)
+    (fun u => module_transpose K addK mulK L addL smulL M addM smulM f u)
+  = matrix_transpose K p q
+    (matrix_of_right_linear_map K addK mulK L addL smulL M addM smulM q p a b f).
+admit.
 //GOD1PRF:367586 By the definition of the matrix of ${ }^{t} f$, we have relations
+claim h_s16_transpose_matrix_definition : forall i :e p, forall j :e q,
+  matrix_entry (matrix_transpose K p q
+    (matrix_of_right_linear_map K addK mulK L addL smulL M addM smulM q p a b f)) j i
+  = matrix_entry (matrix_of_right_linear_map K addK mulK L addL smulL M addM smulM q p a b f) i j.
+admit.
+claim h_s16_transpose_matrix_formula6_formal_call :
+  forall K0, forall aK mK:set -> set -> set,
+  forall X, forall aX sX:set -> set -> set,
+  forall Y, forall aY sY:set -> set -> set,
+  forall q0 p0 :e omega, forall aa bb:set -> set, forall ff:set -> set,
+    right_module_basis K0 aK mK X aX sX q0 aa ->
+    right_module_basis K0 aK mK Y aY sY p0 bb ->
+    right_module_homomorphism K0 aK mK X aX sX Y aY sY ff ->
+    forall i :e p0, forall j :e q0,
+      basis_coordinates K0 aK (opposite_ring_multiplication mK)
+        Y aY (fun scalar x => sY x scalar) p0 bb (ff (aa j)) i
+      = matrix_entry (matrix_of_right_linear_map K0 aK mK
+        X aX sX Y aY sY q0 p0 aa bb ff) i j.
+apply god1_s12_section3_formula6_matrix_coordinates.
 //GOD1PRF:367765 i.e.,
+claim h_s16_transpose_matrix_entry_goal : forall i :e p, forall j :e q,
+  matrix_entry (matrix_of_right_linear_map K addK mulK L addL smulL M addM smulM q p a b f) i j :e K.
+admit.
 //GOD1PRF:367836 this means that for each $x \in \mathrm{~L}$ we have
+claim h_s16_transpose_matrix_pointwise : forall x :e L,
+  f x :e M.
+admit.
 //GOD1PRF:367996 Now if we put
+claim h_s16_transpose_dual_basis_vectors :
+  (forall i :e p, (fun x :e M => right_module_dual_basis_vector
+    K addK mulK M addM smulM p b i x) :e right_module_dual K addK mulK M addM smulM)
+  /\ (forall j :e q, (fun x :e L => right_module_dual_basis_vector
+    K addK mulK L addL smulL q a j x) :e right_module_dual K addK mulK L addL smulL).
+admit.
 //GOD1PRF:368104 then from the results of section 2 we shall have
+claim h_s16_transpose_section2_L_call :
+  module_isomorphism K addK mulK
+    (right_module_dual K addK mulK L addL smulL)
+    (right_module_dual_addition L addK) (right_module_dual_left_scalar L mulK)
+    (K :^: q) (module_power_addition q addK) (module_power_left_scalar q mulK)
+    (fun u => right_module_dual_evaluation K addK mulK L addL smulL q a u)
+  /\ module_basis K addK mulK
+    (right_module_dual K addK mulK L addL smulL)
+    (right_module_dual_addition L addK) (right_module_dual_left_scalar L mulK)
+    q (fun i => fun x :e L => right_module_dual_basis_vector K addK mulK L addL smulL q a i x)
+  /\ forall i j :e q,
+    right_module_dual_basis_vector K addK mulK L addL smulL q a i (a j)
+    = if i = j then ring_one K mulK else ring_zero K addK.
+apply (god1_s16_theorem1_dual_of_finite_free_module
+  K addK mulK L addL smulL q hq a hBasisL).
+claim h_s16_transpose_section2_M_call :
+  module_isomorphism K addK mulK
+    (right_module_dual K addK mulK M addM smulM)
+    (right_module_dual_addition M addK) (right_module_dual_left_scalar M mulK)
+    (K :^: p) (module_power_addition p addK) (module_power_left_scalar p mulK)
+    (fun u => right_module_dual_evaluation K addK mulK M addM smulM p b u)
+  /\ module_basis K addK mulK
+    (right_module_dual K addK mulK M addM smulM)
+    (right_module_dual_addition M addK) (right_module_dual_left_scalar M mulK)
+    p (fun i => fun x :e M => right_module_dual_basis_vector K addK mulK M addM smulM p b i x)
+  /\ forall i j :e p,
+    right_module_dual_basis_vector K addK mulK M addM smulM p b i (b j)
+    = if i = j then ring_one K mulK else ring_zero K addK.
+apply (god1_s16_theorem1_dual_of_finite_free_module
+  K addK mulK M addM smulM p hp b hBasisM).
 //GOD1PRF:368208 Consequently the formula (2) is equivalent to
+claim h_s16_transpose_coefficient_relation : forall i :e p, forall j :e q,
+  right_module_dual_basis_vector K addK mulK M addM smulM p b i (f (a j))
+  = matrix_entry (matrix_of_right_linear_map K addK mulK L addL smulL M addM smulM q p a b f) i j.
+admit.
 //GOD1PRF:368320 But, from the definition of the matrix ( $\alpha_{i j}$ ) of $f$ we have
+claim h_s16_original_matrix_definition : forall i :e p, forall j :e q,
+  matrix_entry (matrix_of_right_linear_map K addK mulK L addL smulL M addM smulM q p a b f) i j
+  = basis_coordinates K addK (opposite_ring_multiplication mulK)
+    M addM (fun scalar x => smulM x scalar) p b (f (a j)) i.
+admit.
+claim h_s16_original_matrix_formula6_formal_call : forall i :e p, forall j :e q,
+  basis_coordinates K addK (opposite_ring_multiplication mulK)
+    M addM (fun scalar x => smulM x scalar) p b (f (a j)) i
+  = matrix_entry (matrix_of_right_linear_map K addK mulK
+    L addL smulL M addM smulM q p a b f) i j.
+apply (god1_s12_section3_formula6_matrix_coordinates
+  K addK mulK L addL smulL M addM smulM q hq p hp a b f
+  hBasisL hBasisM hf).
 //GOD1PRF:368461 by comparing the last two results we see therefore that
+claim h_s16_transpose_matrix_conclusion :
+  matrix_of_right_linear_map K addK (opposite_ring_multiplication mulK)
+    (right_module_dual K addK mulK M addM smulM)
+    (right_module_dual_addition M addK)
+    (fun u scalar => right_module_dual_left_scalar M mulK scalar u)
+    (right_module_dual K addK mulK L addL smulL)
+    (right_module_dual_addition L addK)
+    (fun u scalar => right_module_dual_left_scalar L mulK scalar u)
+    p q
+    (fun i => fun x :e M => right_module_dual_basis_vector K addK mulK M addM smulM p b i x)
+    (fun j => fun x :e L => right_module_dual_basis_vector K addK mulK L addL smulL q a j x)
+    (fun u => module_transpose K addK mulK L addL smulL M addM smulM f u)
+  = matrix_transpose K p q
+    (matrix_of_right_linear_map K addK mulK L addL smulL M addM smulM q p a b f).
+admit.
 Admitted.
 
 Theorem god1_s16_theorem4_matrix_transpose_laws :
@@ -38073,19 +42044,115 @@ let r.
 assume hr hK.
 apply andI.
 //GOD1PRF:370528 To prove $a$ ), put
+claim h_s16_t4_addition_setup : forall A B :e matrix_space K p q,
+  A :e matrix_space K p q /\ B :e matrix_space K p q.
+admit.
 //GOD1PRF:370638 then $\mathrm{A}+\mathrm{B}=\left(\alpha_{i j}+\beta_{i j}\right)$ and therefore
+claim h_s16_t4_transpose_addition : forall A B :e matrix_space K p q,
+  matrix_transpose K p q (matrix_addition K add p q A B)
+  = matrix_addition K add q p
+      (matrix_transpose K p q A) (matrix_transpose K p q B).
+admit.
 //GOD1PRF:370890 To prove $b$ ), put
+claim h_s16_t4_product_setup : forall A :e matrix_space K p q,
+  forall B :e matrix_space K q r,
+  A :e matrix_space K p q /\ B :e matrix_space K q r.
+admit.
 //GOD1PRF:371142 then the matrix
+claim h_s16_t4_product_matrix : forall A :e matrix_space K p q,
+  forall B :e matrix_space K q r,
+  matrix_multiplication K add mul p q r A B :e matrix_space K p r.
+admit.
 //GOD1PRF:371259 is given by the relations
+claim h_s16_t4_product_entry_formula : forall A :e matrix_space K p q,
+  forall B :e matrix_space K q r, forall i :e p, forall k :e r,
+  matrix_entry (matrix_multiplication K add mul p q r A B) i k
+  = ring_finite_sum K add q
+      (fun j => mul (matrix_entry A i j) (matrix_entry B j k)).
+admit.
 //GOD1PRF:371562 (cf. § 14, section 2), the products $\alpha_{i j} \beta_{j k}$ being calculated in the given ring K . On the other hand, we have
+claim h_s16_t4_s14_theorem2_formal_call :
+  forall K0, forall aK mK:set -> set -> set,
+  forall L0, forall aL sL:set -> set -> set,
+  forall M0, forall aM sM:set -> set -> set,
+  forall N0, forall aN sN:set -> set -> set,
+  forall r0 q0 p0 :e omega, forall aa bb cc:set -> set,
+  forall ff gg:set -> set,
+    right_module_basis K0 aK mK L0 aL sL r0 aa ->
+    right_module_basis K0 aK mK M0 aM sM q0 bb ->
+    right_module_basis K0 aK mK N0 aN sN p0 cc ->
+    right_module_homomorphism K0 aK mK M0 aM sM N0 aN sN ff ->
+    right_module_homomorphism K0 aK mK L0 aL sL M0 aM sM gg ->
+    matrix_of_right_linear_map K0 aK mK L0 aL sL N0 aN sN r0 p0 aa cc
+      (fun x => ff (gg x))
+    = matrix_multiplication K0 aK mK p0 q0 r0
+      (matrix_of_right_linear_map K0 aK mK M0 aM sM N0 aN sN q0 p0 bb cc ff)
+      (matrix_of_right_linear_map K0 aK mK L0 aL sL M0 aM sM r0 q0 aa bb gg).
+apply god1_s14_theorem2_matrix_of_composition_is_product.
 //GOD1PRF:372057 Hence if we put
+claim h_s16_t4_transpose_setup : forall A :e matrix_space K p q,
+  forall B :e matrix_space K q r,
+  matrix_transpose K p q A :e matrix_space K q p
+  /\ matrix_transpose K q r B :e matrix_space K r q.
+admit.
 //GOD1PRF:372216 we have
+claim h_s16_t4_transpose_entries :
+  (forall A :e matrix_space K p q, forall i :e p, forall j :e q,
+    matrix_entry (matrix_transpose K p q A) j i = matrix_entry A i j)
+  /\ (forall B :e matrix_space K q r, forall j :e q, forall k :e r,
+    matrix_entry (matrix_transpose K q r B) k j = matrix_entry B j k).
+admit.
 //GOD1PRF:372306 where the products $\beta_{k j}^{\prime} \alpha_{j i}^{\prime}$ are calculated in the opposite ring $\mathrm{K}^{0}$. Hence, replacing the product $\beta_{k j}^{\prime} \alpha_{j i}^{\prime}$ in $\mathrm{K}^{0}$ by the product $\alpha_{j i}^{\prime} \beta_{k j}^{\prime}$, and using the relations $\alpha_{j i}^{\prime}=\alpha_{i j}, \beta_{k j}^{\prime}=\beta_{j k}$, we see that
+claim h_s16_t4_transpose_product : forall A :e matrix_space K p q,
+  forall B :e matrix_space K q r,
+  matrix_transpose K p r (matrix_multiplication K add mul p q r A B)
+  = matrix_multiplication K add (opposite_ring_multiplication mul) r q p
+      (matrix_transpose K q r B) (matrix_transpose K p q A).
+admit.
 //GOD1PRF:372816 by virtue of (3); and this proves the assertion b) of the theorem. The assertion $d$ ) is trivial, so that it remains to prove $c$ ). Let $A \in \mathbf{M}_{n}(\mathbf{K})$, suppose that $A$ is invertible and let $B$ be its inverse. From the relations
+claim h_s16_t4_double_transpose_and_inverse_relations :
+  (forall A :e matrix_space K p q,
+    matrix_transpose K q p (matrix_transpose K p q A) = A)
+  /\ (forall A :e square_matrix_ring K p,
+    invertible_matrix K add mul p A ->
+    matrix_multiplication K add mul p p p A (matrix_inverse K add mul p A)
+      = unit_matrix K add mul p
+    /\ matrix_multiplication K add mul p p p (matrix_inverse K add mul p A) A
+      = unit_matrix K add mul p).
+admit.
 //GOD1PRF:373106 it follows that
+claim h_s16_t4_transposed_inverse_relations :
+  forall A :e square_matrix_ring K p,
+  invertible_matrix K add mul p A ->
+  matrix_multiplication K add (opposite_ring_multiplication mul) p p p
+      (matrix_transpose K p p (matrix_inverse K add mul p A))
+      (matrix_transpose K p p A)
+    = matrix_transpose K p p (unit_matrix K add mul p)
+  /\ matrix_multiplication K add (opposite_ring_multiplication mul) p p p
+      (matrix_transpose K p p A)
+      (matrix_transpose K p p (matrix_inverse K add mul p A))
+    = matrix_transpose K p p (unit_matrix K add mul p).
+admit.
 //GOD1PRF:373248 but it is clear that
+claim h_s16_t4_transpose_unit_matrix :
+  matrix_transpose K p p (unit_matrix K add mul p) = unit_matrix K add mul p.
+admit.
 //GOD1PRF:373311 hence ${ }^{t} \mathrm{~A}$ is invertible, and moreover the above calculation shows that
+claim h_s16_t4_forward_invertibility_and_inverse :
+  forall A :e square_matrix_ring K p,
+  invertible_matrix K add mul p A ->
+  invertible_matrix K add (opposite_ring_multiplication mul) p
+    (matrix_transpose K p p A)
+  /\ matrix_inverse K add (opposite_ring_multiplication mul) p
+      (matrix_transpose K p p A)
+    = matrix_transpose K p p (matrix_inverse K add mul p A).
+admit.
 //GOD1PRF:373483 Conversely, if ${ }^{t} \mathrm{~A}$ is invertible, then by what has just been proved the matrix ${ }^{t}\left({ }^{t} \mathrm{~A}\right)$ is invertible, i.e., $\mathbf{A}$ is invertible.\\
+claim h_s16_t4_converse_invertibility : forall A :e square_matrix_ring K p,
+  invertible_matrix K add (opposite_ring_multiplication mul) p
+    (matrix_transpose K p p A) ->
+  invertible_matrix K add mul p A.
+admit.
 Admitted.
 
 (** § 17. Sums of submodules. **)
@@ -38115,9 +42182,32 @@ let K addK mulK L addL smul M N.
 assume hM hN.
 apply andI.
 //GOD1PRF:377102 Certainly it is clear that every submodule of L which contains both M and N will contain every vector $z$ having this property. It is therefore enough to show that these vectors form a submodule P containing M and N . Now it is clear that P contains M and N (put $x=0$ or $y=0$ in the relation $z=x+y$ ); on the other hand, if
+claim h_s17_two_sum_containment_and_leastness :
+  M c= submodule_sum K addK mulK L addL smul M N
+  /\ N c= submodule_sum K addK mulK L addL smul M N
+  /\ forall P, submodule K addK mulK L addL smul P ->
+    M c= P -> N c= P ->
+    submodule_sum K addK mulK L addL smul M N c= P.
+admit.
 //GOD1PRF:377707 are two elements of $\mathbf{P}$, and if $\lambda, \mu$ are any two scalars, then we have
+claim h_s17_two_sum_linear_combination :
+  forall z z' :e submodule_sum K addK mulK L addL smul M N,
+  forall lambda mu :e K,
+  addL (smul lambda z) (smul mu z')
+    :e submodule_sum K addK mulK L addL smul M N.
+admit.
 //GOD1PRF:377850 where
+claim h_s17_two_sum_combination_decomposition :
+  forall x x' :e M, forall y y' :e N, forall lambda mu :e K,
+  addL (smul lambda (addL x y)) (smul mu (addL x' y'))
+  = addL (addL (smul lambda x) (smul mu x'))
+      (addL (smul lambda y) (smul mu y')).
+admit.
 //GOD1PRF:377987 Hence P is a submodule of L , as asserted.\\
+claim h_s17_two_sum_submodule_conclusion :
+  submodule K addK mulK L addL smul
+    (submodule_sum K addK mulK L addL smul M N).
+admit.
 Admitted.
 
 //GOD1:380037 submodule_family_sum : "the sum of the finite family of submodules #8 indexed by #7" | $\sum_{i\in #7}#8_i$
@@ -38147,10 +42237,45 @@ let K addK mulK L addL smul I M.
 assume hFinite hM.
 apply andI.
 //GOD1PRF:379119 Then P is the smallest submodule of L which contains $\mathbf{M}_{1}, \ldots, \mathbf{M}_{p}$.\\
+claim h_s17_family_sum_least_submodule_goal :
+  submodule K addK mulK L addL smul
+    (submodule_family_sum K addK mulK L addL smul I M)
+  /\ (forall i :e I,
+    M i c= submodule_family_sum K addK mulK L addL smul I M)
+  /\ forall P, submodule K addK mulK L addL smul P ->
+    (forall i :e I, M i c= P) ->
+    submodule_family_sum K addK mulK L addL smul I M c= P.
+admit.
 //GOD1PRF:379216 First of all it is clear that P contains $\mathrm{M}_{i}$ (put $x_{j}=0$ whenever $j \neq i$ in the relation (1)), and that any submodule which contains all the $\mathbf{M}_{i}$ must contain all the vectors (1). Hence it remains to be shown that $P$ is a submodule of $L$. If
+claim h_s17_family_sum_containment_and_leastness :
+  (forall i :e I,
+    M i c= submodule_family_sum K addK mulK L addL smul I M)
+  /\ forall P, submodule K addK mulK L addL smul P ->
+    (forall i :e I, M i c= P) ->
+    submodule_family_sum K addK mulK L addL smul I M c= P.
+admit.
 //GOD1PRF:379624 are any two elements of P , and if $\lambda^{\prime}, \lambda^{\prime \prime} \in \mathrm{K}$ are any two scalars, then we have
+claim h_s17_family_sum_linear_combination :
+  forall z z' :e submodule_family_sum K addK mulK L addL smul I M,
+  forall lambda mu :e K,
+  addL (smul lambda z) (smul mu z')
+    :e submodule_family_sum K addK mulK L addL smul I M.
+admit.
 //GOD1PRF:379849 where
+claim h_s17_family_sum_combined_coefficients :
+  forall x x' :e (Pi_ i :e I, M i),
+  forall lambda mu :e K,
+  exists y :e (Pi_ i :e I, M i),
+    addL
+      (smul lambda (module_finitely_supported_sum L addL I (fun i => x i)))
+      (smul mu (module_finitely_supported_sum L addL I (fun i => x' i)))
+    = module_finitely_supported_sum L addL I (fun i => y i).
+admit.
 //GOD1PRF:380001 and hence P is a submodule of L .\\
+claim h_s17_family_sum_submodule_conclusion :
+  submodule K addK mulK L addL smul
+    (submodule_family_sum K addK mulK L addL smul I M).
+admit.
 Admitted.
 
 //GOD1:381544 indexed_module_product : "the direct product of the family of modules #5 indexed by #4" | $\prod_{i\in #4}#5_i$
@@ -38179,6 +42304,11 @@ Theorem god1_indexed_direct_product_is_module :
 let K addK mulK I M addM smul.
 assume hM.
 //GOD1PRF:381194 That we obtain a module structure on L in this way is easily verified, and we leave the details to the reader.
+claim h_s17_product_module_structure : left_module K addK mulK
+  (indexed_module_product I M)
+  (indexed_module_product_addition I addM)
+  (indexed_module_product_left_scalar I smul).
+admit.
 Admitted.
 
 //GOD1:381544 module_product_projection : "the #7-th canonical projection from a direct product of modules" | $\operatorname{pr}_{#7}$
@@ -38217,8 +42347,27 @@ let K addK mulK I M addM smul.
 assume hM.
 apply andI.
 //GOD1PRF:381992 is a module homomorphism. So is the mapping
+claim h_s17_product_projections_linear : forall i :e I,
+  module_homomorphism K addK mulK
+    (indexed_module_product I M)
+    (indexed_module_product_addition I addM)
+    (indexed_module_product_left_scalar I smul)
+    (M i) (addM i) (smul i) (module_product_projection i).
+admit.
 //GOD1PRF:382190 where on the right-hand side the letter $x$ occurs in the $i$ th place.\\
+claim h_s17_product_injections_linear : forall i :e I,
+  module_homomorphism K addK mulK
+    (M i) (addM i) (smul i)
+    (indexed_module_product I M)
+    (indexed_module_product_addition I addM)
+    (indexed_module_product_left_scalar I smul)
+    (module_product_injection I M addM i).
+admit.
 //GOD1PRF:382264 Moreover, it is clear that the homomorphism $u_{i}$ is injective, and it is therefore an isomorphism of $\mathbf{M}_{i}$ onto a submodule of $\mathbf{M}_{1} \times \ldots \times \mathbf{M}_{p}$. In practice, we shall generally identify $\mathbf{M}_{i}$ with its image under $u_{i}$. The formula
+claim h_s17_product_injections_injective : forall i :e I,
+  inj (M i) (indexed_module_product I M)
+    (module_product_injection I M addM i).
+admit.
 Admitted.
 
 //GOD1:383491 submodule_family_sum_map : "the canonical summation map from the product of #8 to #4" | $(x_i)\mapsto\sum_i x_i$
@@ -38258,6 +42407,11 @@ let K addK mulK L addL smul M N.
 assume hM hN.
 apply iffI.
 //GOD1PRF:384198 If $x \in M \cap N$ then we have $x+(-x)=0$, and $x \in M,-x \in N$; hence $x=0$ if M and N are linearly independent. Conversely, suppose that $\mathrm{M} \cap \mathrm{N}=0$; if $x \in \mathrm{M}$ and $y \in \mathrm{~N}$ are such that $x+y=0$, then we have $x=-y \in \mathrm{M} \cap \mathrm{N}$, hence $x=y=0$.
+claim h_s17_t1_independence_intersection_equivalence :
+  linearly_independent_submodules K addK mulK L addL smul 2
+    (fun i => if i = 0 then M else N)
+  <-> {x :e M|x :e N} = {module_zero L addL}.
+admit.
 Admitted.
 
 //GOD1:386555 complementary_submodule : "#8 is a complementary submodule of #7 in #4" | $#4=#7\oplus #8$
@@ -38318,14 +42472,70 @@ let K addK mulK L addL smul I M.
 assume hDirect.
 apply andI.
 //GOD1PRF:387710 where the $\mathbf{M}_{i}$ are linearly independent submodules of L . Then every $x \in \mathrm{~L}$ can be written uniquely in the form
+claim h_s17_direct_sum_unique_expansion : forall x :e L,
+  exists coeff :e indexed_module_product I M,
+    x = submodule_family_sum_map L addL I coeff
+    /\ forall coeff' :e indexed_module_product I M,
+      x = submodule_family_sum_map L addL I coeff' -> coeff' = coeff.
+admit.
 //GOD1PRF:388006 where $v_{i}$ is a mapping of L into L . On the other hand, if we introduce the isomorphism
+claim h_s17_direct_sum_summation_isomorphism :
+  module_isomorphism K addK mulK
+    (indexed_module_product I M)
+    (indexed_module_product_addition I (fun i => addL))
+    (indexed_module_product_left_scalar I (fun i => smul))
+    L addL smul (submodule_family_sum_map L addL I).
+admit.
 //GOD1PRF:388340 then it is clear that
+claim h_s17_direct_sum_coordinate_projection : forall x :e L, forall i :e I,
+  direct_sum_projection L addL I M i x :e M i
+  /\ exists coeff :e indexed_module_product I M,
+    x = submodule_family_sum_map L addL I coeff
+    /\ direct_sum_projection L addL I M i x = coeff i.
+admit.
 //GOD1PRF:388417 This result shows that $v_{i}$ is a linear mapping. (The reader should also verify this by direct calculation.)
+claim h_s17_direct_sum_projection_linear : forall i :e I,
+  module_endomorphism K addK mulK L addL smul
+    (direct_sum_projection L addL I M i).
+admit.
 //GOD1PRF:388530 The endomorphism $v_{i}$ has as image the submodule $\mathrm{M}_{i}$. For each $x \in \mathrm{~L}, v_{i}(x)$ is the one and only vector in $\mathrm{M}_{i}$ such that $x-v_{i}(x)$ belongs to the submodule generated by $\mathrm{M}_{1}, \ldots, \mathrm{M}_{i-1}, \mathrm{M}_{i+1}, \ldots, \mathrm{M}_{p}$. For this reason, $v_{i}(x)$ is called the projection of $x$ on $\mathrm{M}_{i}$.
+claim h_s17_direct_sum_projection_image : forall i :e I,
+  module_homomorphism_image L (direct_sum_projection L addL I M i) = M i.
+admit.
 //GOD1PRF:388915 Clearly, $v_{i}(x)=x$ if and only if $x \in \mathbf{M}_{i}$. Since $v_{i}(x) \in \mathbf{M}_{i}$ for all $x \in \mathbf{L}$, it follows that $v_{i}\left(v_{i}(x)\right)=v_{i}(x)$ for all $x \in \mathrm{~L}$, i.e., that
+claim h_s17_direct_sum_projection_idempotent : forall i :e I,
+  module_projection K addK mulK L addL smul
+    (direct_sum_projection L addL I M i).
+admit.
 //GOD1PRF:389284 It is also clear that $v_{j}(x)=0$ for $x \in \mathbf{M}_{j}$, if $j \neq i$, hence that $v_{j}\left(v_{i}(x)\right)=0$ for all $x \in \mathrm{~L}$ if $i \neq j$ : in other words,
+claim h_s17_direct_sum_projection_orthogonality :
+  forall i j :e I, forall x :e L,
+  direct_sum_projection L addL I M j
+    (direct_sum_projection L addL I M i x)
+  = if i = j then direct_sum_projection L addL I M i x
+    else module_zero L addL.
+admit.
 //GOD1PRF:389526 Finally, for each $x \in \mathrm{~L}$ we have
+claim h_s17_direct_sum_projection_expansion : forall x :e L,
+  x = module_finitely_supported_sum L addL I
+    (fun i => direct_sum_projection L addL I M i x).
+admit.
 //GOD1PRF:389627 which shows that
+claim h_s17_direct_sum_projection_conclusion :
+  (forall i :e I,
+    module_projection K addK mulK L addL smul
+      (direct_sum_projection L addL I M i)
+    /\ module_homomorphism_image L
+      (direct_sum_projection L addL I M i) = M i)
+  /\ (forall i j :e I, forall x :e L,
+    direct_sum_projection L addL I M j
+      (direct_sum_projection L addL I M i x)
+    = if i = j then direct_sum_projection L addL I M i x
+      else module_zero L addL)
+  /\ forall x :e L,
+    module_finitely_supported_sum L addL I
+      (fun i => direct_sum_projection L addL I M i x) = x.
+admit.
 Admitted.
 
 Theorem god1_s17_theorem2_orthogonal_projections_give_direct_sum :
@@ -38343,9 +42553,25 @@ Theorem god1_s17_theorem2_orthogonal_projections_give_direct_sum :
 let K addK mulK L addL smul I v.
 assume hFinite hv hOrthogonal hSum.
 //GOD1PRF:390137 The formula
+claim h_s17_t2_sum_formula : forall x :e L,
+  module_finitely_supported_sum L addL I (fun i => v i x) = x.
+exact hSum.
 //GOD1PRF:390184 shows already that L is the sum of the $\mathbf{M}_{i}$. Now suppose that $x_{i} \in \mathbf{M}_{i}(1 \leqslant i \leqslant p)$ are such that
+claim h_s17_t2_images_sum_to_L :
+  submodule_family_sum K addK mulK L addL smul I
+    (fun i => module_homomorphism_image L (v i)) = L.
+admit.
 //GOD1PRF:390395 There exist $y_{i} \in \mathrm{~L}$ such that $x_{i}=v_{i}\left(y_{i}\right)$, and hence
+claim h_s17_t2_image_representatives :
+  forall x :e indexed_module_product I
+    (fun i => module_homomorphism_image L (v i)),
+  forall i :e I, exists y :e L, x i = v i y.
+admit.
 //GOD1PRF:390664 Hence by applying $v_{i}$ to the relation (2) we obtain simply $x_{i}=0$. It follows that the submodules $\mathrm{M}_{i}$ are linearly independent, and the proof is complete.\\
+claim h_s17_t2_independence_conclusion :
+  direct_sum_decomposition K addK mulK L addL smul I
+    (fun i => module_homomorphism_image L (v i)).
+admit.
 Admitted.
 
 Theorem god1_s17_corollary_direct_summand_characterizations :
@@ -38365,11 +42591,51 @@ let K addK mulK L addL smul M.
 assume hM.
 apply andI.
 //GOD1PRF:391191 (DS 1) implies (DS 2) : write $\mathrm{L}=\mathbf{M} \oplus \mathbf{N}$ and take $v(x)$ to be the projection of $x$ on M "parallel to N ".\\
+claim h_s17_cor_ds1_implies_ds2 :
+  direct_summand K addK mulK L addL smul M ->
+  exists v:set -> set,
+    module_projection K addK mulK L addL smul v
+    /\ module_homomorphism_image L v = M.
+admit.
 //GOD1PRF:391332 (DS 2) implies (DS 3) : since $v$ maps L onto M , we may define a homomorphism $q: \mathrm{L} \rightarrow \mathrm{M}$ by putting $q(x)=v(x)$ for all $x \in \mathrm{~L}$ (the only difference between $q$ and $v$ is that $v$ is a mapping of L into L whereas $q$ is a mapping of L into M ). If $x \in \mathrm{M}$, there\\
+claim h_s17_cor_ds2_implies_ds3 :
+  (exists v:set -> set,
+    module_projection K addK mulK L addL smul v
+    /\ module_homomorphism_image L v = M) ->
+  exists q:set -> set,
+    module_homomorphism K addK mulK L addL smul M addL smul q
+    /\ forall x :e M, q x = x.
+admit.
 //GOD1PRF:391650 exists $y \in \mathrm{~L}$ such that $v(y)=x$, and hence
+claim h_s17_cor_retraction_identity :
+  forall q:set -> set,
+  module_homomorphism K addK mulK L addL smul M addL smul q ->
+  (forall x :e M, q x = x) -> forall x :e M, q x = x.
+admit.
 //GOD1PRF:391742 (DS 3) implies (DS 1). Let N be the kernel of $q$. Then we have
+claim h_s17_cor_kernel_complement_setup :
+  forall q:set -> set,
+  module_homomorphism K addK mulK L addL smul M addL smul q ->
+  (forall x :e M, q x = x) ->
+  {x :e M|x :e module_homomorphism_kernel
+    K addK mulK L addL smul M addL smul q}
+    = {module_zero L addL}.
+admit.
 //GOD1PRF:391844 for if $x \in \mathrm{M} \cap \mathrm{N}$ then $q(x)=x$, but also $q(x)=0$, so that $x=0$. For each $x \in \mathrm{~L}$ we have $q(q(x))=q(x)$, hence $q(x-q(x))=0$, so that $x-q(x) \in \mathrm{N}$, and therefore
+claim h_s17_cor_kernel_decomposition :
+  forall q:set -> set,
+  module_homomorphism K addK mulK L addL smul M addL smul q ->
+  (forall x :e M, q x = x) ->
+  submodule_sum K addK mulK L addL smul M
+    (module_homomorphism_kernel K addK mulK L addL smul M addL smul q) = L.
+admit.
 //GOD1PRF:392108 Thus $\mathbf{L}=\mathbf{M}+\mathbf{N}$; since $\mathbf{M} \cap \mathbf{N}=0$, it follows that $\mathbf{M}$ is a direct summand of $\mathbf{L}$.\\
+claim h_s17_cor_ds3_implies_ds1 :
+  (exists q:set -> set,
+    module_homomorphism K addK mulK L addL smul M addL smul q
+    /\ forall x :e M, q x = x) ->
+  direct_summand K addK mulK L addL smul M.
+admit.
 Admitted.
 
 (** § 18. Finiteness theorems. **)
@@ -38406,17 +42672,131 @@ let K addK mulK L addL smulL M addM smulM f.
 assume hf.
 apply andI.
 //GOD1PRF:401709 Suppose that $\operatorname{Ker}(f)$ is generated by vectors $a_{1}, \ldots, a_{p}$, and $\operatorname{Im}(f)$ by vectors $b_{1}, \ldots, b_{q}$. Choose vectors $a_{p+1}, \ldots, a_{p+q}$ in L such that
+claim h_s18_t1_generators_and_lifts :
+  finitely_generated_module K addK mulK
+    (module_homomorphism_kernel K addK mulK L addL smulL M addM smulM f)
+    addL smulL ->
+  finitely_generated_module K addK mulK
+    (module_homomorphism_image L f) addM smulM ->
+  exists I, finite I /\ exists a:set -> set,
+    generating_family K addK mulK
+      (module_homomorphism_kernel K addK mulK L addL smulL M addM smulM f)
+      addL smulL I a
+  /\ exists J, finite J /\ exists b:set -> set,
+    generating_family K addK mulK (module_homomorphism_image L f)
+      addM smulM J b
+    /\ forall j :e J, exists x :e L, f x = b j.
+admit.
 //GOD1PRF:401988 To prove Theorem 1 it is enough to show that $a_{1}, \ldots, a_{p+q}$ generate L in any case, and that they form a basis of L in the case where $a_{1}, \ldots, a_{p}$ form a basis of $\operatorname{Ker}(f)$ and $b_{1}, \ldots, b_{q}$ form a basis of $\operatorname{Im}(f)$.
+claim h_s18_t1_generation_and_basis_reduction :
+  (finitely_generated_module K addK mulK
+      (module_homomorphism_kernel K addK mulK L addL smulL M addM smulM f)
+      addL smulL ->
+    finitely_generated_module K addK mulK
+      (module_homomorphism_image L f) addM smulM ->
+    finitely_generated_module K addK mulK L addL smulL)
+  /\ forall p q :e omega,
+    isomorphic_modules K addK mulK
+      (module_homomorphism_kernel K addK mulK L addL smulL M addM smulM f)
+      addL smulL (K :^: p) (module_power_addition p addK)
+      (module_power_left_scalar p mulK) ->
+    isomorphic_modules K addK mulK (module_homomorphism_image L f) addM smulM
+      (K :^: q) (module_power_addition q addK)
+      (module_power_left_scalar q mulK) ->
+    isomorphic_modules K addK mulK L addL smulL
+      (K :^: (p + q)) (module_power_addition (p + q) addK)
+      (module_power_left_scalar (p + q) mulK).
+admit.
 //GOD1PRF:402263 For the first assertion, consider a vector $x \in \mathrm{~L}$. Since $f(x)$ belongs to the submodule of $M$ generated by $b_{1}, \ldots, b_{q}$, there exist scalars $\eta_{j}(1 \leqslant j \leqslant q)$ such that
+claim h_s18_t1_image_of_vector : forall x :e L,
+  f x :e module_homomorphism_image L f
+  /\ exists z :e L, f z = f x.
+admit.
 //GOD1PRF:402708 hence we have
+claim h_s18_t1_residual_in_kernel : forall x z :e L,
+  f z = f x ->
+  addL x (group_inverse L addL z)
+    :e module_homomorphism_kernel
+      K addK mulK L addL smulL M addM smulM f.
+admit.
 //GOD1PRF:402775 where $y \in \operatorname{Ker}(f)$; but now there exist scalars $\xi_{i}(1 \leqslant i \leqslant p)$ such that
+claim h_s18_t1_kernel_generation_applies :
+  finitely_generated_module K addK mulK
+    (module_homomorphism_kernel K addK mulK L addL smulL M addM smulM f)
+    addL smulL ->
+  exists I, finite I /\ exists a:set -> set,
+    generating_family K addK mulK
+      (module_homomorphism_kernel K addK mulK L addL smulL M addM smulM f)
+      addL smulL I a.
+admit.
 //GOD1PRF:402932 These two formulae show that $x$ is indeed a linear combination of $a_{1}, \ldots, a_{p+q}$.\\
+claim h_s18_t1_finite_generation_conclusion :
+  finitely_generated_module K addK mulK
+    (module_homomorphism_kernel K addK mulK L addL smulL M addM smulM f)
+    addL smulL ->
+  finitely_generated_module K addK mulK
+    (module_homomorphism_image L f) addM smulM ->
+  finitely_generated_module K addK mulK L addL smulL.
+admit.
 //GOD1PRF:403279 To prove the second assertion it is enough to show that if the vectors $a_{i}(1 \leqslant i \leqslant p)$ are linearly independent, and the vectors $b_{i}(1 \leqslant j \leqslant q)$ are linearly independent, then $a_{1}, \ldots, a_{p+q}$ are linearly independent. Now consider a relation of the form
+claim h_s18_t1_basis_independence_reduction : forall p q :e omega,
+  isomorphic_modules K addK mulK
+    (module_homomorphism_kernel K addK mulK L addL smulL M addM smulM f)
+    addL smulL (K :^: p) (module_power_addition p addK)
+    (module_power_left_scalar p mulK) ->
+  isomorphic_modules K addK mulK (module_homomorphism_image L f) addM smulM
+    (K :^: q) (module_power_addition q addK)
+    (module_power_left_scalar q mulK) ->
+  isomorphic_modules K addK mulK L addL smulL
+    (K :^: (p + q)) (module_power_addition (p + q) addK)
+    (module_power_left_scalar (p + q) mulK).
+admit.
 //GOD1PRF:403637 and apply $f$ to the left-hand side. Since $a_{1}, \ldots, a_{p}$ are in the kernel of $f$, we obtain
+claim h_s18_t1_kernel_vectors_map_to_zero :
+  forall x :e module_homomorphism_kernel
+    K addK mulK L addL smulL M addM smulM f,
+  f x = module_zero M addM.
+admit.
 //GOD1PRF:403830 however, the vectors $f\left(a_{p+1}\right)=b_{1}, \ldots, f\left(a_{p+q}\right)=b_{q}$ are linearly independent by hypothesis, hence
+claim h_s18_t1_image_basis_independent : forall q :e omega,
+  forall b:set -> set,
+  module_basis K addK mulK (module_homomorphism_image L f) addM smulM q b ->
+  linearly_independent_family K addK mulK
+    (module_homomorphism_image L f) addM smulM q b.
+admit.
 //GOD1PRF:404009 and the original relation therefore reduces to
+claim h_s18_t1_relation_reduces_to_kernel :
+  forall p :e omega, forall a:set -> set,
+  module_basis K addK mulK
+    (module_homomorphism_kernel K addK mulK L addL smulL M addM smulM f)
+    addL smulL p a ->
+  linearly_independent_family K addK mulK
+    (module_homomorphism_kernel K addK mulK L addL smulL M addM smulM f)
+    addL smulL p a.
+admit.
 //GOD1PRF:404109 But $a_{1}, \ldots, a_{p}$ are linearly independent, therefore
+claim h_s18_t1_kernel_basis_independent : forall p :e omega,
+  forall a:set -> set,
+  module_basis K addK mulK
+    (module_homomorphism_kernel K addK mulK L addL smulL M addM smulM f)
+    addL smulL p a ->
+  linearly_independent_family K addK mulK
+    (module_homomorphism_kernel K addK mulK L addL smulL M addM smulM f)
+    addL smulL p a.
+admit.
 //GOD1PRF:404213 and the proof is complete.\\
+claim h_s18_t1_free_rank_conclusion : forall p q :e omega,
+  isomorphic_modules K addK mulK
+    (module_homomorphism_kernel K addK mulK L addL smulL M addM smulM f)
+    addL smulL (K :^: p) (module_power_addition p addK)
+    (module_power_left_scalar p mulK) ->
+  isomorphic_modules K addK mulK (module_homomorphism_image L f) addM smulM
+    (K :^: q) (module_power_addition q addK)
+    (module_power_left_scalar q mulK) ->
+  isomorphic_modules K addK mulK L addL smulL
+    (K :^: (p + q)) (module_power_addition (p + q) addK)
+    (module_power_left_scalar (p + q) mulK).
+admit.
 Admitted.
 
 //GOD1:405336 left_noetherian_ring : "#1 is a left Noetherian ring" | $#1\text{ is left Noetherian}$
@@ -38455,11 +42835,88 @@ let K addK mulK.
 assume hK.
 apply iffI.
 //GOD1PRF:406373 It is clear that $b$ ) implies $a$ ). For the left K -module K is finitely generated, and therefore its submodules (i.e., the left ideals of K ) must be finitely generated if $b$ ) is satisfied.
+claim h_s18_t2_b_implies_a :
+  (forall M, forall addM smul:set -> set -> set,
+    finitely_generated_module K addK mulK M addM smul ->
+    forall N, submodule K addK mulK M addM smul N ->
+      finitely_generated_module K addK mulK N addM smul) ->
+  left_noetherian_ring K addK mulK.
+admit.
 //GOD1PRF:406569 Let us now show that $a$ ) implies $b$ ). We shall do this in two steps; first we shall show that, for every integer $n \geqslant 1$, every submodule of $\mathrm{K}^{n}$ is finitely generated, and then we shall deduce $b$ ) in full generality.
+claim h_s18_t2_a_implies_b_reduction :
+  left_noetherian_ring K addK mulK ->
+  (forall n :e omega, forall N,
+    submodule K addK mulK (K :^: n)
+      (module_power_addition n addK) (module_power_left_scalar n mulK) N ->
+    finitely_generated_module K addK mulK N
+      (module_power_addition n addK) (module_power_left_scalar n mulK)) ->
+  forall M, forall addM smul:set -> set -> set,
+    finitely_generated_module K addK mulK M addM smul ->
+    forall N, submodule K addK mulK M addM smul N ->
+      finitely_generated_module K addK mulK N addM smul.
+admit.
 //GOD1PRF:406814 So let us prove that every submodule L of $\mathrm{K}^{n}$ is finitely generated. If $n=1$, this is just the hypothesis $a$ ); we may therefore argue by induction on $n$, and assume that the result is true for $n-1$. Define a mapping $f: \mathrm{L} \rightarrow \mathrm{K}$ by putting
+claim h_s18_t2_power_submodule_induction :
+  left_noetherian_ring K addK mulK ->
+  forall n :e omega, forall N,
+    submodule K addK mulK (K :^: n)
+      (module_power_addition n addK) (module_power_left_scalar n mulK) N ->
+    finitely_generated_module K addK mulK N
+      (module_power_addition n addK) (module_power_left_scalar n mulK).
+admit.
 //GOD1PRF:407155 $f$ is a homomorphism of L into K . To prove that L is finitely generated, it is enough by Theorem 1 to prove that $\operatorname{Ker}(f)$ and $\operatorname{Im}(f)$ are finitely generated. Now $\operatorname{Im}(f)$ is a submodule of K , hence is finitely generated by hypothesis $a$ ). As to $\mathrm{Ker}(f)$, it is a submodule of the submodule of $\mathrm{K}^{n}$ defined by the relation $\xi_{n}=0$; this submodule of $\mathrm{K}^{n}$ is evidently isomorphic to $\mathrm{K}^{n-1}$; hence all its submodules, and in particular $\operatorname{Ker}(f)$, are finitely generated, by the inductive hypothesis.
+claim h_s18_t2_theorem1_formal_call :
+  forall K0, forall aK mK:set -> set -> set,
+  forall L0, forall aL sL:set -> set -> set,
+  forall M0, forall aM sM:set -> set -> set,
+  forall f0:set -> set,
+    module_homomorphism K0 aK mK L0 aL sL M0 aM sM f0 ->
+    (finitely_generated_module K0 aK mK
+      (module_homomorphism_kernel K0 aK mK L0 aL sL M0 aM sM f0)
+      aL sL ->
+      finitely_generated_module K0 aK mK
+        (module_homomorphism_image L0 f0) aM sM ->
+      finitely_generated_module K0 aK mK L0 aL sL)
+    /\ (forall p0 q0 :e omega,
+      isomorphic_modules K0 aK mK
+        (module_homomorphism_kernel K0 aK mK L0 aL sL M0 aM sM f0)
+        aL sL (K0 :^: p0) (module_power_addition p0 aK)
+        (module_power_left_scalar p0 mK) ->
+      isomorphic_modules K0 aK mK
+        (module_homomorphism_image L0 f0) aM sM
+        (K0 :^: q0) (module_power_addition q0 aK)
+        (module_power_left_scalar q0 mK) ->
+      isomorphic_modules K0 aK mK L0 aL sL
+        (K0 :^: (p0 + q0)) (module_power_addition (p0 + q0) aK)
+        (module_power_left_scalar (p0 + q0) mK)).
+apply god1_s18_theorem1_finite_kernel_and_image.
 //GOD1PRF:407765 We have therefore shown, with the help of $a$ ), that every submodule of $\mathrm{K}^{n}$ is finitely generated. Now let M be a left K -module, $\mathrm{M}^{\prime}$ a submodule of M ; we shall show that, if M is finitely generated, then so is $\mathrm{M}^{\prime}$.
+claim h_s18_t2_power_result_and_general_goal :
+  left_noetherian_ring K addK mulK ->
+  forall M, forall addM smul:set -> set -> set,
+  finitely_generated_module K addK mulK M addM smul ->
+  forall N, submodule K addK mulK M addM smul N ->
+  finitely_generated_module K addK mulK N addM smul.
+admit.
 //GOD1PRF:408033 Since M is finitely generated, there exists (§ 12, Corollary 2 to Theorem 3) an integer $n$ and a homomorphism $f$ of $\mathrm{K}^{n}$ onto M . Consider $\mathrm{L}=f^{-1}\left(\mathrm{M}^{\prime}\right)$; since $f$ is surjective, $f$ induces a homomorphism of L onto $\mathrm{M}^{\prime}$. On the other hand, L is finitely generated, by what has already been proved; hence $\mathrm{M}^{\prime}$ is finitely generated (in detail, if L is generated by vectors $a_{i}, 1 \leqslant i \leqslant p$, then clearly $\mathrm{M}^{\prime}$ is generated by the vectors $f\left(a_{i}\right), 1 \leqslant i \leqslant p$ ).\\
+claim h_s18_t2_s12_corollary2_formal_call :
+  forall K0, forall aK mK:set -> set -> set,
+  forall M0, forall aM sM:set -> set -> set,
+  left_module K0 aK mK M0 aM sM ->
+  (finitely_generated_module K0 aK mK M0 aM sM
+  <-> exists n0 :e omega, exists f0:set -> set,
+    module_homomorphism K0 aK mK
+      (K0 :^: n0) (module_power_addition n0 aK)
+      (module_power_left_scalar n0 mK) M0 aM sM f0
+    /\ surj (K0 :^: n0) M0 f0).
+apply god1_s12_corollary2_finitely_generated_iff_quotient_of_power.
+claim h_s18_t2_general_submodule_conclusion :
+  left_noetherian_ring K addK mulK ->
+  forall M, forall addM smul:set -> set -> set,
+    finitely_generated_module K addK mulK M addM smul ->
+    forall N, submodule K addK mulK M addM smul N ->
+      finitely_generated_module K addK mulK N addM smul.
+admit.
 Admitted.
 
 //GOD1:408800 left_ideal_free_generator_property : "every nonzero left ideal of #1 is freely generated by one element" | $I\cong #1$
@@ -38488,10 +42945,103 @@ let K addK mulK.
 assume hK.
 apply iffI.
 //GOD1PRF:409252 To prove that $b$ ) implies $a$ ), take $\mathrm{M}=\mathrm{K}$; then M has a basis consisting of one vector, and therefore every submodule of M (i.e., every left ideal of K ) must have a basis consisting of no vectors or one vector ; and this is precisely the property a).
+claim h_s18_t3_b_implies_a :
+  (forall n :e omega, forall M, forall addM smul:set -> set -> set,
+    forall a:set -> set,
+      module_basis K addK mulK M addM smul n a ->
+      forall N, submodule K addK mulK M addM smul N ->
+      exists p :e omega, p c= n /\ exists b:set -> set,
+        module_basis K addK mulK N addM smul p b) ->
+  left_ideal_free_generator_property K addK mulK.
+admit.
 //GOD1PRF:409527 Let us show conversely that $a$ ) implies $b$ ). It is clear that $b$ ) is equivalent to the following statement:\\
+claim h_s18_t3_b_equivalent_to_power_form :
+  (forall n :e omega, forall M, forall addM smul:set -> set -> set,
+    forall a:set -> set,
+      module_basis K addK mulK M addM smul n a ->
+      forall N, submodule K addK mulK M addM smul N ->
+      exists p :e omega, p c= n /\ exists b:set -> set,
+        module_basis K addK mulK N addM smul p b)
+  <-> (forall n :e omega, forall N,
+    submodule K addK mulK (K :^: n)
+      (module_power_addition n addK) (module_power_left_scalar n mulK) N ->
+    exists p :e omega, p c= n
+    /\ isomorphic_modules K addK mulK N
+      (module_power_addition n addK) (module_power_left_scalar n mulK)
+      (K :^: p) (module_power_addition p addK)
+      (module_power_left_scalar p mulK)).
+admit.
 //GOD1PRF:409643 $\left.b^{\prime}\right)$ For each integer $n \geqslant 1$ and each submodule L of $\mathrm{K}^{n}$, there exists an integer $p \leqslant n$ such that L is isomorphic to $\mathrm{K}^{p}$.
+claim h_s18_t3_power_submodule_rank_statement :
+  forall n :e omega, forall N,
+  submodule K addK mulK (K :^: n)
+    (module_power_addition n addK) (module_power_left_scalar n mulK) N ->
+  exists p :e omega, p c= n
+  /\ isomorphic_modules K addK mulK N
+    (module_power_addition n addK) (module_power_left_scalar n mulK)
+    (K :^: p) (module_power_addition p addK)
+    (module_power_left_scalar p mulK).
+admit.
 //GOD1PRF:409832 When $n=1$, it is clear that $b^{\prime}$ ) reduces to $a$ ). We may therefore argue by induction on $n$, and assume that $b^{\prime}$ ) is true for $n-1$. Let L be a submodule of $\mathrm{K}^{n}$ and consider, as in the proof of Theorem 2, the homomorphism $f: \mathrm{L} \rightarrow \mathrm{K}$ defined by $f\left(\xi_{1}, \ldots, \xi_{n}\right)=\xi_{n}$. The image of $f$ is a submodule of K , hence is isomorphic to $\mathrm{K}^{r}$ where $r \leqslant 1$; the kernel of $f$ is isomorphic to a submodule of $\mathrm{K}^{n-1}$, hence by the inductive hypothesis is isomorphic to $\mathrm{K}^{s}$ for some integer $s \leqslant n-1$. Using Theorem 1, it follows that L is isomorphic to $\mathrm{K}^{r+s}$; and since
+claim h_s18_t3_theorem2_formal_call :
+  forall K0, forall aK mK:set -> set -> set,
+  ring K0 aK mK ->
+  (left_noetherian_ring K0 aK mK
+  <-> forall M0, forall aM sM:set -> set -> set,
+    finitely_generated_module K0 aK mK M0 aM sM ->
+    forall N0, submodule K0 aK mK M0 aM sM N0 ->
+      finitely_generated_module K0 aK mK N0 aM sM).
+apply god1_s18_theorem2_noetherian_submodule_characterization.
+claim h_s18_t3_theorem1_formal_call :
+  forall K0, forall aK mK:set -> set -> set,
+  forall L0, forall aL sL:set -> set -> set,
+  forall M0, forall aM sM:set -> set -> set,
+  forall f0:set -> set,
+    module_homomorphism K0 aK mK L0 aL sL M0 aM sM f0 ->
+    (finitely_generated_module K0 aK mK
+      (module_homomorphism_kernel K0 aK mK L0 aL sL M0 aM sM f0)
+      aL sL ->
+      finitely_generated_module K0 aK mK
+        (module_homomorphism_image L0 f0) aM sM ->
+      finitely_generated_module K0 aK mK L0 aL sL)
+    /\ (forall p0 q0 :e omega,
+      isomorphic_modules K0 aK mK
+        (module_homomorphism_kernel K0 aK mK L0 aL sL M0 aM sM f0)
+        aL sL (K0 :^: p0) (module_power_addition p0 aK)
+        (module_power_left_scalar p0 mK) ->
+      isomorphic_modules K0 aK mK
+        (module_homomorphism_image L0 f0) aM sM
+        (K0 :^: q0) (module_power_addition q0 aK)
+        (module_power_left_scalar q0 mK) ->
+      isomorphic_modules K0 aK mK L0 aL sL
+        (K0 :^: (p0 + q0)) (module_power_addition (p0 + q0) aK)
+        (module_power_left_scalar (p0 + q0) mK)).
+apply god1_s18_theorem1_finite_kernel_and_image.
+claim h_s18_t3_inductive_rank_step :
+  left_ideal_free_generator_property K addK mulK ->
+  forall n :e omega, forall N,
+    submodule K addK mulK (K :^: n)
+      (module_power_addition n addK) (module_power_left_scalar n mulK) N ->
+    exists p :e omega, p c= n
+    /\ isomorphic_modules K addK mulK N
+      (module_power_addition n addK) (module_power_left_scalar n mulK)
+      (K :^: p) (module_power_addition p addK)
+      (module_power_left_scalar p mulK).
+admit.
 //GOD1PRF:410581 the proof is complete.\\
+claim h_s18_t3_submodule_basis_conclusion :
+  left_ideal_free_generator_property K addK mulK ->
+  forall n :e omega, forall M, forall addM smul:set -> set -> set,
+  forall a:set -> set,
+    module_basis K addK mulK M addM smul n a ->
+    forall N, submodule K addK mulK M addM smul N ->
+    exists p :e omega, p c= n /\ exists b:set -> set,
+      module_basis K addK mulK N addM smul p b.
+admit.
+Admitted.
+
+Theorem god1_integers_are_principal_ideal_domain :
+  principal_ideal_domain int add_SNo mul_SNo.
 Admitted.
 
 Theorem god1_s18_corollary_subgroups_of_integer_powers_are_free :
@@ -38506,7 +43056,27 @@ assume hn.
 let H.
 assume hH.
 //GOD1PRF:411488 Observe that, since $\mathbf{Z}$ is a principal ideal domain, Theorem 3 implies the following result:
+claim h_s18_cor_integers_pid_formal_call :
+  principal_ideal_domain int add_SNo mul_SNo.
+apply god1_integers_are_principal_ideal_domain.
+claim h_s18_cor_theorem3_formal_call :
+  forall K0, forall aK mK:set -> set -> set,
+  ring K0 aK mK ->
+  (left_ideal_free_generator_property K0 aK mK
+  <-> forall n0 :e omega,
+    forall M0, forall aM sM:set -> set -> set,
+    forall a:set -> set,
+      module_basis K0 aK mK M0 aM sM n0 a ->
+      forall N0, submodule K0 aK mK M0 aM sM N0 ->
+      exists p0 :e omega, p0 c= n0 /\ exists b:set -> set,
+        module_basis K0 aK mK N0 aM sM p0 b).
+apply god1_s18_theorem3_submodules_of_finite_free_modules.
 //GOD1PRF:411591 COROLLARY TO THEOREM 3. Every subgroup of $\mathbf{Z}^{n}$ is isomorphic to $\mathbf{Z}^{p}$ for some integer $p \leqslant n$.
+claim h_s18_cor_integer_subgroup_conclusion :
+  exists p :e omega, p c= n
+  /\ isomorphic_groups H (module_power_addition n add_SNo)
+    (int :^: p) (module_power_addition p add_SNo).
+admit.
 Admitted.
 
 //GOD1:413095 homogeneous_linear_system_solution : "#7 solves the homogeneous linear system with coefficient matrix #6" | $#6#7=0$
@@ -38556,8 +43126,70 @@ let A.
 assume hA.
 apply andI.
 //GOD1PRF:412656 It follows that the kernel of $f$ is the submodule of $\mathrm{K}^{n}$ consisting of all vectors $\left(\xi_{1}, \ldots, \xi_{n}\right)$ which satisfy the relations
+claim h_s18_system_kernel_identification :
+  homogeneous_linear_solution_space K add mul p n A
+  = {x :e K :^: n|forall i :e p,
+      ring_finite_sum K add n
+        (fun j => mul (matrix_entry A i j) (x j))
+      = ring_zero K add}.
+admit.
 //GOD1PRF:413212 Let L be the submodule of $\mathrm{K}^{n}$ consisting of the solutions of (1). We shall interpret in the language of linear equations the following properties of $L$ :\\
+claim h_s18_system_two_module_properties :
+  (right_noetherian_ring K add mul ->
+    finitely_generated_module K add (opposite_ring_multiplication mul)
+      (homogeneous_linear_solution_space K add mul p n A)
+      (module_power_addition n add)
+      (fun scalar x => module_power_left_scalar n
+        (opposite_ring_multiplication mul) scalar x))
+  /\ ((division_ring K add mul \/ principal_ideal_domain K add mul) ->
+    exists r :e omega, r c= n
+    /\ isomorphic_modules K add (opposite_ring_multiplication mul)
+      (homogeneous_linear_solution_space K add mul p n A)
+      (module_power_addition n add)
+      (fun scalar x => module_power_left_scalar n
+        (opposite_ring_multiplication mul) scalar x)
+      (K :^: r) (module_power_addition r add)
+      (module_power_left_scalar r (opposite_ring_multiplication mul))).
+admit.
 //GOD1PRF:413507 The first is true provided that K is right Noetherian (Theorem 2), and the second is true if K is a division ring or a principal ideal domain (Theorem 3).
+claim h_s18_system_theorem2_formal_call :
+  forall K0, forall aK mK:set -> set -> set,
+  ring K0 aK mK ->
+  (left_noetherian_ring K0 aK mK
+  <-> forall M0, forall aM sM:set -> set -> set,
+    finitely_generated_module K0 aK mK M0 aM sM ->
+    forall N0, submodule K0 aK mK M0 aM sM N0 ->
+      finitely_generated_module K0 aK mK N0 aM sM).
+apply god1_s18_theorem2_noetherian_submodule_characterization.
+claim h_s18_system_theorem3_formal_call :
+  forall K0, forall aK mK:set -> set -> set,
+  ring K0 aK mK ->
+  (left_ideal_free_generator_property K0 aK mK
+  <-> forall n0 :e omega,
+    forall M0, forall aM sM:set -> set -> set,
+    forall a:set -> set,
+      module_basis K0 aK mK M0 aM sM n0 a ->
+      forall N0, submodule K0 aK mK M0 aM sM N0 ->
+      exists r0 :e omega, r0 c= n0 /\ exists b:set -> set,
+        module_basis K0 aK mK N0 aM sM r0 b).
+apply god1_s18_theorem3_submodules_of_finite_free_modules.
+claim h_s18_system_finiteness_conclusion :
+  (right_noetherian_ring K add mul ->
+    finitely_generated_module K add (opposite_ring_multiplication mul)
+      (homogeneous_linear_solution_space K add mul p n A)
+      (module_power_addition n add)
+      (fun scalar x => module_power_left_scalar n
+        (opposite_ring_multiplication mul) scalar x))
+  /\ ((division_ring K add mul \/ principal_ideal_domain K add mul) ->
+    exists r :e omega, r c= n
+    /\ isomorphic_modules K add (opposite_ring_multiplication mul)
+      (homogeneous_linear_solution_space K add mul p n A)
+      (module_power_addition n add)
+      (fun scalar x => module_power_left_scalar n
+        (opposite_ring_multiplication mul) scalar x)
+      (K :^: r) (module_power_addition r add)
+      (module_power_left_scalar r (opposite_ring_multiplication mul))).
+admit.
 Admitted.
 
 //GOD1:416094 increasing_sequence_of_sets : "#2 is an increasing sequence of subsets of #1" | $#2_n\subseteq #2_{n+1}$
@@ -38594,10 +43226,59 @@ let K add mul.
 assume hK.
 apply iffI.
 //GOD1PRF:417197 (NR 1) implies (NR 2). Let ( $I_{n}$ ) be an increasing sequence of left ideals of K . The union $I$ of the $I_{n}$ is again a left ideal (§ 10, Theorem 1). Since $K$ is left Noetherian, $I$ is\\
+claim h_s18_t4_s10_theorem1_formal_call :
+  forall K0, forall aK mK:set -> set -> set,
+  forall M0, forall aM sM:set -> set -> set,
+  forall I0, forall N0:set -> set,
+    left_module K0 aK mK M0 aM sM ->
+    (forall i :e I0, submodule K0 aK mK M0 aM sM (N0 i)) ->
+    submodule K0 aK mK M0 aM sM
+      (module_family_intersection I0 N0 M0)
+    /\ (((exists i, i :e I0)
+      /\ (forall i j :e I0, exists k :e I0,
+        N0 i c= N0 k /\ N0 j c= N0 k)) ->
+      submodule K0 aK mK M0 aM sM (module_family_union I0 N0)).
+apply god1_s10_theorem1_intersection_and_directed_union_submodules.
+claim h_s18_t4_nr1_implies_nr2 :
+  left_noetherian_ring K add mul ->
+  forall A:set -> set,
+    increasing_sequence_of_sets K A ->
+    (forall n :e omega, left_ideal K add mul (A n)) ->
+    stationary_sequence_of_sets K A.
+admit.
 //GOD1PRF:417394 generated by a finite number of elements $x_{1}, \ldots, x_{r}$; and, by the definition of a union, there exist integers $p_{1}, \ldots, p_{r}$ such that $x_{1} \in \mathrm{I}_{p_{1}}, \ldots, x_{r} \in \mathrm{I}_{p_{r}}$. Let $p$ be the maximum of the integers $p_{1}, \ldots, p_{r}$; then $\mathrm{I}_{p}$ contains $x_{1}, \ldots, x_{r}$ because it contains $\mathrm{I}_{p_{1}}, \ldots, \mathrm{I}_{p_{r}}$; hence $\mathrm{I}_{p}$ contains the ideal generated by $x_{1}, \ldots, x_{r}$, namely the ideal I. Hence if $n \geqslant p$ we have
+claim h_s18_t4_finite_generators_force_stationarity :
+  left_noetherian_ring K add mul ->
+  forall A:set -> set,
+    increasing_sequence_of_sets K A ->
+    (forall n :e omega, left_ideal K add mul (A n)) ->
+    exists p :e omega, forall n :e omega, p c= n -> A n = A p.
+admit.
 //GOD1PRF:418025 and therefore $I_{p}=I_{n}$.\\
+claim h_s18_t4_stationary_sequence_conclusion :
+  left_noetherian_ring K add mul ->
+  forall A:set -> set,
+    increasing_sequence_of_sets K A ->
+    (forall n :e omega, left_ideal K add mul (A n)) ->
+    stationary_sequence_of_sets K A.
+admit.
 //GOD1PRF:418056 (NR 2) implies (NR 3). Let F be a non-empty set of left ideals of K . If F contains no maximal element, then for each $I \in F$ we can find $J \in F$ which strictly contains $I$. So choose $I_{1} \in F$; then there exists $I_{2} \in F$ strictly containing $I_{1}$, then $I_{3} \in F$ strictly containing $\mathrm{I}_{2}$, and so on ; it is clear that in this way we obtain a strictly increasing infinite sequence of left ideals of K, contrary to (NR 2).\\
+claim h_s18_t4_nr2_implies_nr3 :
+  (forall A:set -> set,
+    increasing_sequence_of_sets K A ->
+    (forall n :e omega, left_ideal K add mul (A n)) ->
+    stationary_sequence_of_sets K A) ->
+  forall F, F <> 0 ->
+    (forall I :e F, left_ideal K add mul I) ->
+    exists I, maximal_element_by_inclusion K F I.
+admit.
 //GOD1PRF:418512 (NR 3) implies (NR 1). Let I be a left ideal of K, and let F be the set of left ideals of K which are finitely generated and contained in I . The set F is not empty (for example, it contains the zero ideal). By (NR 3) it therefore has a maximal element J. Let ( $x_{1}, \ldots, x_{n}$ ) be a system of generators of J . For each $x \in \mathrm{I}$, the left ideal generated by $x_{1}, \ldots, x_{n}$ and $x$ is finitely generated and contained in I, hence belongs to F ; also it contains J ; hence, as J is a maximal element of F , it must be equal to J . Consequently, we have $x \in \mathrm{~J}$ for all $x \in \mathrm{I}$, and therefore $\mathrm{I}=\mathrm{J}$. Hence I is finitely generated.\\
+claim h_s18_t4_nr3_implies_nr1 :
+  (forall F, F <> 0 ->
+    (forall I :e F, left_ideal K add mul I) ->
+    exists I, maximal_element_by_inclusion K F I) ->
+  left_noetherian_ring K add mul.
+admit.
 Admitted.
 
 //GOD1:419218 maximal_left_ideal : "#4 is a maximal left ideal of #1" | $#4\triangleleft_{\max,l}#1$
