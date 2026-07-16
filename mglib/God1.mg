@@ -67204,6 +67204,371 @@ Definition isomorphic_rings :
   fun K addK mulK L addL mulL =>
     exists f:set -> set, ring_isomorphism K addK mulK L addL mulL f.
 
+Theorem god1_ring_homomorphism_rings :
+  forall K, forall addK mulK:set -> set -> set,
+  forall L, forall addL mulL:set -> set -> set,
+  forall f:set -> set,
+    ring_homomorphism K addK mulK L addL mulL f ->
+    ring K addK mulK /\ ring L addL mulL.
+let K addK mulK L addL mulL f.
+assume hf.
+exact (andEL
+  (ring K addK mulK /\ ring L addL mulL)
+  (forall x :e K, f x :e L)
+  (andEL
+    ((ring K addK mulK /\ ring L addL mulL)
+      /\ forall x :e K, f x :e L)
+    (forall x y :e K,
+      f (addK x y) = addL (f x) (f y)
+      /\ f (mulK x y) = mulL (f x) (f y))
+    (andEL
+      (((ring K addK mulK /\ ring L addL mulL)
+        /\ forall x :e K, f x :e L)
+        /\ forall x y :e K,
+          f (addK x y) = addL (f x) (f y)
+          /\ f (mulK x y) = mulL (f x) (f y))
+      (f (ring_one K mulK) = ring_one L mulL) hf))).
+Qed.
+
+Theorem god1_ring_homomorphism_maps_into :
+  forall K, forall addK mulK:set -> set -> set,
+  forall L, forall addL mulL:set -> set -> set,
+  forall f:set -> set,
+    ring_homomorphism K addK mulK L addL mulL f ->
+    forall x :e K, f x :e L.
+let K addK mulK L addL mulL f.
+assume hf.
+exact (andER
+  (ring K addK mulK /\ ring L addL mulL)
+  (forall x :e K, f x :e L)
+  (andEL
+    ((ring K addK mulK /\ ring L addL mulL)
+      /\ forall x :e K, f x :e L)
+    (forall x y :e K,
+      f (addK x y) = addL (f x) (f y)
+      /\ f (mulK x y) = mulL (f x) (f y))
+    (andEL
+      (((ring K addK mulK /\ ring L addL mulL)
+        /\ forall x :e K, f x :e L)
+        /\ forall x y :e K,
+          f (addK x y) = addL (f x) (f y)
+          /\ f (mulK x y) = mulL (f x) (f y))
+      (f (ring_one K mulK) = ring_one L mulL) hf))).
+Qed.
+
+Theorem god1_ring_homomorphism_operations :
+  forall K, forall addK mulK:set -> set -> set,
+  forall L, forall addL mulL:set -> set -> set,
+  forall f:set -> set,
+    ring_homomorphism K addK mulK L addL mulL f ->
+    forall x y :e K,
+      f (addK x y) = addL (f x) (f y)
+      /\ f (mulK x y) = mulL (f x) (f y).
+let K addK mulK L addL mulL f.
+assume hf.
+exact (andER
+  ((ring K addK mulK /\ ring L addL mulL)
+    /\ forall x :e K, f x :e L)
+  (forall x y :e K,
+    f (addK x y) = addL (f x) (f y)
+    /\ f (mulK x y) = mulL (f x) (f y))
+  (andEL
+    (((ring K addK mulK /\ ring L addL mulL)
+      /\ forall x :e K, f x :e L)
+      /\ forall x y :e K,
+        f (addK x y) = addL (f x) (f y)
+        /\ f (mulK x y) = mulL (f x) (f y))
+    (f (ring_one K mulK) = ring_one L mulL) hf)).
+Qed.
+
+Theorem god1_ring_homomorphism_preserves_one :
+  forall K, forall addK mulK:set -> set -> set,
+  forall L, forall addL mulL:set -> set -> set,
+  forall f:set -> set,
+    ring_homomorphism K addK mulK L addL mulL f ->
+    f (ring_one K mulK) = ring_one L mulL.
+let K addK mulK L addL mulL f.
+assume hf.
+exact (andER
+  (((ring K addK mulK /\ ring L addL mulL)
+    /\ forall x :e K, f x :e L)
+    /\ forall x y :e K,
+      f (addK x y) = addL (f x) (f y)
+      /\ f (mulK x y) = mulL (f x) (f y))
+  (f (ring_one K mulK) = ring_one L mulL) hf).
+Qed.
+
+Theorem god1_ring_homomorphism_additive_group_homomorphism :
+  forall K, forall addK mulK:set -> set -> set,
+  forall L, forall addL mulL:set -> set -> set,
+  forall f:set -> set,
+    ring_homomorphism K addK mulK L addL mulL f ->
+    group_homomorphism K addK L addL f.
+let K addK mulK L addL mulL f.
+assume hf.
+claim hrings : ring K addK mulK /\ ring L addL mulL.
+exact (god1_ring_homomorphism_rings K addK mulK L addL mulL f hf).
+exact (andI
+  ((group K addK /\ group L addL)
+    /\ forall x :e K, f x :e L)
+  (forall x y :e K, f (addK x y) = addL (f x) (f y))
+  (andI
+    (group K addK /\ group L addL)
+    (forall x :e K, f x :e L)
+    (andI
+      (group K addK) (group L addL)
+      (god1_ring_additive_group K addK mulK
+        (andEL (ring K addK mulK) (ring L addL mulL) hrings))
+      (god1_ring_additive_group L addL mulL
+        (andER (ring K addK mulK) (ring L addL mulL) hrings)))
+    (god1_ring_homomorphism_maps_into K addK mulK L addL mulL f hf))
+  (fun x hx y hy => andEL
+    (f (addK x y) = addL (f x) (f y))
+    (f (mulK x y) = mulL (f x) (f y))
+    (god1_ring_homomorphism_operations
+      K addK mulK L addL mulL f hf x hx y hy))).
+Qed.
+
+Theorem god1_ring_homomorphism_composite :
+  forall K, forall addK mulK:set -> set -> set,
+  forall L, forall addL mulL:set -> set -> set,
+  forall M, forall addM mulM:set -> set -> set,
+  forall f g:set -> set,
+    ring_homomorphism K addK mulK L addL mulL f ->
+    ring_homomorphism L addL mulL M addM mulM g ->
+    ring_homomorphism K addK mulK M addM mulM (fun x => g (f x)).
+let K addK mulK L addL mulL M addM mulM f g.
+assume hf hg.
+claim hringsF : ring K addK mulK /\ ring L addL mulL.
+exact (god1_ring_homomorphism_rings K addK mulK L addL mulL f hf).
+claim hringsG : ring L addL mulL /\ ring M addM mulM.
+exact (god1_ring_homomorphism_rings L addL mulL M addM mulM g hg).
+claim hmaps : forall x :e K, g (f x) :e M.
+exact (fun x hx => god1_ring_homomorphism_maps_into
+  L addL mulL M addM mulM g hg (f x)
+  (god1_ring_homomorphism_maps_into
+    K addK mulK L addL mulL f hf x hx)).
+claim hops : forall x y :e K,
+  g (f (addK x y)) = addM (g (f x)) (g (f y))
+  /\ g (f (mulK x y)) = mulM (g (f x)) (g (f y)).
+let x.
+assume hx.
+let y.
+assume hy.
+claim hfx : f x :e L.
+exact (god1_ring_homomorphism_maps_into
+  K addK mulK L addL mulL f hf x hx).
+claim hfy : f y :e L.
+exact (god1_ring_homomorphism_maps_into
+  K addK mulK L addL mulL f hf y hy).
+claim hfops :
+  f (addK x y) = addL (f x) (f y)
+  /\ f (mulK x y) = mulL (f x) (f y).
+exact (god1_ring_homomorphism_operations
+  K addK mulK L addL mulL f hf x hx y hy).
+claim hgops :
+  g (addL (f x) (f y)) = addM (g (f x)) (g (f y))
+  /\ g (mulL (f x) (f y)) = mulM (g (f x)) (g (f y)).
+exact (god1_ring_homomorphism_operations
+  L addL mulL M addM mulM g hg (f x) hfx (f y) hfy).
+exact (andI
+  (g (f (addK x y)) = addM (g (f x)) (g (f y)))
+  (g (f (mulK x y)) = mulM (g (f x)) (g (f y)))
+  (eq_i_tra
+    (g (f (addK x y))) (g (addL (f x) (f y)))
+    (addM (g (f x)) (g (f y)))
+    (f_eq_i g (f (addK x y)) (addL (f x) (f y))
+      (andEL
+        (f (addK x y) = addL (f x) (f y))
+        (f (mulK x y) = mulL (f x) (f y)) hfops))
+    (andEL
+      (g (addL (f x) (f y)) = addM (g (f x)) (g (f y)))
+      (g (mulL (f x) (f y)) = mulM (g (f x)) (g (f y))) hgops))
+  (eq_i_tra
+    (g (f (mulK x y))) (g (mulL (f x) (f y)))
+    (mulM (g (f x)) (g (f y)))
+    (f_eq_i g (f (mulK x y)) (mulL (f x) (f y))
+      (andER
+        (f (addK x y) = addL (f x) (f y))
+        (f (mulK x y) = mulL (f x) (f y)) hfops))
+    (andER
+      (g (addL (f x) (f y)) = addM (g (f x)) (g (f y)))
+      (g (mulL (f x) (f y)) = mulM (g (f x)) (g (f y))) hgops))).
+claim hone :
+  g (f (ring_one K mulK)) = ring_one M mulM.
+exact (eq_i_tra
+  (g (f (ring_one K mulK))) (g (ring_one L mulL))
+  (ring_one M mulM)
+  (f_eq_i g (f (ring_one K mulK)) (ring_one L mulL)
+    (god1_ring_homomorphism_preserves_one
+      K addK mulK L addL mulL f hf))
+  (god1_ring_homomorphism_preserves_one
+    L addL mulL M addM mulM g hg)).
+exact (andI
+  (((ring K addK mulK /\ ring M addM mulM)
+    /\ forall x :e K, g (f x) :e M)
+    /\ forall x y :e K,
+      g (f (addK x y)) = addM (g (f x)) (g (f y))
+      /\ g (f (mulK x y)) = mulM (g (f x)) (g (f y)))
+  (g (f (ring_one K mulK)) = ring_one M mulM)
+  (andI
+    ((ring K addK mulK /\ ring M addM mulM)
+      /\ forall x :e K, g (f x) :e M)
+    (forall x y :e K,
+      g (f (addK x y)) = addM (g (f x)) (g (f y))
+      /\ g (f (mulK x y)) = mulM (g (f x)) (g (f y)))
+    (andI
+      (ring K addK mulK /\ ring M addM mulM)
+      (forall x :e K, g (f x) :e M)
+      (andI
+        (ring K addK mulK) (ring M addM mulM)
+        (andEL (ring K addK mulK) (ring L addL mulL) hringsF)
+        (andER (ring L addL mulL) (ring M addM mulM) hringsG))
+      hmaps)
+    hops)
+  hone).
+Qed.
+
+Theorem god1_bijective_ring_homomorphism_inverse :
+  forall K, forall addK mulK:set -> set -> set,
+  forall L, forall addL mulL:set -> set -> set,
+  forall f:set -> set,
+    ring_homomorphism K addK mulK L addL mulL f -> bij K L f ->
+    ring_homomorphism L addL mulL K addK mulK (inv K f).
+let K addK mulK L addL mulL f.
+assume hf hbij.
+claim hrings : ring K addK mulK /\ ring L addL mulL.
+exact (god1_ring_homomorphism_rings K addK mulK L addL mulL f hf).
+claim hK : ring K addK mulK.
+exact (andEL (ring K addK mulK) (ring L addL mulL) hrings).
+claim hL : ring L addL mulL.
+exact (andER (ring K addK mulK) (ring L addL mulL) hrings).
+claim hinvbij : bij L K (inv K f).
+exact (bij_inv K L f hbij).
+claim hinvmaps : forall u :e L, inv K f u :e K.
+exact (god1_bijection_maps_into L K (inv K f) hinvbij).
+claim haddhom : group_homomorphism L addL K addK (inv K f).
+exact (god1_bijective_group_homomorphism_inverse
+  K addK L addL f
+  (god1_ring_homomorphism_additive_group_homomorphism
+    K addK mulK L addL mulL f hf) hbij).
+claim hadd : forall u v :e L,
+  inv K f (addL u v) = addK (inv K f u) (inv K f v).
+exact (god1_group_homomorphism_multiplies
+  L addL K addK (inv K f) haddhom).
+claim hmul : forall u v :e L,
+  inv K f (mulL u v) = mulK (inv K f u) (inv K f v).
+let u.
+assume hu.
+let v.
+assume hv.
+claim hiu : inv K f u :e K.
+exact (hinvmaps u hu).
+claim hiv : inv K f v :e K.
+exact (hinvmaps v hv).
+claim huv : mulL u v :e L.
+exact (god1_ring_multiplicative_law L addL mulL hL u hu v hv).
+claim hiuv : inv K f (mulL u v) :e K.
+exact (hinvmaps (mulL u v) huv).
+claim hiprod : mulK (inv K f u) (inv K f v) :e K.
+exact (god1_ring_multiplicative_law K addK mulK hK
+  (inv K f u) hiu (inv K f v) hiv).
+apply (god1_bijection_injective K L f hbij
+  (inv K f (mulL u v)) hiuv
+  (mulK (inv K f u) (inv K f v)) hiprod).
+claim hleft : f (inv K f (mulL u v)) = mulL u v.
+exact (andER
+  (inv K f (mulL u v) :e K)
+  (f (inv K f (mulL u v)) = mulL u v)
+  (surj_rinv K L f
+    (god1_bijection_surjective K L f hbij) (mulL u v) huv)).
+claim hright :
+  f (mulK (inv K f u) (inv K f v)) = mulL u v.
+claim hfops :
+  f (addK (inv K f u) (inv K f v))
+    = addL (f (inv K f u)) (f (inv K f v))
+  /\ f (mulK (inv K f u) (inv K f v))
+    = mulL (f (inv K f u)) (f (inv K f v)).
+exact (god1_ring_homomorphism_operations
+  K addK mulK L addL mulL f hf
+  (inv K f u) hiu (inv K f v) hiv).
+claim hfu : f (inv K f u) = u.
+exact (andER
+  (inv K f u :e K) (f (inv K f u) = u)
+  (surj_rinv K L f
+    (god1_bijection_surjective K L f hbij) u hu)).
+claim hfv : f (inv K f v) = v.
+exact (andER
+  (inv K f v :e K) (f (inv K f v) = v)
+  (surj_rinv K L f
+    (god1_bijection_surjective K L f hbij) v hv)).
+exact (eq_i_tra
+  (f (mulK (inv K f u) (inv K f v)))
+  (mulL (f (inv K f u)) (f (inv K f v)))
+  (mulL u v)
+  (andER
+    (f (addK (inv K f u) (inv K f v))
+      = addL (f (inv K f u)) (f (inv K f v)))
+    (f (mulK (inv K f u) (inv K f v))
+      = mulL (f (inv K f u)) (f (inv K f v))) hfops)
+  (eq_i_tra
+    (mulL (f (inv K f u)) (f (inv K f v)))
+    (mulL u (f (inv K f v))) (mulL u v)
+    (f_eq_i (fun z => mulL z (f (inv K f v)))
+      (f (inv K f u)) u hfu)
+    (f_eq_i (fun z => mulL u z)
+      (f (inv K f v)) v hfv))).
+exact (eq_i_tra
+  (f (inv K f (mulL u v))) (mulL u v)
+  (f (mulK (inv K f u) (inv K f v)))
+  hleft
+  (eq_sym
+    (f (mulK (inv K f u) (inv K f v)))
+    (mulL u v) hright)).
+claim honeK : ring_one K mulK :e K.
+exact (andEL
+  (ring_one K mulK :e K)
+  (forall z :e K,
+    mulK z (ring_one K mulK) = z
+    /\ mulK (ring_one K mulK) z = z)
+  (god1_ring_multiplicative_identity_specification K addK mulK hK)).
+claim hone : inv K f (ring_one L mulL) = ring_one K mulK.
+exact (eq_i_tra
+  (inv K f (ring_one L mulL))
+  (inv K f (f (ring_one K mulK)))
+  (ring_one K mulK)
+  (f_eq_i (inv K f) (ring_one L mulL) (f (ring_one K mulK))
+    (eq_sym (f (ring_one K mulK)) (ring_one L mulL)
+      (god1_ring_homomorphism_preserves_one
+        K addK mulK L addL mulL f hf)))
+  (inj_linv K f
+    (god1_bijection_injective K L f hbij)
+    (ring_one K mulK) honeK)).
+exact (andI
+  (((ring L addL mulL /\ ring K addK mulK)
+    /\ forall u :e L, inv K f u :e K)
+    /\ forall u v :e L,
+      inv K f (addL u v) = addK (inv K f u) (inv K f v)
+      /\ inv K f (mulL u v) = mulK (inv K f u) (inv K f v))
+  (inv K f (ring_one L mulL) = ring_one K mulK)
+  (andI
+    ((ring L addL mulL /\ ring K addK mulK)
+      /\ forall u :e L, inv K f u :e K)
+    (forall u v :e L,
+      inv K f (addL u v) = addK (inv K f u) (inv K f v)
+      /\ inv K f (mulL u v) = mulK (inv K f u) (inv K f v))
+    (andI
+      (ring L addL mulL /\ ring K addK mulK)
+      (forall u :e L, inv K f u :e K)
+      (andI (ring L addL mulL) (ring K addK mulK) hL hK)
+      hinvmaps)
+    (fun u hu v hv => andI
+      (inv K f (addL u v) = addK (inv K f u) (inv K f v))
+      (inv K f (mulL u v) = mulK (inv K f u) (inv K f v))
+      (hadd u hu v hv) (hmul u hu v hv)))
+  hone).
+Qed.
+
 Theorem god1_ring_homomorphism_composition_and_inverse :
   forall K, forall addK mulK:set -> set -> set,
   forall L, forall addL mulL:set -> set -> set,
@@ -67216,7 +67581,6 @@ Theorem god1_ring_homomorphism_composition_and_inverse :
       ring_homomorphism L addL mulL K addK mulK (inv K f)).
 let K addK mulK L addL mulL M addM mulM f g.
 assume hf hg.
-apply andI.
 //GOD1PRF:123686 The properties of ring homomorphisms are analogous to those of group homomorphisms (§ 7, sections 8 and 9).
 claim h_s8_ring_hom_s7_group_result_call :
   forall A, forall addA:set -> set -> set,
@@ -67228,23 +67592,36 @@ claim h_s8_ring_hom_s7_group_result_call :
     group_homomorphism A addA C addC (fun x => v (u x))
     /\ (bij A B u ->
       group_homomorphism B addB A addA (inv A u)).
-apply god1_s7_theorem6_composite_and_inverse_homomorphisms.
+exact god1_s7_theorem6_composite_and_inverse_homomorphisms.
 claim h_s8_ring_hom_additive_group_maps :
   group_homomorphism K addK L addL f
   /\ group_homomorphism L addL M addM g.
-admit.
+exact (andI
+  (group_homomorphism K addK L addL f)
+  (group_homomorphism L addL M addM g)
+  (god1_ring_homomorphism_additive_group_homomorphism
+    K addK mulK L addL mulL f hf)
+  (god1_ring_homomorphism_additive_group_homomorphism
+    L addL mulL M addM mulM g hg)).
 //GOD1PRF:123888 are ring homomorphisms, then so is their composition $g \circ f$.
 claim h_s8_ring_hom_composite :
   ring_homomorphism K addK mulK M addM mulM (fun x => g (f x)).
-admit.
+exact (god1_ring_homomorphism_composite
+  K addK mulK L addL mulL M addM mulM f g hf hg).
 //GOD1PRF:123956 If a homomorphism $f: \mathrm{K} \rightarrow \mathrm{L}$ is bijective, then the inverse mapping is also a homomorphism ; in this case $f$ is said to be an isomorphism, and two rings K , L are said to be isomorphic if there exists an isomorphism of K onto L .
 claim h_s8_ring_hom_inverse_bijection_call :
   bij K L f -> bij L K (inv K f).
-apply (bij_inv K L f).
+exact (bij_inv K L f).
 claim h_s8_ring_hom_inverse :
   bij K L f -> ring_homomorphism L addL mulL K addK mulK (inv K f).
-admit.
-Admitted.
+exact (god1_bijective_ring_homomorphism_inverse
+  K addK mulK L addL mulL f hf).
+exact (andI
+  (ring_homomorphism K addK mulK M addM mulM (fun x => g (f x)))
+  (bij K L f ->
+    ring_homomorphism L addL mulL K addK mulK (inv K f))
+  h_s8_ring_hom_composite h_s8_ring_hom_inverse).
+Qed.
 
 //GOD1:124303 ring_homomorphism_kernel : "the kernel of the ring homomorphism #7" | $\operatorname{Ker}(#7)$
 Definition ring_homomorphism_kernel :
