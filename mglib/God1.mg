@@ -46527,6 +46527,277 @@ Definition group_homomorphism :
     /\ (forall x y :e G,
       f (mulG x y) = mulH (f x) (f y)).
 
+Theorem god1_group_homomorphism_domain_group :
+  forall G, forall mulG:set -> set -> set,
+  forall H, forall mulH:set -> set -> set,
+  forall f:set -> set,
+    group_homomorphism G mulG H mulH f -> group G mulG.
+let G mulG H mulH f.
+assume hf.
+exact (andEL (group G mulG) (group H mulH)
+  (andEL
+    (group G mulG /\ group H mulH)
+    (forall x :e G, f x :e H)
+    (andEL
+      ((group G mulG /\ group H mulH)
+        /\ (forall x :e G, f x :e H))
+      (forall x y :e G,
+        f (mulG x y) = mulH (f x) (f y)) hf))).
+Qed.
+
+Theorem god1_group_homomorphism_codomain_group :
+  forall G, forall mulG:set -> set -> set,
+  forall H, forall mulH:set -> set -> set,
+  forall f:set -> set,
+    group_homomorphism G mulG H mulH f -> group H mulH.
+let G mulG H mulH f.
+assume hf.
+exact (andER (group G mulG) (group H mulH)
+  (andEL
+    (group G mulG /\ group H mulH)
+    (forall x :e G, f x :e H)
+    (andEL
+      ((group G mulG /\ group H mulH)
+        /\ (forall x :e G, f x :e H))
+      (forall x y :e G,
+        f (mulG x y) = mulH (f x) (f y)) hf))).
+Qed.
+
+Theorem god1_group_homomorphism_maps_into :
+  forall G, forall mulG:set -> set -> set,
+  forall H, forall mulH:set -> set -> set,
+  forall f:set -> set,
+    group_homomorphism G mulG H mulH f ->
+    forall x :e G, f x :e H.
+let G mulG H mulH f.
+assume hf.
+exact (andER
+  (group G mulG /\ group H mulH)
+  (forall x :e G, f x :e H)
+  (andEL
+    ((group G mulG /\ group H mulH)
+      /\ (forall x :e G, f x :e H))
+    (forall x y :e G,
+      f (mulG x y) = mulH (f x) (f y)) hf)).
+Qed.
+
+Theorem god1_group_homomorphism_multiplies :
+  forall G, forall mulG:set -> set -> set,
+  forall H, forall mulH:set -> set -> set,
+  forall f:set -> set,
+    group_homomorphism G mulG H mulH f ->
+    forall x y :e G,
+      f (mulG x y) = mulH (f x) (f y).
+let G mulG H mulH f.
+assume hf.
+exact (andER
+  ((group G mulG /\ group H mulH)
+    /\ (forall x :e G, f x :e H))
+  (forall x y :e G,
+    f (mulG x y) = mulH (f x) (f y)) hf).
+Qed.
+
+Theorem god1_group_homomorphism_identity_image_idempotent :
+  forall G, forall mulG:set -> set -> set,
+  forall H, forall mulH:set -> set -> set,
+  forall f:set -> set,
+    group_homomorphism G mulG H mulH f ->
+    f (group_identity G mulG)
+      = mulH (f (group_identity G mulG))
+        (f (group_identity G mulG)).
+let G mulG H mulH f.
+assume hf.
+claim hG : group G mulG.
+exact (god1_group_homomorphism_domain_group G mulG H mulH f hf).
+claim heG : group_identity G mulG :e G.
+exact (god1_group_identity_in G mulG hG).
+claim heGsquare :
+  mulG (group_identity G mulG) (group_identity G mulG)
+    = group_identity G mulG.
+exact (andEL
+  (mulG (group_identity G mulG) (group_identity G mulG)
+    = group_identity G mulG)
+  (mulG (group_identity G mulG) (group_identity G mulG)
+    = group_identity G mulG)
+  ((andER
+    (group_identity G mulG :e G)
+    (forall x :e G,
+      mulG x (group_identity G mulG) = x
+      /\ mulG (group_identity G mulG) x = x)
+    (god1_group_identity_specification G mulG hG))
+    (group_identity G mulG) heG)).
+apply (eq_i_tra
+  (f (group_identity G mulG))
+  (f (mulG (group_identity G mulG) (group_identity G mulG)))
+  (mulH (f (group_identity G mulG))
+    (f (group_identity G mulG)))).
+- exact (f_eq_i f (group_identity G mulG)
+    (mulG (group_identity G mulG) (group_identity G mulG))
+    (eq_sym
+      (mulG (group_identity G mulG) (group_identity G mulG))
+      (group_identity G mulG) heGsquare)).
+- exact (god1_group_homomorphism_multiplies
+    G mulG H mulH f hf
+    (group_identity G mulG) heG (group_identity G mulG) heG).
+Qed.
+
+Theorem god1_group_homomorphism_preserves_identity :
+  forall G, forall mulG:set -> set -> set,
+  forall H, forall mulH:set -> set -> set,
+  forall f:set -> set,
+    group_homomorphism G mulG H mulH f ->
+    f (group_identity G mulG) = group_identity H mulH.
+let G mulG H mulH f.
+assume hf.
+claim hG : group G mulG.
+exact (god1_group_homomorphism_domain_group G mulG H mulH f hf).
+claim hH : group H mulH.
+exact (god1_group_homomorphism_codomain_group G mulG H mulH f hf).
+claim heG : group_identity G mulG :e G.
+exact (god1_group_identity_in G mulG hG).
+claim hfeG : f (group_identity G mulG) :e H.
+exact (god1_group_homomorphism_maps_into
+  G mulG H mulH f hf (group_identity G mulG) heG).
+claim heH : group_identity H mulH :e H.
+exact (god1_group_identity_in H mulH hH).
+claim heGsquare :
+  mulG (group_identity G mulG) (group_identity G mulG)
+    = group_identity G mulG.
+exact (andEL
+  (mulG (group_identity G mulG) (group_identity G mulG)
+    = group_identity G mulG)
+  (mulG (group_identity G mulG) (group_identity G mulG)
+    = group_identity G mulG)
+  ((andER
+    (group_identity G mulG :e G)
+    (forall x :e G,
+      mulG x (group_identity G mulG) = x
+      /\ mulG (group_identity G mulG) x = x)
+    (god1_group_identity_specification G mulG hG))
+    (group_identity G mulG) heG)).
+claim hproduct :
+  f (group_identity G mulG)
+    = mulH (f (group_identity G mulG))
+      (f (group_identity G mulG)).
+exact (god1_group_homomorphism_identity_image_idempotent
+  G mulG H mulH f hf).
+apply eq_sym.
+apply (god1_group_left_cancel H mulH hH
+  (f (group_identity G mulG)) hfeG
+  (group_identity H mulH) heH
+  (f (group_identity G mulG)) hfeG).
+apply (eq_i_tra
+  (mulH (f (group_identity G mulG)) (group_identity H mulH))
+  (f (group_identity G mulG))
+  (mulH (f (group_identity G mulG))
+    (f (group_identity G mulG)))).
+- exact (andEL
+    (mulH (f (group_identity G mulG)) (group_identity H mulH)
+      = f (group_identity G mulG))
+    (mulH (group_identity H mulH) (f (group_identity G mulG))
+      = f (group_identity G mulG))
+    ((andER
+      (group_identity H mulH :e H)
+      (forall x :e H,
+        mulH x (group_identity H mulH) = x
+        /\ mulH (group_identity H mulH) x = x)
+      (god1_group_identity_specification H mulH hH))
+      (f (group_identity G mulG)) hfeG)).
+- exact hproduct.
+Qed.
+
+Theorem god1_group_homomorphism_inverse_image_left :
+  forall G, forall mulG:set -> set -> set,
+  forall H, forall mulH:set -> set -> set,
+  forall f:set -> set,
+    group_homomorphism G mulG H mulH f ->
+    forall x :e G,
+      mulH (f (group_inverse G mulG x)) (f x)
+        = group_identity H mulH.
+let G mulG H mulH f.
+assume hf.
+claim hG : group G mulG.
+exact (god1_group_homomorphism_domain_group G mulG H mulH f hf).
+let x.
+assume hx.
+claim hix : group_inverse G mulG x :e G.
+exact (god1_group_inverse_in G mulG hG x hx).
+apply (eq_i_tra
+  (mulH (f (group_inverse G mulG x)) (f x))
+  (f (mulG (group_inverse G mulG x) x))
+  (group_identity H mulH)).
+- apply eq_sym.
+  exact (god1_group_homomorphism_multiplies
+    G mulG H mulH f hf (group_inverse G mulG x) hix x hx).
+- apply (eq_i_tra
+    (f (mulG (group_inverse G mulG x) x))
+    (f (group_identity G mulG)) (group_identity H mulH)).
+  - exact (f_eq_i f (mulG (group_inverse G mulG x) x)
+      (group_identity G mulG)
+      (andER
+        (group_inverse G mulG x :e G)
+        (mulG (group_inverse G mulG x) x = group_identity G mulG)
+        (andEL
+          (group_inverse G mulG x :e G
+            /\ mulG (group_inverse G mulG x) x
+              = group_identity G mulG)
+          (mulG x (group_inverse G mulG x) = group_identity G mulG)
+          (god1_group_inverse_specification G mulG hG x hx)))).
+  - exact (god1_group_homomorphism_preserves_identity
+      G mulG H mulH f hf).
+Qed.
+
+Theorem god1_group_homomorphism_preserves_inverse :
+  forall G, forall mulG:set -> set -> set,
+  forall H, forall mulH:set -> set -> set,
+  forall f:set -> set,
+    group_homomorphism G mulG H mulH f ->
+    forall x :e G,
+      f (group_inverse G mulG x) = group_inverse H mulH (f x).
+let G mulG H mulH f.
+assume hf.
+claim hG : group G mulG.
+exact (god1_group_homomorphism_domain_group G mulG H mulH f hf).
+claim hH : group H mulH.
+exact (god1_group_homomorphism_codomain_group G mulG H mulH f hf).
+let x.
+assume hx.
+claim hix : group_inverse G mulG x :e G.
+exact (god1_group_inverse_in G mulG hG x hx).
+claim hfx : f x :e H.
+exact (god1_group_homomorphism_maps_into G mulG H mulH f hf x hx).
+claim hfix : f (group_inverse G mulG x) :e H.
+exact (god1_group_homomorphism_maps_into
+  G mulG H mulH f hf (group_inverse G mulG x) hix).
+claim hleft :
+  mulH (f (group_inverse G mulG x)) (f x)
+    = group_identity H mulH.
+exact (god1_group_homomorphism_inverse_image_left
+  G mulG H mulH f hf x hx).
+apply (god1_s6_left_and_right_reflections_equal
+  H mulH (group_identity H mulH) (f x)
+  (f (group_inverse G mulG x))
+  (group_inverse H mulH (f x))
+  (god1_group_associative H mulH hH)
+  (god1_group_identity_specification H mulH hH) hfx).
+- exact (andI
+    (f (group_inverse G mulG x) :e H)
+    (mulH (f (group_inverse G mulG x)) (f x)
+      = group_identity H mulH) hfix hleft).
+- exact (andI
+    (group_inverse H mulH (f x) :e H)
+    (mulH (f x) (group_inverse H mulH (f x))
+      = group_identity H mulH)
+    (god1_group_inverse_in H mulH hH (f x) hfx)
+    (andER
+      (group_inverse H mulH (f x) :e H
+        /\ mulH (group_inverse H mulH (f x)) (f x)
+          = group_identity H mulH)
+      (mulH (f x) (group_inverse H mulH (f x))
+        = group_identity H mulH)
+      (god1_group_inverse_specification H mulH hH (f x) hfx))).
+Qed.
+
 Theorem god1_group_homomorphism_preserves_identity_and_inverse :
   forall G, forall mulG:set -> set -> set,
   forall H, forall mulH:set -> set -> set,
@@ -46540,15 +46811,185 @@ assume hf.
 //GOD1PRF:60962 Putting $y=e$, we obtain $f(x)=f(x) f(e)$, and therefore
 claim h_s7_hom_identity_preserved :
   f (group_identity G mulG) = group_identity H mulH.
-admit.
+exact (god1_group_homomorphism_preserves_identity
+  G mulG H mulH f hf).
 //GOD1PRF:61036 Next, taking $y=x^{-1}$, we obtain $e=f(x) f\left(x^{-1}\right)$, so that
 claim h_s7_hom_inverse_preserved :
   forall x :e G,
     f (group_inverse G mulG x) =
       group_inverse H mulH (f x).
-admit.
-apply andI.
-Admitted.
+exact (god1_group_homomorphism_preserves_inverse
+  G mulG H mulH f hf).
+exact (andI
+  (f (group_identity G mulG) = group_identity H mulH)
+  (forall x :e G,
+    f (group_inverse G mulG x) = group_inverse H mulH (f x))
+  h_s7_hom_identity_preserved h_s7_hom_inverse_preserved).
+Qed.
+
+Theorem god1_group_homomorphism_composite_multiplies :
+  forall M, forall mulM:set -> set -> set,
+  forall N, forall mulN:set -> set -> set,
+  forall P, forall mulP:set -> set -> set,
+  forall f g:set -> set,
+    group_homomorphism M mulM N mulN f ->
+    group_homomorphism N mulN P mulP g ->
+    forall x y :e M,
+      g (f (mulM x y)) = mulP (g (f x)) (g (f y)).
+let M mulM N mulN P mulP f g.
+assume hf hg.
+let x.
+assume hx.
+let y.
+assume hy.
+apply (eq_i_tra
+  (g (f (mulM x y)))
+  (g (mulN (f x) (f y)))
+  (mulP (g (f x)) (g (f y)))).
+- exact (f_eq_i g (f (mulM x y)) (mulN (f x) (f y))
+    (god1_group_homomorphism_multiplies
+      M mulM N mulN f hf x hx y hy)).
+- exact (god1_group_homomorphism_multiplies
+    N mulN P mulP g hg
+    (f x)
+    (god1_group_homomorphism_maps_into M mulM N mulN f hf x hx)
+    (f y)
+    (god1_group_homomorphism_maps_into M mulM N mulN f hf y hy)).
+Qed.
+
+Theorem god1_group_homomorphism_composite :
+  forall M, forall mulM:set -> set -> set,
+  forall N, forall mulN:set -> set -> set,
+  forall P, forall mulP:set -> set -> set,
+  forall f g:set -> set,
+    group_homomorphism M mulM N mulN f ->
+    group_homomorphism N mulN P mulP g ->
+    group_homomorphism M mulM P mulP (fun x => g (f x)).
+let M mulM N mulN P mulP f g.
+assume hf hg.
+claim hM : group M mulM.
+exact (god1_group_homomorphism_domain_group M mulM N mulN f hf).
+claim hP : group P mulP.
+exact (god1_group_homomorphism_codomain_group N mulN P mulP g hg).
+claim hmaps : forall x :e M, g (f x) :e P.
+let x.
+assume hx.
+exact (god1_group_homomorphism_maps_into N mulN P mulP g hg
+  (f x)
+  (god1_group_homomorphism_maps_into M mulM N mulN f hf x hx)).
+claim hmult : forall x y :e M,
+  g (f (mulM x y)) = mulP (g (f x)) (g (f y)).
+exact (god1_group_homomorphism_composite_multiplies
+  M mulM N mulN P mulP f g hf hg).
+exact (andI
+  ((group M mulM /\ group P mulP)
+    /\ (forall x :e M, g (f x) :e P))
+  (forall x y :e M,
+    g (f (mulM x y)) = mulP (g (f x)) (g (f y)))
+  (andI
+    (group M mulM /\ group P mulP)
+    (forall x :e M, g (f x) :e P)
+    (andI (group M mulM) (group P mulP) hM hP) hmaps)
+  hmult).
+Qed.
+
+Theorem god1_bijective_group_homomorphism_inverse_multiplies :
+  forall M, forall mulM:set -> set -> set,
+  forall N, forall mulN:set -> set -> set,
+  forall f:set -> set,
+    group_homomorphism M mulM N mulN f -> bij M N f ->
+    forall u v :e N,
+      inv M f (mulN u v) = mulM (inv M f u) (inv M f v).
+let M mulM N mulN f.
+assume hf hbij.
+claim hM : group M mulM.
+exact (god1_group_homomorphism_domain_group M mulM N mulN f hf).
+claim hN : group N mulN.
+exact (god1_group_homomorphism_codomain_group M mulM N mulN f hf).
+claim hinvbij : bij N M (inv M f).
+exact (bij_inv M N f hbij).
+let u.
+assume hu.
+let v.
+assume hv.
+claim hiu : inv M f u :e M.
+exact (god1_bijection_maps_into N M (inv M f) hinvbij u hu).
+claim hiv : inv M f v :e M.
+exact (god1_bijection_maps_into N M (inv M f) hinvbij v hv).
+claim huv : mulN u v :e N.
+exact (god1_group_law_of_composition N mulN hN u hu v hv).
+claim hiprod : mulM (inv M f u) (inv M f v) :e M.
+exact (god1_group_law_of_composition M mulM hM
+  (inv M f u) hiu (inv M f v) hiv).
+claim hiuv : inv M f (mulN u v) :e M.
+exact (god1_bijection_maps_into N M (inv M f)
+  hinvbij (mulN u v) huv).
+apply (god1_bijection_injective M N f hbij
+  (inv M f (mulN u v)) hiuv
+  (mulM (inv M f u) (inv M f v)) hiprod).
+apply (eq_i_tra
+  (f (inv M f (mulN u v))) (mulN u v)
+  (f (mulM (inv M f u) (inv M f v)))).
+- exact (andER
+    (inv M f (mulN u v) :e M)
+    (f (inv M f (mulN u v)) = mulN u v)
+    (surj_rinv M N f
+      (god1_bijection_surjective M N f hbij) (mulN u v) huv)).
+- apply eq_sym.
+  apply (eq_i_tra
+    (f (mulM (inv M f u) (inv M f v)))
+    (mulN (f (inv M f u)) (f (inv M f v))) (mulN u v)).
+  - exact (god1_group_homomorphism_multiplies
+      M mulM N mulN f hf
+      (inv M f u) hiu (inv M f v) hiv).
+  - apply (eq_i_tra
+      (mulN (f (inv M f u)) (f (inv M f v)))
+      (mulN u (f (inv M f v))) (mulN u v)).
+    - exact (f_eq_i (fun z => mulN z (f (inv M f v)))
+        (f (inv M f u)) u
+        (andER
+          (inv M f u :e M) (f (inv M f u) = u)
+          (surj_rinv M N f
+            (god1_bijection_surjective M N f hbij) u hu))).
+    - exact (f_eq_i (fun z => mulN u z)
+        (f (inv M f v)) v
+        (andER
+          (inv M f v :e M) (f (inv M f v) = v)
+          (surj_rinv M N f
+            (god1_bijection_surjective M N f hbij) v hv))).
+Qed.
+
+Theorem god1_bijective_group_homomorphism_inverse :
+  forall M, forall mulM:set -> set -> set,
+  forall N, forall mulN:set -> set -> set,
+  forall f:set -> set,
+    group_homomorphism M mulM N mulN f -> bij M N f ->
+    group_homomorphism N mulN M mulM (inv M f).
+let M mulM N mulN f.
+assume hf hbij.
+claim hM : group M mulM.
+exact (god1_group_homomorphism_domain_group M mulM N mulN f hf).
+claim hN : group N mulN.
+exact (god1_group_homomorphism_codomain_group M mulM N mulN f hf).
+claim hinvbij : bij N M (inv M f).
+exact (bij_inv M N f hbij).
+claim hmaps : forall u :e N, inv M f u :e M.
+exact (god1_bijection_maps_into N M (inv M f) hinvbij).
+claim hmult : forall u v :e N,
+  inv M f (mulN u v) = mulM (inv M f u) (inv M f v).
+exact (god1_bijective_group_homomorphism_inverse_multiplies
+  M mulM N mulN f hf hbij).
+exact (andI
+  ((group N mulN /\ group M mulM)
+    /\ (forall u :e N, inv M f u :e M))
+  (forall u v :e N,
+    inv M f (mulN u v) = mulM (inv M f u) (inv M f v))
+  (andI
+    (group N mulN /\ group M mulM)
+    (forall u :e N, inv M f u :e M)
+    (andI (group N mulN) (group M mulM) hN hM) hmaps)
+  hmult).
+Qed.
 
 Theorem god1_s7_theorem6_composite_and_inverse_homomorphisms :
   forall M, forall mulM:set -> set -> set,
@@ -46562,52 +47003,41 @@ Theorem god1_s7_theorem6_composite_and_inverse_homomorphisms :
       group_homomorphism N mulN M mulM (inv M f)).
 let M mulM N mulN P mulP f g.
 assume hf hg.
-apply andI.
 //GOD1PRF:63143 If $x, y \in \mathrm{M}$, then
 claim h_s7_t6_composite_calculation :
   forall x y :e M,
     g (f (mulM x y)) = mulP (g (f x)) (g (f y)).
-admit.
+exact (god1_group_homomorphism_composite_multiplies
+  M mulM N mulN P mulP f g hf hg).
 //GOD1PRF:63245 which proves the first part of the theorem.
 claim h_s7_t6_composite_homomorphism :
   group_homomorphism M mulM P mulP (fun x => g (f x)).
-admit.
+exact (god1_group_homomorphism_composite
+  M mulM N mulN P mulP f g hf hg).
 //GOD1PRF:63291 To prove the second part, in other words that
 claim h_s7_t6_inverse_homomorphism_goal :
   bij M N f ->
   group_homomorphism N mulN M mulM (inv M f).
-admit.
+assume hbij.
+exact (god1_bijective_group_homomorphism_inverse
+  M mulM N mulN f hf hbij).
 //GOD1PRF:63377 for all $u, v \in \mathrm{~N}$, it is sufficient (since $f$ is bijective, and therefore injective) to establish that the images under $f$ of the two sides of this relation are equal, i.e., that
-claim h_s7_t6_injective_reduction :
-  bij M N f -> forall u v :e N,
-    f (inv M f (mulN u v))
-      = f (mulM (inv M f u) (inv M f v)) ->
-    inv M f (mulN u v)
-      = mulM (inv M f u) (inv M f v).
-admit.
 //GOD1PRF:63641 But the left-hand side is equal to $u v$, by the definition of the inverse mapping $f^{-1}$; and since $f$ is a homomorphism, the right-hand side is equal to
-claim h_s7_t6_inverse_image_calculation :
-  bij M N f -> forall u v :e N,
-    f (inv M f (mulN u v)) = mulN u v
-    /\ f (mulM (inv M f u) (inv M f v))
-      = mulN (f (inv M f u)) (f (inv M f v)).
-admit.
 claim h_s7_t6_bijection_inverse_call :
   bij M N f -> bij N M (inv M f).
 apply (bij_inv M N f).
 //GOD1PRF:63858 which is equal to $u v$.
-claim h_s7_t6_both_images_equal :
-  bij M N f -> forall u v :e N,
-    f (inv M f (mulN u v))
-      = f (mulM (inv M f u) (inv M f v)).
-admit.
 //GOD1PRF:63885 Q.E.D.
 claim h_s7_t6_book_conclusion :
   group_homomorphism M mulM P mulP (fun x => g (f x))
   /\ (bij M N f ->
     group_homomorphism N mulN M mulM (inv M f)).
-admit.
-Admitted.
+exact (andI
+  (group_homomorphism M mulM P mulP (fun x => g (f x)))
+  (bij M N f -> group_homomorphism N mulN M mulM (inv M f))
+  h_s7_t6_composite_homomorphism h_s7_t6_inverse_homomorphism_goal).
+exact h_s7_t6_book_conclusion.
+Qed.
 
 //GOD1:63893 group_isomorphism : "#7 is an isomorphism from the group #1 onto the group #3" | $#7:#1\xrightarrow{\sim}#3$
 Definition group_isomorphism :
@@ -46624,6 +47054,133 @@ Definition isomorphic_groups :
   fun G mulG H mulH =>
     exists f:set -> set, group_isomorphism G mulG H mulH f.
 
+Theorem god1_group_isomorphism_homomorphism :
+  forall G, forall mulG:set -> set -> set,
+  forall H, forall mulH:set -> set -> set,
+  forall f:set -> set,
+    group_isomorphism G mulG H mulH f ->
+    group_homomorphism G mulG H mulH f.
+let G mulG H mulH f.
+assume hf.
+exact (andEL
+  (group_homomorphism G mulG H mulH f)
+  (bij G H f) hf).
+Qed.
+
+Theorem god1_group_isomorphism_bijective :
+  forall G, forall mulG:set -> set -> set,
+  forall H, forall mulH:set -> set -> set,
+  forall f:set -> set,
+    group_isomorphism G mulG H mulH f -> bij G H f.
+let G mulG H mulH f.
+assume hf.
+exact (andER
+  (group_homomorphism G mulG H mulH f)
+  (bij G H f) hf).
+Qed.
+
+Theorem god1_identity_group_homomorphism :
+  forall G, forall mul:set -> set -> set,
+    group G mul -> group_homomorphism G mul G mul (fun x => x).
+let G mul.
+assume hG.
+claim hmaps : forall x :e G, (fun z:set => z) x :e G.
+let x.
+assume hx.
+exact hx.
+claim hmult : forall x y :e G,
+  (fun z:set => z) (mul x y)
+    = mul ((fun z:set => z) x) ((fun z:set => z) y).
+let x.
+assume hx.
+let y.
+assume hy.
+exact (eq_ref (mul x y)).
+exact (andI
+  ((group G mul /\ group G mul)
+    /\ (forall x :e G, (fun z:set => z) x :e G))
+  (forall x y :e G,
+    (fun z:set => z) (mul x y)
+      = mul ((fun z:set => z) x) ((fun z:set => z) y))
+  (andI
+    (group G mul /\ group G mul)
+    (forall x :e G, (fun z:set => z) x :e G)
+    (andI (group G mul) (group G mul) hG hG) hmaps)
+  hmult).
+Qed.
+
+Theorem god1_group_isomorphism_reflexive :
+  forall G, forall mul:set -> set -> set,
+    group G mul -> isomorphic_groups G mul G mul.
+let G mul.
+assume hG.
+apply (ex_intro_setfun
+  (fun f => group_isomorphism G mul G mul f)
+  (fun x => x)).
+exact (andI
+  (group_homomorphism G mul G mul (fun x => x))
+  (bij G G (fun x => x))
+  (god1_identity_group_homomorphism G mul hG) (bij_id G)).
+Qed.
+
+Theorem god1_group_isomorphism_symmetric :
+  forall G, forall mulG:set -> set -> set,
+  forall H, forall mulH:set -> set -> set,
+    isomorphic_groups G mulG H mulH ->
+    isomorphic_groups H mulH G mulG.
+let G mulG H mulH.
+assume hGH.
+apply hGH.
+let f.
+assume hf.
+claim hhom : group_homomorphism G mulG H mulH f.
+exact (god1_group_isomorphism_homomorphism G mulG H mulH f hf).
+claim hbij : bij G H f.
+exact (god1_group_isomorphism_bijective G mulG H mulH f hf).
+apply (ex_intro_setfun
+  (fun g => group_isomorphism H mulH G mulG g) (inv G f)).
+exact (andI
+  (group_homomorphism H mulH G mulG (inv G f))
+  (bij H G (inv G f))
+  (god1_bijective_group_homomorphism_inverse
+    G mulG H mulH f hhom hbij)
+  (bij_inv G H f hbij)).
+Qed.
+
+Theorem god1_group_isomorphism_transitive :
+  forall G, forall mulG:set -> set -> set,
+  forall H, forall mulH:set -> set -> set,
+  forall K, forall mulK:set -> set -> set,
+    isomorphic_groups G mulG H mulH ->
+    isomorphic_groups H mulH K mulK ->
+    isomorphic_groups G mulG K mulK.
+let G mulG H mulH K mulK.
+assume hGH hHK.
+apply hGH.
+let f.
+assume hf.
+apply hHK.
+let g.
+assume hg.
+claim hfhom : group_homomorphism G mulG H mulH f.
+exact (god1_group_isomorphism_homomorphism G mulG H mulH f hf).
+claim hghom : group_homomorphism H mulH K mulK g.
+exact (god1_group_isomorphism_homomorphism H mulH K mulK g hg).
+claim hfbij : bij G H f.
+exact (god1_group_isomorphism_bijective G mulG H mulH f hf).
+claim hgbij : bij H K g.
+exact (god1_group_isomorphism_bijective H mulH K mulK g hg).
+apply (ex_intro_setfun
+  (fun q => group_isomorphism G mulG K mulK q)
+  (fun x => g (f x))).
+exact (andI
+  (group_homomorphism G mulG K mulK (fun x => g (f x)))
+  (bij G K (fun x => g (f x)))
+  (god1_group_homomorphism_composite
+    G mulG H mulH K mulK f g hfhom hghom)
+  (bij_comp G H K f g hfbij hgbij)).
+Qed.
+
 Theorem god1_group_isomorphism_is_equivalence :
   (forall G, forall mul:set -> set -> set,
     group G mul -> isomorphic_groups G mul G mul)
@@ -46637,22 +47194,7 @@ Theorem god1_group_isomorphism_is_equivalence :
       isomorphic_groups G mulG H mulH ->
       isomorphic_groups H mulH K mulK ->
       isomorphic_groups G mulG K mulK).
-apply andI.
 //GOD1PRF:64271 is an equivalence relation.
-claim h_s7_isomorphism_equivalence_goal :
-  (forall G, forall mul:set -> set -> set,
-    group G mul -> isomorphic_groups G mul G mul)
-  /\ (forall G, forall mulG:set -> set -> set,
-    forall H, forall mulH:set -> set -> set,
-    isomorphic_groups G mulG H mulH ->
-    isomorphic_groups H mulH G mulG)
-  /\ (forall G, forall mulG:set -> set -> set,
-    forall H, forall mulH:set -> set -> set,
-    forall K, forall mulK:set -> set -> set,
-    isomorphic_groups G mulG H mulH ->
-    isomorphic_groups H mulH K mulK ->
-    isomorphic_groups G mulG K mulK).
-admit.
 //GOD1PRF:64299 For $G$ and $G$ are isomorphic, $G$ being any group, because the identity mapping is an isomorphism of $G$ onto $G$; next, if there exists an isomorphism $f$ of G onto H , then there exists an isomorphism of H onto G , namely $f^{-1}$; and finally, if there exists an isomorphism $f$ of a group M onto a group N , and an isomorphism $g$ of N onto a third group P , then there exists an isomorphism of M onto P-namely $g \circ f$, which is a homomorphism by Theorem 6, and is bijective because $f$ and $g$ are bijective.
 claim h_s7_isomorphism_theorem6_call :
   forall M, forall mulM:set -> set -> set,
@@ -46678,8 +47220,30 @@ claim h_s7_isomorphism_three_cases :
     isomorphic_groups G mulG H mulH ->
     isomorphic_groups H mulH P mulP ->
     isomorphic_groups G mulG P mulP).
-admit.
-Admitted.
+exact (andI
+  ((forall G, forall mul:set -> set -> set,
+      group G mul -> isomorphic_groups G mul G mul)
+    /\ (forall G, forall mulG:set -> set -> set,
+      forall H, forall mulH:set -> set -> set,
+      isomorphic_groups G mulG H mulH ->
+      isomorphic_groups H mulH G mulG))
+  (forall G, forall mulG:set -> set -> set,
+    forall H, forall mulH:set -> set -> set,
+    forall P, forall mulP:set -> set -> set,
+    isomorphic_groups G mulG H mulH ->
+    isomorphic_groups H mulH P mulP ->
+    isomorphic_groups G mulG P mulP)
+  (andI
+    (forall G, forall mul:set -> set -> set,
+      group G mul -> isomorphic_groups G mul G mul)
+    (forall G, forall mulG:set -> set -> set,
+      forall H, forall mulH:set -> set -> set,
+      isomorphic_groups G mulG H mulH ->
+      isomorphic_groups H mulH G mulG)
+    god1_group_isomorphism_reflexive god1_group_isomorphism_symmetric)
+  god1_group_isomorphism_transitive).
+exact h_s7_isomorphism_three_cases.
+Qed.
 
 //GOD1:64820 group_automorphism : "#4 is an automorphism of the group #1" | $#4\in\operatorname{Aut}(#1)$
 Definition group_automorphism :
@@ -46715,6 +47279,146 @@ Definition group_preimage_of_subset :
   set -> set -> (set -> set) -> set :=
   fun G B f => {x :e G|f x :e B}.
 
+Theorem god1_group_homomorphism_image_subgroup :
+  forall G, forall mulG:set -> set -> set,
+  forall H, forall mulH:set -> set -> set,
+  forall f:set -> set,
+    group_homomorphism G mulG H mulH f ->
+    forall A, subgroup G mulG A ->
+      subgroup H mulH (group_image_of_subset A f).
+let G mulG H mulH f.
+assume hf.
+let A.
+assume hA.
+claim hG : group G mulG.
+exact (god1_group_homomorphism_domain_group G mulG H mulH f hf).
+claim hH : group H mulH.
+exact (god1_group_homomorphism_codomain_group G mulG H mulH f hf).
+apply (god1_subgroup_of_identity_product_inverse
+  H mulH (group_image_of_subset A f) hH).
+- let z.
+  assume hz.
+  apply (ReplE_impred A f z hz (z :e H)).
+  let x.
+  assume hx hzx.
+  exact (mem_eq_substL H (f x) z hzx
+    (god1_group_homomorphism_maps_into G mulG H mulH f hf x
+      ((god1_subgroup_subset G mulG A hA) x hx))).
+- exact (mem_eq_substL (group_image_of_subset A f)
+    (f (group_identity G mulG)) (group_identity H mulH)
+    (eq_sym
+      (f (group_identity G mulG)) (group_identity H mulH)
+      (god1_group_homomorphism_preserves_identity
+        G mulG H mulH f hf))
+    (ReplI A f (group_identity G mulG)
+      (god1_subgroup_contains_identity G mulG A hA))).
+- let u.
+  assume hu.
+  let v.
+  assume hv.
+  apply (ReplE_impred A f u hu
+    (mulH u v :e group_image_of_subset A f)).
+  let x.
+  assume hx hux.
+  apply (ReplE_impred A f v hv
+    (mulH u v :e group_image_of_subset A f)).
+  let y.
+  assume hy hvy.
+  claim hxy : mulG x y :e A.
+  exact (god1_subgroup_product_closed G mulG A hA x hx y hy).
+  apply (mem_eq_substL (group_image_of_subset A f)
+    (f (mulG x y)) (mulH u v)).
+  - apply (eq_i_tra (mulH u v) (mulH (f x) v) (f (mulG x y))).
+    - exact (f_eq_i (fun z => mulH z v) u (f x) hux).
+    - apply (eq_i_tra
+        (mulH (f x) v) (mulH (f x) (f y)) (f (mulG x y))).
+      - exact (f_eq_i (fun z => mulH (f x) z) v (f y) hvy).
+      - apply eq_sym.
+        exact (god1_group_homomorphism_multiplies
+          G mulG H mulH f hf x
+          ((god1_subgroup_subset G mulG A hA) x hx)
+          y ((god1_subgroup_subset G mulG A hA) y hy)).
+  - exact (ReplI A f (mulG x y) hxy).
+- let u.
+  assume hu.
+  apply (ReplE_impred A f u hu
+    (group_inverse H mulH u :e group_image_of_subset A f)).
+  let x.
+  assume hx hux.
+  claim hxG : x :e G.
+  exact ((god1_subgroup_subset G mulG A hA) x hx).
+  apply (mem_eq_substL (group_image_of_subset A f)
+    (f (group_inverse G mulG x)) (group_inverse H mulH u)).
+  - apply (eq_i_tra
+      (group_inverse H mulH u)
+      (group_inverse H mulH (f x))
+      (f (group_inverse G mulG x))).
+    - exact (f_eq_i (fun z => group_inverse H mulH z) u (f x) hux).
+    - apply eq_sym.
+      exact (god1_group_homomorphism_preserves_inverse
+        G mulG H mulH f hf x hxG).
+  - exact (ReplI A f (group_inverse G mulG x)
+      (god1_subgroup_inverse_closed G mulG A hA x hx)).
+Qed.
+
+Theorem god1_group_homomorphism_preimage_subgroup :
+  forall G, forall mulG:set -> set -> set,
+  forall H, forall mulH:set -> set -> set,
+  forall f:set -> set,
+    group_homomorphism G mulG H mulH f ->
+    forall B, subgroup H mulH B ->
+      subgroup G mulG (group_preimage_of_subset G B f).
+let G mulG H mulH f.
+assume hf.
+let B.
+assume hB.
+claim hG : group G mulG.
+exact (god1_group_homomorphism_domain_group G mulG H mulH f hf).
+claim hH : group H mulH.
+exact (god1_group_homomorphism_codomain_group G mulG H mulH f hf).
+apply (god1_subgroup_of_identity_product_inverse
+  G mulG (group_preimage_of_subset G B f) hG).
+- let x.
+  assume hx.
+  exact (SepE1 G (fun z => f z :e B) x hx).
+- exact (SepI G (fun x => f x :e B) (group_identity G mulG)
+    (god1_group_identity_in G mulG hG)
+    (mem_eq_substL B (group_identity H mulH)
+      (f (group_identity G mulG))
+      (god1_group_homomorphism_preserves_identity
+        G mulG H mulH f hf)
+      (god1_subgroup_contains_identity H mulH B hB))).
+- let x.
+  assume hx.
+  let y.
+  assume hy.
+  claim hxG : x :e G.
+  exact (SepE1 G (fun z => f z :e B) x hx).
+  claim hyG : y :e G.
+  exact (SepE1 G (fun z => f z :e B) y hy).
+  exact (SepI G (fun z => f z :e B) (mulG x y)
+    (god1_group_law_of_composition G mulG hG x hxG y hyG)
+    (mem_eq_substL B (mulH (f x) (f y)) (f (mulG x y))
+      (god1_group_homomorphism_multiplies
+        G mulG H mulH f hf x hxG y hyG)
+      (god1_subgroup_product_closed H mulH B hB
+        (f x) (SepE2 G (fun z => f z :e B) x hx)
+        (f y) (SepE2 G (fun z => f z :e B) y hy)))).
+- let x.
+  assume hx.
+  claim hxG : x :e G.
+  exact (SepE1 G (fun z => f z :e B) x hx).
+  exact (SepI G (fun z => f z :e B) (group_inverse G mulG x)
+    (god1_group_inverse_in G mulG hG x hxG)
+    (mem_eq_substL B
+      (group_inverse H mulH (f x))
+      (f (group_inverse G mulG x))
+      (god1_group_homomorphism_preserves_inverse
+        G mulG H mulH f hf x hxG)
+      (god1_subgroup_inverse_closed H mulH B hB
+        (f x) (SepE2 G (fun z => f z :e B) x hx)))).
+Qed.
+
 Theorem god1_s7_theorem7_images_and_preimages_of_subgroups :
   forall G, forall mulG:set -> set -> set,
   forall H, forall mulH:set -> set -> set,
@@ -46728,31 +47432,38 @@ Theorem god1_s7_theorem7_images_and_preimages_of_subgroups :
       subgroup G mulG (group_preimage_of_subset G B f)).
 let G mulG H mulH f.
 assume hf.
-apply andI.
 //GOD1PRF:67072 Let $\mathrm{G}^{\prime}$ be a subgroup of G and let $\mathrm{H}^{\prime}=f\left(\mathrm{G}^{\prime}\right)$ be its image.
 claim h_s7_t7_image_setup :
   forall A,
     subgroup G mulG A ->
     group_image_of_subset A f c= H.
-admit.
+let A.
+assume hA.
+exact (god1_subgroup_subset H mulH (group_image_of_subset A f)
+  (god1_group_homomorphism_image_subgroup
+    G mulG H mulH f hf A hA)).
 //GOD1PRF:67195 If $u, v \in \mathrm{H}^{\prime}$, then there exist $x, y \in \mathrm{G}$ such that $u=f(x), v=f(y)$, and we calculate
-claim h_s7_t7_image_representatives :
-  forall A, forall u v :e group_image_of_subset A f,
-    exists x y :e A, u = f x /\ v = f y.
-admit.
 //GOD1PRF:67397 Since $x y^{-1} \in \mathrm{G}^{\prime}$, it follows that $u v^{-1} \in \mathrm{H}^{\prime}$, and therefore $\mathrm{H}^{\prime}$ is a subgroup of H .
 claim h_s7_t7_image_subgroup :
   forall A,
     subgroup G mulG A ->
     subgroup H mulH (group_image_of_subset A f).
-admit.
+exact (god1_group_homomorphism_image_subgroup
+  G mulG H mulH f hf).
 //GOD1PRF:67548 This proves the first statement of the theorem; the proof of the second is analogous, and we leave the details to the reader.
 claim h_s7_t7_preimage_subgroup :
   forall B,
     subgroup H mulH B ->
     subgroup G mulG (group_preimage_of_subset G B f).
-admit.
-Admitted.
+exact (god1_group_homomorphism_preimage_subgroup
+  G mulG H mulH f hf).
+exact (andI
+  (forall A, subgroup G mulG A ->
+    subgroup H mulH (group_image_of_subset A f))
+  (forall B, subgroup H mulH B ->
+    subgroup G mulG (group_preimage_of_subset G B f))
+  h_s7_t7_image_subgroup h_s7_t7_preimage_subgroup).
+Qed.
 
 //GOD1:68903 normal_subgroup : "#3 is a normal subgroup of the group #1" | $#3\trianglelefteq #1$
 Definition normal_subgroup :
@@ -46761,6 +47472,219 @@ Definition normal_subgroup :
     subgroup G mul N
     /\ forall a :e G, forall x :e N,
       mul (mul a x) (group_inverse G mul a) :e N.
+
+Theorem god1_group_homomorphism_kernel_elim :
+  forall G, forall mulG:set -> set -> set,
+  forall H, forall mulH:set -> set -> set,
+  forall f:set -> set, forall x,
+    x :e group_homomorphism_kernel G mulG H mulH f ->
+    x :e G /\ f x = group_identity H mulH.
+let G mulG H mulH f x.
+assume hx.
+exact (andI (x :e G) (f x = group_identity H mulH)
+  (SepE1 G (fun z => f z = group_identity H mulH) x hx)
+  (SepE2 G (fun z => f z = group_identity H mulH) x hx)).
+Qed.
+
+Theorem god1_group_homomorphism_kernel_intro :
+  forall G, forall mulG:set -> set -> set,
+  forall H, forall mulH:set -> set -> set,
+  forall f:set -> set, forall x,
+    x :e G -> f x = group_identity H mulH ->
+    x :e group_homomorphism_kernel G mulG H mulH f.
+let G mulG H mulH f x.
+assume hx heq.
+exact (SepI G (fun z => f z = group_identity H mulH) x hx heq).
+Qed.
+
+Theorem god1_group_homomorphism_kernel_subgroup :
+  forall G, forall mulG:set -> set -> set,
+  forall H, forall mulH:set -> set -> set,
+  forall f:set -> set,
+    group_homomorphism G mulG H mulH f ->
+    subgroup G mulG (group_homomorphism_kernel G mulG H mulH f).
+let G mulG H mulH f.
+assume hf.
+claim hG : group G mulG.
+exact (god1_group_homomorphism_domain_group G mulG H mulH f hf).
+claim hH : group H mulH.
+exact (god1_group_homomorphism_codomain_group G mulG H mulH f hf).
+apply (god1_subgroup_of_identity_product_inverse G mulG
+  (group_homomorphism_kernel G mulG H mulH f) hG).
+- let x.
+  assume hx.
+  exact (andEL (x :e G) (f x = group_identity H mulH)
+    (god1_group_homomorphism_kernel_elim
+      G mulG H mulH f x hx)).
+- exact (god1_group_homomorphism_kernel_intro
+    G mulG H mulH f (group_identity G mulG)
+    (god1_group_identity_in G mulG hG)
+    (god1_group_homomorphism_preserves_identity
+      G mulG H mulH f hf)).
+- let x.
+  assume hx.
+  let y.
+  assume hy.
+  claim hxdata : x :e G /\ f x = group_identity H mulH.
+  exact (god1_group_homomorphism_kernel_elim
+    G mulG H mulH f x hx).
+  claim hydata : y :e G /\ f y = group_identity H mulH.
+  exact (god1_group_homomorphism_kernel_elim
+    G mulG H mulH f y hy).
+  apply (god1_group_homomorphism_kernel_intro
+    G mulG H mulH f (mulG x y)
+    (god1_group_law_of_composition G mulG hG
+      x (andEL (x :e G) (f x = group_identity H mulH) hxdata)
+      y (andEL (y :e G) (f y = group_identity H mulH) hydata))).
+  apply (eq_i_tra (f (mulG x y)) (mulH (f x) (f y))
+    (group_identity H mulH)).
+  - exact (god1_group_homomorphism_multiplies
+      G mulG H mulH f hf
+      x (andEL (x :e G) (f x = group_identity H mulH) hxdata)
+      y (andEL (y :e G) (f y = group_identity H mulH) hydata)).
+  - apply (eq_i_tra
+      (mulH (f x) (f y))
+      (mulH (group_identity H mulH) (group_identity H mulH))
+      (group_identity H mulH)).
+    - apply (eq_i_tra
+        (mulH (f x) (f y))
+        (mulH (group_identity H mulH) (f y))
+        (mulH (group_identity H mulH) (group_identity H mulH))).
+      - exact (f_eq_i (fun z => mulH z (f y))
+          (f x) (group_identity H mulH)
+          (andER (x :e G) (f x = group_identity H mulH) hxdata)).
+      - exact (f_eq_i (fun z => mulH (group_identity H mulH) z)
+          (f y) (group_identity H mulH)
+          (andER (y :e G) (f y = group_identity H mulH) hydata)).
+    - exact (andEL
+        (mulH (group_identity H mulH) (group_identity H mulH)
+          = group_identity H mulH)
+        (mulH (group_identity H mulH) (group_identity H mulH)
+          = group_identity H mulH)
+        ((andER
+          (group_identity H mulH :e H)
+          (forall z :e H,
+            mulH z (group_identity H mulH) = z
+            /\ mulH (group_identity H mulH) z = z)
+          (god1_group_identity_specification H mulH hH))
+          (group_identity H mulH) (god1_group_identity_in H mulH hH))).
+- let x.
+  assume hx.
+  claim hxdata : x :e G /\ f x = group_identity H mulH.
+  exact (god1_group_homomorphism_kernel_elim
+    G mulG H mulH f x hx).
+  claim hxG : x :e G.
+  exact (andEL (x :e G) (f x = group_identity H mulH) hxdata).
+  apply (god1_group_homomorphism_kernel_intro
+    G mulG H mulH f (group_inverse G mulG x)
+    (god1_group_inverse_in G mulG hG x hxG)).
+  apply (eq_i_tra
+    (f (group_inverse G mulG x))
+    (group_inverse H mulH (f x)) (group_identity H mulH)).
+  - exact (god1_group_homomorphism_preserves_inverse
+      G mulG H mulH f hf x hxG).
+  - apply (eq_i_tra
+      (group_inverse H mulH (f x))
+      (group_inverse H mulH (group_identity H mulH))
+      (group_identity H mulH)).
+    - exact (f_eq_i (fun z => group_inverse H mulH z)
+        (f x) (group_identity H mulH)
+        (andER (x :e G) (f x = group_identity H mulH) hxdata)).
+    - exact (god1_group_inverse_identity H mulH hH).
+Qed.
+
+Theorem god1_group_homomorphism_kernel_conjugate :
+  forall G, forall mulG:set -> set -> set,
+  forall H, forall mulH:set -> set -> set,
+  forall f:set -> set,
+    group_homomorphism G mulG H mulH f ->
+    forall x :e group_homomorphism_kernel G mulG H mulH f,
+    forall a :e G,
+      f (mulG (mulG a x) (group_inverse G mulG a))
+        = group_identity H mulH.
+let G mulG H mulH f.
+assume hf.
+claim hG : group G mulG.
+exact (god1_group_homomorphism_domain_group G mulG H mulH f hf).
+claim hH : group H mulH.
+exact (god1_group_homomorphism_codomain_group G mulG H mulH f hf).
+let x.
+assume hx.
+claim hxdata : x :e G /\ f x = group_identity H mulH.
+exact (god1_group_homomorphism_kernel_elim
+  G mulG H mulH f x hx).
+claim hxG : x :e G.
+exact (andEL (x :e G) (f x = group_identity H mulH) hxdata).
+let a.
+assume ha.
+claim hia : group_inverse G mulG a :e G.
+exact (god1_group_inverse_in G mulG hG a ha).
+claim hax : mulG a x :e G.
+exact (god1_group_law_of_composition G mulG hG a ha x hxG).
+claim hfa : f a :e H.
+exact (god1_group_homomorphism_maps_into G mulG H mulH f hf a ha).
+apply (eq_i_tra
+  (f (mulG (mulG a x) (group_inverse G mulG a)))
+  (mulH (f (mulG a x)) (f (group_inverse G mulG a)))
+  (group_identity H mulH)).
+- exact (god1_group_homomorphism_multiplies
+    G mulG H mulH f hf (mulG a x) hax
+    (group_inverse G mulG a) hia).
+- apply (eq_i_tra
+    (mulH (f (mulG a x)) (f (group_inverse G mulG a)))
+    (mulH (mulH (f a) (f x)) (f (group_inverse G mulG a)))
+    (group_identity H mulH)).
+  - exact (f_eq_i (fun z => mulH z (f (group_inverse G mulG a)))
+      (f (mulG a x)) (mulH (f a) (f x))
+      (god1_group_homomorphism_multiplies
+        G mulG H mulH f hf a ha x hxG)).
+  - apply (eq_i_tra
+      (mulH (mulH (f a) (f x)) (f (group_inverse G mulG a)))
+      (mulH
+        (mulH (f a) (group_identity H mulH))
+        (group_inverse H mulH (f a)))
+      (group_identity H mulH)).
+    - apply (eq_i_tra
+        (mulH (mulH (f a) (f x)) (f (group_inverse G mulG a)))
+        (mulH (mulH (f a) (group_identity H mulH))
+          (f (group_inverse G mulG a)))
+        (mulH (mulH (f a) (group_identity H mulH))
+          (group_inverse H mulH (f a)))).
+      - exact (f_eq_i
+          (fun z => mulH (mulH (f a) z) (f (group_inverse G mulG a)))
+          (f x) (group_identity H mulH)
+          (andER (x :e G) (f x = group_identity H mulH) hxdata)).
+      - exact (f_eq_i
+          (fun z => mulH (mulH (f a) (group_identity H mulH)) z)
+          (f (group_inverse G mulG a))
+          (group_inverse H mulH (f a))
+          (god1_group_homomorphism_preserves_inverse
+            G mulG H mulH f hf a ha)).
+    - apply (eq_i_tra
+        (mulH (mulH (f a) (group_identity H mulH))
+          (group_inverse H mulH (f a)))
+        (mulH (f a) (group_inverse H mulH (f a)))
+        (group_identity H mulH)).
+      - exact (f_eq_i (fun z => mulH z (group_inverse H mulH (f a)))
+          (mulH (f a) (group_identity H mulH)) (f a)
+          (andEL
+            (mulH (f a) (group_identity H mulH) = f a)
+            (mulH (group_identity H mulH) (f a) = f a)
+            ((andER
+              (group_identity H mulH :e H)
+              (forall z :e H,
+                mulH z (group_identity H mulH) = z
+                /\ mulH (group_identity H mulH) z = z)
+              (god1_group_identity_specification H mulH hH))
+              (f a) hfa))).
+      - exact (andER
+          (group_inverse H mulH (f a) :e H
+            /\ mulH (group_inverse H mulH (f a)) (f a)
+              = group_identity H mulH)
+          (mulH (f a) (group_inverse H mulH (f a))
+            = group_identity H mulH)
+          (god1_group_inverse_specification H mulH hH (f a) hfa)).
+Qed.
 
 Theorem god1_kernel_is_normal_subgroup :
   forall G, forall mulG:set -> set -> set,
@@ -46777,13 +47701,232 @@ claim h_s7_kernel_conjugate_calculation :
   forall a :e G,
     f (mulG (mulG a x) (group_inverse G mulG a))
       = group_identity H mulH.
-admit.
+exact (god1_group_homomorphism_kernel_conjugate
+  G mulG H mulH f hf).
 //GOD1PRF:69103 Thus the kernel of a homomorphism is a normal subgroup.
 claim h_s7_kernel_normal_conclusion :
   normal_subgroup G mulG
     (group_homomorphism_kernel G mulG H mulH f).
-admit.
-Admitted.
+claim hG : group G mulG.
+exact (god1_group_homomorphism_domain_group G mulG H mulH f hf).
+claim hsub : subgroup G mulG
+  (group_homomorphism_kernel G mulG H mulH f).
+exact (god1_group_homomorphism_kernel_subgroup
+  G mulG H mulH f hf).
+claim hclosed : forall a :e G,
+  forall x :e group_homomorphism_kernel G mulG H mulH f,
+    mulG (mulG a x) (group_inverse G mulG a)
+      :e group_homomorphism_kernel G mulG H mulH f.
+let a.
+assume ha.
+let x.
+assume hx.
+claim hxG : x :e G.
+exact (andEL (x :e G) (f x = group_identity H mulH)
+  (god1_group_homomorphism_kernel_elim
+    G mulG H mulH f x hx)).
+exact (god1_group_homomorphism_kernel_intro
+  G mulG H mulH f
+  (mulG (mulG a x) (group_inverse G mulG a))
+  (god1_group_law_of_composition G mulG hG
+    (mulG a x)
+    (god1_group_law_of_composition G mulG hG a ha x hxG)
+    (group_inverse G mulG a)
+    (god1_group_inverse_in G mulG hG a ha))
+  (h_s7_kernel_conjugate_calculation x hx a ha)).
+exact (andI
+  (subgroup G mulG (group_homomorphism_kernel G mulG H mulH f))
+  (forall a :e G,
+    forall x :e group_homomorphism_kernel G mulG H mulH f,
+      mulG (mulG a x) (group_inverse G mulG a)
+        :e group_homomorphism_kernel G mulG H mulH f)
+  hsub hclosed).
+exact h_s7_kernel_normal_conclusion.
+Qed.
+
+Theorem god1_injection_injective :
+  forall X Y, forall f:set -> set,
+    inj X Y f -> forall x y :e X, f x = f y -> x = y.
+let X Y f.
+assume hf.
+exact (andER
+  (forall x :e X, f x :e Y)
+  (forall x y :e X, f x = f y -> x = y) hf).
+Qed.
+
+Theorem god1_group_homomorphism_kernel_equation :
+  forall G, forall mulG:set -> set -> set,
+  forall H, forall mulH:set -> set -> set,
+  forall f:set -> set,
+    group_homomorphism G mulG H mulH f ->
+    forall x :e G,
+      (f x = group_identity H mulH <->
+        f x = f (group_identity G mulG)).
+let G mulG H mulH f.
+assume hf.
+let x.
+assume hx.
+apply iffI.
+- assume hxe.
+  exact (eq_i_tra (f x) (group_identity H mulH)
+    (f (group_identity G mulG)) hxe
+    (eq_sym
+      (f (group_identity G mulG)) (group_identity H mulH)
+      (god1_group_homomorphism_preserves_identity
+        G mulG H mulH f hf))).
+- assume hxf.
+  exact (eq_i_tra (f x) (f (group_identity G mulG))
+    (group_identity H mulH) hxf
+    (god1_group_homomorphism_preserves_identity
+      G mulG H mulH f hf)).
+Qed.
+
+Theorem god1_injective_homomorphism_kernel_trivial :
+  forall G, forall mulG:set -> set -> set,
+  forall H, forall mulH:set -> set -> set,
+  forall f:set -> set,
+    group_homomorphism G mulG H mulH f -> inj G H f ->
+    group_homomorphism_kernel G mulG H mulH f
+      = {group_identity G mulG}.
+let G mulG H mulH f.
+assume hf hinj.
+claim hG : group G mulG.
+exact (god1_group_homomorphism_domain_group G mulG H mulH f hf).
+claim heG : group_identity G mulG :e G.
+exact (god1_group_identity_in G mulG hG).
+claim heker : group_identity G mulG :e
+  group_homomorphism_kernel G mulG H mulH f.
+exact (god1_group_homomorphism_kernel_intro
+  G mulG H mulH f (group_identity G mulG) heG
+  (god1_group_homomorphism_preserves_identity
+    G mulG H mulH f hf)).
+apply set_ext.
+- let x.
+  assume hx.
+  claim hxdata : x :e G /\ f x = group_identity H mulH.
+  exact (god1_group_homomorphism_kernel_elim
+    G mulG H mulH f x hx).
+  claim hxe : x = group_identity G mulG.
+  exact (god1_injection_injective G H f hinj
+    x (andEL (x :e G) (f x = group_identity H mulH) hxdata)
+    (group_identity G mulG) heG
+    (eq_i_tra (f x) (group_identity H mulH)
+      (f (group_identity G mulG))
+      (andER (x :e G) (f x = group_identity H mulH) hxdata)
+      (eq_sym
+        (f (group_identity G mulG)) (group_identity H mulH)
+        (god1_group_homomorphism_preserves_identity
+          G mulG H mulH f hf)))).
+  exact (mem_eq_substL {group_identity G mulG}
+    (group_identity G mulG) x hxe (SingI (group_identity G mulG))).
+- let x.
+  assume hx.
+  exact (mem_eq_substL
+    (group_homomorphism_kernel G mulG H mulH f)
+    (group_identity G mulG) x
+    (SingE (group_identity G mulG) x hx) heker).
+Qed.
+
+Theorem god1_group_homomorphism_equal_images_difference_in_kernel :
+  forall G, forall mulG:set -> set -> set,
+  forall H, forall mulH:set -> set -> set,
+  forall f:set -> set,
+    group_homomorphism G mulG H mulH f ->
+    forall x y :e G, f x = f y ->
+      mulG x (group_inverse G mulG y) :e
+        group_homomorphism_kernel G mulG H mulH f.
+let G mulG H mulH f.
+assume hf.
+claim hG : group G mulG.
+exact (god1_group_homomorphism_domain_group G mulG H mulH f hf).
+claim hH : group H mulH.
+exact (god1_group_homomorphism_codomain_group G mulG H mulH f hf).
+let x.
+assume hx.
+let y.
+assume hy hxy.
+claim hiy : group_inverse G mulG y :e G.
+exact (god1_group_inverse_in G mulG hG y hy).
+claim hfy : f y :e H.
+exact (god1_group_homomorphism_maps_into G mulG H mulH f hf y hy).
+apply (god1_group_homomorphism_kernel_intro
+  G mulG H mulH f (mulG x (group_inverse G mulG y))
+  (god1_group_law_of_composition G mulG hG x hx
+    (group_inverse G mulG y) hiy)).
+apply (eq_i_tra
+  (f (mulG x (group_inverse G mulG y)))
+  (mulH (f x) (f (group_inverse G mulG y)))
+  (group_identity H mulH)).
+- exact (god1_group_homomorphism_multiplies
+    G mulG H mulH f hf x hx (group_inverse G mulG y) hiy).
+- apply (eq_i_tra
+    (mulH (f x) (f (group_inverse G mulG y)))
+    (mulH (f y) (group_inverse H mulH (f y)))
+    (group_identity H mulH)).
+  - apply (eq_i_tra
+      (mulH (f x) (f (group_inverse G mulG y)))
+      (mulH (f y) (f (group_inverse G mulG y)))
+      (mulH (f y) (group_inverse H mulH (f y)))).
+    - exact (f_eq_i (fun z => mulH z (f (group_inverse G mulG y)))
+        (f x) (f y) hxy).
+    - exact (f_eq_i (fun z => mulH (f y) z)
+        (f (group_inverse G mulG y))
+        (group_inverse H mulH (f y))
+        (god1_group_homomorphism_preserves_inverse
+          G mulG H mulH f hf y hy)).
+  - exact (andER
+      (group_inverse H mulH (f y) :e H
+        /\ mulH (group_inverse H mulH (f y)) (f y)
+          = group_identity H mulH)
+      (mulH (f y) (group_inverse H mulH (f y))
+        = group_identity H mulH)
+      (god1_group_inverse_specification H mulH hH (f y) hfy)).
+Qed.
+
+Theorem god1_trivial_kernel_homomorphism_injective :
+  forall G, forall mulG:set -> set -> set,
+  forall H, forall mulH:set -> set -> set,
+  forall f:set -> set,
+    group_homomorphism G mulG H mulH f ->
+    group_homomorphism_kernel G mulG H mulH f
+      = {group_identity G mulG} -> inj G H f.
+let G mulG H mulH f.
+assume hf hker.
+claim hG : group G mulG.
+exact (god1_group_homomorphism_domain_group G mulG H mulH f hf).
+apply (injI G H f
+  (god1_group_homomorphism_maps_into G mulG H mulH f hf)).
+let x.
+assume hx.
+let y.
+assume hy hxy.
+claim hiy : group_inverse G mulG y :e G.
+exact (god1_group_inverse_in G mulG hG y hy).
+claim hdiffker : mulG x (group_inverse G mulG y) :e
+  group_homomorphism_kernel G mulG H mulH f.
+exact (god1_group_homomorphism_equal_images_difference_in_kernel
+  G mulG H mulH f hf x hx y hy hxy).
+claim hdiffe : mulG x (group_inverse G mulG y) = group_identity G mulG.
+exact (SingE (group_identity G mulG)
+  (mulG x (group_inverse G mulG y))
+  (mem_eq_set_subst
+    (group_homomorphism_kernel G mulG H mulH f)
+    {group_identity G mulG}
+    (mulG x (group_inverse G mulG y)) hker hdiffker)).
+apply (god1_group_right_cancel G mulG hG
+  x hx y hy (group_inverse G mulG y) hiy).
+apply (eq_i_tra
+  (mulG x (group_inverse G mulG y))
+  (group_identity G mulG)
+  (mulG y (group_inverse G mulG y))).
+- exact hdiffe.
+- apply eq_sym.
+  exact (andER
+    (group_inverse G mulG y :e G
+      /\ mulG (group_inverse G mulG y) y = group_identity G mulG)
+    (mulG y (group_inverse G mulG y) = group_identity G mulG)
+    (god1_group_inverse_specification G mulG hG y hy)).
+Qed.
 
 Theorem god1_s7_theorem8_injective_iff_trivial_kernel :
   forall G, forall mulG:set -> set -> set,
@@ -46795,43 +47938,43 @@ Theorem god1_s7_theorem8_injective_iff_trivial_kernel :
       = {group_identity G mulG}).
 let G mulG H mulH f.
 assume hf.
-apply iffI.
 //GOD1PRF:69673 Since $f(e)=e$, the relation $f(x)=e$ is equivalent to $f(x)=f(e)$.
 claim h_s7_t8_kernel_equation :
   forall x :e G,
     (f x = group_identity H mulH <->
       f x = f (group_identity G mulG)).
-admit.
+exact (god1_group_homomorphism_kernel_equation
+  G mulG H mulH f hf).
 //GOD1PRF:69741 If $f$ is injective, this implies that $x=e$, and therefore $\operatorname{Ker}(f)=\{e\}$.
 claim h_s7_t8_injective_kernel_trivial :
   inj G H f ->
   group_homomorphism_kernel G mulG H mulH f
     = {group_identity G mulG}.
-admit.
+exact (god1_injective_homomorphism_kernel_trivial
+  G mulG H mulH f hf).
 //GOD1PRF:69832 Conversely, suppose that $\operatorname{Ker}(f)=\{e\}$.
-claim h_s7_t8_reverse_hypothesis :
-  group_homomorphism_kernel G mulG H mulH f
-    = {group_identity G mulG} ->
-  group_identity G mulG :e
-    group_homomorphism_kernel G mulG H mulH f.
-admit.
 //GOD1PRF:69888 If $f(x)=f(y)$, then
-claim h_s7_t8_equal_images :
-  forall x y :e G, f x = f y -> f x = f y.
-admit.
 //GOD1PRF:69935 or, since $f$ is a homomorphism, $f\left(x y^{-1}\right)=e$, i.e.
 claim h_s7_t8_difference_in_kernel :
   forall x y :e G,
     f x = f y ->
     mulG x (group_inverse G mulG y) :e
       group_homomorphism_kernel G mulG H mulH f.
-admit.
+exact (god1_group_homomorphism_equal_images_difference_in_kernel
+  G mulG H mulH f hf).
 //GOD1PRF:70046 Since $\operatorname{Ker}(f)=\{e\}$ it follows that $x y^{-1}=e$, so that $x=y$ and hence $f$ is injective.
 claim h_s7_t8_trivial_kernel_injective :
   group_homomorphism_kernel G mulG H mulH f
     = {group_identity G mulG} -> inj G H f.
-admit.
-Admitted.
+exact (god1_trivial_kernel_homomorphism_injective
+  G mulG H mulH f hf).
+exact (iffI
+  (inj G H f)
+  (group_homomorphism_kernel G mulG H mulH f
+    = {group_identity G mulG})
+  h_s7_t8_injective_kernel_trivial
+  h_s7_t8_trivial_kernel_injective).
+Qed.
 
 (** Formal interface for the factor-through-surjection result cited as §2, Theorem 1. **)
 Theorem god1_s2_theorem1_factor_through_surjection :
@@ -46844,8 +47987,68 @@ Theorem god1_s2_theorem1_factor_through_surjection :
     /\ (forall f1 f2:set -> set,
       (forall x :e A, f x = f1 (p x)) ->
       (forall x :e A, f x = f2 (p x)) ->
-      f1 = f2).
-Admitted.
+      forall b :e B, f1 b = f2 b).
+let A B C p f.
+assume hp.
+claim hpmaps : forall x :e A, p x :e B.
+exact (andEL
+  (forall x :e A, p x :e B)
+  (forall b :e B, exists x :e A, p x = b) hp).
+claim hpsurj : forall b :e B, exists x :e A, p x = b.
+exact (andER
+  (forall x :e A, p x :e B)
+  (forall b :e B, exists x :e A, p x = b) hp).
+apply andI.
+- apply iffI.
+  - assume hex.
+    apply hex.
+    let f'.
+    assume hfactor.
+    let x.
+    assume hx.
+    let y.
+    assume hy hpxy.
+    apply (eq_i_tra (f x) (f' (p x)) (f y)).
+    - exact (hfactor x hx).
+    - apply (eq_i_tra (f' (p x)) (f' (p y)) (f y)).
+      - exact (f_eq_i f' (p x) (p y) hpxy).
+      - apply eq_sym.
+        exact (hfactor y hy).
+  - assume hfibers.
+    apply (ex_intro_setfun
+      (fun f' => forall x :e A, f x = f' (p x))
+      (fun b => f (inv A p b))).
+    let x.
+    assume hx.
+    claim hchoice : inv A p (p x) :e A
+      /\ p (inv A p (p x)) = p x.
+    exact (surj_rinv A B p hpsurj (p x) (hpmaps x hx)).
+    exact (hfibers x hx (inv A p (p x))
+      (andEL
+        (inv A p (p x) :e A)
+        (p (inv A p (p x)) = p x) hchoice)
+      (eq_sym
+        (p (inv A p (p x))) (p x)
+        (andER
+          (inv A p (p x) :e A)
+          (p (inv A p (p x)) = p x) hchoice))).
+- let f1 f2.
+  assume hf1 hf2.
+  let b.
+  assume hb.
+  apply (exandE_i (fun x => x :e A) (fun x => p x = b)
+    (hpsurj b hb)).
+  let x.
+  assume hx hpx.
+  apply (eq_i_tra (f1 b) (f1 (p x)) (f2 b)).
+  - exact (f_eq_i f1 b (p x) (eq_sym (p x) b hpx)).
+  - apply (eq_i_tra (f1 (p x)) (f x) (f2 b)).
+    - apply eq_sym.
+      exact (hf1 x hx).
+    - apply (eq_i_tra (f x) (f2 (p x)) (f2 b)).
+      - exact (hf2 x hx).
+      - exact (f_eq_i f2 (p x) b hpx).
+Qed.
 
 Theorem god1_s7_theorem9_factorization_of_group_homomorphism :
   forall G, forall mulG:set -> set -> set,
