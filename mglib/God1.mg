@@ -51880,6 +51880,352 @@ Definition group_element_order :
   fun G mul x n =>
     n :e omega /\ equip (cyclic_subgroup G mul x) n.
 
+Theorem god1_natural_nonzero_contains_zero :
+  forall n :e omega, n <> 0 -> 0 :e n.
+let n.
+assume hn hn0.
+apply (orE (n = 0) (0 :e n)
+  (god1_natural_zero_or_positive n hn) (0 :e n)).
+- assume hzero.
+  exact (FalseE (hn0 hzero) (0 :e n)).
+- assume hpositive.
+  exact hpositive.
+Qed.
+
+Theorem god1_nonzero_integer_period_gives_positive_natural_period :
+  forall G, forall mul:set -> set -> set, forall x :e G,
+    group G mul -> forall q :e int, q <> 0 ->
+    group_int_power G mul x q = group_identity G mul ->
+    exists d :e omega,
+      d <> 0 /\ group_nat_power G mul x d = group_identity G mul.
+let G mul x.
+assume hx hG.
+let q.
+assume hq hq0 hperiod.
+apply (int_3_cases q hq
+  (exists d :e omega,
+    d <> 0 /\ group_nat_power G mul x d = group_identity G mul)).
+- let m.
+  assume hm hqneg.
+  claim hd : ordsucc m :e omega.
+  exact (nat_p_omega (ordsucc m)
+    (nat_ordsucc m (omega_nat_p m hm))).
+  claim hposInt : group_int_power G mul x (ordsucc m)
+    = group_identity G mul.
+  exact (eq_i_tra
+    (group_int_power G mul x (ordsucc m))
+    (group_int_power G mul x
+      (minus_SNo (minus_SNo (ordsucc m))))
+    (group_identity G mul)
+    (f_eq_i (fun z => group_int_power G mul x z)
+      (ordsucc m) (minus_SNo (minus_SNo (ordsucc m)))
+      (eq_sym
+        (minus_SNo (minus_SNo (ordsucc m))) (ordsucc m)
+        (minus_SNo_invol (ordsucc m)
+          (nat_p_SNo (ordsucc m)
+            (nat_ordsucc m (omega_nat_p m hm))))))
+    (eq_i_tra
+      (group_int_power G mul x
+        (minus_SNo (minus_SNo (ordsucc m))))
+      (group_inverse G mul
+        (group_int_power G mul x (minus_SNo (ordsucc m))))
+      (group_identity G mul)
+      (eq_sym
+        (group_inverse G mul
+          (group_int_power G mul x (minus_SNo (ordsucc m))))
+        (group_int_power G mul x
+          (minus_SNo (minus_SNo (ordsucc m))))
+        (god1_group_int_power_inverse G mul x hG hx
+        (minus_SNo (ordsucc m))
+          (int_minus_SNo_omega (ordsucc m) hd)))
+      (eq_i_tra
+        (group_inverse G mul
+          (group_int_power G mul x (minus_SNo (ordsucc m))))
+        (group_inverse G mul (group_identity G mul))
+        (group_identity G mul)
+        (f_eq_i (fun z => group_inverse G mul z)
+          (group_int_power G mul x (minus_SNo (ordsucc m)))
+          (group_identity G mul)
+          (eq_i_tra
+            (group_int_power G mul x (minus_SNo (ordsucc m)))
+            (group_int_power G mul x q)
+            (group_identity G mul)
+            (f_eq_i (fun z => group_int_power G mul x z)
+              (minus_SNo (ordsucc m)) q
+              (eq_sym q (minus_SNo (ordsucc m)) hqneg))
+            hperiod))
+        (god1_group_inverse_identity G mul hG)))).
+  apply (ex_intro
+    (fun d => d :e omega /\
+      (d <> 0 /\ group_nat_power G mul x d = group_identity G mul))
+    (ordsucc m)).
+  exact (andI
+    (ordsucc m :e omega)
+    (ordsucc m <> 0
+      /\ group_nat_power G mul x (ordsucc m) = group_identity G mul)
+    hd
+    (andI
+      (ordsucc m <> 0)
+      (group_nat_power G mul x (ordsucc m) = group_identity G mul)
+      (neq_ordsucc_0 m)
+      (eq_i_tra
+        (group_nat_power G mul x (ordsucc m))
+        (group_int_power G mul x (ordsucc m))
+        (group_identity G mul)
+        (eq_sym
+          (group_int_power G mul x (ordsucc m))
+          (group_nat_power G mul x (ordsucc m))
+          (god1_group_int_power_nat G mul x (ordsucc m)
+            (nat_ordsucc m (omega_nat_p m hm))))
+        hposInt))).
+- assume hqzero.
+  exact (FalseE (hq0 hqzero)
+    (exists d :e omega,
+      d <> 0 /\ group_nat_power G mul x d = group_identity G mul)).
+- let m.
+  assume hm hqpos.
+  claim hd : ordsucc m :e omega.
+  exact (nat_p_omega (ordsucc m)
+    (nat_ordsucc m (omega_nat_p m hm))).
+  apply (ex_intro
+    (fun d => d :e omega /\
+      (d <> 0 /\ group_nat_power G mul x d = group_identity G mul))
+    (ordsucc m)).
+  exact (andI
+    (ordsucc m :e omega)
+    (ordsucc m <> 0
+      /\ group_nat_power G mul x (ordsucc m) = group_identity G mul)
+    hd
+    (andI
+      (ordsucc m <> 0)
+      (group_nat_power G mul x (ordsucc m) = group_identity G mul)
+      (neq_ordsucc_0 m)
+      (eq_i_tra
+        (group_nat_power G mul x (ordsucc m))
+        (group_int_power G mul x (ordsucc m))
+        (group_identity G mul)
+        (eq_sym
+          (group_int_power G mul x (ordsucc m))
+          (group_nat_power G mul x (ordsucc m))
+          (god1_group_int_power_nat G mul x (ordsucc m)
+            (nat_ordsucc m (omega_nat_p m hm))))
+        (eq_i_tra
+          (group_int_power G mul x (ordsucc m))
+          (group_int_power G mul x q)
+          (group_identity G mul)
+          (f_eq_i (fun z => group_int_power G mul x z)
+            (ordsucc m) q (eq_sym q (ordsucc m) hqpos))
+          hperiod)))).
+Qed.
+
+Theorem god1_positive_natural_period_makes_cyclic_subgroup_finite :
+  forall G, forall mul:set -> set -> set, forall x :e G,
+    group G mul -> forall d :e omega, d <> 0 ->
+    group_nat_power G mul x d = group_identity G mul ->
+    finite (cyclic_subgroup G mul x).
+let G mul x.
+assume hx hG.
+let d.
+assume hd hd0 hperiod.
+claim hsurj : surj d (cyclic_subgroup G mul x)
+  (fun a => group_nat_power G mul x a).
+exact (god1_group_period_surjects_onto_cyclic_subgroup
+  G mul x hG hx d hd hd0 hperiod).
+claim himage :
+  {group_nat_power G mul x a|a :e d}
+    = cyclic_subgroup G mul x.
+exact (god1_surjection_image_is_codomain
+  d (cyclic_subgroup G mul x)
+  (fun a => group_nat_power G mul x a) hsurj).
+claim hfiniteImage : finite
+  {group_nat_power G mul x a|a :e d}.
+exact (Repl_finite (fun a => group_nat_power G mul x a)
+  d (nat_finite d (omega_nat_p d hd))).
+apply (exandE_i
+  (fun n => n :e omega)
+  (fun n => equip {group_nat_power G mul x a|a :e d} n)
+  hfiniteImage).
+let n.
+assume hn heImage.
+exact (ex_intro
+  (fun m => m :e omega /\ equip (cyclic_subgroup G mul x) m) n
+  (andI (n :e omega) (equip (cyclic_subgroup G mul x) n) hn
+    (god1_equip_domain_eq_subst
+      {group_nat_power G mul x a|a :e d}
+      (cyclic_subgroup G mul x) n himage heImage))).
+Qed.
+
+Theorem god1_element_finite_order_iff_nonzero_integer_period :
+  forall G, forall mul:set -> set -> set, forall x :e G,
+    group G mul ->
+    ((exists n :e omega, group_element_order G mul x n) <->
+      exists q :e int,
+        q <> 0 /\ group_int_power G mul x q = group_identity G mul).
+let G mul x.
+assume hx hG.
+apply iffI.
+- assume horderExists.
+  apply (exandE_i
+    (fun n => n :e omega)
+    (fun n => group_element_order G mul x n)
+    horderExists).
+  let n.
+  assume hn horder.
+  claim heC : equip (cyclic_subgroup G mul x) n.
+  exact (andER
+    (n :e omega) (equip (cyclic_subgroup G mul x) n) horder).
+  apply (exandE_i
+    (fun d => d :e omega)
+    (fun d => (d <> 0 /\ d c= n)
+      /\ group_nat_power G mul x d = group_identity G mul)
+    (god1_finite_cyclic_subgroup_has_bounded_positive_period
+      G mul x hG hx n hn heC)).
+  let d.
+  assume hd hddata.
+  claim hd0 : d <> 0.
+  exact (andEL (d <> 0) (d c= n)
+    (andEL (d <> 0 /\ d c= n)
+      (group_nat_power G mul x d = group_identity G mul) hddata)).
+  claim hperiodNat :
+    group_nat_power G mul x d = group_identity G mul.
+  exact (andER (d <> 0 /\ d c= n)
+    (group_nat_power G mul x d = group_identity G mul) hddata).
+  apply (ex_intro
+    (fun q => q :e int /\
+      (q <> 0 /\ group_int_power G mul x q = group_identity G mul)) d).
+  exact (andI
+    (d :e int)
+    (d <> 0 /\ group_int_power G mul x d = group_identity G mul)
+    (Subq_omega_int d hd)
+    (andI
+      (d <> 0)
+      (group_int_power G mul x d = group_identity G mul)
+      hd0
+      (eq_i_tra
+        (group_int_power G mul x d)
+        (group_nat_power G mul x d)
+        (group_identity G mul)
+        (god1_group_int_power_nat G mul x d (omega_nat_p d hd))
+        hperiodNat))).
+- assume hperiodExists.
+  apply (exandE_i
+    (fun q => q :e int)
+    (fun q => q <> 0
+      /\ group_int_power G mul x q = group_identity G mul)
+    hperiodExists).
+  let q.
+  assume hq hqdata.
+  claim hq0 : q <> 0.
+  exact (andEL (q <> 0)
+    (group_int_power G mul x q = group_identity G mul) hqdata).
+  claim hqperiod :
+    group_int_power G mul x q = group_identity G mul.
+  exact (andER (q <> 0)
+    (group_int_power G mul x q = group_identity G mul) hqdata).
+  apply (exandE_i
+    (fun d => d :e omega)
+    (fun d => d <> 0
+      /\ group_nat_power G mul x d = group_identity G mul)
+    (god1_nonzero_integer_period_gives_positive_natural_period
+      G mul x hx hG q hq hq0 hqperiod)).
+  let d.
+  assume hd hddata.
+  claim hfiniteC : finite (cyclic_subgroup G mul x).
+  exact (god1_positive_natural_period_makes_cyclic_subgroup_finite
+    G mul x hx hG d hd
+    (andEL (d <> 0)
+      (group_nat_power G mul x d = group_identity G mul) hddata)
+    (andER (d <> 0)
+      (group_nat_power G mul x d = group_identity G mul) hddata)).
+  apply (exandE_i
+    (fun n => n :e omega)
+    (fun n => equip (cyclic_subgroup G mul x) n) hfiniteC).
+  let n.
+  assume hn heCn.
+  apply (ex_intro
+    (fun m => m :e omega /\ group_element_order G mul x m) n).
+  exact (andI
+    (n :e omega) (group_element_order G mul x n) hn
+    (andI (n :e omega) (equip (cyclic_subgroup G mul x) n)
+      hn heCn)).
+Qed.
+
+Theorem god1_finite_element_order_specification :
+  forall G, forall mul:set -> set -> set, forall x :e G,
+    group G mul -> forall n :e omega,
+    group_element_order G mul x n ->
+    0 :e n
+    /\ group_nat_power G mul x n = group_identity G mul
+    /\ forall p :e n,
+      p <> 0 ->
+      group_nat_power G mul x p <> group_identity G mul.
+let G mul x.
+assume hx hG.
+let n.
+assume hn horder.
+claim heCn : equip (cyclic_subgroup G mul x) n.
+exact (andER
+  (n :e omega) (equip (cyclic_subgroup G mul x) n) horder).
+claim hn0 : n <> 0.
+assume hnzero.
+claim hCempty : cyclic_subgroup G mul x = 0.
+exact (equip_0_Empty (cyclic_subgroup G mul x)
+  (god1_equip_codomain_eq_subst
+    (cyclic_subgroup G mul x) n 0 hnzero heCn)).
+claim hidentityC : group_identity G mul :e cyclic_subgroup G mul x.
+exact (god1_subgroup_contains_identity
+  G mul (cyclic_subgroup G mul x)
+  (god1_powers_form_cyclic_subgroup G mul x hx hG)).
+exact (EmptyE (group_identity G mul)
+  (mem_eq_set_subst (cyclic_subgroup G mul x) 0
+    (group_identity G mul) hCempty hidentityC)).
+claim h0n : 0 :e n.
+exact (god1_natural_nonzero_contains_zero n hn hn0).
+claim hnperiod :
+  group_nat_power G mul x n = group_identity G mul.
+exact (god1_finite_cyclic_subgroup_cardinality_power_identity
+  G mul x hG hx n hn heCn).
+claim hminimal : forall p :e n,
+  p <> 0 ->
+  group_nat_power G mul x p <> group_identity G mul.
+let p.
+assume hpn hp0 hpperiod.
+claim hpomega : p :e omega.
+exact (omega_TransSet n hn p hpn).
+claim hsurj : surj p (cyclic_subgroup G mul x)
+  (fun a => group_nat_power G mul x a).
+exact (god1_group_period_surjects_onto_cyclic_subgroup
+  G mul x hG hx p hpomega hp0 hpperiod).
+claim hatleast_np : atleastp n p.
+exact (atleastp_tra n (cyclic_subgroup G mul x) p
+  (equip_atleastp n (cyclic_subgroup G mul x)
+    (equip_sym (cyclic_subgroup G mul x) n heCn))
+  (god1_surjection_gives_reverse_atleastp
+    p (cyclic_subgroup G mul x)
+    (fun a => group_nat_power G mul x a) hsurj)).
+claim hsuccpn : ordsucc p c= n.
+exact (TransSet_In_ordsucc_Subq (ordsucc p) n
+  (ordinal_TransSet n
+    (nat_p_ordinal n (omega_nat_p n hn)))
+  (nat_ordsucc_in_ordsucc n (omega_nat_p n hn) p hpn)).
+claim hatleast_succp_p : atleastp (ordsucc p) p.
+exact (atleastp_tra (ordsucc p) n p
+  (Subq_atleastp (ordsucc p) n hsuccpn) hatleast_np).
+exact ((Pigeonhole_not_atleastp_ordsucc p
+  (omega_nat_p p hpomega)) hatleast_succp_p).
+exact (andI
+  (0 :e n
+    /\ group_nat_power G mul x n = group_identity G mul)
+  (forall p :e n,
+    p <> 0 ->
+    group_nat_power G mul x p <> group_identity G mul)
+  (andI
+    (0 :e n)
+    (group_nat_power G mul x n = group_identity G mul)
+    h0n hnperiod)
+  hminimal).
+Qed.
+
 Theorem god1_finite_element_order_characterization :
   forall G, forall mul:set -> set -> set, forall x :e G,
     group G mul ->
@@ -51898,23 +52244,11 @@ let G mul x.
 assume hx hG.
 apply andI.
 //GOD1PRF:75505 Since H is the image of $\mathbb{Z}$ under the homomorphism $n \rightarrow x^{n}$, it follows that $x$ is of finite order if and only if there exists a non-zero integer $p$ such that
-claim h_s7_element_order_finite_iff_periodic :
-  (exists n :e omega, group_element_order G mul x n) <->
-    exists p :e int,
-      p <> 0
-      /\ group_int_power G mul x p = group_identity G mul.
-admit.
+- exact (god1_element_finite_order_iff_nonzero_integer_period
+    G mul x hx hG).
 //GOD1PRF:75706 and then the order of $x$ is the smallest positive integer $p$ which satisfies this relation.
-claim h_s7_element_order_minimal_period :
-  forall n :e omega,
-    group_element_order G mul x n ->
-    0 :e n
-    /\ group_nat_power G mul x n = group_identity G mul
-    /\ forall p :e n,
-      p <> 0 ->
-      group_nat_power G mul x p <> group_identity G mul.
-admit.
-Admitted.
+- exact (god1_finite_element_order_specification G mul x hx hG).
+Qed.
 
 //GOD1:75842 group_action : "the group #1 acts on #3 by #4" | $#1\curvearrowright #3$
 Definition group_action :
