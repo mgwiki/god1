@@ -36685,7 +36685,8 @@ Theorem god1_s11_theorem2_unique_coordinates_iff_independent :
           K addK mulK M addM smul n a x coeff
         /\ forall eta:set -> set,
           linear_representation
-            K addK mulK M addM smul n a x eta -> eta = coeff)
+            K addK mulK M addM smul n a x eta ->
+          forall i :e n, eta i = coeff i)
       <-> linearly_independent_family
         K addK mulK M addM smul n a).
 let K addK mulK M addM smul n.
@@ -36878,6 +36879,10 @@ Theorem god1_module_homomorphism_additive_and_homogeneous_iff_linear :
     <-> (forall x y :e L, f (addL x y) = addM (f x) (f y))
       /\ (forall scalar :e K, forall x :e L,
         f (smulL scalar x) = smulM scalar (f x))).
+let K addK mulK L addL smulL M addM smulM f.
+assume hL hM hf.
+apply iffI.
+//GOD1PRF:250349 Let $\mathrm{L}, \mathrm{M}$ be two left K -modules. For a mapping $f: \mathrm{L} \rightarrow \mathrm{M}$ to be linear, it is necessary and sufficient that
 Admitted.
 
 Theorem god1_module_homomorphism_preserves_zero_and_linear_combinations :
@@ -36894,6 +36899,11 @@ Theorem god1_module_homomorphism_preserves_zero_and_linear_combinations :
           (fun i => smulL (coeff i) (a i)))
       = module_finitely_supported_sum M addM I
           (fun i => smulM (coeff i) (f (a i))).
+let K addK mulK L addL smulL M addM smulM f.
+assume hf.
+apply andI.
+//GOD1PRF:250702 Taking $\lambda=0$ in the second of these relations, we see that
+//GOD1PRF:251000 for all positive integers $n$, all vectors $x_{1}, \ldots, x_{n} \in \mathrm{~L}$ and all scalars $\lambda_{1}, \ldots, \lambda_{n} \in \mathrm{~K}$. For when $n=2$ this relation reduces to the definition of a homomorphism, and for general $n$ is proved by induction on $n$ :
 Admitted.
 
 Theorem god1_s12_theorem1_composition_and_inverse_linear :
@@ -36913,6 +36923,15 @@ Theorem god1_s12_theorem1_composition_and_inverse_linear :
         module_isomorphism K addK mulK M addM smulM N addN smulN g ->
         module_isomorphism K addK mulK L addL smulL N addN smulN
           (fun x => g (f x))).
+let K addK mulK L addL smulL M addM smulM N addN smulN f g.
+assume hf hg.
+apply andI.
+//GOD1PRF:252087 Let $h=g \circ f$. Then we have
+//GOD1PRF:252287 so that $h$ is a homomorphism. If $f$ and $g$ are isomorphisms, i.e., if they are bijective, then $h$ too is bijective and is therefore an isomorphism.
+//GOD1PRF:252440 Now suppose that $f$ is an isomorphism. To show that the inverse mapping $f^{-1}$ (which is bijective) is an isomorphism, it is enough to prove that it is linear, in other words that
+//GOD1PRF:252683 for all $\lambda, \mu \in \mathrm{K}$ and all $u, v \in \mathrm{M}$; or, equivalently, that
+//GOD1PRF:252847 But since $f$ is linear, the right-hand side of this relation is equal to
+//GOD1PRF:253032 which is visibly equal to $\lambda u+\mu v$.
 Admitted.
 
 //GOD1:254452 module_homomorphism_kernel : "the kernel of the module homomorphism #11" | $\operatorname{Ker}(#11)$
@@ -36942,6 +36961,12 @@ Theorem god1_s12_theorem2_images_and_preimages_of_submodules :
       submodule K addK mulK M addM smulM B ->
       submodule K addK mulK L addL smulL
         (group_preimage_of_subset L B f)).
+let K addK mulK L addL smulL M addM smulM f.
+assume hf.
+apply andI.
+//GOD1PRF:253820 Let $\mathrm{L}^{\prime}$ be a submodule of L . Suppose that $u, v$ are elements of $f\left(\mathrm{~L}^{\prime}\right)$; then we may write $u=f(x), v=f(y)$ with $x, y \in \mathrm{~L}^{\prime}$. Since $f$ is linear, we have
+//GOD1PRF:254125 which is an element of $\mathrm{L}^{\prime}$, because $\mathrm{L}^{\prime}$ is a submodule of L . Hence $f\left(\mathrm{~L}^{\prime}\right)$ contains\\
+//GOD1PRF:254277 $\mu u+\mu v$ for all choices of the scalars $\lambda, \mu \in \mathrm{K}$, and the first assertion of the theorem is proved. The proof of the second assertion is analogous.
 Admitted.
 
 Theorem god1_module_homomorphism_kernel_image_and_injectivity :
@@ -36957,6 +36982,11 @@ Theorem god1_module_homomorphism_kernel_image_and_injectivity :
     /\ (inj L M f <->
       module_homomorphism_kernel K addK mulK L addL smulL M addM smulM f
       = {module_zero L addL}).
+let K addK mulK L addL smulL M addM smulM f.
+assume hf.
+apply andI.
+//GOD1PRF:254452 In particular, the kernel of $f$, i.e., the set of all $x \in \mathrm{~L}$ such that $f(x)=0$, is a submodule of L , which is denoted by
+//GOD1PRF:254709 is a submodule of M . We recall (§ 7, Theorem 8) that $f$ is injective if and only if
 Admitted.
 
 Theorem god1_s12_theorem3_linear_map_from_basis :
@@ -36972,11 +37002,28 @@ Theorem god1_s12_theorem3_linear_map_from_basis :
       /\ (forall i :e I, f (a i) = c i)
       /\ (forall g:set -> set,
         module_homomorphism K addK mulK L addL smulL M addM smulM g ->
-        (forall i :e I, g (a i) = c i) -> g = f)
+        (forall i :e I, g (a i) = c i) ->
+        forall x :e L, g x = f x)
       /\ (inj L M f <->
         linearly_independent_family K addK mulK M addM smulM I c)
       /\ (surj L M f <->
         generating_family K addK mulK M addM smulM I c).
+let K addK mulK L addL smulL M addM smulM I a c.
+assume hBasis hM hc.
+//GOD1PRF:255484 From formula (1) of section 1, the homomorphism $f$, if it exists, is necessarily given by
+//GOD1PRF:255706 so that $f$ is unique.\\
+//GOD1PRF:255731 As to the existence of $f$, observe that for each $x \in \mathrm{~L}$ there exists a unique system of scalars $\xi_{i}(1 \leqslant i \leqslant p)$ such that
+//GOD1PRF:256000 where $f_{i}: \mathrm{L} \rightarrow \mathrm{K}$ are the coordinate functions (§ 11, section 4) on the module L with respect to the basis $a_{1}, \ldots, a_{p}$. Hence the formula (2) effectively defines a mapping $f$ of L into M , and $f$ is given also by the relation
+//GOD1PRF:256321 So it remains to be shown that $f$ is a homomorphism which maps the vectors $a_{i}$ to the vectors $c_{i}$.\\
+//GOD1PRF:256536 The second assertion follows immediately from the formulae
+//GOD1PRF:256704 (which were proved in § 11, Section 4), and the relation
+//GOD1PRF:256846 To show that $f$ is a homomorphism, we recall that we proved in § 11, section 4 that
+//GOD1PRF:256994 or in other words that the coordinate functions $f_{i}: \mathrm{L} \rightarrow \mathrm{K}$ are homomorphisms of left K -modules. Consequently
+//GOD1PRF:257516 and therefore $f$ is linear.\\
+//GOD1PRF:257547 Finally, we must determine the conditions under which $f$ is injective or surjective. First of all, it is clear that the image $f(\mathrm{~L})$ is the set of linear combinations of the vectors $c_{1}, \ldots, c_{p}$, i.e. that $f$ maps L onto the submodule of M generated by $c_{1}, \ldots, c_{p}$; and therefore $f$ is surjective if and only if the vectors $c_{i}$ generate M .
+//GOD1PRF:257927 Next, the mapping $f$ is injective if and only if the relation $f(x)=0$ implies that $x=0$, or in other words if and only if the relation
+//GOD1PRF:258178 but, since the $a_{i}$ are linearly independent, the latter relation is equivalent to
+//GOD1PRF:258299 Hence $f$ is injective if and only if $c_{1}, \ldots, c_{p}$ are linearly independent.\\
 Admitted.
 
 Theorem god1_s12_corollary1_free_module_iff_isomorphic_to_power :
@@ -36991,6 +37038,11 @@ Theorem god1_s12_corollary1_free_module_iff_isomorphic_to_power :
         (module_power_addition n addK)
         (module_power_left_scalar n mulK)
         M addM smulM).
+let K addK mulK M addM smulM.
+assume hM.
+apply iffI.
+//GOD1PRF:258871 By Theorem 3 there exists always one and only one homomorphism
+//GOD1PRF:259062 For the vectors $c_{i}$ to form a basis of $M$ it is necessary and sufficient that they be linearly independent and generate M , i.e., that $f$ should be injective and surjective.\\
 Admitted.
 
 Theorem god1_s12_corollary2_finitely_generated_iff_quotient_of_power :
@@ -37006,6 +37058,11 @@ Theorem god1_s12_corollary2_finitely_generated_iff_quotient_of_power :
         (module_power_left_scalar n mulK)
         M addM smulM f
       /\ surj (K :^: n) M f).
+let K addK mulK M addM smulM.
+assume hM.
+apply iffI.
+//GOD1PRF:259395 More precisely, M is generated by vectors $c_{1}, \ldots, c_{n}$ if and only if the homomorphism $f: \mathrm{K}^{n} \rightarrow \mathrm{M}$ which maps each $e_{i}$ to $e_{i}(1 \leqslant i \leqslant n)$ is surjective; hence the necessity of the condition. That the condition is sufficient follows from the fact that $\mathrm{K}^{n}$ is finitely generated and from the following assertion : let
+//GOD1PRF:259833 be a homomorphism of K -modules; if L is finitely generated and $f$ is surjective, then M is finitely generated. For let $a_{1}, \ldots, a_{n}$ be a set of generators of L , and let $b_{i}=f\left(a_{i}\right) (1 \leqslant i \leqslant n)$. For each $y \in \mathrm{M}$, there exists $x \in \mathrm{~L}$ such that $y=f(x)$. Writing $x=\xi_{1}+ \cdots+\xi_{n} a_{n}$ and using the relation (1) of section 1 we see that $y=\xi_{1} b_{1}+\cdots+\xi_{n} b_{n}$; hence the $b_{i}$ generate M , and so M is finitely generated.
 Admitted.
 
 (** § 13. Addition of homomorphisms and matrices. **)
@@ -37044,6 +37101,15 @@ Theorem god1_s13_theorem1_homomorphisms_form_additive_group :
         (module_homomorphism_space K addK mulK L addL smulL M addM smulM)
         (module_homomorphism_addition L addM)
         (module_homomorphism_scalar L smulM)).
+let K addK mulK L addL smulL M addM smulM.
+assume hL hM.
+apply andI.
+//GOD1PRF:281515 Put $h=f+g$. Then we have
+//GOD1PRF:281757 which takes care of the first part of the theorem.\\
+//GOD1PRF:281810 For the second part, consider the set E of all mappings (linear or not) of L into M . With the law of composition $(f, g) \rightarrow f+g$, this set E becomes a commutative group (§ 10, Example 4 ; the fact that L is a module is not used here; L is regarded simply as a set). Thus we have to show that Hom ( $\mathrm{L}, \mathrm{M}$ ) is a subgroup of E . Now Hom ( $\mathrm{L}, \mathrm{M}$ ) clearly contains the neutral element of E , namely the mapping of L into M which takes the value 0 at every element of L ; and if $f, g$ are homomorphisms then so is $f-g$, by the first part of the theorem. Hence Hom ( $\mathrm{L}, \mathrm{M}$ ) is a subgroup of E , and the proof is complete.\\
+//GOD1PRF:282625 When the ground ring $K$ is commutative, we may consider Hom ( $L, M$ ) as a left K -module. For if E is once again the set of all mappings (linear or not) of L into M , then by § 10, Example 4 we may consider E as not merely a commutative group but as a left K -module, the product $\lambda f$ of a scalar $\lambda \in \mathrm{K}$ and a mapping $f: \mathrm{L} \rightarrow \mathrm{M}$ being the mapping
+//GOD1PRF:283064 of $L$ into $M$ (and for this we do not need to assume that $K$ is commutative). Now if $K$ is commutative it turns out that Hom ( $\mathrm{L}, \mathrm{M}$ ) is not merely a subgroup of E but a submodule of E ; in other words, that if $f: \mathrm{L} \rightarrow \mathrm{M}$ is a homomorphism, then so is $f^{\prime}=\lambda f$. For we have
+//GOD1PRF:283657 which proves our assertion. Hence in this case ( K commutative) we may regard Hom ( $\mathrm{L}, \mathrm{M}$ ) as a left K -module.
 Admitted.
 
 //GOD1:265022 matrix_space : "the set of #2-by-#3 matrices with coefficients in #1" | $\operatorname{Mat}_{#2\times #3}(#1)$
@@ -37140,6 +37206,16 @@ Theorem god1_matrices_classify_maps_between_finite_free_right_modules :
       (fun F => matrix_of_right_linear_map
         K addK mulK L addL smulL M addM smulM q p a b
         (fun x => F x)).
+let K addK mulK L addL smulL M addM smulM q.
+assume hq.
+let p.
+assume hp.
+let a b.
+assume hBasisL hBasisM.
+//GOD1PRF:263264 Conversely, let $\alpha_{i j} \in \mathrm{~K}(1 \leqslant i \leqslant p, 1 \leqslant j \leqslant q)$ be arbitrary scalars, and define a mapping $f: \mathrm{L} \rightarrow \mathrm{M}$ by means of the formulae (6): that is to say, $f$ maps a vector $x \in \mathrm{~L}$, with coordinates $\xi_{1}, \ldots, \xi_{q}$ relative to the given basis of $L$, to the vector in $M$ whose coordinates $\eta_{1}, \ldots, \eta_{p}$ are given by the equations (6). Then $f$ is a homomorphism of L into M ; for we have
+//GOD1PRF:264244 where the vectors $c_{j}$ are given by (5), and this shows that $f$ is the homomorphism whose existence is asserted by Theorem 3.
+//GOD1PRF:264375 Moreover, if the homomorphism $f$ is given, there is only one system of scalars $\alpha_{i j}$ such that $f$ is defined by the relations (6), for the above calculations show that the $\alpha_{i j}$ are the coordinates of the vectors $f\left(a_{j}\right)$ with respect to the basis $b_{1}, \ldots, b_{p}$ of M , and are therefore uniquely determined.
+//GOD1PRF:267718 These considerations show that there is a "canonical" bijection of the set of all homomorphisms of $\mathrm{K}^{q}$ into $\mathrm{K}^{p}$ onto the set of all matrices with $p$ rows and $q$ columns (and coefficients in K). We shall often make use of this correspondence, usually without explicit reference.
 Admitted.
 
 Theorem god1_s13_theorem2_matrix_of_sum :
@@ -37159,6 +37235,17 @@ Theorem god1_s13_theorem2_matrix_of_sum :
         K addK mulK L addL smulL M addM smulM q p a b f)
       (matrix_of_right_linear_map
         K addK mulK L addL smulL M addM smulM q p a b g).
+let K addK mulK L addL smulL M addM smulM q.
+assume hq.
+let p.
+assume hp.
+let a b f g.
+assume hBasisL hBasisM hf hg.
+//GOD1PRF:284678 Let $h=f+g$ and let
+//GOD1PRF:284798 be the matrix of $h$ with respect to the chosen bases. Then
+//GOD1PRF:285020 and consequently the entries of $\mathbf{C}$ are given by
+//GOD1PRF:286162 We have also proved the following result:\\
+//GOD1PRF:286206 theorem 2. Let L and M be finitely generated free K -modules, and let $f, g$ be homomorphisms of L into M . Choose bases of L and M and let $\mathrm{A}, \mathrm{B}$ be the matrices of the homomorphisms $f, g$, relative to these bases. Then the matrix of $f+g$ (relative to these bases) is $\mathrm{A}+\mathrm{B}$.
 Admitted.
 
 (** § 14. Products of matrices. **)
@@ -37185,13 +37272,25 @@ Theorem god1_s14_theorem1_composition_distributes_over_map_addition :
     module_homomorphism K addK mulK L addL smulL M addM smulM g ->
     module_homomorphism K addK mulK M addM smulM N addN smulN h ->
     (forall x :e L,
-      h (addM (f x) (g x)) = addN (h (f x)) (h (g x)))
+      h ((module_homomorphism_addition L addM
+          (fun y :e L => f y) (fun y :e L => g y)) x)
+      = (module_homomorphism_addition L addN
+          (fun y :e L => h (f y))
+          (fun y :e L => h (g y))) x)
     /\ (forall u v:set -> set,
       module_homomorphism K addK mulK M addM smulM N addN smulN u ->
       module_homomorphism K addK mulK M addM smulM N addN smulN v ->
       forall x :e L,
-        addN (u (f x)) (v (f x))
-        = (fun y:set => addN (u y) (v y)) (f x)).
+        (module_homomorphism_addition M addN
+          (fun y :e M => u y) (fun y :e M => v y)) (f x)
+        = (module_homomorphism_addition L addN
+            (fun y :e L => u (f y))
+            (fun y :e L => v (f y))) x).
+let K addK mulK L addL smulL M addM smulM N addN smulN f g h.
+assume hf hg hh.
+apply andI.
+//GOD1PRF:287616 Take for example the first assertion. Putting $u=f+g$, we have
+//GOD1PRF:287738 so that the mapping $h \circ u$ is the sum of the mappings $h \circ f$ and $h \circ g$. Similarly for the second assertion.
 Admitted.
 
 Theorem god1_s14_corollary_endomorphisms_form_ring :
@@ -37202,6 +37301,9 @@ Theorem god1_s14_corollary_endomorphisms_form_ring :
       (module_endomorphism_ring K addK mulK M addM smul)
       (module_homomorphism_addition M addM)
       (module_endomorphism_composition M).
+let K addK mulK M addM smul.
+assume hM.
+//GOD1PRF:288115 The fact that Hom $(\mathrm{L}, \mathrm{L})$ is a commutative group with respect to addition follows from § 13, Theorem 1. Associativity of multiplication follows from § 2, Theorem 2, and the existence of a neutral element for multiplication follows from the fact that the identity mapping $j_{\mathrm{L}}$ belongs to Hom (L,L). Finally, Theorem 1 shows that the "distributive laws" are satisfied, and completes the proof that Hom ( $\mathrm{L}, \mathrm{L}$ ) is a ring.
 Admitted.
 
 Theorem god1_s14_theorem2_matrix_of_composition_is_product :
@@ -37224,6 +37326,22 @@ Theorem god1_s14_theorem2_matrix_of_composition_is_product :
         K addK mulK M addM smulM N addN smulN q p b c f)
       (matrix_of_right_linear_map
         K addK mulK L addL smulL M addM smulM r q a b g).
+let K addK mulK L addL smulL M addM smulM N addN smulN r.
+assume hr.
+let q.
+assume hq.
+let p.
+assume hp.
+let a b c f g.
+assume hBasisL hBasisM hBasisN hf hg.
+//GOD1PRF:289891 We shall calculate $C$ in terms of $A$ and $B$.\\
+//GOD1PRF:290160 Since we know the matrices A and B of $f$ and $g$, formulae (6) of § 12, Section 3 show that
+//GOD1PRF:290474 and therefore we have
+//GOD1PRF:290912 But the matrix $\mathbf{C = ( \gamma _ { i k } ) \text { of } h \text { is also given by the formulae }}$
+//GOD1PRF:291087 Comparing these two expressions for $\zeta_{i}$ we see that
+//GOD1PRF:291383 or, in a more condensed notation,
+//GOD1PRF:292326 With this definition, we can state the following result:\\
+//GOD1PRF:292921 Then the matrix of $f \circ g$ with respect to the bases $\left(a_{k}\right)$ and $\left(c_{i}\right)$ is AB .\\
 Admitted.
 
 Theorem god1_matrix_associative_distributive_and_units :
@@ -37244,8 +37362,32 @@ Theorem god1_matrix_associative_distributive_and_units :
         (matrix_multiplication K add mul p q r A C)
         (matrix_multiplication K add mul p q r B C))
     /\ (forall A :e matrix_space K p q,
+        forall B C :e matrix_space K q r,
+      matrix_multiplication K add mul p q r A
+        (matrix_addition K add q r B C)
+      = matrix_addition K add p r
+        (matrix_multiplication K add mul p q r A B)
+        (matrix_multiplication K add mul p q r A C))
+    /\ (forall A :e matrix_space K p q,
       matrix_multiplication K add mul p p q (unit_matrix K add mul p) A = A
       /\ matrix_multiplication K add mul p q q A (unit_matrix K add mul q) = A).
+let K add mul p.
+assume hp.
+let q.
+assume hq.
+let r.
+assume hr.
+let s.
+assume hs hK.
+apply andI.
+//GOD1PRF:295385 with $n$ rows and $n$ columns. It is called the unit matrix of order $n$. This terminology is justified by the fact that, for all matrices $X$ and $Y$ with coefficients in $K$, the relations
+//GOD1PRF:295659 are true, provided only that they make sense (i.e., that X has $n$ rows and Y has $n$ columns). These relations are easy consequences of the formulae (1); geometrically they are to be interpreted as follows. Let L be a finitely-generated free right K -module, having a basis $\left(a_{i}\right)_{1 \leqslant i \leqslant n}$ consisting of $n$ vectors (for example, we might take L to be $\mathrm{K}^{n}$, and the basis to be the canonical basis). Then the endomorphism $j: \mathrm{L} \rightarrow \mathrm{L}$ which has $1_{n}$ as matrix with respect to the basis $\left(a_{i}\right)$ is the identity mapping of L onto L . This follows from the formulae (6) of § 12 , section 3 , and the fact that here we have
+//GOD1PRF:296467 Now, to prove for example the relation $1_{n} . \mathrm{X}=\mathrm{X}$, we introduce a second module M , a basis $\left(b_{j}\right)$ of M and the homomorphism $f: \mathrm{M} \rightarrow \mathrm{L}$ which has X as matrix with respect to the bases $\left(a_{i}\right)$ and $\left(b_{j}\right)$ of L and M . Theorem 1 shows that $1_{n} . \mathrm{X}$ is the matrix, with respect to these bases, of the homomorphism $j \circ f$; but since $j=j_{\mathrm{L}}$ we have $j \circ f=f$ and therefore $1_{n} . \mathrm{X}=\mathrm{X}$, as required.
+//GOD1PRF:297216 Matrix multiplication is associative, that is to say
+//GOD1PRF:297292 whenever both sides of the equation are defined. To prove this, we introduce the homomorphisms
+//GOD1PRF:297547 whose matrices (with respect to the canonical bases) are $\mathrm{A}, \mathrm{B}, \mathrm{C}$ respectively; by Theorem 2, the matrix $\mathrm{A}(\mathrm{BC})$ represents $f \circ(g \circ h)$, and the matrix $(\mathrm{AB}) \mathrm{C}$ represents $(f \circ g) \circ h$, whence the result.
+//GOD1PRF:297835 Finally, the distributive laws
+//GOD1PRF:298001 hold whenever the terms appearing in these formulae are defined. The proof proceeds on the same lines, by replacing the matrices A, B, C by module homomorphisms and applying Theorem 1.
 Admitted.
 
 //GOD1:299045 square_matrix_ring : "the ring of square matrices of order #4 over #1" | $M_{#4}(#1)$
@@ -37259,6 +37401,9 @@ Theorem god1_square_matrices_form_ring :
       (square_matrix_ring K n)
       (matrix_addition K add n n)
       (matrix_multiplication K add mul n n n).
+let K add mul n.
+assume hn hK.
+//GOD1PRF:298526 and the set $\mathrm{M}_{n}(\mathrm{~K})$ with these two laws of composition is a ring. For we know already that $\mathrm{M}_{n}(\mathrm{~K})$ is a commutative group with respect to addition ; we have just shown that the multiplication is associative, and it is clear (from Example 3 above) that $\mathrm{M}_{n}(\mathrm{~K})$ possesses a neutral element for multiplication, namely the matrix $1_{n}$; finally, the formulae above show that multiplication in $\mathrm{M}_{n}(\mathrm{~K})$ is distributive over addition.
 Admitted.
 
 (** § 15. Invertible matrices and change of basis. **)
@@ -37283,6 +37428,11 @@ Theorem god1_module_automorphisms_form_general_linear_group :
         (module_endomorphism_ring K addK mulK M addM smul)
         (module_homomorphism_addition M addM)
         (module_endomorphism_composition M).
+let K addK mulK M addM smul.
+assume hM.
+apply andI.
+//GOD1PRF:315562 We recall (§ 12, section 1) that an automorphism of a module M is a bijective homomorphism of M onto M , i.e., an isomorphism of M onto M . Hence an automorphism of M is in particular a permutation of the set M . Theorem 1 of § 12 shows that, if $u$ and $v$ are automorphisms of M , then so is the mapping $u \circ v^{-1}$. Consequently the set
+//GOD1PRF:316557 and the elements of GL(M) are just the units of the ring Hom (M, M); for if an endomorphism $u$ is a unit in the ring Hom ( $\mathbf{M}, \mathbf{M}$ ), then there exists an endomorphism $v$ such that $u \circ v=v \circ u=j_{\mathrm{M}}$, so that $u$ is bijective and therefore belongs to GL(M); and the converse is obvious. Thus GL(M) is the group of units of the ring Hom (M, M), in the sense of § 8, Remark 1.\\
 Admitted.
 
 //GOD1:317017 invertible_matrix : "#6 is an invertible square matrix of order #4 over #1" | $#6\in\operatorname{GL}(#4,#1)$
@@ -37324,6 +37474,12 @@ Theorem god1_general_linear_group_is_group :
       /\ matrix_multiplication K add mul n n n A
         (matrix_inverse K add mul n A)
       = unit_matrix K add mul n.
+let K add mul n.
+assume hn hK.
+apply andI.
+//GOD1PRF:317233 that is to say if $U$ is a unit of the ring $M_{n}(K)$; the matrix $V$ is then unique, and is denoted by $\mathrm{U}^{-1}$ and called the inverse of U . We denote by
+//GOD1PRF:317435 the set of all invertible square matrices of order $n$ with coefficients in K . Endowed\\
+//GOD1PRF:317525 with the law of composition ( U, V) → UV, this set is a group, called the general linear group in $n$ variables over the ring K ; it is just the (multiplicative) group of units of the ring $\mathbf{M}_{n}(\mathbf{K})$.
 Admitted.
 
 Theorem god1_automorphism_iff_matrix_invertible :
@@ -37338,6 +37494,16 @@ Theorem god1_automorphism_iff_matrix_invertible :
     <-> invertible_matrix K addK mulK n
       (matrix_of_right_linear_map
         K addK mulK M addM smulR M addM smulR n n a a f)).
+let K addK mulK M addM smulR n.
+assume hn.
+let a f.
+assume hBasis hf.
+apply iffI.
+//GOD1PRF:317747 Let M be a finitely generated free module, and let $a_{1}, \ldots, a_{n}$ be a basis of M . With each endomorphism $f$ of M we can associate the matrix of $f$ with respect to this basis (§ 12, section 3). If we denote this matrix by $\mathrm{A}(f)$, we obtain a bijection
+//GOD1PRF:318057 of the ring Hom ( $\mathbf{M}, \mathbf{M}$ ) onto the ring $\mathbf{M}_{n}(\mathbf{K})$ of all square matrices of order $n$ with coefficients in K ; and the method by which we defined the sum and the product of two matrices shows that
+//GOD1PRF:318447 so that the mapping $f \rightarrow \mathrm{~A}(f)$ is an isomorphism (§ 8, section 6) of the ring Hom (M, M) onto the ring $\mathrm{M}_{n}(\mathrm{~K})$.
+//GOD1PRF:318603 Since an isomorphism of a ring $U$ onto a ring $V$ clearly maps the set $U^{*}$ of units of U onto the set $\mathrm{V}^{*}$ of units of V , it follows that for an endomorphism $f$ of M to be an automorphism of M it is necessary and sufficient that its matrix $\mathrm{A}(f)$ should be a unit of the ring $\mathbf{M}_{n}(\mathrm{~K})$. In other words, the relations
+//GOD1PRF:319066 are equivalent.\\
 Admitted.
 
 //GOD1:321107 determinant_2 : "the determinant of the square matrix #4 of order two" | $\det(#4)$
@@ -37359,6 +37525,17 @@ Theorem god1_determinant_2_multiplicative_and_detects_units :
     /\ (forall A :e square_matrix_ring K 2,
       invertible_matrix K add mul 2 A
       <-> ring_unit K add mul (determinant_2 K add mul A)).
+let K add mul.
+assume hK.
+apply andI.
+//GOD1PRF:321528 which is valid for all $A, B \in M_{2}(K)$. This formula is equivalent to the identity
+//GOD1PRF:321681 which the reader will have no difficulty in checking for himself, provided he remembers that K is assumed to be commutative.
+//GOD1PRF:321807 Since the determinant of the unit matrix $1_{2}$ is clearly equal to 1 , the relation
+//GOD1PRF:321987 shows that for the matrix A to be invertible it is necessary that its determinant should be a unit of K . Conversely, suppose that $a d-b c$ is a unit of K , and consider the two equations involving $x$ and $y$ in the system (2). Clearly they are satisfied by taking
+//GOD1PRF:322309 and the equations involving $z$ and $t$ are likewise satisfied by
+//GOD1PRF:322431 and then it is easily verified that the matrix
+//GOD1PRF:322544 so constructed is a two-sided inverse of A.
+//GOD1PRF:322589 Hence, if the ring K is commutative, the matrix $\left(\begin{array}{ll}a & b \\ c & d\end{array}\right)$ is invertible if and only if $a d-b c$ is invertible in K . such that
 Admitted.
 
 //GOD1:326299 transition_matrix : "the transition matrix from the basis #9 to the basis #10" | $T_{#10\leftarrow #9}$
@@ -37392,6 +37569,23 @@ Theorem god1_transition_matrix_is_invertible_and_changes_coordinates :
           (basis_coordinates
             K addK (opposite_ring_multiplication mulK)
             M addM (fun scalar y => smulR y scalar) n a x j)).
+let K addK mulK M addM smulR n.
+assume hn.
+let a b.
+assume hBasisA hBasisB.
+apply andI.
+//GOD1PRF:324942 For this purpose consider the homomorphisms
+//GOD1PRF:325186 where ( $e_{1}, \ldots, e_{n}$ ) is the canonical basis of $\mathrm{K}^{n}$. For $\left(a_{i}\right)$ and $\left(b_{i}\right)$ to be bases of M it is necessary and sufficient that $u$ and $v$ should be isomorphisms (§ 12, Corollary 1 to Theorem 3). If $\xi_{1}, \ldots, \xi_{n}$ are the coordinates of $x$ with respect to the basis $\left(a_{i}\right)$, and if $\eta_{1}, \ldots, \eta_{n}$ are its coordinates with respect to the basis $\left(b_{i}\right)$, then we have
+//GOD1PRF:325750 Hence, introducing the automorphism (§ 12, Theorem 1)
+//GOD1PRF:325868 of $K^{n}$, we have
+//GOD1PRF:325977 so that if we denote by
+//GOD1PRF:326066 the matrix of $w$ with respect to the canonical basis of $\mathrm{K}^{n}$, we have the formulae
+//GOD1PRF:326299 which solve the problem we set ourselves. They are called the formulae for change of basis, and the matrix $\left(\alpha_{i j}\right)$ which features in these formulae is called the transition matrix from the basis $\left(a_{i}\right)_{1 \leqslant i \leqslant n}$ to the basis $\left(b_{i}\right)_{1 \leqslant i \leqslant n}$; since it is the matrix of an automorphism of $\mathrm{K}^{n}$, it follows that
+//GOD1PRF:326773 Notice also that the relation (4) may be written as $u=v \circ w$, and therefore implies that
+//GOD1PRF:327000 be the matrix of the automorphism $w^{-1}$ (with respect to the canonical basis of $\mathrm{K}^{n}$ ), i.e., the inverse of the transition matrix $\left(\alpha_{i j}\right)$. Then we have
+//GOD1PRF:327265 and therefore, using (3),
+//GOD1PRF:327668 It should be carefully noted that the matrices $\left(\alpha_{i j}\right)$ and $\left(\beta_{i j}\right)$ which figure in the formulae (5) and (7) are not the same but are inverses of each other.
+//GOD1PRF:327865 A similar calculation gives the relations
 Admitted.
 
 //GOD1:328624 right_basis_transform : "the family obtained from #9 using the coefficient matrix #10" | $b_j=\sum_i #9_i#10_{ij}$
@@ -37412,6 +37606,13 @@ Theorem god1_s15_theorem1_basis_transform_iff_matrix_invertible :
     (right_module_basis K addK mulK M addM smulR n
       (fun j => right_basis_transform K addK M addM smulR n a B j)
     <-> invertible_matrix K addK mulK n B).
+let K addK mulK M addM smulR n.
+assume hn.
+let a B.
+assume hB hBasis.
+apply iffI.
+//GOD1PRF:328966 Consider the homomorphisms $u, v: \mathrm{K}^{n} \rightarrow \mathrm{M}$ given by the formulae (3). Since the ( $a_{i}$ ) form a basis of M , it follows that $u$ is bijective. To express that the ( $b_{i}$ ) form a basis, we have to express that $v$ is bijective, or equivalently that $u^{-1} \circ v$ is an automorphism of $K^{n}$. Now we have
+//GOD1PRF:329608 Hence $\left(\beta_{i j}\right)$ is precisely the matrix of the endomorphism $u^{-1} \circ v$ of $\mathrm{K}^{n}$; since an endomorphism of $\mathrm{K}^{n}$ is bijective if and only if its matrix belongs to $\mathrm{GL}(n, \mathrm{~K})$, the theorem is proved.\\
 Admitted.
 
 Theorem god1_s15_theorem2_matrix_under_change_of_bases :
@@ -37434,6 +37635,17 @@ Theorem god1_s15_theorem2_matrix_under_change_of_bases :
         (matrix_of_right_linear_map
           K addK mulK L addL smulL M addM smulM q p a2 b2 f)
         (transition_matrix K addK mulK L addL smulL q a1 a2)).
+let K addK mulK L addL smulL M addM smulM q.
+assume hq.
+let p.
+assume hp.
+let a1 a2 b1 b2 f.
+assume hA1 hA2 hB1 hB2 hf.
+//GOD1PRF:331932 For this purpose, consider the homomorphisms $u^{\prime}, u^{\prime \prime}: \mathrm{K}^{q} \rightarrow \mathrm{~L}$ which map the canonical basis of $\mathrm{K}^{q}$ onto the bases $\left(a_{j}^{\prime}\right)$ and $\left(a_{j}^{\prime \prime}\right)$ respectively, and the homomorphisms $v^{\prime}, v^{\prime \prime}: \mathrm{K}^{p} \rightarrow \mathrm{M}$ which map the canonical basis of $\mathrm{K}^{p}$ onto the bases ( $b_{i}^{\prime}$ ) and ( $b_{i}^{\prime \prime}$ ) respectively. Then
+//GOD1PRF:332519 where $u$ (resp. $v$ ) is an automorphism of $\mathrm{K}^{q}$ (resp. $\mathrm{K}^{p}$ ) whose matrix with respect to the canonical basis of $\mathrm{K}^{q}$ (resp. $\mathrm{K}^{p}$ ) is precisely U (resp. V), by the results of the last section. On the other hand, if we introduce the homomorphisms
+//GOD1PRF:333026 then the matrices $\mathrm{A}^{\prime}, \mathrm{A}^{\prime \prime}$ defined above are just the matrices of $f^{\prime}, f^{\prime \prime}$ with respect to the canonical bases of $\mathrm{K}^{q}$ and $\mathrm{K}^{p}$, by Remark 2 of § 12. In terms of the mappings $u, v$ defined above, we have
+//GOD1PRF:333594 since the composition of two homomorphisms corresponds to the product of their matrices, we obtain
+//GOD1PRF:333739 by taking the matrices of $u, v, f^{\prime}, f^{\prime \prime}$ with respect to the canonical bases, and this is the solution of the problem posed at the beginning of this section. Hence:\\
 Admitted.
 
 Theorem god1_s15_corollary_similar_matrices_of_endomorphism :
@@ -37452,6 +37664,11 @@ Theorem god1_s15_corollary_similar_matrices_of_endomorphism :
           K addK mulK M addM smulR M addM smulR n n a1 a1 f)
         (matrix_inverse K addK mulK n
           (transition_matrix K addK mulK M addM smulR n a1 a2))).
+let K addK mulK M addM smulR n.
+assume hn.
+let a1 a2 f.
+assume hA1 hA2 hf.
+//GOD1PRF:334858 If in particular $\mathrm{L}=\mathrm{M}$, then we may assume that the bases $\left(a_{j}^{\prime}\right)$ and $\left(b_{i}^{\prime}\right)$ are the same, and that the bases $\left(a_{j}^{\prime \prime}\right)$ and $\left(b_{i}^{\prime \prime}\right)$ are the same. Then clearly we have $\mathrm{U}=\mathrm{V}$, and hence:
 Admitted.
 
 //GOD1:336010 similar_matrices : "the square matrices #5 and #6 are similar over #1" | $#5\sim #6$
@@ -37496,6 +37713,12 @@ Theorem god1_right_module_dual_is_left_module :
       (right_module_dual K addK mulK L addL smulR)
       (right_module_dual_addition L addK)
       (right_module_dual_left_scalar L mulK).
+let K addK mulK L addL smulR.
+assume hL.
+//GOD1PRF:350189 We shall see (by using the fact that K is not only a right K -module but also a left K -module) that in fact the set Hom ( $\mathrm{L}, \mathrm{K}$ ) can be regarded not merely as a commutative group, but as a left K -module. Let $f$ be a linear form on L , let $\lambda \in \mathrm{K}$ be a scalar, and consider the function $g$ on L defined by
+//GOD1PRF:350563 Multiplying the relation (1) on the left by $\lambda$, and using the associative and distributive laws in the ring K, we obtain
+//GOD1PRF:350743 so that $g$ is again a linear form on L . Naturally, we write
+//GOD1PRF:350825 thereby defining a second operation on the set $\operatorname{Hom}(\mathrm{L}, \mathrm{K})$, which consists of "multiplying" an element of this set on the left by a scalar. It remains to be checked that the set Hom (L,K), together with the law of addition defined in § 13 and the law of "scalar multiplication" just defined, is effectively a left K -module. We shall leave this verification to the reader as an exercise. (Alternatively, we can use the following fact : let E be the set of all mappings of L into K , linear or not; considering L simply as a set, and K as a left K -module, by Example 4 of § 10 we can regard E as a left K -module ; now, to do the same for $\operatorname{Hom}(\mathrm{L}, \mathrm{K})$, it is enough to show that $\operatorname{Hom}(\mathrm{L}, \mathrm{K})$ is a submodule of E ; and this is precisely what the preceding considerations show.)
 Admitted.
 
 //GOD1:353884 right_module_dual_evaluation : "evaluation of a linear form on the basis #8" | $\theta(f)=(f(#8_i))_i$
@@ -37541,6 +37764,17 @@ Theorem god1_s16_theorem1_dual_of_finite_free_module :
       right_module_dual_basis_vector
         K addK mulK L addL smulR n a i (a j)
       = if i = j then ring_one K mulK else ring_zero K addK.
+let K addK mulK L addL smulR n.
+assume hn.
+let a.
+assume hBasis.
+apply andI.
+//GOD1PRF:354419 Let $\alpha_{1}, \ldots, \alpha_{n}$ be arbitrary elements of K . Theorem 3 of § 12 shows that there exists one and only one $f \in \mathrm{~L}^{*}$ such that
+//GOD1PRF:354732 Hence the mapping $\theta$ is bijective. To show that $\theta$ is an isomorphism it remains to show that $\theta$ is linear. For this, let $f, g \in \mathrm{~L}^{*}$, and put $h=f+g$; then we have
+//GOD1PRF:355300 also, replacing $f$ by $\lambda f$ clearly multiplies the coefficients $f\left(a_{i}\right)$ on the left by $\lambda$, so that
+//GOD1PRF:355474 and therefore $\theta$ is linear.\\
+//GOD1PRF:355510 To compare the proof of the theorem we have to establish the existence of a basis $\left(u_{i}\right)_{1 \leqslant i \leqslant n}$ of $\mathrm{L}^{*}$ with the stated properties. Now the relations imposed on the $u_{i}$ imply that
+//GOD1PRF:355926 in other words, they imply that $\theta$ maps the elements $\left(u_{i}\right)_{1 \leqslant i \leqslant n}$ of $L^{*}$ onto the canonical basis of $\mathrm{K}^{n}$. Since $\theta$ is an isomorphism of modules, the existence of the basis $\left(u_{i}\right)$ sought is clear; we have only to take the images under $\theta^{-1}$ of the elements of the canonical basis of $\mathbf{K}^{\boldsymbol{n}}$.\\
 Admitted.
 
 //GOD1:357975 right_module_bidual : "the bidual of the right module #4" | $#4^{**}$
@@ -37590,6 +37824,20 @@ Theorem god1_bidual_is_right_module_and_evaluation_is_linear :
       (right_module_bidual_right_scalar
         (right_module_dual K addK mulK L addL smulR) mulK)
       (canonical_bidual_mapping K addK mulK L addL smulR).
+let K addK mulK L addL smulR.
+assume hL.
+apply andI.
+//GOD1PRF:358229 In all cases we can define a canonical mapping of L into $\mathrm{L}^{* *}$, as follows. Let $x$ be a "fixed" element of L , and consider the mapping
+//GOD1PRF:358500 thus $u$ consists in associating with each linear form $f$ on L its value at the point $x$ of L . The mapping $u$ is linear, i.e., it satisfies
+//GOD1PRF:358707 for all $f, g \in \mathrm{~L}^{*}$ and all $\alpha, \beta \in \mathrm{K}$. If we put $\alpha f+\beta g=h$, then the above relation takes the form
+//GOD1PRF:358902 and in this form it reduces purely and simply to the definition of the element $h=\alpha f+\beta g$ of $\mathrm{L}^{*}$.
+//GOD1PRF:359024 Hence $u$ is a linear form on $\mathrm{L}^{*}$, i.e., $u \in \mathrm{~L}^{* *}$. In this way we have therefore attached to each $x \in \mathrm{~L}$ an element $u \in \mathrm{~L}^{* *}$; hence we have a mapping of L into $\mathrm{L}^{* *}$, which is by definition the canonical mapping of L into its bidual.
+//GOD1PRF:359332 This mapping is linear. Let $x, y \in \mathrm{~L} ; \alpha, \beta \in \mathrm{K}$; and put $z=x \alpha+y \beta$. Also let $u, v, w \in \mathrm{~L}^{* *}$ be the images of $x, y, z$ under the canonical mapping. Then we have to establish the relation
+//GOD1PRF:359610 Since $u, v, w$ are linear forms on $\mathrm{L}^{*}$, this relation means that
+//GOD1PRF:359725 for all $f \in \mathrm{~L}^{*}$; now, by the definition of the canonical mapping, we have
+//GOD1PRF:359868 and therefore we have to show that
+//GOD1PRF:359939 i.e., that
+//GOD1PRF:360003 But this is precisely the identity which defines the linear forms $f$ on L .\\
 Admitted.
 
 Theorem god1_s16_theorem2_finite_free_module_isomorphic_to_bidual :
@@ -37606,6 +37854,16 @@ Theorem god1_s16_theorem2_finite_free_module_isomorphic_to_bidual :
       (fun scalar u => right_module_bidual_right_scalar
         (right_module_dual K addK mulK L addL smulR) mulK u scalar)
       (canonical_bidual_mapping K addK mulK L addL smulR).
+let K addK mulK L addL smulR n.
+assume hn.
+let a.
+assume hBasis.
+//GOD1PRF:360204 To prove this theorem, we have to show that the canonical mapping
+//GOD1PRF:360322 is bijective if L is finitely generated and free. Let $\left(a_{i}\right)_{1 \leqslant i \leqslant n}$ be a basis of L , let $\left(f_{i}\right)_{1 \leqslant i \leqslant n}$ be the dual basis of $L^{*}$, and put
+//GOD1PRF:360591 Clearly it is enough to show that the $u_{i}$ form a basis of $\mathrm{L}^{* *}$; we shall in fact show that they form the basis in $\mathrm{L}^{* *}$ which is dual to the basis $\left(f_{i}\right)$ of the module $\mathrm{L}^{*}$, in other words that
+//GOD1PRF:360952 By the definition of the canonical homomorphism of L into $\mathrm{L}^{* *}$, we have
+//GOD1PRF:361115 hence $u_{i}\left(f_{j}\right)=f_{j}\left(a_{i}\right)$; but since the $f_{j}$ form the dual basis of the basis $\left(a_{i}\right)$ of L , we have
+//GOD1PRF:361373 This establishes the relations above, and completes the proof.\\
 Admitted.
 
 Theorem god1_s16_corollary1_every_bidual_form_is_evaluation :
@@ -37620,13 +37878,22 @@ Theorem god1_s16_corollary1_every_bidual_form_is_evaluation :
         /\ forall y :e L,
           (forall f :e right_module_dual K addK mulK L addL smulR,
             u f = f y) -> y = x.
+let K addK mulK L addL smulR n.
+assume hn.
+let a.
+assume hBasis.
+let u.
+assume hu.
+//GOD1PRF:361690 For there exists a unique $x \in \mathrm{~L}$ such that $u=j(x)$, where $j$ denotes the canonical isomorphism of L onto its bidual.\\
 Admitted.
 
 Theorem god1_s16_corollary2_prescribed_values_on_dual_basis :
   forall K, forall addK mulK:set -> set -> set,
   forall L, forall addL smulR:set -> set -> set,
   forall n :e omega, forall f:set -> set, forall beta :e K :^: n,
-    right_module K addK mulK L addL smulR ->
+    finitely_generated_free_module
+      K addK (opposite_ring_multiplication mulK)
+      L addL (fun scalar x => smulR x scalar) ->
     module_basis K addK mulK
       (right_module_dual K addK mulK L addL smulR)
       (right_module_dual_addition L addK)
@@ -37635,6 +37902,11 @@ Theorem god1_s16_corollary2_prescribed_values_on_dual_basis :
       (forall i :e n, f i x = beta i)
       /\ forall y :e L,
         (forall i :e n, f i y = beta i) -> y = x.
+let K addK mulK L addL smulR n.
+assume hn.
+let f beta.
+assume hbeta hFree hBasis.
+//GOD1PRF:362137 For, since the $f_{i}$ form a basis of $\mathrm{L}^{*}$, there exists a unique linear form $u$ on $\mathrm{L}^{*}$ such that $u\left(f_{i}\right)=\beta_{i}$ for all $i(\S 12$, Theorem 3); since $u(f)=f(x)$ for some $x \in \mathrm{~L}$ uniquely determined by $u$, the corollary is proved.
 Admitted.
 
 //GOD1:362899 module_transpose : "the transpose of the right-module homomorphism #10" | ${}^t#10$
@@ -37662,6 +37934,13 @@ Theorem god1_module_transpose_is_left_linear :
       (right_module_dual_left_scalar L mulK)
       (fun u => module_transpose
         K addK mulK L addL smulL M addM smulM f u).
+let K addK mulK L addL smulL M addM smulM f.
+assume hf.
+//GOD1PRF:362472 Let $\mathrm{L}, \mathrm{M}$ be two right K -modules, and let $f: \mathrm{L} \rightarrow \mathrm{M}$ be a homomorphism. Let $u$ be a linear form on M ; then the composite mapping $u \circ f$ is clearly (§ 12, Theorem 1) a linear form on L . We may therefore define a mapping
+//GOD1PRF:362974 This mapping ${ }^{t} f$ is a homomorphism. Let $u, v \in \mathrm{M}^{*}$; then we have
+//GOD1PRF:363119 by Theorem 1 of § 14, and consequently
+//GOD1PRF:363210 Next, for each $\lambda \in \mathbf{K}$ let $h_{\lambda}$ denote the homothety $\xi \rightarrow \lambda \xi$ in $\mathbf{K}$. Then, for any $u \in \mathbf{M}^{*}$, we have
+//GOD1PRF:363618 Hence the mapping ${ }^{t} f$ is linear, as stated above.\\
 Admitted.
 
 Theorem god1_s16_theorem3_transpose_addition_and_composition :
@@ -37683,6 +37962,13 @@ Theorem god1_s16_theorem3_transpose_addition_and_composition :
     = fun u :e right_module_dual K addK mulK N addN smulN =>
         module_transpose K addK mulK L addL smulL M addM smulM f
           (module_transpose K addK mulK M addM smulM N addN smulN h u).
+let K addK mulK L addL smulL M addM smulM N addN smulN f g h.
+assume hf hg hh.
+apply andI.
+//GOD1PRF:364898 To prove a) put $h=f+g$. Then if $u \in \mathbf{M}^{*}$ we have
+//GOD1PRF:365052 and therefore ${ }^{t} h={ }^{t} f+{ }^{t} g$.\\
+//GOD1PRF:365101 To prove $b$ ), put $h=g \circ f$. Then if $u \in \mathrm{~N}^{*}$ we have
+//GOD1PRF:365335 and therefore ${ }^{t} h={ }^{t} f+{ }^{t} g$.\\
 Admitted.
 
 Theorem god1_transpose_of_identity_and_automorphism :
@@ -37702,6 +37988,13 @@ Theorem god1_transpose_of_identity_and_automorphism :
         (right_module_dual_left_scalar L mulK)
         (fun u => module_transpose
           K addK mulK L addL smulR L addL smulR f u)).
+let K addK mulK L addL smulR f.
+assume hL.
+apply andI.
+//GOD1PRF:365384 As to $c$ ), we shall first show that if $f: \mathrm{L} \rightarrow \mathrm{L}$ is the identity mapping, then the same is true of its transpose. If $u$ is a linear form on L , then
+//GOD1PRF:365598 since $f$ is the identity mapping; hence ${ }^{t} f$ is the identity mapping on $\mathrm{L}^{*}$. Now let $f$ be an automorphism of L ; then there exists a homomorphism $g: \mathrm{L} \rightarrow \mathrm{L}$ such that
+//GOD1PRF:365859 and therefore (using part $b$ ))
+//GOD1PRF:366005 which shows that ${ }^{t} f$ is an automorphism of $\mathrm{L}^{*}$. Moreover, this calculation shows that
 Admitted.
 
 //GOD1:369038 matrix_transpose : "the transpose of the #2-by-#3 matrix #4" | ${}^t#4$
@@ -37734,6 +38027,21 @@ Theorem god1_matrix_of_transposed_map_is_transpose_matrix :
     = matrix_transpose K p q
       (matrix_of_right_linear_map
         K addK mulK L addL smulL M addM smulM q p a b f).
+let K addK mulK L addL smulL M addM smulM q.
+assume hq.
+let p.
+assume hp.
+let a b f.
+assume hBasisL hBasisM hf.
+//GOD1PRF:367506 We propose to calculate the matrix ${ }^{t} f$ in terms of the matrix of $f$.\\
+//GOD1PRF:367586 By the definition of the matrix of ${ }^{t} f$, we have relations
+//GOD1PRF:367765 i.e.,
+//GOD1PRF:367836 this means that for each $x \in \mathrm{~L}$ we have
+//GOD1PRF:367996 Now if we put
+//GOD1PRF:368104 then from the results of section 2 we shall have
+//GOD1PRF:368208 Consequently the formula (2) is equivalent to
+//GOD1PRF:368320 But, from the definition of the matrix ( $\alpha_{i j}$ ) of $f$ we have
+//GOD1PRF:368461 by comparing the last two results we see therefore that
 Admitted.
 
 Theorem god1_s16_theorem4_matrix_transpose_laws :
@@ -37757,6 +38065,27 @@ Theorem god1_s16_theorem4_matrix_transpose_laws :
         (matrix_transpose K p p A)))
     /\ forall A :e matrix_space K p q,
       matrix_transpose K q p (matrix_transpose K p q A) = A.
+let K add mul p.
+assume hp.
+let q.
+assume hq.
+let r.
+assume hr hK.
+apply andI.
+//GOD1PRF:370528 To prove $a$ ), put
+//GOD1PRF:370638 then $\mathrm{A}+\mathrm{B}=\left(\alpha_{i j}+\beta_{i j}\right)$ and therefore
+//GOD1PRF:370890 To prove $b$ ), put
+//GOD1PRF:371142 then the matrix
+//GOD1PRF:371259 is given by the relations
+//GOD1PRF:371562 (cf. § 14, section 2), the products $\alpha_{i j} \beta_{j k}$ being calculated in the given ring K . On the other hand, we have
+//GOD1PRF:372057 Hence if we put
+//GOD1PRF:372216 we have
+//GOD1PRF:372306 where the products $\beta_{k j}^{\prime} \alpha_{j i}^{\prime}$ are calculated in the opposite ring $\mathrm{K}^{0}$. Hence, replacing the product $\beta_{k j}^{\prime} \alpha_{j i}^{\prime}$ in $\mathrm{K}^{0}$ by the product $\alpha_{j i}^{\prime} \beta_{k j}^{\prime}$, and using the relations $\alpha_{j i}^{\prime}=\alpha_{i j}, \beta_{k j}^{\prime}=\beta_{j k}$, we see that
+//GOD1PRF:372816 by virtue of (3); and this proves the assertion b) of the theorem. The assertion $d$ ) is trivial, so that it remains to prove $c$ ). Let $A \in \mathbf{M}_{n}(\mathbf{K})$, suppose that $A$ is invertible and let $B$ be its inverse. From the relations
+//GOD1PRF:373106 it follows that
+//GOD1PRF:373248 but it is clear that
+//GOD1PRF:373311 hence ${ }^{t} \mathrm{~A}$ is invertible, and moreover the above calculation shows that
+//GOD1PRF:373483 Conversely, if ${ }^{t} \mathrm{~A}$ is invertible, then by what has just been proved the matrix ${ }^{t}\left({ }^{t} \mathrm{~A}\right)$ is invertible, i.e., $\mathbf{A}$ is invertible.\\
 Admitted.
 
 (** § 17. Sums of submodules. **)
@@ -37782,6 +38111,13 @@ Theorem god1_sum_of_two_submodules_is_least_containing_submodule :
       submodule K addK mulK L addL smul P ->
       M c= P -> N c= P ->
       submodule_sum K addK mulK L addL smul M N c= P.
+let K addK mulK L addL smul M N.
+assume hM hN.
+apply andI.
+//GOD1PRF:377102 Certainly it is clear that every submodule of L which contains both M and N will contain every vector $z$ having this property. It is therefore enough to show that these vectors form a submodule P containing M and N . Now it is clear that P contains M and N (put $x=0$ or $y=0$ in the relation $z=x+y$ ); on the other hand, if
+//GOD1PRF:377707 are two elements of $\mathbf{P}$, and if $\lambda, \mu$ are any two scalars, then we have
+//GOD1PRF:377850 where
+//GOD1PRF:377987 Hence P is a submodule of L , as asserted.\\
 Admitted.
 
 //GOD1:380037 submodule_family_sum : "the sum of the finite family of submodules #8 indexed by #7" | $\sum_{i\in #7}#8_i$
@@ -37807,6 +38143,14 @@ Theorem god1_finite_sum_of_submodules_is_least_containing_submodule :
       submodule K addK mulK L addL smul P ->
       (forall i :e I, M i c= P) ->
       submodule_family_sum K addK mulK L addL smul I M c= P.
+let K addK mulK L addL smul I M.
+assume hFinite hM.
+apply andI.
+//GOD1PRF:379119 Then P is the smallest submodule of L which contains $\mathbf{M}_{1}, \ldots, \mathbf{M}_{p}$.\\
+//GOD1PRF:379216 First of all it is clear that P contains $\mathrm{M}_{i}$ (put $x_{j}=0$ whenever $j \neq i$ in the relation (1)), and that any submodule which contains all the $\mathbf{M}_{i}$ must contain all the vectors (1). Hence it remains to be shown that $P$ is a submodule of $L$. If
+//GOD1PRF:379624 are any two elements of P , and if $\lambda^{\prime}, \lambda^{\prime \prime} \in \mathrm{K}$ are any two scalars, then we have
+//GOD1PRF:379849 where
+//GOD1PRF:380001 and hence P is a submodule of L .\\
 Admitted.
 
 //GOD1:381544 indexed_module_product : "the direct product of the family of modules #5 indexed by #4" | $\prod_{i\in #4}#5_i$
@@ -37832,6 +38176,9 @@ Theorem god1_indexed_direct_product_is_module :
       (indexed_module_product I M)
       (indexed_module_product_addition I addM)
       (indexed_module_product_left_scalar I smul).
+let K addK mulK I M addM smul.
+assume hM.
+//GOD1PRF:381194 That we obtain a module structure on L in this way is easily verified, and we leave the details to the reader.
 Admitted.
 
 //GOD1:381544 module_product_projection : "the #7-th canonical projection from a direct product of modules" | $\operatorname{pr}_{#7}$
@@ -37866,6 +38213,12 @@ Theorem god1_product_projections_and_injections_are_linear :
         (module_product_injection I M addM i)
       /\ inj (M i) (indexed_module_product I M)
         (module_product_injection I M addM i)).
+let K addK mulK I M addM smul.
+assume hM.
+apply andI.
+//GOD1PRF:381992 is a module homomorphism. So is the mapping
+//GOD1PRF:382190 where on the right-hand side the letter $x$ occurs in the $i$ th place.\\
+//GOD1PRF:382264 Moreover, it is clear that the homomorphism $u_{i}$ is injective, and it is therefore an isomorphism of $\mathbf{M}_{i}$ onto a submodule of $\mathbf{M}_{1} \times \ldots \times \mathbf{M}_{p}$. In practice, we shall generally identify $\mathbf{M}_{i}$ with its image under $u_{i}$. The formula
 Admitted.
 
 //GOD1:383491 submodule_family_sum_map : "the canonical summation map from the product of #8 to #4" | $(x_i)\mapsto\sum_i x_i$
@@ -37901,6 +38254,10 @@ Theorem god1_s17_theorem1_two_submodules_independent_iff_trivial_intersection :
     (linearly_independent_submodules K addK mulK L addL smul 2
       (fun i => if i = 0 then M else N)
     <-> {x :e M|x :e N} = {module_zero L addL}).
+let K addK mulK L addL smul M N.
+assume hM hN.
+apply iffI.
+//GOD1PRF:384198 If $x \in M \cap N$ then we have $x+(-x)=0$, and $x \in M,-x \in N$; hence $x=0$ if M and N are linearly independent. Conversely, suppose that $\mathrm{M} \cap \mathrm{N}=0$; if $x \in \mathrm{M}$ and $y \in \mathrm{~N}$ are such that $x+y=0$, then we have $x=-y \in \mathrm{M} \cap \mathrm{N}$, hence $x=y=0$.
 Admitted.
 
 //GOD1:386555 complementary_submodule : "#8 is a complementary submodule of #7 in #4" | $#4=#7\oplus #8$
@@ -37957,6 +38314,18 @@ Theorem god1_direct_sum_projections_are_orthogonal_and_sum_to_identity :
     /\ forall x :e L,
       module_finitely_supported_sum L addL I
         (fun i => direct_sum_projection L addL I M i x) = x.
+let K addK mulK L addL smul I M.
+assume hDirect.
+apply andI.
+//GOD1PRF:387710 where the $\mathbf{M}_{i}$ are linearly independent submodules of L . Then every $x \in \mathrm{~L}$ can be written uniquely in the form
+//GOD1PRF:388006 where $v_{i}$ is a mapping of L into L . On the other hand, if we introduce the isomorphism
+//GOD1PRF:388340 then it is clear that
+//GOD1PRF:388417 This result shows that $v_{i}$ is a linear mapping. (The reader should also verify this by direct calculation.)
+//GOD1PRF:388530 The endomorphism $v_{i}$ has as image the submodule $\mathrm{M}_{i}$. For each $x \in \mathrm{~L}, v_{i}(x)$ is the one and only vector in $\mathrm{M}_{i}$ such that $x-v_{i}(x)$ belongs to the submodule generated by $\mathrm{M}_{1}, \ldots, \mathrm{M}_{i-1}, \mathrm{M}_{i+1}, \ldots, \mathrm{M}_{p}$. For this reason, $v_{i}(x)$ is called the projection of $x$ on $\mathrm{M}_{i}$.
+//GOD1PRF:388915 Clearly, $v_{i}(x)=x$ if and only if $x \in \mathbf{M}_{i}$. Since $v_{i}(x) \in \mathbf{M}_{i}$ for all $x \in \mathbf{L}$, it follows that $v_{i}\left(v_{i}(x)\right)=v_{i}(x)$ for all $x \in \mathrm{~L}$, i.e., that
+//GOD1PRF:389284 It is also clear that $v_{j}(x)=0$ for $x \in \mathbf{M}_{j}$, if $j \neq i$, hence that $v_{j}\left(v_{i}(x)\right)=0$ for all $x \in \mathrm{~L}$ if $i \neq j$ : in other words,
+//GOD1PRF:389526 Finally, for each $x \in \mathrm{~L}$ we have
+//GOD1PRF:389627 which shows that
 Admitted.
 
 Theorem god1_s17_theorem2_orthogonal_projections_give_direct_sum :
@@ -37971,6 +38340,12 @@ Theorem god1_s17_theorem2_orthogonal_projections_give_direct_sum :
       module_finitely_supported_sum L addL I (fun i => v i x) = x) ->
     direct_sum_decomposition K addK mulK L addL smul I
       (fun i => module_homomorphism_image L (v i)).
+let K addK mulK L addL smul I v.
+assume hFinite hv hOrthogonal hSum.
+//GOD1PRF:390137 The formula
+//GOD1PRF:390184 shows already that L is the sum of the $\mathbf{M}_{i}$. Now suppose that $x_{i} \in \mathbf{M}_{i}(1 \leqslant i \leqslant p)$ are such that
+//GOD1PRF:390395 There exist $y_{i} \in \mathrm{~L}$ such that $x_{i}=v_{i}\left(y_{i}\right)$, and hence
+//GOD1PRF:390664 Hence by applying $v_{i}$ to the relation (2) we obtain simply $x_{i}=0$. It follows that the submodules $\mathrm{M}_{i}$ are linearly independent, and the proof is complete.\\
 Admitted.
 
 Theorem god1_s17_corollary_direct_summand_characterizations :
@@ -37986,6 +38361,15 @@ Theorem god1_s17_corollary_direct_summand_characterizations :
       module_homomorphism K addK mulK
         L addL smul M addL smul q
       /\ forall x :e M, q x = x).
+let K addK mulK L addL smul M.
+assume hM.
+apply andI.
+//GOD1PRF:391191 (DS 1) implies (DS 2) : write $\mathrm{L}=\mathbf{M} \oplus \mathbf{N}$ and take $v(x)$ to be the projection of $x$ on M "parallel to N ".\\
+//GOD1PRF:391332 (DS 2) implies (DS 3) : since $v$ maps L onto M , we may define a homomorphism $q: \mathrm{L} \rightarrow \mathrm{M}$ by putting $q(x)=v(x)$ for all $x \in \mathrm{~L}$ (the only difference between $q$ and $v$ is that $v$ is a mapping of L into L whereas $q$ is a mapping of L into M ). If $x \in \mathrm{M}$, there\\
+//GOD1PRF:391650 exists $y \in \mathrm{~L}$ such that $v(y)=x$, and hence
+//GOD1PRF:391742 (DS 3) implies (DS 1). Let N be the kernel of $q$. Then we have
+//GOD1PRF:391844 for if $x \in \mathrm{M} \cap \mathrm{N}$ then $q(x)=x$, but also $q(x)=0$, so that $x=0$. For each $x \in \mathrm{~L}$ we have $q(q(x))=q(x)$, hence $q(x-q(x))=0$, so that $x-q(x) \in \mathrm{N}$, and therefore
+//GOD1PRF:392108 Thus $\mathbf{L}=\mathbf{M}+\mathbf{N}$; since $\mathbf{M} \cap \mathbf{N}=0$, it follows that $\mathbf{M}$ is a direct summand of $\mathbf{L}$.\\
 Admitted.
 
 (** § 18. Finiteness theorems. **)
@@ -38018,6 +38402,21 @@ Theorem god1_s18_theorem1_finite_kernel_and_image :
         L addL smulL
         (K :^: (p + q)) (module_power_addition (p + q) addK)
         (module_power_left_scalar (p + q) mulK)).
+let K addK mulK L addL smulL M addM smulM f.
+assume hf.
+apply andI.
+//GOD1PRF:401709 Suppose that $\operatorname{Ker}(f)$ is generated by vectors $a_{1}, \ldots, a_{p}$, and $\operatorname{Im}(f)$ by vectors $b_{1}, \ldots, b_{q}$. Choose vectors $a_{p+1}, \ldots, a_{p+q}$ in L such that
+//GOD1PRF:401988 To prove Theorem 1 it is enough to show that $a_{1}, \ldots, a_{p+q}$ generate L in any case, and that they form a basis of L in the case where $a_{1}, \ldots, a_{p}$ form a basis of $\operatorname{Ker}(f)$ and $b_{1}, \ldots, b_{q}$ form a basis of $\operatorname{Im}(f)$.
+//GOD1PRF:402263 For the first assertion, consider a vector $x \in \mathrm{~L}$. Since $f(x)$ belongs to the submodule of $M$ generated by $b_{1}, \ldots, b_{q}$, there exist scalars $\eta_{j}(1 \leqslant j \leqslant q)$ such that
+//GOD1PRF:402708 hence we have
+//GOD1PRF:402775 where $y \in \operatorname{Ker}(f)$; but now there exist scalars $\xi_{i}(1 \leqslant i \leqslant p)$ such that
+//GOD1PRF:402932 These two formulae show that $x$ is indeed a linear combination of $a_{1}, \ldots, a_{p+q}$.\\
+//GOD1PRF:403279 To prove the second assertion it is enough to show that if the vectors $a_{i}(1 \leqslant i \leqslant p)$ are linearly independent, and the vectors $b_{i}(1 \leqslant j \leqslant q)$ are linearly independent, then $a_{1}, \ldots, a_{p+q}$ are linearly independent. Now consider a relation of the form
+//GOD1PRF:403637 and apply $f$ to the left-hand side. Since $a_{1}, \ldots, a_{p}$ are in the kernel of $f$, we obtain
+//GOD1PRF:403830 however, the vectors $f\left(a_{p+1}\right)=b_{1}, \ldots, f\left(a_{p+q}\right)=b_{q}$ are linearly independent by hypothesis, hence
+//GOD1PRF:404009 and the original relation therefore reduces to
+//GOD1PRF:404109 But $a_{1}, \ldots, a_{p}$ are linearly independent, therefore
+//GOD1PRF:404213 and the proof is complete.\\
 Admitted.
 
 //GOD1:405336 left_noetherian_ring : "#1 is a left Noetherian ring" | $#1\text{ is left Noetherian}$
@@ -38052,6 +38451,15 @@ Theorem god1_s18_theorem2_noetherian_submodule_characterization :
       forall N,
         submodule K addK mulK M addM smul N ->
         finitely_generated_module K addK mulK N addM smul).
+let K addK mulK.
+assume hK.
+apply iffI.
+//GOD1PRF:406373 It is clear that $b$ ) implies $a$ ). For the left K -module K is finitely generated, and therefore its submodules (i.e., the left ideals of K ) must be finitely generated if $b$ ) is satisfied.
+//GOD1PRF:406569 Let us now show that $a$ ) implies $b$ ). We shall do this in two steps; first we shall show that, for every integer $n \geqslant 1$, every submodule of $\mathrm{K}^{n}$ is finitely generated, and then we shall deduce $b$ ) in full generality.
+//GOD1PRF:406814 So let us prove that every submodule L of $\mathrm{K}^{n}$ is finitely generated. If $n=1$, this is just the hypothesis $a$ ); we may therefore argue by induction on $n$, and assume that the result is true for $n-1$. Define a mapping $f: \mathrm{L} \rightarrow \mathrm{K}$ by putting
+//GOD1PRF:407155 $f$ is a homomorphism of L into K . To prove that L is finitely generated, it is enough by Theorem 1 to prove that $\operatorname{Ker}(f)$ and $\operatorname{Im}(f)$ are finitely generated. Now $\operatorname{Im}(f)$ is a submodule of K , hence is finitely generated by hypothesis $a$ ). As to $\mathrm{Ker}(f)$, it is a submodule of the submodule of $\mathrm{K}^{n}$ defined by the relation $\xi_{n}=0$; this submodule of $\mathrm{K}^{n}$ is evidently isomorphic to $\mathrm{K}^{n-1}$; hence all its submodules, and in particular $\operatorname{Ker}(f)$, are finitely generated, by the inductive hypothesis.
+//GOD1PRF:407765 We have therefore shown, with the help of $a$ ), that every submodule of $\mathrm{K}^{n}$ is finitely generated. Now let M be a left K -module, $\mathrm{M}^{\prime}$ a submodule of M ; we shall show that, if M is finitely generated, then so is $\mathrm{M}^{\prime}$.
+//GOD1PRF:408033 Since M is finitely generated, there exists (§ 12, Corollary 2 to Theorem 3) an integer $n$ and a homomorphism $f$ of $\mathrm{K}^{n}$ onto M . Consider $\mathrm{L}=f^{-1}\left(\mathrm{M}^{\prime}\right)$; since $f$ is surjective, $f$ induces a homomorphism of L onto $\mathrm{M}^{\prime}$. On the other hand, L is finitely generated, by what has already been proved; hence $\mathrm{M}^{\prime}$ is finitely generated (in detail, if L is generated by vectors $a_{i}, 1 \leqslant i \leqslant p$, then clearly $\mathrm{M}^{\prime}$ is generated by the vectors $f\left(a_{i}\right), 1 \leqslant i \leqslant p$ ).\\
 Admitted.
 
 //GOD1:408800 left_ideal_free_generator_property : "every nonzero left ideal of #1 is freely generated by one element" | $I\cong #1$
@@ -38076,6 +38484,14 @@ Theorem god1_s18_theorem3_submodules_of_finite_free_modules :
           exists p :e omega, p c= n
           /\ exists b:set -> set,
             module_basis K addK mulK N addM smul p b).
+let K addK mulK.
+assume hK.
+apply iffI.
+//GOD1PRF:409252 To prove that $b$ ) implies $a$ ), take $\mathrm{M}=\mathrm{K}$; then M has a basis consisting of one vector, and therefore every submodule of M (i.e., every left ideal of K ) must have a basis consisting of no vectors or one vector ; and this is precisely the property a).
+//GOD1PRF:409527 Let us show conversely that $a$ ) implies $b$ ). It is clear that $b$ ) is equivalent to the following statement:\\
+//GOD1PRF:409643 $\left.b^{\prime}\right)$ For each integer $n \geqslant 1$ and each submodule L of $\mathrm{K}^{n}$, there exists an integer $p \leqslant n$ such that L is isomorphic to $\mathrm{K}^{p}$.
+//GOD1PRF:409832 When $n=1$, it is clear that $b^{\prime}$ ) reduces to $a$ ). We may therefore argue by induction on $n$, and assume that $b^{\prime}$ ) is true for $n-1$. Let L be a submodule of $\mathrm{K}^{n}$ and consider, as in the proof of Theorem 2, the homomorphism $f: \mathrm{L} \rightarrow \mathrm{K}$ defined by $f\left(\xi_{1}, \ldots, \xi_{n}\right)=\xi_{n}$. The image of $f$ is a submodule of K , hence is isomorphic to $\mathrm{K}^{r}$ where $r \leqslant 1$; the kernel of $f$ is isomorphic to a submodule of $\mathrm{K}^{n-1}$, hence by the inductive hypothesis is isomorphic to $\mathrm{K}^{s}$ for some integer $s \leqslant n-1$. Using Theorem 1, it follows that L is isomorphic to $\mathrm{K}^{r+s}$; and since
+//GOD1PRF:410581 the proof is complete.\\
 Admitted.
 
 Theorem god1_s18_corollary_subgroups_of_integer_powers_are_free :
@@ -38085,6 +38501,12 @@ Theorem god1_s18_corollary_subgroups_of_integer_powers_are_free :
     exists p :e omega, p c= n
     /\ isomorphic_groups H (module_power_addition n add_SNo)
       (int :^: p) (module_power_addition p add_SNo).
+let n.
+assume hn.
+let H.
+assume hH.
+//GOD1PRF:411488 Observe that, since $\mathbf{Z}$ is a principal ideal domain, Theorem 3 implies the following result:
+//GOD1PRF:411591 COROLLARY TO THEOREM 3. Every subgroup of $\mathbf{Z}^{n}$ is isomorphic to $\mathbf{Z}^{p}$ for some integer $p \leqslant n$.
 Admitted.
 
 //GOD1:413095 homogeneous_linear_system_solution : "#7 solves the homogeneous linear system with coefficient matrix #6" | $#6#7=0$
@@ -38126,6 +38548,16 @@ Theorem god1_homogeneous_solution_modules_are_finite_over_finite_rings :
           (opposite_ring_multiplication mul) scalar x)
         (K :^: r) (module_power_addition r add)
         (module_power_left_scalar r (opposite_ring_multiplication mul))).
+let K add mul p.
+assume hp.
+let n.
+assume hn.
+let A.
+assume hA.
+apply andI.
+//GOD1PRF:412656 It follows that the kernel of $f$ is the submodule of $\mathrm{K}^{n}$ consisting of all vectors $\left(\xi_{1}, \ldots, \xi_{n}\right)$ which satisfy the relations
+//GOD1PRF:413212 Let L be the submodule of $\mathrm{K}^{n}$ consisting of the solutions of (1). We shall interpret in the language of linear equations the following properties of $L$ :\\
+//GOD1PRF:413507 The first is true provided that K is right Noetherian (Theorem 2), and the second is true if K is a division ring or a principal ideal domain (Theorem 3).
 Admitted.
 
 //GOD1:416094 increasing_sequence_of_sets : "#2 is an increasing sequence of subsets of #1" | $#2_n\subseteq #2_{n+1}$
@@ -38158,6 +38590,14 @@ Theorem god1_s18_theorem4_noetherian_chain_conditions :
       /\ (forall F,
         F <> 0 -> (forall I :e F, left_ideal K add mul I) ->
         exists I, maximal_element_by_inclusion K F I)).
+let K add mul.
+assume hK.
+apply iffI.
+//GOD1PRF:417197 (NR 1) implies (NR 2). Let ( $I_{n}$ ) be an increasing sequence of left ideals of K . The union $I$ of the $I_{n}$ is again a left ideal (§ 10, Theorem 1). Since $K$ is left Noetherian, $I$ is\\
+//GOD1PRF:417394 generated by a finite number of elements $x_{1}, \ldots, x_{r}$; and, by the definition of a union, there exist integers $p_{1}, \ldots, p_{r}$ such that $x_{1} \in \mathrm{I}_{p_{1}}, \ldots, x_{r} \in \mathrm{I}_{p_{r}}$. Let $p$ be the maximum of the integers $p_{1}, \ldots, p_{r}$; then $\mathrm{I}_{p}$ contains $x_{1}, \ldots, x_{r}$ because it contains $\mathrm{I}_{p_{1}}, \ldots, \mathrm{I}_{p_{r}}$; hence $\mathrm{I}_{p}$ contains the ideal generated by $x_{1}, \ldots, x_{r}$, namely the ideal I. Hence if $n \geqslant p$ we have
+//GOD1PRF:418025 and therefore $I_{p}=I_{n}$.\\
+//GOD1PRF:418056 (NR 2) implies (NR 3). Let F be a non-empty set of left ideals of K . If F contains no maximal element, then for each $I \in F$ we can find $J \in F$ which strictly contains $I$. So choose $I_{1} \in F$; then there exists $I_{2} \in F$ strictly containing $I_{1}$, then $I_{3} \in F$ strictly containing $\mathrm{I}_{2}$, and so on ; it is clear that in this way we obtain a strictly increasing infinite sequence of left ideals of K, contrary to (NR 2).\\
+//GOD1PRF:418512 (NR 3) implies (NR 1). Let I be a left ideal of K, and let F be the set of left ideals of K which are finitely generated and contained in I . The set F is not empty (for example, it contains the zero ideal). By (NR 3) it therefore has a maximal element J. Let ( $x_{1}, \ldots, x_{n}$ ) be a system of generators of J . For each $x \in \mathrm{I}$, the left ideal generated by $x_{1}, \ldots, x_{n}$ and $x$ is finitely generated and contained in I, hence belongs to F ; also it contains J ; hence, as J is a maximal element of F , it must be equal to J . Consequently, we have $x \in \mathrm{~J}$ for all $x \in \mathrm{I}$, and therefore $\mathrm{I}=\mathrm{J}$. Hence I is finitely generated.\\
 Admitted.
 
 //GOD1:419218 maximal_left_ideal : "#4 is a maximal left ideal of #1" | $#4\triangleleft_{\max,l}#1$
