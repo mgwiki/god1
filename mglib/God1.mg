@@ -34500,18 +34500,212 @@ assume hop.
 let e1 e2.
 assume he1 he2.
 //GOD1PRF:8596 Suppose that $e^{\prime}, e^{\prime \prime}$ are neutral elements.
-claim h_s6_t1_neutral_data :
-  neutral_element X op e1 /\ neutral_element X op e2.
-admit.
-//GOD1PRF:8663 Then the formula $e^{\prime} \perp x=x$ applied to $x=e^{\prime \prime}$ gives $e^{\prime} \perp e^{\prime \prime}=e^{\prime \prime}$; and the formula $x \perp e^{\prime \prime}=x$ applied to $x=e^{\prime}$ gives $e^{\prime} \perp e^{\prime \prime} =e^{\prime}$.
-claim h_s6_t1_middle_values :
-  op e1 e2 = e2 /\ op e1 e2 = e1.
-admit.
 apply (eq_i_tra e1 (op e1 e2) e2).
+//GOD1PRF:8663 Then the formula $e^{\prime} \perp x=x$ applied to $x=e^{\prime \prime}$ gives $e^{\prime} \perp e^{\prime \prime}=e^{\prime \prime}$; and the formula $x \perp e^{\prime \prime}=x$ applied to $x=e^{\prime}$ gives $e^{\prime} \perp e^{\prime \prime} =e^{\prime}$.
+- apply eq_sym.
+  exact (andEL (op e1 e2 = e1) (op e2 e1 = e1)
+    ((andER (e2 :e X)
+      (forall x :e X, op x e2 = x /\ op e2 x = x) he2)
+      e1 (andEL (e1 :e X)
+        (forall x :e X, op x e1 = x /\ op e1 x = x) he1))).
 //GOD1PRF:8926 Hence $e^{\prime}=e^{\prime \prime}$.
-claim h_s6_t1_conclusion : e1 = e2.
-admit.
-Admitted.
+- exact (andER (op e2 e1 = e2) (op e1 e2 = e2)
+    ((andER (e1 :e X)
+      (forall x :e X, op x e1 = x /\ op e1 x = x) he1)
+      e2 (andEL (e2 :e X)
+        (forall x :e X, op x e2 = x /\ op e2 x = x) he2))).
+Qed.
+
+//GOD1PRF:14362 Let $x^{\prime}$ be a left reflection and $x^{\prime \prime}$ a right reflection of $x$.
+Theorem god1_s6_left_and_right_reflections_equal :
+  forall X, forall op:set -> set -> set, forall e x l r,
+    associative_on X op ->
+    neutral_element X op e ->
+    x :e X ->
+    left_reflection X op e x l ->
+    right_reflection X op e x r ->
+    l = r.
+let X op e x l r.
+assume hassoc he hx hl hr.
+//GOD1PRF:14513 Using associativity, it follows that
+apply (eq_i_tra l (op l e) r).
+- apply eq_sym.
+  exact (andEL (op l e = l) (op e l = l)
+    ((andER (e :e X)
+      (forall y :e X, op y e = y /\ op e y = y) he)
+      l (andEL (l :e X) (op l x = e) hl))).
+- apply (eq_i_tra (op l e) (op l (op x r)) r).
+  - f_equal.
+    apply eq_sym.
+    exact (andER (r :e X) (op x r = e) hr).
+  - apply (eq_i_tra (op l (op x r)) (op (op l x) r) r).
+    - exact (hassoc l (andEL (l :e X) (op l x = e) hl)
+        x hx r (andEL (r :e X) (op x r = e) hr)).
+    - apply (eq_i_tra (op (op l x) r) (op e r) r).
+      - f_equal.
+        exact (andER (l :e X) (op l x = e) hl).
+      - exact (andER (op r e = r) (op e r = r)
+          ((andER (e :e X)
+            (forall y :e X, op y e = y /\ op e y = y) he)
+            r (andEL (r :e X) (op x r = e) hr))).
+Qed.
+
+//GOD1PRF:14745 Hence every right reflection of $x$ is equal to every left reflection of $x$, and therefore $x$ has only one left reflection and only one right reflection, and the two are equal.
+Theorem god1_s6_one_sided_reflections_are_unique :
+  forall X, forall op:set -> set -> set, forall e x l r,
+    associative_on X op ->
+    neutral_element X op e ->
+    x :e X ->
+    left_reflection X op e x l ->
+    right_reflection X op e x r ->
+    (forall l' :e X, left_reflection X op e x l' -> l' = l)
+    /\ (forall r' :e X, right_reflection X op e x r' -> r' = r)
+    /\ l = r.
+let X op e x l r.
+assume hassoc he hx hl hr.
+apply andI.
+- apply andI.
+  - let l'.
+    assume hl'X hl'.
+    apply (eq_i_tra l' r l).
+    - exact (god1_s6_left_and_right_reflections_equal
+        X op e x l' r hassoc he hx hl' hr).
+    - apply eq_sym.
+      exact (god1_s6_left_and_right_reflections_equal
+        X op e x l r hassoc he hx hl hr).
+  - let r'.
+    assume hr'X hr'.
+    apply (eq_i_tra r' l r).
+    - apply eq_sym.
+      exact (god1_s6_left_and_right_reflections_equal
+        X op e x l r' hassoc he hx hl hr').
+    - exact (god1_s6_left_and_right_reflections_equal
+        X op e x l r hassoc he hx hl hr).
+- exact (god1_s6_left_and_right_reflections_equal
+    X op e x l r hassoc he hx hl hr).
+Qed.
+
+//GOD1PRF:14924 If $x^{\prime}$ denotes their common value, we have
+Theorem god1_s6_left_and_right_reflections_give_common_reflection :
+  forall X, forall op:set -> set -> set, forall e x l r,
+    associative_on X op ->
+    neutral_element X op e ->
+    x :e X ->
+    left_reflection X op e x l ->
+    right_reflection X op e x r ->
+    reflection X op e x l.
+let X op e x l r.
+assume hassoc he hx hl hr.
+apply (andI (l :e X /\ op l x = e) (op x l = e)).
+- exact hl.
+- apply (eq_i_tra (op x l) (op x r) e).
+  - f_equal.
+    exact (god1_s6_left_and_right_reflections_equal
+      X op e x l r hassoc he hx hl hr).
+  - exact (andER (r :e X) (op x r = e) hr).
+Qed.
+
+Theorem god1_s6_reflexibility_gives_one_sided_reflections :
+  forall X, forall op:set -> set -> set, forall e x,
+    reflexible X op e x ->
+    (exists l :e X, left_reflection X op e x l) /\
+    (exists r :e X, right_reflection X op e x r).
+let X op e x.
+assume hreflexible.
+apply (exandE_i
+  (fun u => u :e X)
+  (fun u => reflection X op e x u)
+  (andER (x :e X)
+    (exists u :e X, reflection X op e x u) hreflexible)).
+let u.
+assume hu hreflection.
+apply andI.
+- witness u.
+  apply andI.
+  - exact hu.
+  - exact (andEL
+      (u :e X /\ op u x = e) (op x u = e) hreflection).
+- witness u.
+  apply andI.
+  - exact hu.
+  - exact (andI (u :e X) (op x u = e) hu
+      (andER (u :e X /\ op u x = e) (op x u = e) hreflection)).
+Qed.
+
+//GOD1PRF:15024 so that $x$ is reflexible and $x^{\prime}$ is the reflection of $x$ (necessarily unique, because a reflection of $x$ is a fortiori a left reflection and a right reflection of $x$, and must therefore be equal to $x^{\prime}$ ).
+Theorem god1_s6_one_sided_reflections_give_reflexibility_and_uniqueness :
+  forall X, forall op:set -> set -> set, forall e x,
+    associative_on X op ->
+    neutral_element X op e ->
+    x :e X ->
+    ((exists l :e X, left_reflection X op e x l) /\
+     (exists r :e X, right_reflection X op e x r)) ->
+    reflexible X op e x
+    /\ exists u :e X,
+      reflection X op e x u
+      /\ (forall v :e X, reflection X op e x v -> v = u)
+      /\ (forall v :e X, left_reflection X op e x v -> v = u)
+      /\ (forall v :e X, right_reflection X op e x v -> v = u).
+let X op e x.
+assume hassoc he hx honesided.
+apply (exandE_i
+  (fun l => l :e X)
+  (fun l => left_reflection X op e x l)
+  (andEL
+    (exists l :e X, left_reflection X op e x l)
+    (exists r :e X, right_reflection X op e x r)
+    honesided)).
+let l.
+assume hlX hl.
+apply (exandE_i
+  (fun r => r :e X)
+  (fun r => right_reflection X op e x r)
+  (andER
+    (exists l :e X, left_reflection X op e x l)
+    (exists r :e X, right_reflection X op e x r)
+    honesided)).
+let r.
+assume hrX hr.
+apply andI.
+- apply (andI (x :e X)
+    (exists u :e X, reflection X op e x u)).
+  - exact hx.
+  - witness l.
+    apply andI.
+    - exact hlX.
+    - exact (god1_s6_left_and_right_reflections_give_common_reflection
+        X op e x l r hassoc he hx hl hr).
+- witness l.
+  apply andI.
+  - exact hlX.
+  - apply andI.
+    - apply andI.
+      - apply andI.
+        - exact (god1_s6_left_and_right_reflections_give_common_reflection
+            X op e x l r hassoc he hx hl hr).
+        - let v.
+          assume hvX hv.
+          apply (eq_i_tra v r l).
+          - exact (god1_s6_left_and_right_reflections_equal
+              X op e x v r hassoc he hx
+              (andEL (v :e X /\ op v x = e) (op x v = e) hv) hr).
+          - apply eq_sym.
+            exact (god1_s6_left_and_right_reflections_equal
+              X op e x l r hassoc he hx hl hr).
+      - let v.
+        assume hvX hv.
+        apply (eq_i_tra v r l).
+        - exact (god1_s6_left_and_right_reflections_equal
+            X op e x v r hassoc he hx hv hr).
+        - apply eq_sym.
+          exact (god1_s6_left_and_right_reflections_equal
+            X op e x l r hassoc he hx hl hr).
+    - let v.
+      assume hvX hv.
+      apply eq_sym.
+      exact (god1_s6_left_and_right_reflections_equal
+        X op e x l v hassoc he hx hl hv).
+Qed.
 
 Theorem god1_s6_theorem2_reflection_characterization :
   forall X, forall op:set -> set -> set, forall e x,
@@ -34532,68 +34726,217 @@ Theorem god1_s6_theorem2_reflection_characterization :
         /\ (forall v :e X, right_reflection X op e x v -> v = u)).
 let X op e x.
 assume hop hassoc he hx.
+//GOD1PRF:15253 Q.E.D.
 apply andI.
 - apply iffI.
-claim h_s6_t2_necessary :
-  reflexible X op e x ->
-  (exists l :e X, left_reflection X op e x l) /\
-  (exists r :e X, right_reflection X op e x r).
-admit.
-//GOD1PRF:14362 Let $x^{\prime}$ be a left reflection and $x^{\prime \prime}$ a right reflection of $x$.
-claim h_s6_t2_reflection_equations :
-  forall l r :e X,
-    left_reflection X op e x l ->
-    right_reflection X op e x r ->
-    op l x = e /\ op x r = e.
-admit.
-//GOD1PRF:14513 Using associativity, it follows that
-claim h_s6_t2_associativity_instance :
-  forall l r :e X,
-    op l (op x r) = op (op l x) r.
-let l.
-assume hl.
-let r.
-assume hr.
-apply hassoc.
-claim h_s6_t2_right_equals_left :
-  forall l r :e X,
-    left_reflection X op e x l ->
-    right_reflection X op e x r -> r = l.
-admit.
-//GOD1PRF:14745 Hence every right reflection of $x$ is equal to every left reflection of $x$, and therefore $x$ has only one left reflection and only one right reflection, and the two are equal.
-claim h_s6_t2_unique_one_sided_reflections :
-  forall l r :e X,
-    left_reflection X op e x l ->
-    right_reflection X op e x r ->
-    (forall l' :e X, left_reflection X op e x l' -> l' = l)
-    /\ (forall r' :e X, right_reflection X op e x r' -> r' = r)
-    /\ l = r.
-admit.
-//GOD1PRF:14924 If $x^{\prime}$ denotes their common value, we have
-claim h_s6_t2_common_value_is_two_sided :
-  forall u :e X,
-    left_reflection X op e x u ->
-    right_reflection X op e x u ->
-    reflection X op e x u.
-admit.
-//GOD1PRF:15024 so that $x$ is reflexible and $x^{\prime}$ is the reflection of $x$ (necessarily unique, because a reflection of $x$ is a fortiori a left reflection and a right reflection of $x$, and must therefore be equal to $x^{\prime}$ ).
-claim h_s6_t2_sufficient_and_unique :
-  ((exists l :e X, left_reflection X op e x l) /\
-    (exists r :e X, right_reflection X op e x r)) ->
-  reflexible X op e x
-  /\ exists u :e X,
-    reflection X op e x u
-    /\ (forall v :e X, reflection X op e x v -> v = u)
-    /\ (forall v :e X, left_reflection X op e x v -> v = u)
-    /\ (forall v :e X, right_reflection X op e x v -> v = u).
-admit.
-//GOD1PRF:15253 Q.E.D.
-claim h_s6_t2_book_conclusion :
-  reflexible X op e x <->
-  ((exists l :e X, left_reflection X op e x l) /\
-   (exists r :e X, right_reflection X op e x r)).
-admit.
-Admitted.
+  - exact (god1_s6_reflexibility_gives_one_sided_reflections X op e x).
+  - assume honesided.
+    exact (andEL
+      (reflexible X op e x)
+      (exists u :e X,
+        reflection X op e x u
+        /\ (forall v :e X, reflection X op e x v -> v = u)
+        /\ (forall v :e X, left_reflection X op e x v -> v = u)
+        /\ (forall v :e X, right_reflection X op e x v -> v = u))
+      (god1_s6_one_sided_reflections_give_reflexibility_and_uniqueness
+        X op e x hassoc he hx honesided)).
+- assume honesided.
+  exact (andER
+    (reflexible X op e x)
+    (exists u :e X,
+      reflection X op e x u
+      /\ (forall v :e X, reflection X op e x v -> v = u)
+      /\ (forall v :e X, left_reflection X op e x v -> v = u)
+      /\ (forall v :e X, right_reflection X op e x v -> v = u))
+    (god1_s6_one_sided_reflections_give_reflexibility_and_uniqueness
+      X op e x hassoc he hx honesided)).
+Qed.
+
+//GOD1PRF:15889 The first part of the theorem follows immediately from the relations
+Theorem god1_s6_reflection_reverses :
+  forall X, forall op:set -> set -> set, forall e x r,
+    x :e X ->
+    reflection X op e x r ->
+    reflection X op e r x.
+let X op e x r.
+assume hx hreflection.
+apply (andI (x :e X /\ op x r = e) (op r x = e)).
+- exact (andI (x :e X) (op x r = e) hx
+    (andER (r :e X /\ op r x = e) (op x r = e) hreflection)).
+- exact (andER (r :e X) (op r x = e)
+    (andEL (r :e X /\ op r x = e) (op x r = e) hreflection)).
+Qed.
+
+//GOD1PRF:16006 For the second part, we calculate
+Theorem god1_s6_reflection_product_calculation :
+  forall X, forall op:set -> set -> set, forall e x y rx ry,
+    law_of_composition X op ->
+    associative_on X op ->
+    neutral_element X op e ->
+    x :e X -> y :e X ->
+    reflection X op e x rx ->
+    reflection X op e y ry ->
+    op (op ry rx) (op x y) = e
+    /\ op (op x y) (op ry rx) = e.
+let X op e x y rx ry.
+assume hop hassoc he hx hy hrefx hrefy.
+apply andI.
+- apply (eq_i_tra
+    (op (op ry rx) (op x y))
+    (op ry (op rx (op x y))) e).
+  - apply eq_sym.
+    exact (hassoc ry
+      (andEL (ry :e X)
+        (op ry y = e)
+        (andEL (ry :e X /\ op ry y = e) (op y ry = e) hrefy))
+      rx
+      (andEL (rx :e X)
+        (op rx x = e)
+        (andEL (rx :e X /\ op rx x = e) (op x rx = e) hrefx))
+      (op x y) (hop x hx y hy)).
+  - apply (eq_i_tra
+      (op ry (op rx (op x y)))
+      (op ry (op (op rx x) y)) e).
+    - f_equal.
+      exact (hassoc rx
+        (andEL (rx :e X)
+          (op rx x = e)
+          (andEL (rx :e X /\ op rx x = e) (op x rx = e) hrefx))
+        x hx y hy).
+    - apply (eq_i_tra
+        (op ry (op (op rx x) y))
+        (op ry (op e y)) e).
+      - f_equal.
+        f_equal.
+        exact (andER (rx :e X) (op rx x = e)
+          (andEL (rx :e X /\ op rx x = e) (op x rx = e) hrefx)).
+      - apply (eq_i_tra (op ry (op e y)) (op ry y) e).
+        - f_equal.
+          exact (andER (op y e = y) (op e y = y)
+            ((andER (e :e X)
+              (forall z :e X, op z e = z /\ op e z = z) he) y hy)).
+        - exact (andER (ry :e X) (op ry y = e)
+            (andEL (ry :e X /\ op ry y = e) (op y ry = e) hrefy)).
+- apply (eq_i_tra
+    (op (op x y) (op ry rx))
+    (op x (op y (op ry rx))) e).
+  - apply eq_sym.
+    exact (hassoc x hx y hy (op ry rx)
+      (hop ry
+        (andEL (ry :e X)
+          (op ry y = e)
+          (andEL (ry :e X /\ op ry y = e) (op y ry = e) hrefy))
+        rx
+        (andEL (rx :e X)
+          (op rx x = e)
+          (andEL (rx :e X /\ op rx x = e) (op x rx = e) hrefx)))).
+  - apply (eq_i_tra
+      (op x (op y (op ry rx)))
+      (op x (op (op y ry) rx)) e).
+    - f_equal.
+      exact (hassoc y hy ry
+        (andEL (ry :e X)
+          (op ry y = e)
+          (andEL (ry :e X /\ op ry y = e) (op y ry = e) hrefy))
+        rx
+        (andEL (rx :e X)
+          (op rx x = e)
+          (andEL (rx :e X /\ op rx x = e) (op x rx = e) hrefx))).
+    - apply (eq_i_tra
+        (op x (op (op y ry) rx))
+        (op x (op e rx)) e).
+      - f_equal.
+        f_equal.
+        exact (andER (ry :e X /\ op ry y = e) (op y ry = e) hrefy).
+      - apply (eq_i_tra (op x (op e rx)) (op x rx) e).
+        - f_equal.
+          exact (andER (op rx e = rx) (op e rx = rx)
+            ((andER (e :e X)
+              (forall z :e X, op z e = z /\ op e z = z) he)
+              rx
+              (andEL (rx :e X)
+                (op rx x = e)
+                (andEL (rx :e X /\ op rx x = e)
+                  (op x rx = e) hrefx)))).
+        - exact (andER (rx :e X /\ op rx x = e) (op x rx = e) hrefx).
+Qed.
+
+//GOD1PRF:16409 This shows that $x \perp y$ is reflexible and that $y^{\prime} \perp x^{\prime}$ is its reflection.
+Theorem god1_s6_product_has_reversed_product_reflection :
+  forall X, forall op:set -> set -> set, forall e x y rx ry,
+    law_of_composition X op ->
+    associative_on X op ->
+    neutral_element X op e ->
+    x :e X -> y :e X ->
+    reflection X op e x rx ->
+    reflection X op e y ry ->
+    reflexible X op e (op x y)
+    /\ reflection X op e (op x y) (op ry rx).
+let X op e x y rx ry.
+assume hop hassoc he hx hy hrefx hrefy.
+apply andI.
+- apply (andI (op x y :e X)
+    (exists u :e X, reflection X op e (op x y) u)).
+  - exact (hop x hx y hy).
+  - witness (op ry rx).
+    apply andI.
+    - exact (hop ry
+        (andEL (ry :e X)
+          (op ry y = e)
+          (andEL (ry :e X /\ op ry y = e) (op y ry = e) hrefy))
+        rx
+        (andEL (rx :e X)
+          (op rx x = e)
+          (andEL (rx :e X /\ op rx x = e) (op x rx = e) hrefx))).
+    - apply (andI
+        (op ry rx :e X /\ op (op ry rx) (op x y) = e)
+        (op (op x y) (op ry rx) = e)).
+      - exact (andI
+          (op ry rx :e X)
+          (op (op ry rx) (op x y) = e)
+          (hop ry
+            (andEL (ry :e X)
+              (op ry y = e)
+              (andEL (ry :e X /\ op ry y = e) (op y ry = e) hrefy))
+            rx
+            (andEL (rx :e X)
+              (op rx x = e)
+              (andEL (rx :e X /\ op rx x = e) (op x rx = e) hrefx)))
+          (andEL
+            (op (op ry rx) (op x y) = e)
+            (op (op x y) (op ry rx) = e)
+            (god1_s6_reflection_product_calculation
+              X op e x y rx ry hop hassoc he hx hy hrefx hrefy))).
+      - exact (andER
+          (op (op ry rx) (op x y) = e)
+          (op (op x y) (op ry rx) = e)
+          (god1_s6_reflection_product_calculation
+            X op e x y rx ry hop hassoc he hx hy hrefx hrefy)).
+- apply (andI
+    (op ry rx :e X /\ op (op ry rx) (op x y) = e)
+    (op (op x y) (op ry rx) = e)).
+  - exact (andI
+      (op ry rx :e X)
+      (op (op ry rx) (op x y) = e)
+      (hop ry
+        (andEL (ry :e X)
+          (op ry y = e)
+          (andEL (ry :e X /\ op ry y = e) (op y ry = e) hrefy))
+        rx
+        (andEL (rx :e X)
+          (op rx x = e)
+          (andEL (rx :e X /\ op rx x = e) (op x rx = e) hrefx)))
+      (andEL
+        (op (op ry rx) (op x y) = e)
+        (op (op x y) (op ry rx) = e)
+        (god1_s6_reflection_product_calculation
+          X op e x y rx ry hop hassoc he hx hy hrefx hrefy))).
+  - exact (andER
+      (op (op ry rx) (op x y) = e)
+      (op (op x y) (op ry rx) = e)
+      (god1_s6_reflection_product_calculation
+        X op e x y rx ry hop hassoc he hx hy hrefx hrefy)).
+Qed.
 
 Theorem god1_s6_theorem3_reflections_and_products :
   forall X, forall op:set -> set -> set, forall e,
@@ -34611,28 +34954,85 @@ Theorem god1_s6_theorem3_reflections_and_products :
 let X op e.
 assume hop hassoc he.
 apply andI.
-//GOD1PRF:15889 The first part of the theorem follows immediately from the relations
-claim h_s6_t3_reflection_reverses :
-  forall x r :e X,
-    reflection X op e x r -> reflection X op e r x.
-admit.
-//GOD1PRF:16006 For the second part, we calculate
-claim h_s6_t3_product_calculation :
-  forall x y rx ry :e X,
-    reflection X op e x rx ->
-    reflection X op e y ry ->
-    op (op ry rx) (op x y) = e
-    /\ op (op x y) (op ry rx) = e.
-admit.
-//GOD1PRF:16409 This shows that $x \perp y$ is reflexible and that $y^{\prime} \perp x^{\prime}$ is its reflection.
-claim h_s6_t3_product_reflection :
-  forall x y rx ry :e X,
-    reflection X op e x rx ->
-    reflection X op e y ry ->
-    reflexible X op e (op x y)
-    /\ reflection X op e (op x y) (op ry rx).
-admit.
-Admitted.
+- let x.
+  assume hx.
+  let r.
+  assume hrX hreflection.
+  exact (god1_s6_reflection_reverses X op e x r hx hreflection).
+- let x.
+  assume hx.
+  let y.
+  assume hy.
+  let rx.
+  assume hrxX.
+  let ry.
+  assume hryX hrefx hrefy.
+  exact (god1_s6_product_has_reversed_product_reflection
+    X op e x y rx ry hop hassoc he hx hy hrefx hrefy).
+Qed.
+
+Theorem god1_s6_reflexible_left_factor_forces_solution :
+  forall X, forall op:set -> set -> set, forall e a ar b y,
+    associative_on X op ->
+    neutral_element X op e ->
+    a :e X ->
+    reflection X op e a ar ->
+    b :e X -> y :e X ->
+    op a y = b ->
+    y = op ar b.
+let X op e a ar b y.
+assume hassoc he ha hreflection hb hy hay.
+//GOD1PRF:17285 For the relation $a \perp x=b$ implies
+apply (eq_i_tra y (op ar (op a y)) (op ar b)).
+//GOD1PRF:17380 i.e.,
+- apply (eq_i_tra y (op e y) (op ar (op a y))).
+  - apply eq_sym.
+    exact (andER (op y e = y) (op e y = y)
+      ((andER (e :e X)
+        (forall z :e X, op z e = z /\ op e z = z) he) y hy)).
+  - apply (eq_i_tra (op e y) (op (op ar a) y) (op ar (op a y))).
+    - f_equal.
+      apply eq_sym.
+      exact (andER (ar :e X) (op ar a = e)
+        (andEL (ar :e X /\ op ar a = e)
+          (op a ar = e) hreflection)).
+    - apply eq_sym.
+      exact (hassoc ar
+        (andEL (ar :e X)
+          (op ar a = e)
+          (andEL (ar :e X /\ op ar a = e)
+            (op a ar = e) hreflection))
+        a ha y hy).
+- f_equal.
+  exact hay.
+Qed.
+
+//GOD1PRF:17465 conversely, from $x=a^{\prime} \perp b$ it follows that
+Theorem god1_s6_reflexible_left_factor_candidate_solves :
+  forall X, forall op:set -> set -> set, forall e a ar b,
+    associative_on X op ->
+    neutral_element X op e ->
+    a :e X ->
+    reflection X op e a ar ->
+    b :e X ->
+    op a (op ar b) = b.
+let X op e a ar b.
+assume hassoc he ha hreflection hb.
+apply (eq_i_tra (op a (op ar b)) (op (op a ar) b) b).
+- exact (hassoc a ha ar
+    (andEL (ar :e X)
+      (op ar a = e)
+      (andEL (ar :e X /\ op ar a = e)
+        (op a ar = e) hreflection))
+    b hb).
+- apply (eq_i_tra (op (op a ar) b) (op e b) b).
+  - f_equal.
+    exact (andER (ar :e X /\ op ar a = e)
+      (op a ar = e) hreflection).
+  - exact (andER (op b e = b) (op e b = b)
+      ((andER (e :e X)
+        (forall z :e X, op z e = z /\ op e z = z) he) b hb)).
+Qed.
 
 Theorem god1_s6_theorem4_equation_with_reflexible_left_factor :
   forall X, forall op:set -> set -> set, forall e,
@@ -34654,24 +35054,19 @@ let ar.
 assume harX href.
 let b.
 assume hb.
-//GOD1PRF:17285 For the relation $a \perp x=b$ implies
-claim h_s6_t4_left_multiply :
-  forall y :e X, op a y = b -> op ar (op a y) = op ar b.
-admit.
-//GOD1PRF:17380 i.e.,
-claim h_s6_t4_forced_solution :
-  forall y :e X, op a y = b -> y = op ar b.
-admit.
-//GOD1PRF:17465 conversely, from $x=a^{\prime} \perp b$ it follows that
-claim h_s6_t4_candidate_solves : op a (op ar b) = b.
-admit.
 witness (op ar b).
-claim h_s6_t4_candidate_membership : op ar b :e X.
-admit.
-claim h_s6_t4_uniqueness :
-  forall y :e X, op a y = b -> y = op ar b.
-admit.
-Admitted.
+apply andI.
+- exact (hop ar harX b hb).
+- apply andI.
+  - apply andI.
+    - exact (god1_s6_reflexible_left_factor_candidate_solves
+        X op e a ar b hassoc he ha href hb).
+    - exact (eq_ref (op ar b)).
+  - let y.
+    assume hy hay.
+    exact (god1_s6_reflexible_left_factor_forces_solution
+      X op e a ar b y hassoc he ha href hb hy hay).
+Qed.
 
 (** § 7. Groups. **)
 
