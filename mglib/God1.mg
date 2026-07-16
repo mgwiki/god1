@@ -39490,7 +39490,16 @@ Definition matrix_row_linear_form :
 Definition linear_system_rank :
   set -> (set -> set -> set) -> (set -> set -> set) ->
   set -> set -> set -> set :=
-  fun K add mul n p A => matrix_rank K add mul n p A.
+  fun K add mul n p A =>
+    module_family_rank K add mul
+      (right_module_dual K add mul
+        (K :^: p) (module_power_addition p add)
+        (fun x scalar => module_power_left_scalar p
+          (opposite_ring_multiplication mul) scalar x))
+      (right_module_dual_addition (K :^: p) add)
+      (right_module_dual_left_scalar (K :^: p) mul)
+      n (fun i => fun x :e K :^: p =>
+        matrix_row_linear_form K add mul p A i x).
 
 Theorem god1_linear_system_rank_equals_row_form_rank_and_matrix_rank :
   forall K, forall add mul:set -> set -> set,
@@ -39507,6 +39516,15 @@ Theorem god1_linear_system_rank_equals_row_form_rank_and_matrix_rank :
         (right_module_dual_left_scalar (K :^: p) mul)
         n (fun i => fun x :e K :^: p =>
           matrix_row_linear_form K add mul p A i x).
+let K add mul n.
+assume hn.
+let p.
+assume hp.
+let A.
+assume hA hDivision.
+apply andI.
+//GOD1PRF:494390 The rank of the system of equations (1) is defined to be the rank $r$ of the family of linear forms $\left(f_{i}\right)_{1 \leqslant i \leqslant n}$. Since the coordinates of $f_{i}$ with respect to the basis of $\left(\mathrm{K}^{p}\right)^{*}$ dual to the canonical basis of $\mathrm{K}^{p}$ are the scalars $\alpha_{i j}$, we see (§ 19, Theorem 15) that $r$ is also the rank of the matrix
+//GOD1PRF:494933 i.e., the rank of the transposed matrix ${ }^{t}$ A. Hence (§ 19, Corollary to Theorem 16) the rank of the system (1) is equal to the rank of the matrix A .
 Admitted.
 
 //GOD1:496635 associated_homogeneous_solution_space : "the solution space of the homogeneous system associated with #6x=#7" | $\ker(#6)$
@@ -39527,6 +39545,13 @@ Theorem god1_s20_associated_homogeneous_solution_dimension :
       (fun x scalar => module_power_left_scalar p
         (opposite_ring_multiplication mul) scalar x)
     + linear_system_rank K add mul n p A = p.
+let K add mul n.
+assume hn.
+let p.
+assume hp.
+let A.
+assume hA hDivision.
+//GOD1PRF:496993 The solutions $y$ of this system of equations form a vector subspace of $\mathrm{K}^{p}$ whose dimension, by Theorem 17 of § 19, is $p-r$, where $r$ is the rank of the family $\left(f_{i}\right)_{1 \leqslant i \leqslant n}$.
 Admitted.
 
 //GOD1:499438 cramer_linear_system : "the coefficient matrix #6 defines a Cramer system" | $#6\text{ is a Cramer system}$
@@ -39557,6 +39582,22 @@ Theorem god1_s20_theorem1_cramer_system_characterizations :
         (right_module_dual_left_scalar (K :^: p) mul)
         n (fun i => fun x :e K :^: p =>
           matrix_row_linear_form K add mul p A i x)).
+let K add mul n.
+assume hn.
+let p.
+assume hp.
+let A.
+assume hA hDivision.
+apply andI.
+//GOD1PRF:497669 The statement $a$ ) expresses that the homomorphism
+//GOD1PRF:497775 is bijective; if so, then $f$ is an isomorphism, so that $\operatorname{Ker}(f)=\{0\}$ and
+//GOD1PRF:497949 i.e., $p=n$. Hence $a$ ) implies $b$ ). Conversely, if $f$ is injective and if $p=n$, then $f$ is bijective by virtue of § 19, Theorem 13, Corollary 1. Hence $b$ ) implies $a$ ).
+//GOD1PRF:498130 Next, let us show that $a$ ) implies $c$ ). We have already seen that $a$ ) implies that $p=n$. If
+//GOD1PRF:498282 is a linear relation between the forms $f_{i}$, then we have
+//GOD1PRF:498402 for all $x \in \mathrm{~K}^{p}$. Taking $x$ to be a solution of (1), we obtain
+//GOD1PRF:498582 now if (1) has a solution for all choices of the constant terms $\beta_{i}$, the relation (7) will be satisfied for all choices of $\beta_{i} \in \mathrm{~K}$, and this clearly implies that
+//GOD1PRF:498815 Hence $a$ ) implies $c$ ). (Alternatively we could observe that, if the $f_{i}$ are not linearly independent, then the system (5) has no solutions unless the $\beta_{i}$ satisfy certain nontrivial conditions, namely the consistency conditions introduced in section 2 .)
+//GOD1PRF:499086 Finally, we must show that $c$ ) implies $a$ ). From section 2 above, or from Theorem 4 of § 19, the system (1) always has at least one solution, hence the homomorphism $f$ is surjective; but since $\mathrm{K}^{p}$ and $\mathrm{K}^{n}$ have the same dimension by hypothesis, $f$ is also injective and therefore (1) has at most one solution.\\
 Admitted.
 
 Theorem god1_s20_theorem2_square_cramer_equivalences_and_solution :
@@ -39585,6 +39626,15 @@ Theorem god1_s20_theorem2_square_cramer_equivalences_and_solution :
         /\ linear_system_solution K add mul n n A b
           (matrix_vector_product K add mul n n
             (matrix_inverse K add mul n A) b)).
+let K add mul.
+let n.
+assume hn.
+let A.
+assume hA hDivision.
+apply andI.
+//GOD1PRF:500651 If we write (4) in the form $f(x)=b$, where $f$ is the endomorphism of $\mathrm{K}^{n}$ whose matrix with respect to the canonical basis is A , then we see that $a$ ) means that $f$ is bijective, $b$ ) that $f$ is surjective, $c$ ) that $f$ is injective, $e$ ) that $\operatorname{Ker}(f)=\{0\}$, and $f$ ) that $f$ is a unit in the endomorphism ring of $\mathrm{K}^{n}$. Hence the equivalence of $a$ ), $b$ ), $c$ ), $e$ ) and $f$ ) follows from Corollary 1 of Theorem 13 of § 19.
+//GOD1PRF:501135 Also it is clear that $a$ ) implies $d$ ); and $d$ ) implies $e$ ), from the arguments of section 2.\\
+//GOD1PRF:501238 To complete the proof it remains only to establish the formula (8), which is trivial.\\
 Admitted.
 
 Theorem god1_s20_theorem3_independent_system_reduces_to_cramer_system :
@@ -39627,6 +39677,23 @@ Theorem god1_s20_theorem3_independent_system_reduces_to_cramer_system :
               linear_system_solution K add mul n p A b y ->
               (forall k :e p,
                 k /:e {cols i|i :e n} -> y k = eta k) -> y = x.
+let K add mul n.
+assume hn.
+let p.
+assume hp.
+let A.
+assume hA hDivision hIndependent.
+//GOD1PRF:502280 We shall now examine the system of equations (1) in the case where the linear forms $f_{1}, \ldots, f_{n}$ are linearly independent: as we have seen in section 2 , the general system can always be reduced to one of this sort. But we shall not assume that $p=n$. Certainly we must have $n \leqslant p$, because $f_{1}, \ldots, f_{n}$ are linearly independent elements of a vector space of dimension $p$ (namely the dual of $\mathrm{K}^{p}$ ).
+//GOD1PRF:502723 The matrix $\mathrm{A}=\left(\alpha_{i j}\right)_{1 \leqslant i \leqslant n, 1 \leqslant j \leqslant p}$ is now of rank $n$ and therefore (§ 19, Theorem 16) contains an invertible square submatrix of order $n$. We shall suppose that the matrix
+//GOD1PRF:503044 is invertible: this involves no essential loss of generality since we can always reduce to this case, by appropriately renumbering the unknowns $\xi_{i}$.
+//GOD1PRF:503447 where we have put
+//GOD1PRF:503602 Since U is invertible, (9) is a Cramer system with respect to the unknowns $\xi_{1}, \ldots, \xi_{n}$, and therefore has a unique solution for all values of the constant terms $\gamma_{i}$. Now these constant terms in (9) depend only on the unknowns $\xi_{n+1}, \ldots, \xi_{p}$, and consequently the system of equations (1) has a unique solution for which the unknowns $\xi_{n+1}, \ldots, \xi_{p}$ are assigned arbitrary values in advance.
+//GOD1PRF:504044 Moreover, the solution of (9) is given by the formula
+//GOD1PRF:504277 Hence, if we put
+//GOD1PRF:504371 it becomes
+//GOD1PRF:504484 replacing the $\gamma_{j}$ by their values (10) we obtain formulae of the form
+//GOD1PRF:504717 ( $1 \leqslant i \leqslant n$ ), where the $\lambda_{i k}$ are new constants which depend only on the coefficients $\alpha_{i j}$ in (1).
+//GOD1PRF:504856 Since (1) is equivalent to the conjunction of (9) and (10), and since (9) is equivalent to (11), it is clear that the set of relations (1) is equivalent to the set of relations (12). In other words:\\
 Admitted.
 
 (** § 21. Multilinear functions. **)
@@ -39735,6 +39802,9 @@ Theorem god1_multilinear_mappings_form_module :
         K addK mulK I X addX smulX M addM smulM)
       (multilinear_mapping_addition (indexed_module_product I X) addM)
       (multilinear_mapping_scalar (indexed_module_product I X) smulM).
+let K addK mulK I X addX smulX M addM smulM.
+assume hRing hModules hTarget.
+//GOD1PRF:519268 it is a submodule of the module (§ 10, Example 4) of all mappings (multilinear or not) of the set $\mathbf{X}=\mathbf{X}_{1} \times \cdots \times \mathbf{X}_{p}$ into $\mathbf{M}$. In other words, if $f$ and $g$ are multilinear, then so is $\lambda f+\mu g$ for all scalars $\lambda, \mu$. This result (which is an immediate consequence of the fact that a linear combination of linear mappings, for example of mappings of the form (2), is again a linear mapping) allows us to consider the set $\mathscr{L}\left(\mathrm{X}_{1}, \ldots, \mathrm{X}_{p} ; \mathrm{M}\right)$ as a module over the ring K .
 Admitted.
 
 //GOD1:524442 commutative_module_dual : "the dual of the module #4 over the commutative ring #1" | $#4^*$
@@ -39785,13 +39855,15 @@ Definition tensor_space :
       (tensor_argument_scalar X smulX p q)
       K addK mulK.
 
-//GOD1:527304 tensor_product_of_multilinear_forms : "the tensor product of the multilinear forms #12 and #13" | $#12\otimes #13$
+//GOD1:527304 tensor_product_of_multilinear_forms : "the tensor product of the multilinear forms #7 and #8" | $#7\otimes #8$
 Definition tensor_product_of_multilinear_forms :
   set -> (set -> set -> set) ->
-  set -> set -> (set -> set) -> (set -> set) -> set :=
-  fun K mul I J f g =>
+  set -> set -> (set -> set) -> (set -> set) ->
+  (set -> set) -> (set -> set) -> set :=
+  fun K mul I J X Y f g =>
     fun z :e indexed_module_product (I :+: J)
-      (fun h => if h :e {Inj0 i|i :e I} then K else K) =>
+      (fun h => if h :e {Inj0 i|i :e I}
+        then X (Unj h) else Y (Unj h)) =>
       mul
         (f (fun i :e I => z (Inj0 i)))
         (g (fun j :e J => z (Inj1 j))).
@@ -39812,9 +39884,25 @@ Theorem god1_tensor_product_of_multilinear_forms_is_multilinear_and_associative 
       (fun h scalar x => if h :e {Inj0 i|i :e I}
         then smulX (Unj h) scalar x else smulY (Unj h) scalar x)
       K add mul
-      (fun z => mul
-        (f (fun i :e I => z (Inj0 i)))
-        (g (fun j :e J => z (Inj1 j)))).
+      (fun z => ap
+        (tensor_product_of_multilinear_forms K mul I J X Y f g) z)
+    /\ forall H, forall Z:set -> set,
+      forall addZ smulZ:set -> set -> set -> set,
+      forall h:set -> set,
+        multilinear_mapping K add mul H Z addZ smulZ K add mul h ->
+        forall x :e indexed_module_product I X,
+        forall y :e indexed_module_product J Y,
+        forall z :e indexed_module_product H Z,
+          mul (mul (f x) (g y)) (h z)
+          = mul (f x) (mul (g y) (h z)).
+let K add mul I J X Y addX smulX addY smulY f g.
+assume hRing hf hg.
+apply andI.
+//GOD1PRF:527741 it is a multilinear mapping, for if we give for example $x_{2}, \ldots, y_{q}$ fixed values $a_{2}, \ldots, b_{q}$, we obtain
+//GOD1PRF:527952 which is proportional, as a function of $x_{1}$, to $f\left(x_{1}, a_{2}, \ldots, a_{p}\right)$, and is therefore a linear function of $x_{1}$.
+//GOD1PRF:528097 Given three multilinear forms $f, g, h$ we have the associativity law
+//GOD1PRF:528224 the common value of the two sides of this relation is the function
+//GOD1PRF:528406 Hence we may define unambiguously tensor products of any number of multilinear forms, and thus generalize the notion introduced in Example 2 above for linear forms.
 Admitted.
 
 Theorem god1_s21_theorem1_bilinear_maps_on_free_modules :
@@ -39841,6 +39929,21 @@ Theorem god1_s21_theorem1_bilinear_maps_on_free_modules :
               (basis_coordinates K addK mulK X addX smulX m a x (u 0))
               (basis_coordinates K addK mulK Y addY smulY n b y (u 1)))
             (c (u 0) (u 1)))).
+let K addK mulK X addX smulX Y addY smulY M addM smulM m.
+assume hm.
+let n.
+assume hn.
+let a b f.
+assume hRing hBasisX hBasisY hModuleM.
+apply iffI.
+//GOD1PRF:542078 Formula (11) shows that, if $f$ is bilinear, we must have
+//GOD1PRF:542203 so that $f$ is given by a formula of the form (13). Conversely, suppose that $f$ is defined by (13). To show that $f$ is bilinear it is enough to show that the general term $\xi_{i} \eta_{j} c_{i j}$ of the sum (13) is a bilinear function of $x$ and $y$. Since $c_{i j}$ is independent of $x$ and $y$, we need only show that $\xi_{i} \eta_{j}$ is bilinear. Now if $u_{i}(1 \leqslant i \leqslant m)$ are the coordinate functions on X with respect to the basis $\left(a_{i}\right)$, and $v_{j}(1 \leqslant j \leqslant n)$ the coordinate functions on Y with respect to the basis $\left(b_{j}\right)$, then we have
+//GOD1PRF:542859 Hence (Example 2) $\xi_{i} \eta_{j}$ is indeed a bilinear function of $(x, y)$.\\
+//GOD1PRF:542941 To complete the proof of the theorem we must show that the relation (13), i.e.,
+//GOD1PRF:543075 implies that $c_{i j}=f\left(a_{i}, b_{j}\right)$. But the formula just written gives
+//GOD1PRF:543266 also
+//GOD1PRF:543504 (cf. for example § 16, section 2, or observe that
+//GOD1PRF:543672 hence the only term which can be non-zero in the sum for $f\left(a_{i}, b_{j}\right)$ is the term for which $k=i$ and $l=j$, and this term is equal to $c_{i j}$.\\
 Admitted.
 
 Theorem god1_bilinear_tensor_basis :
@@ -39868,6 +39971,13 @@ Theorem god1_bilinear_tensor_basis :
         mulK
           (basis_coordinate_function K addK mulK X addX smulX m a (u 0) (z 0))
           (basis_coordinate_function K addK mulK Y addY smulY n b (u 1) (z 1))).
+let K addK mulK X addX smulX Y addY smulY m.
+assume hm.
+let n.
+assume hn.
+let a b.
+assume hRing hBasisX hBasisY.
+//GOD1PRF:544615 which is an identity in the module $\mathscr{L}(\mathrm{X}, \mathrm{Y} ; \mathrm{K})$ of bilinear forms on $\mathrm{X} \times \mathrm{Y}$. Since this decomposition of $f$ is unique it follows that the $m n$ forms $u_{i} \otimes v_{j}$ form a basis of $\mathscr{L}(\mathrm{X}, \mathrm{Y} ; \mathrm{K})$.
 Admitted.
 
 Theorem god1_s21_theorem2_trilinear_maps_on_free_modules :
@@ -39898,6 +40008,21 @@ Theorem god1_s21_theorem2_trilinear_maps_on_free_modules :
                 (basis_coordinates K addK mulK Y addY smulY n b y (u 1 0))
                 (basis_coordinates K addK mulK Z addZ smulZ p c z (u 1 1))))
             (coeff (u 0) (u 1 0) (u 1 1)))).
+let K addK mulK X addX smulX Y addY smulY Z addZ smulZ
+  M addM smulM m.
+assume hm.
+let n.
+assume hn.
+let p.
+assume hp.
+let a b c f.
+assume hRing hBasisX hBasisY hBasisZ hModuleM.
+apply iffI.
+//GOD1PRF:548789 Formula (12) shows that if $f$ is trilinear then we have (15), with the coefficients $c_{i j k}$ given by (16). Conversely, if $f$ is given by (15), to show that $f$ is trilinear it is enough to show that the function $\xi_{i} \eta_{j} \zeta_{k} c_{i j k}$ is trilinear; or, since $c_{i j k}$ is independent of $x, y, z$, that the function $\xi_{i} \eta_{j} \zeta_{k}$ is trilinear. Introducing the coordinate functions $u_{i}, v_{j}, w_{k}$ on the modules $\mathrm{X}, \mathrm{Y}, \mathrm{Z}$ respectively relative to the given bases, it is clear that
+//GOD1PRF:549406 and the right-hand side is indeed a trilinear form on $\mathrm{X} \times \mathrm{Y} \times \mathrm{Z}$, namely it is the form
+//GOD1PRF:549576 To complete the proof it remains to show that (15) implies (16); now (15) gives
+//GOD1PRF:549819 and the only term on the right-hand side which can be non-zero is that for which $\lambda=i, \mu=j, v=k$. For this term we have
+//GOD1PRF:550037 and (16) follows.\\
 Admitted.
 
 Theorem god1_s21_theorem3_multilinear_maps_on_free_modules :
@@ -39923,6 +40048,16 @@ Theorem god1_s21_theorem3_multilinear_maps_on_free_modules :
               (fun h => basis_coordinates K addK mulK
                 (X h) (addX h) (smulX h) (n h) (a h) (x h) (idx h)))
             (coeff idx))).
+let K addK mulK.
+let p.
+assume hp.
+let X addX smulX n a M addM smulM f.
+assume hRing hBases hModuleM.
+apply iffI.
+//GOD1PRF:555349 If $f$ is multilinear, formula (17) follows immediately from (10) of section 3 . Conversely, to show that (17) always represents a multilinear mapping, it is enough to show that the function
+//GOD1PRF:555639 is always $p$-linear. Now if $u_{h_{1}}, u_{h_{2}}, \ldots, u_{h n_{h}}$ are the coordinate functions on the module $\mathrm{X}_{h}$, with respect to the basis $a_{h_{1}}, \ldots, a_{h n_{h}}$, it is clear that
+//GOD1PRF:555982 so that the function
+//GOD1PRF:556081 is indeed multilinear (Example 2). Finally, we leave to the reader the task of checking that (17) implies (18), as in the proofs of Theorems 1 and 2.\\
 Admitted.
 
 (** § 22. Alternating bilinear and trilinear mappings. **)
@@ -39965,6 +40100,13 @@ Theorem god1_alternating_bilinear_maps_are_skew_and_form_submodule :
       (multilinear_mapping_scalar (indexed_module_product 2 (fun i => X)) smulM)
       (alternating_bilinear_mapping_space
         K addK mulK X addX smulX M addM smulM).
+let K addK mulK X addX smulX M addM smulM f.
+assume hAlternating.
+apply andI.
+//GOD1PRF:580788 If so, then for all $x, y \in \mathbf{X}$ we have
+//GOD1PRF:580947 so that an alternating bilinear mapping $f$ satisfies the identity
+//GOD1PRF:581077 for all $x, y \in \mathbf{X}$.\\
+//GOD1PRF:581704 Clearly, every linear combination of alternating bilinear mappings is again an alternating bilinear mapping; in other words, the alternating bilinear mappings form a submodule of the module $\mathscr{L}(\mathrm{X}, \mathrm{X} ; \mathrm{M})$ of all bilinear mappings of $\mathrm{X} \times \mathrm{X}$ into M .
 Admitted.
 
 //GOD1:582578 exterior_product_two_linear_forms : "the exterior product of the linear forms #7 and #8" | $#7\wedge #8$
@@ -39986,10 +40128,12 @@ Theorem god1_exterior_product_two_forms_is_alternating :
     module_homomorphism K addK mulK X addX smulX K addK mulK v ->
     alternating_bilinear_mapping K addK mulK
       X addX smulX K addK mulK
-      (fun z =>
-        addK
-          (mulK (u (z 0)) (v (z 1)))
-          (ring_negation K addK (mulK (u (z 1)) (v (z 0))))).
+      (fun z => ap
+        (exterior_product_two_linear_forms K addK mulK X u v) z).
+let K addK mulK X addX smulX u v.
+assume hRing hu hv.
+//GOD1PRF:582447 is alternating and bilinear. In particular, if $u$ and $v$ are linear forms on X , the mapping
+//GOD1PRF:582578 of $\mathrm{X} \times \mathrm{X}$ into K is an alternating bilinear form on $\mathrm{X} \times \mathrm{X}$; it is called the exterior product of the linear forms $u$ and $v$, and is denoted by
 Admitted.
 
 Theorem god1_s22_theorem1_alternating_bilinear_coefficients :
@@ -40025,6 +40169,17 @@ Theorem god1_s22_theorem1_alternating_bilinear_coefficients :
                   (basis_coordinates K addK mulK X addX smulX n a x (u 1))
                   (basis_coordinates K addK mulK X addX smulX n a y (u 0)))))
             (f (bilinear_tuple (a (u 0)) (a (u 1)))))).
+let K addK mulK X addX smulX M addM smulM.
+let n.
+assume hn.
+let a f.
+assume hRing hBasis hModule hBilinear.
+apply andI.
+//GOD1PRF:584234 It is clear that the relation (1) for $x=a_{i}$ and the relation (2) for $x=a_{i}, y=a_{j}$ give the relations (3). Conversely, suppose that (3) is satisfied ; in the formula
+//GOD1PRF:584487 which follows from Theorem 1 -of § 21, the terms for which $i=j$ are zero and therefore\\
+//GOD1PRF:584578 we may write
+//GOD1PRF:584681 in the second of these sums, replace $i$ and $j$ by $j$ and $i$ respectively (this is purely a change of notation), and we obtain
+//GOD1PRF:585010 by using (3); hence we obtain the formula (4), and this shows that $f$ is alternating, for it is clear that the differences $\xi_{i} \eta_{j}-\xi_{j} \eta_{i}$ are all zero when $x=y$.\\
 Admitted.
 
 //GOD1:587005 determinant_of_two_vectors_in_basis : "the determinant of #9 and #10 with respect to the two-vector basis #8" | $\det_{#8}(#9,#10)$
@@ -40058,9 +40213,16 @@ Theorem god1_two_dimensional_determinant_is_unique_normalized_alternating_form :
       alternating_bilinear_mapping K addK mulK
         X addX smulX K addK mulK f ->
       f (bilinear_tuple (a 0) (a 1)) = ring_one K mulK ->
-      f = (fun z =>
+      forall x y :e X,
+      f (bilinear_tuple x y) =
         determinant_of_two_vectors_in_basis
-          K addK mulK X addX smulX a (z 0) (z 1)).
+          K addK mulK X addX smulX a x y.
+let K addK mulK X addX smulX a.
+assume hRing hBasis.
+apply andI.
+//GOD1PRF:587005 is called the determinant of the vectors $x$ and $y$ with respect to the basis $\left(a_{1}, a_{2}\right)$ of X ; it is an alternating bilinear form on X such that
+//GOD1PRF:587275 Moreover this property characterizes D, for (6) can be written as
+//GOD1PRF:587389 and therefore $f=\mathrm{D}$ if $f\left(a_{1}, a_{2}\right)=1$.\\
 Admitted.
 
 //GOD1:589730 alternating_trilinear_mapping : "#13 is an alternating trilinear mapping on #4 with values in #10" | $#13(x,y,z)=0\text{ when two arguments agree}$
@@ -40182,6 +40344,22 @@ Theorem god1_s22_theorem2_alternating_trilinear_coefficients :
                 K addK mulK X addX smulX n a
                 (t 0) (t 1 0) (t 1 1) x y z))
             (f (trilinear_tuple (a (t 0)) (a (t 1 0)) (a (t 1 1)))))).
+let K addK mulK X addX smulX M addM smulM.
+let n.
+assume hn.
+let a f.
+assume hRing hBasis hModule hTrilinear.
+apply andI.
+//GOD1PRF:593908 To prove Theorem 2, we must first show that, for every alternating trilinear mapping $f$, the coefficients of $f$ satisfy (11) and (12). This follows by substituting $x=a_{i}$, $y=a_{j}, z=a_{k}$ in the relations (9) and (10).
+//GOD1PRF:594136 Conversely, suppose that (11) and (12) are satisfied. In the formula
+//GOD1PRF:594303 which follows from Theorem 2 of § 21, the only terms which can possibly be non-zero are those for which the indices $i, j, k$ are all distinct. By classifying the triples $(i, j, k)$ according to the relative magnitudes of $i, j, k$ we therefore obtain a decompositicn of $f(x, y, z)$ into six partial sums, namely
+//GOD1PRF:594979 For each of these partial sums we can change the notation so that the sum in question extends over all triples $(i, j, k)$ such that $i<j<k$ (for example, in the second sum, we have to replace $j$ by $i, k$ by $j$, and $i$ by $k$ ). In this way we obtain
+//GOD1PRF:595594 Having regard to the relations (12) and grouping together the terms with the same indices $i, j, k$ in each of the six sums above, we find
+//GOD1PRF:595950 which is precisely the formula (13).\\
+//GOD1PRF:595989 It remains to verify that $f$ is in fact an alternating function. For this it is clearly sufficient to show that the trilinear form
+//GOD1PRF:596310 is alternating. If $u_{i}$ denotes the $i$ th coordinate function on the module X with respect to the basis $\left(a_{i}\right)$, then we have
+//GOD1PRF:596682 or, in other words,
+//GOD1PRF:596752 This shows (cf. Example 5) that the form in question is alternating, and completes the proof of Theorem 2.
 Admitted.
 
 (** § 23. Alternating multilinear mappings and determinants. **)
@@ -40230,13 +40408,24 @@ Theorem god1_s23_theorem1_signature_and_antisymmetric_permutation_law :
         (permutation_group p) (permutation_composition p)
         {1,minus_SNo 1} mul_SNo s ->
       (forall tau :e adjacent_transpositions p, s tau = minus_SNo 1) ->
-      s = permutation_signature p)
+      forall sigma :e permutation_group p,
+        s sigma = permutation_signature p sigma)
     /\ forall X M, forall addM:set -> set -> set, forall f:set -> set,
       antisymmetric_mapping X M addM p f ->
       forall sigma :e permutation_group p, forall x :e X :^: p,
         f (permuted_tuple p sigma x)
         = signed_group_element M addM
           (permutation_signature p sigma) (f x).
+let p.
+assume hp hPositive.
+apply andI.
+//GOD1PRF:614631 THEOREM 1. For each integer $p \geqslant 1$ there exists one and only one homomorphism
+//GOD1PRF:614784 such that $\mathfrak{p}(\sigma)=-1$ for all transpositions $\sigma$. We have $\mathfrak{p}(\sigma)=(-1)^{r}$ if the permutation $\sigma$ is the product of $r$ transpositions.
+//GOD1PRF:614960 Further, if X is a set and M is an additive group, and if
+//GOD1PRF:615067 is an antisymmetric mapping, then we have
+//GOD1PRF:615215 for all $x_{i} \in \mathrm{X}$ and all permutations $\sigma \in \mathfrak{S}_{p}$.\\
+//GOD1PRF:616081 and each pair of integers $(i, j)$ satisfying these conditions contributes a factor -1 to the signature of $\sigma$. The number of such pairs ( $i, j$ ) is called the number of inversions of $\sigma$; if we denote it by $\mathrm{I}(\sigma)$, then we have
+//GOD1PRF:618031 and therefore
 Admitted.
 
 //GOD1:618185 antisymmetrization : "the antisymmetrization of the #5-variable mapping #6" | $\operatorname{Alt}(#6)$
@@ -40258,6 +40447,25 @@ Theorem god1_antisymmetrization_is_antisymmetric_and_vanishes_on_repetitions :
     /\ forall x :e X :^: p,
       (exists i j :e p, i <> j /\ x i = x j) ->
       antisymmetrization M addM X p f x = module_zero M addM.
+let X M addM.
+let p.
+assume hp.
+let f.
+assume hPositive hGroup hf.
+apply andI.
+//GOD1PRF:619101 To prove these assertions, make $\boldsymbol{S}_{p}$ operate on the set $\mathrm{X}^{p}$ as follows (cf. § 7, section 11, Example 21):
+//GOD1PRF:619522 Let $\omega \in \mathfrak{S}_{p}$ be any permutation; then we have
+//GOD1PRF:619747 Now, since the mapping $\sigma \rightarrow \omega^{\circ} \sigma$ of $\mathfrak{S}_{p}$ into $\mathfrak{S}_{p}$ is a bijection ( $\omega$ being fixed), it is clear that for any function $\varphi: \mathfrak{S}_{p} \rightarrow \mathrm{M}$ we have
+//GOD1PRF:620113 Apply this result to the function $\varphi$ defined by
+//GOD1PRF:620252 and remark that
+//GOD1PRF:620530 it follows that (13) can also be written in the form
+//GOD1PRF:620954 if $\omega$ is a transposition, and therefore $g(x)=g\left(x_{1}, \ldots, x_{p}\right)$ is antisymmetric.\\
+//GOD1PRF:621062 To prove (12), suppose that $x_{i}=x_{j}$, where $i$ and $j$ are two integers such that $i<j$, and let $\tau$ denote the permutation defined as follows:
+//GOD1PRF:621308 From Remark 1 we have $\mathfrak{p}(\tau)=-1$; also, for the element $x=\left(x_{1}, \ldots, x_{p}\right) \in \mathrm{X}^{p}$ under consideration,
+//GOD1PRF:621646 we can divide the permutations $\sigma$ into two classes: those for which $\sigma(i)<\sigma(j)$, and those for which $\sigma(i)>\sigma(j)$. If $\mathfrak{S}_{p}^{\prime}$ and $\mathfrak{S}_{p}^{\prime \prime}$ are the two subsets of $\mathfrak{S}_{p}$ so obtained, they are disjoint and their union is $\mathcal{S}_{p}$, and therefore
+//GOD1PRF:622238 Now the mapping $\sigma \rightarrow \sigma^{\circ} \tau$ is a bijection of $\mathfrak{S}_{p}^{\prime}$ onto $\mathfrak{S}_{p}^{\prime \prime}$. We may therefore pair off the terms on the right-hand side of (15), by associating the term corresponding to $\sigma$ in the first sum with the term corresponding to $\omega=\sigma^{\circ} \tau$ in the second sum. The sum of these two terms is
+//GOD1PRF:622769 which by (14) is equal to
+//GOD1PRF:622926 but since $p(\tau)=-1$, this expression is zero. Hence the terms in the two sums on the right-hand side of (15) cancel each other out, and therefore $g(x)=0$. Hence (12) is proved.
 Admitted.
 
 //GOD1:623317 alternating_multilinear_mapping : "#9 is an alternating #4-linear mapping on #5 with values in #6" | $#9\in\operatorname{Alt}^{#4}(#5,#6)$
@@ -40295,6 +40503,14 @@ Theorem god1_s23_theorem2_alternating_multilinear_is_antisymmetric :
       f (permuted_tuple p sigma x)
       = signed_group_element M addM
         (permutation_signature p sigma) (f x).
+let K addK mulK.
+let p.
+assume hp.
+let X addX smulX M addM smulM f.
+assume hPositive hAlternating.
+apply andI.
+//GOD1PRF:623766 To prove that (6) of section (1) is satisfied, assign fixed values to all the variables except $x_{i}$ and $x_{i+1}$, and regard $f$ as a function of $x_{i}$ and $x_{i+1}$. We obtain then a function of $x_{i}$ and $x_{i+1}$ which is bilinear because $f$ is multilinear, and alternating because $f$ vanishes whenever $x_{i}=x_{i+1}$; hence (§22, section 1, relation (2)) the expression $f\left(x_{1}, \ldots, x_{p}\right)$ is multiplied by -1 when we interchange $x_{i}$ and $x_{i+1}$.\\
+//GOD1PRF:624262 From the results of section 1, it follows that an alternating $p$-linear mapping $f: \mathrm{X}^{p} \rightarrow \mathrm{M}$ satisfies the identity
 Admitted.
 
 Theorem god1_s23_theorem3_antisymmetrization_of_multilinear_map :
@@ -40307,6 +40523,12 @@ Theorem god1_s23_theorem3_antisymmetrization_of_multilinear_map :
     alternating_multilinear_mapping K addK mulK p
       X addX smulX M addM smulM
       (fun x => antisymmetrization M addM X p f x).
+let K addK mulK.
+let p.
+assume hp.
+let X addX smulX M addM smulM f.
+assume hPositive hMultilinear.
+//GOD1PRF:624942 The general term in the sum on the right-hand side is clearly a $p$-linear function of $x_{1}, \ldots, x_{p}$, and therefore so is $g$. It remains to show that $g\left(x_{1}, \ldots, x_{p}\right)$ is zero if the vectors $x_{1}, \ldots, x_{p}$ are not all distinct, and this is a particular case of the assertion (12) of section 2 .
 Admitted.
 
 //GOD1:625569 exterior_product_linear_forms : "the exterior product of the family of linear forms #8 indexed by #7" | $\bigwedge_{i\in #7}#8_i$
@@ -40328,6 +40550,13 @@ Theorem god1_exterior_product_of_linear_forms_is_alternating :
     alternating_multilinear_mapping K add mul p
       X addX smulX K add mul
       (fun x => exterior_product_linear_forms K add mul X p u x).
+let K add mul.
+let p.
+assume hp.
+let X addX smulX u.
+assume hPositive hRing hu.
+//GOD1PRF:625275 Example 2. Let $u_{1}, \ldots, u_{p}$ be linear forms on X . Then the $p$-linear form
+//GOD1PRF:625457 is alternating: apply Theorem 3 to the form $u_{1} \otimes \cdots \otimes u_{p}$ defined in § 21, Example 2.\\
 Admitted.
 
 Theorem god1_s23_theorem4_alternating_map_vanishes_on_short_span :
@@ -40345,6 +40574,18 @@ Theorem god1_s23_theorem4_alternating_map_vanishes_on_short_span :
         x i = module_finitely_supported_sum X addX q
           (fun j => smulX (coeff i j) (b j))) ->
       f x = module_zero M addM.
+let K addK mulK p.
+assume hp.
+let q.
+assume hq.
+let X addX smulX M addM smulM f.
+assume hShort hAlternating.
+let b coeff x.
+assume hx hExpansion.
+//GOD1PRF:626003 Suppose that we have relations
+//GOD1PRF:626083 then formula (10) of § 21, section 3 shows that
+//GOD1PRF:626289 Now suppose that $q<p$. Then the $p$ integers $j_{1}, \ldots, j_{p}$, all of which lie between 1 and $q$, cannot all be distinct. Since $f$ is alternating, it follows that
+//GOD1PRF:626514 for all choices of $j_{1}, \ldots, j_{p}$. Hence the result.\\
 Admitted.
 
 Theorem god1_s23_theorem4_corollary1_dependent_arguments_vanish :
@@ -40358,6 +40599,15 @@ Theorem god1_s23_theorem4_corollary1_dependent_arguments_vanish :
       not (linearly_independent_family
         K addK mulK X addX smulX p (fun i => x i)) ->
       f x = module_zero M addM.
+let K addK mulK.
+let p.
+assume hp.
+let X addX smulX M addM smulM f.
+assume hField hAlternating.
+let x.
+assume hx hDependent.
+//GOD1PRF:626832 If there is a non-trivial linear relation
+//GOD1PRF:626927 with say $\lambda_{p} \neq 0$, then because K is here a field it follows that $a_{p}$ is a linear combination of $a_{1}, \ldots, a_{p-1}$. Hence the $p$ vectors $a_{1}, \ldots, a_{p}$ are linear combinations of $p-1$ of them, and the result now follows from Theorem 4.\\
 Admitted.
 
 Theorem god1_s23_theorem4_corollary2_degree_above_rank_is_zero :
@@ -40370,7 +40620,16 @@ Theorem god1_s23_theorem4_corollary2_degree_above_rank_is_zero :
     left_module K addK mulK M addM smulM ->
     alternating_multilinear_mapping K addK mulK p
       X addX smulX M addM smulM f ->
-    f = (fun x => module_zero M addM).
+    forall x :e X :^: p, f x = module_zero M addM.
+let K addK mulK p.
+assume hp.
+let r.
+assume hr.
+let X addX smulX M addM smulM a f.
+assume hRankBound hBasis hModule hAlternating.
+let x.
+assume hx.
+//GOD1PRF:627390 For if $x_{1}, \ldots, x_{p}$ are any $p$ elements of X , they can be expressed as linear combinations of $r<p$ vectors.
 Admitted.
 
 //GOD1:635431 signature_scalar : "the signature of #5 represented in the commutative ring #1" | $\varepsilon_{#5}\cdot 1_{#1}$
@@ -40426,8 +40685,9 @@ Theorem god1_s23_theorem5_unique_normalized_top_alternating_form :
       alternating_multilinear_mapping K addK mulK p
         X addX smulX K addK mulK D ->
       D (fun i :e p => a i) = ring_one K mulK ->
-      D = (fun x => determinant_of_vectors_in_basis
-        K addK mulK X addX smulX p a (fun i => x i)))
+      forall x :e X :^: p,
+        D x = determinant_of_vectors_in_basis
+          K addK mulK X addX smulX p a (fun i => x i))
     /\ forall M, forall addM smulM:set -> set -> set,
       forall f:set -> set,
       left_module K addK mulK M addM smulM ->
@@ -40438,6 +40698,17 @@ Theorem god1_s23_theorem5_unique_normalized_top_alternating_form :
           (determinant_of_vectors_in_basis
             K addK mulK X addX smulX p a (fun i => x i))
           (f (fun i :e p => a i)).
+let K addK mulK X addX smulX.
+let p.
+assume hp.
+let a.
+assume hPositive hRing hBasis.
+apply andI.
+//GOD1PRF:632672 for $u_{i}\left(a_{j}\right)$ is 0 or 1 according as $i \neq j$ or $i=j$, and therefore if we calculate $\mathrm{D}\left(a_{1}, \ldots, a_{p}\right)$ from the formula (22) the only term which can be non-zero is that for which $\sigma(1)=1, \ldots, \sigma(p)=p$. We have then $u_{\sigma(i)}\left(a_{i}\right)=u_{i}\left(a_{i}\right)=1$, and clearly $\mathfrak{p}(\sigma)=1$; hence (25).
+//GOD1PRF:633059 Furthermore, the relation (25) characterizes D. For by (20) we have
+//GOD1PRF:633185 for any alternating $p$-linear form $f$ on $\mathrm{X}^{p}$; hence the relation $f\left(a_{1}, \ldots, a_{p}\right)=1$ is equivalent to $f=\mathrm{D}$.
+//GOD1PRF:633917 Furthermore, if $f$ is any alternating $p$-linear mapping of $\mathrm{X}^{p}$ into a K -module M , then
+//GOD1PRF:634149 for all vectors $x_{1}, \ldots, x_{p} \in \mathrm{X}$.\\
 Admitted.
 
 Theorem god1_s23_theorem5_corollary_bases_of_commutative_free_module_same_size :
@@ -40445,9 +40716,18 @@ Theorem god1_s23_theorem5_corollary_bases_of_commutative_free_module_same_size :
   forall X, forall addX smulX:set -> set -> set,
   forall p q :e omega, forall a b:set -> set,
     commutative_ring K addK mulK ->
+    ring_zero K addK <> ring_one K mulK ->
     module_basis K addK mulK X addX smulX p a ->
     module_basis K addK mulK X addX smulX q b ->
     p = q.
+let K addK mulK X addX smulX p.
+assume hp.
+let q.
+assume hq.
+let a b.
+assume hRing hNontrivial hBasisA hBasisB.
+//GOD1PRF:634404 Let $\left(a_{1}, \ldots, a_{p}\right)$ and $\left(b_{1}, \ldots, b_{q}\right)$ be bases of X . By Theorem 5 there exists an alternating $q$-linear form $f$ on X such that
+//GOD1PRF:634621 and therefore $f$ is not identically zero. Since X has a basis of $p$ vectors, it follows that $q \leqslant p$, by the corollary to Theorem 4. But then also $p \leqslant q$ by symmetry, and hence $p=q$.
 Admitted.
 
 Theorem god1_s23_theorem6_determinant_of_transpose :
@@ -40456,6 +40736,13 @@ Theorem god1_s23_theorem6_determinant_of_transpose :
     commutative_ring K add mul ->
     matrix_determinant K add mul p A
     = matrix_determinant K add mul p (matrix_transpose K p p A).
+let K add mul.
+let p.
+assume hp.
+let A.
+assume hA hRing.
+//GOD1PRF:636105 now we have seen in section 4 that this determinant is also given by the formula (23), i.e., it is also equal to the expression
+//GOD1PRF:636309 which is contained from (21) by replacing $\xi_{i j}$ by $\xi_{j i}$ throughout. Hence:\\
 Admitted.
 
 Theorem god1_s23_theorem7_determinant_multiplicative :
@@ -40466,6 +40753,23 @@ Theorem god1_s23_theorem7_determinant_multiplicative :
       (matrix_multiplication K add mul p p p A B)
     = mul (matrix_determinant K add mul p A)
       (matrix_determinant K add mul p B).
+let K add mul.
+let p.
+assume hp.
+let A.
+assume hA.
+let B.
+assume hB hRing.
+//GOD1PRF:636819 Let X be a K-module with basis $a_{1}, \ldots, a_{p}$, and let $u, v$ be the endomorphisms of X whose matrices with respect to this basis are the given matrices $\mathrm{A}, \mathrm{B}$ respectively. Then the product matrix AB corresponds to the composite endomorphism $u \circ v$.
+//GOD1PRF:637102 Let $\mathrm{D}\left(x_{1}, \ldots, x_{p}\right)$ be the determinant of $x_{1}, \ldots, x_{p} \in \mathrm{X}$ with respect to the basis $a_{1}, \ldots, a_{p}$. Define a new mapping $\mathrm{D}_{u}: \mathrm{X}^{p} \rightarrow \mathrm{~K}$ as follows:
+//GOD1PRF:637482 Then $\mathrm{D}_{u}$ is an alternating $p$-linear mapping. First of all, $\mathrm{D}_{u}$ is multilinear: if for example we assign fixed values $b_{2}, \ldots, b_{p}$ to $x_{2}, \ldots, x_{p}$ respectively, and if we put $c_{i}=u\left(b_{i}\right)$, we obtain
+//GOD1PRF:637818 as a function of $x_{1}$, this is obtained by composing the linear mapping $u$ with the linear mapping $x_{1} \rightarrow \mathrm{D}\left(x_{1}, c_{2}, \ldots, c_{p}\right)$, so that the result is a linear function of $\mathrm{x}_{1}$. Consequently $\mathrm{D}_{u}$ is multilinear, and it is clearly alternating, since $x_{i}=x_{j}$ implies $u\left(x_{i}\right)=u\left(x_{j}\right)$ and therefore
+//GOD1PRF:638297 We may therefore apply Theorem 5 to $\mathrm{D}_{u}$, which shows that
+//GOD1PRF:639115 and therefore (26) becomes
+//GOD1PRF:639516 and, with $w=u \circ v$,
+//GOD1PRF:639740 But, on the other hand,
+//GOD1PRF:640218 Comparing this with (28) we see that
+//GOD1PRF:640358 as required.\\
 Admitted.
 
 //GOD1:641088 endomorphism_coordinate_matrix : "the matrix of the endomorphism #9 relative to the basis #8" | $[#9]_{#8}$
@@ -40506,6 +40810,20 @@ Theorem god1_endomorphism_determinant_independent_of_basis_and_composes :
         (endomorphism_determinant K addK mulK X addX smulX p a v)
     /\ endomorphism_determinant K addK mulK X addX smulX p a
       (fun x => x) = ring_one K mulK.
+let K addK mulK X addX smulX.
+let p.
+assume hp.
+let a b u v.
+assume hRing hBasisA hBasisB hu hv.
+apply andI.
+//GOD1PRF:641088 The scalar $\operatorname{det}(u)$ is called the determinant of the endomorphism $u$. If A is the matrix of $u$ with respect to an arbitrary basis of X , the calculations above (by applying (29) to the determinant with respect to the given basis) show that
+//GOD1PRF:641408 If $u, v$ are two endomorphisms of X it is clear from the definition that
+//GOD1PRF:641607 and it is equally clear from (29) that the determinant of the identity endomorphism of X is 1 .
+//GOD1PRF:641704 Remark 2. It follows from what has been said that, if $u$ is any endomorphism of X , the determinant of the matrix of $u$ with respect to a basis of X is independent of the basis. This may also be proved as follows. Let A be the matrix of $u$ with respect to a basis of X ; then the matrices of $u$ with respect to other bases of X are of the form
+//GOD1PRF:642161 Now we have
+//GOD1PRF:642353 on the other hand
+//GOD1PRF:642597 and hence finally
+//GOD1PRF:642703 as asserted.
 Admitted.
 
 Theorem god1_s23_theorem8_basis_determinant_criterion :
@@ -40524,6 +40842,16 @@ Theorem god1_s23_theorem8_basis_determinant_criterion :
     <-> matrix_determinant K addK mulK p
       (basis_coordinate_matrix K addK mulK X addX smulX p a x)
       <> ring_zero K addK).
+let K addK mulK X addX smulX.
+let p.
+assume hp.
+let a x.
+assume hField hBasis.
+apply andI.
+//GOD1PRF:643652 The equivalence of $a$ ) and $b$ ) follows from Theorem 10 of § 19. The equivalence of $b$ ) and $c$ ) was proved in § 15, Theorem 1.
+//GOD1PRF:643789 If D denotes the determinant with respect to the basis $a_{1}, \ldots, a_{p}$, considered as an alternating multilinear form, then condition $d$ ) becomes
+//GOD1PRF:644005 it implies $a$ ) by virtue of Theorem 4, Corollary 1. To complete the proof of the theorem it is enough to show that $b$ ) implies $d$ ). Now if the $x_{i}$ form a basis of X , then by Theorem 5 there exists an alternating $p$-linear form $f$ on $\mathrm{X}^{p}$ such that
+//GOD1PRF:644330 since every alternating $p$-linear form on $\mathrm{X}^{p}$ is proportional to D , it follows a fortiori that
 Admitted.
 
 Theorem god1_s23_theorem8_corollary1_matrix_invertible_iff_determinant_nonzero :
@@ -40532,6 +40860,13 @@ Theorem god1_s23_theorem8_corollary1_matrix_invertible_iff_determinant_nonzero :
     field K add mul ->
     (invertible_matrix K add mul p A
     <-> matrix_determinant K add mul p A <> ring_zero K add).
+let K add mul.
+let p.
+assume hp.
+let A.
+assume hA hField.
+apply iffI.
+//GOD1PRF:644661 This follows from the equivalence of $c$ ) and $d$ ) in Theorem 8.\\
 Admitted.
 
 Theorem god1_s23_theorem8_corollary2_endomorphism_conditions :
@@ -40550,6 +40885,14 @@ Theorem god1_s23_theorem8_corollary2_endomorphism_conditions :
     /\ (bij X X u <->
       endomorphism_determinant K addK mulK X addX smulX p a u
       <> ring_zero K addK).
+let K addK mulK X addX smulX.
+let p.
+assume hp.
+let a u.
+assume hField hBasis hu.
+apply andI.
+//GOD1PRF:645034 The equivalence of the first four statements has already been proved in §19 (Theorem 13, Corollary 1) for K a division ring. Also, $u$ is bijective if and only if its matrix A with respect to a basis of L is invertible (§15, section 2), hence if and only if $\operatorname{det}(\mathrm{A}) \neq 0$ (by Corollary 1); but
+//GOD1PRF:645409 and therefore $a$ ) and $e$ ) are equivalent.\\
 Admitted.
 
 Theorem god1_s23_theorem8_corollary3_homogeneous_square_system :
@@ -40560,6 +40903,13 @@ Theorem god1_s23_theorem8_corollary3_homogeneous_square_system :
       homogeneous_linear_system_solution K add mul n n A x
       /\ x <> (fun i :e n => ring_zero K add))
     <-> matrix_determinant K add mul n A = ring_zero K add).
+let K add mul.
+let n.
+assume hn.
+let A.
+assume hA hField.
+apply iffI.
+//GOD1PRF:645884 By Theorem 2 of § 20 (the equivalence of statements $e$ ) and $f$ ) of the theorem), the existence of a non-trivial solution is equivalent to the matrix $\left(\alpha_{i j}\right)$ not being invertible.\\
 Admitted.
 
 Theorem god1_s23_theorem8_corollary4_cramer_determinant_criterion :
@@ -40568,6 +40918,13 @@ Theorem god1_s23_theorem8_corollary4_cramer_determinant_criterion :
     field K add mul ->
     (cramer_linear_system K add mul n n A
     <-> matrix_determinant K add mul n A <> ring_zero K add).
+let K add mul.
+let n.
+assume hn.
+let A.
+assume hA hField.
+apply iffI.
+//GOD1PRF:646593 This follows from the equivalence of statements $a$ ), $d$ ) and $f$ ) in Theorem 2 of § 20.\\
 Admitted.
 
 //GOD1:651243 strictly_increasing_index_tuple : "the #2-tuple of indices in #1 is strictly increasing" | $#2_1<\cdots<#2_p$
@@ -40627,6 +40984,29 @@ Theorem god1_s23_theorem9_alternating_coefficient_characterization_and_expansion
               (selected_coordinate_matrix K addK mulK
                 X addX smulX n p a (fun h => idx h) (fun j => x j)))
             (f (fun h :e p => a (idx h))))).
+let K addK mulK X addX smulX M addM smulM n.
+assume hn.
+let p.
+assume hp.
+let a f.
+assume hRing hBasis hModule hMultilinear.
+apply andI.
+//GOD1PRF:652445 Put $a_{i_{1}}=b_{1}, \ldots, a_{i_{p}}=b_{p}$. If the indices $i_{1}, \ldots, i_{p}$ are not all distinct, at least two of the vectors $b_{j}$ will be equal, and hence if $f$ is alternating we shall have $f\left(b_{1}, \ldots, b_{p}\right)=0$. Hence (31). Writing
+//GOD1PRF:652814 and remarking that
+//GOD1PRF:652873 we obtain (32).\\
+//GOD1PRF:652891 Conversely, suppose that (31) and (32) are satisfied. In the formula
+//GOD1PRF:653105 we may restrict the summation on the right-hand side to sequences $i_{1}, \ldots, i_{p}$ of $p$ distinct integers lying between 1 and $n$. Let us provisionally denote by $S$ the set of all these sequences, and by $S^{+} \subset S$ the set of all sequences $i_{1}, \ldots, i_{p}$ such that
+//GOD1PRF:653468 It is clear that every sequence belonging to $S$ can be obtained in exactly one way by applying a suitable permutation to a sequence which satisfies (35). In other words, if we associate with each sequence ( $i_{1}, \ldots, i_{p}$ ) satisfying (35) and each permutation $\sigma \in \mathfrak{S}_{p}$ the sequence ( $i_{\sigma(1)}, \ldots, i_{\sigma(p)}$ ), we have a bijection of the product set $\mathrm{S}^{+} \times \mathfrak{S}_{p}$ onto S .
+//GOD1PRF:653915 The formula (34) may therefore be written
+//GOD1PRF:654152 using (32), this becomes
+//GOD1PRF:654377 If we put $\alpha_{k l}=\xi_{i_{k} l}$, the sum over $\mathfrak{S}_{p}$ in the above expression is
+//GOD1PRF:654563 which is by definition the determinant
+//GOD1PRF:654840 Hence (33) is proved, and it remains to be shown that $f$ is alternating.\\
+//GOD1PRF:654916 Let $u_{i}(1 \leqslant i \leqslant n)$ denote the coordinate functions on the module X with respect to the basis $\left(a_{i}\right)_{1 \leqslant i \leqslant n}$. Then the expression
+//GOD1PRF:655142 is the value at $\left(x_{1}, \ldots, x_{p}\right)$ of the $p$-linear form $u_{i_{1}} \otimes \cdots \otimes u_{i_{p}}$, because in general we have
+//GOD1PRF:655332 hence, by a calculation analogous to that carried through in detail in section 4 (see the passage from (22) to (23)), the determinant (36) is the value at ( $x_{1}, \ldots, x_{p}$ ) of the exterior product
+//GOD1PRF:655663 defined in Example 2 of section 3. Consequently (33) becomes
+//GOD1PRF:655879 and since the forms $u_{i_{1} \ldots i_{p}}$ are alternating (Example 2), it follows that $f$ is an alternating $p$-linear form. This completes the proof.\\
 Admitted.
 
 //GOD1:657642 family_coordinate_matrix : "the #10-by-#11 coordinate matrix of the vector family #13 in the basis #12" | $([#13_j]_{#12,i})_{i,j}$
@@ -40659,6 +41039,16 @@ Theorem god1_s23_theorem10_linear_independence_by_alternating_form_and_minor :
           (family_coordinate_matrix K addK mulK
             X addX smulX n p a x))
         <> ring_zero K addK).
+let K addK mulK X addX smulX n.
+assume hn.
+let p.
+assume hp.
+let a x.
+assume hField hBasis.
+apply andI.
+//GOD1PRF:658386 In the notation of the last section, the determinants of the submatrices of order $p$ in this matrix are the scalars $u_{i_{1} \ldots i_{p}}\left(x_{1}, \ldots, x_{p}\right)$. If one at least of them is non-zero, it is clear that condition $b$ ) will be satisfied, with $f=u_{i_{1} \ldots i_{p}}$ for a suitable choice of the indices $i_{1}, \ldots, i_{p}$. Hence $c$ ) implies $b$ ). Also $b$ ) implies $a$ ), by Theorem 4.
+//GOD1PRF:658812 If condition $a$ ) is satisfied, there exists a basis of X which begins with the vectors $x_{1}, \ldots, x_{p}$, and hence by (39) there exists an alternating $p$-linear form which takes a non-zero value at $\left(x_{1}, \ldots, x_{p}\right) \in \mathrm{X}^{p}$. Hence $a$ ) implies $b$ ).
+//GOD1PRF:659103 Finally, $b$ ) implies $c$ ). For the formula (37) shows that if $f\left(x_{1}, \ldots, x_{p}\right)$ is not zero, then at least one of the scalars $u_{i_{1} \ldots i_{p}}\left(x_{1}, \ldots, x_{p}\right)$ is non-zero, and this is precisely the assertion c).\\
 Admitted.
 
 //GOD1:662750 augmented_consistency_matrix : "the augmented leading coefficient matrix with final row #7" | $[A_{1..r,1..r}\mid b;A_{#7,1..r}\mid b_{#7}]$
@@ -40689,6 +41079,30 @@ Theorem god1_s23_theorem11_consistency_by_augmented_determinants :
       matrix_determinant K add mul (ordsucc r)
         (augmented_consistency_matrix r A b j)
       = ring_zero K add).
+let K add mul n.
+assume hn.
+let p.
+assume hp.
+let r.
+assume hr.
+let A.
+assume hA.
+let b.
+assume hb hField hrn hrp hRank hLeadingMinor.
+apply iffI.
+//GOD1PRF:663184 First of all, Theorem 5 of § 19 shows that, for the system (41) to have a solution, it is necessary and sufficient that the same should be true of the system
+//GOD1PRF:663452 for all integers $j$ such that $r+1 \leqslant j \leqslant n$. It is therefore sufficient to prove Theorem 11 in the particular case $n=r+1$, and from now on we shall assume that this is the case.
+//GOD1PRF:663649 If the system (41) has solutions, then they are obtained by solving the first $r$ equations, and since the hypothesis (42) shows that the system of linear equations
+//GOD1PRF:663996 is a Cramer system (§ 20, Theorem 2; or Theorem 8, Corollary 4 in this Chapter), it follows that we may assign arbitrary values to the unknowns $\xi_{r+1}, \ldots, \xi_{p}$ in the system (41) (§ 20, Section 5). In particular, if the system (41) has a solution, then it has one for which
+//GOD1PRF:664321 and the converse of this statement is of course trivial. In the case $n=r+1$ which concerns us, we have therefore to express that the system
+//GOD1PRF:664877 of $r+1$ equations in $r$ unknowns, of rank $r$, has at least one solution, and to show that this will be the case if and only if
+//GOD1PRF:665322 Now the condition (44) also expresses that the system
+//GOD1PRF:665806 has a non-trivial solution (Theorem 8, Corollary 3); we are therefore reduced to showing that, if (42) is satisfied, the existence of a solution of (43) is equivalent to the existence of a non-trivial solution of (45).
+//GOD1PRF:666026 First, it is clear that the first statement implies the second, for if $\left(\xi_{1}, \ldots, \xi_{r}\right)$ is a solution of (43), then $\left(\xi_{1}, \ldots, \xi_{r},-1\right)$ is a non-trivial solution of (45).
+//GOD1PRF:666244 Conversely, consider a non-trivial solution $\left(\eta_{1}, \ldots, \eta_{r+1}\right)$ of (45). Then we must have
+//GOD1PRF:666426 for if $\eta_{r+1}=0$ it is clear that $\left(\eta_{1}, \ldots, \eta_{r}\right)$ would be a non-trivial solution of the homogeneous system associated with (43), and a fortiori of the system
+//GOD1PRF:666855 contrary to (42) and Theorem 8, Corollary 3. Thus by (46) we may divide the equations (45) through by $\eta_{r+1}$, and then we see that the scalars
+//GOD1PRF:667076 satisfy (43). This completes the proof.\\
 Admitted.
 
 (** § 24. Determinants. **)
@@ -40738,6 +41152,15 @@ Theorem god1_s24_fundamental_determinant_properties :
           (matrix_add_linear_combination_to_column
             K add mul n A j (fun k => coeff k))
         = matrix_determinant K add mul n A.
+let K add mul.
+let n.
+assume hn hRing.
+apply andI.
+//GOD1PRF:679138 are the vectors represented by the columns of the matrix X , then we have
+//GOD1PRF:679317 where $\mathrm{D}\left(x_{1}, \ldots, x_{n}\right)$ denotes the determinant of the vectors $x_{j}$ with respect to the canonical basis of $\mathrm{K}^{n}$.
+//GOD1PRF:679474 It follows immediately from this that the determinant of X is an alternating multilinear function of the columns of X . This gives rise to the following rules, which are important in practical calculations:\\
+//GOD1PRF:679683 a) A determinant which has two columns equal is zero.
+//GOD1PRF:681510 These properties $c$ ) and $d$ ) are just translations of the relations (3) and (4) of § 21.\\
 Admitted.
 
 //GOD1:687075 skip_ordinal_index : "the increasing enumeration of #1 with the index #2 omitted" | $[k\mapsto k]_{#1\setminus\{#2\}}$
@@ -40780,6 +41203,20 @@ Theorem god1_s24_theorem1_laplace_expansion_along_row_or_column :
       = ring_finite_sum K add (ordsucc n)
         (fun j => mul (matrix_entry A i j)
           (matrix_cofactor K add mul n i j A)).
+let K add mul.
+let n.
+assume hn.
+let A.
+assume hA hRing.
+apply andI.
+//GOD1PRF:685385 where $u$ is a fixed element of $\mathrm{K}^{n}$ and D denotes the determinant with respect to the canonical basis. Since D is alternating and $n$-linear, it is clear that $f$ is alternating and ( $n-1$ )-linear. Putting
+//GOD1PRF:685676 On the other hand, the expression (2) is the determinant of order $n-1$ formed by the coordinates with index $\neq i$ of the vectors $x_{1}, \ldots, x_{n-1}$. It remains to calculate
+//GOD1PRF:686251 since $u$ is the sum of the vector $\alpha_{i} e_{i}$ and a linear combination of the vectors $e_{1}, \ldots$, $e_{i-1}, e_{i+1}, \ldots, e_{n}$, we may replace $u$ in the above expressions by $\alpha_{i} e_{i}$, and thus we obtain
+//GOD1PRF:686809 Hence
+//GOD1PRF:686924 Putting these results into (1) we obtain the identity
+//GOD1PRF:687498 for each integer $j$ such that $1 \leqslant j \leqslant n$.\\
+//GOD1PRF:688045 Since $\operatorname{det}\left({ }^{\mathrm{t}} \mathrm{X}\right)=\operatorname{det}(\mathrm{X})$, we have also a formula
+//GOD1PRF:688328 called the expansion of $\operatorname{det}(\mathrm{X})$ along the $i$ th row of X .
 Admitted.
 
 //GOD1:690072 upper_triangular_matrix : "the square matrix #5 is upper triangular" | $#5_{ij}=0\text{ for }j<i$
@@ -40797,6 +41234,14 @@ Theorem god1_s24_example2_determinant_of_upper_triangular_matrix :
     upper_triangular_matrix K add n A ->
     matrix_determinant K add mul n A
     = ring_finite_product K add mul n (fun i => matrix_entry A i i).
+let K add mul.
+let n.
+assume hn.
+let A.
+assume hA hRing hTriangular.
+//GOD1PRF:689730 expanding $\mathbf{X}$ along its first column we find that
+//GOD1PRF:690028 and hence, by induction on $n$, that
+//GOD1PRF:690149 the product of the diagonal terms of X .\\
 Admitted.
 
 Theorem god1_s24_example2_determinant_of_two_block_upper_triangular_matrix :
@@ -40812,6 +41257,20 @@ Theorem god1_s24_example2_determinant_of_two_block_upper_triangular_matrix :
       (matrix_determinant K add mul q
         (matrix_submatrix q q
           (fun i => p + i) (fun j => p + j) A)).
+let K add mul p.
+assume hp.
+let q.
+assume hq.
+let A.
+assume hA hRing hBlockZero.
+//GOD1PRF:690814 | To prove this result it is enough, arguing by induction on $p$, to prove it when $p=2$, i.e., to show that
+//GOD1PRF:691058 where A is a square matrix of order $p, \mathrm{D}$ a square matrix of order $q$, and B a square matrix with $p$ rows and $q$ columns. For this purpose let $u$ be the endomorphism of the module $\mathrm{K}^{p+q}$ whose matrix is X relative to the canonical basis $\left(e_{1}, \ldots, e_{p+q}\right)$. Let E be the subspace generated by $e_{1}, \ldots, e_{p}$ and $\mathbf{F}$ the subspace generated by $e_{p+1}, \ldots, e_{p+q}$, so that
+//GOD1PRF:691554 and let $v$ be the endomorphism of E whose matrix is A with respect to the basis ( $e_{1}, \ldots, e_{p}$ ) of $\mathrm{E}, w$ the endomorphism of F whose matrix is D with respect to the basis $\left(e_{p+1}, \ldots, e_{p+q}\right)$ of $\mathbf{F}$, and $\mathbf{D}\left(x_{1}, \ldots, x_{p+q}\right)$ the determinant of $p+q$ variable vectors $x_{i}$ with respect to the basis ( $e_{1}, \ldots, e_{p+q}$ ) of $\mathrm{K}^{p+q}$. Then we have
+//GOD1PRF:692454 Now if $b_{p+1}, \ldots, b_{p+q}$ are given, the expression
+//GOD1PRF:692593 in which $x_{1}, \ldots, x_{p} \in \mathrm{E}$, is an alternating $p$-linear form on E , and therefore (§ 23, section 5, formula (29)) we have
+//GOD1PRF:693235 for suitable vectors $a_{p+j} \in \mathrm{E}(1 \leqslant j \leqslant q)$; hence
+//GOD1PRF:693620 since the $a_{p+j} \in \mathrm{E}$ are linear combinations of $e_{1}, \ldots, e_{p}$ (use rule $e$ ) of section 1 , for example). But an argument similar to that given above shows that
+//GOD1PRF:693986 and since $\operatorname{det}(w)=\operatorname{det}(\mathrm{D})$ we have proved that
 Admitted.
 
 //GOD1:694957 matrix_adjugate : "the adjugate matrix of #5" | $\widetilde{#5}$
@@ -40838,6 +41297,17 @@ Theorem god1_s24_theorem2_adjugate_identity :
     = matrix_left_scalar K mul (ordsucc n) (ordsucc n)
       (matrix_determinant K add mul (ordsucc n) A)
       (unit_matrix K add mul (ordsucc n)).
+let K add mul.
+let n.
+assume hn.
+let A.
+assume hA hRing.
+apply andI.
+//GOD1PRF:695207 To show for example that $\widetilde{\mathrm{X}} . \mathrm{X}=\operatorname{det}(\mathrm{X}) .1_{n}$, i.e., that $\widetilde{\mathrm{X}} . \mathrm{X}$ is the diagonal matrix all of whose diagonal entries are equal to $\operatorname{det}(\mathrm{X})$, we have to show that
+//GOD1PRF:695657 Now the left-hand side of (10) is equal to
+//GOD1PRF:695787 from (7), this expression is precisely the determinant of the matrix obtained by replacing the terms $\check{\zeta}_{1 i}, \ldots, \check{\zeta}_{n i}$ of the $i$ th column of X by the scalars $\check{\zeta}_{1 k}, \ldots, \check{\zeta}_{n k}$. If $i \neq k$ the resulting matrix has two equal columns (the $i$ th and the $k$ th), and therefore its determinant is zero. If $i=k$, the new matrix is just X itself. This proves (10) and hence the formula
+//GOD1PRF:696328 The proof of the formula
+//GOD1PRF:696413 is analogous; we have to use rows instead of columns, and (8) instead of (7).
 Admitted.
 
 Theorem god1_s24_theorem2_corollary1_invertible_iff_determinant_unit :
@@ -40854,6 +41324,15 @@ Theorem god1_s24_theorem2_corollary1_invertible_iff_determinant_unit :
         (ring_inverse K add mul
           (matrix_determinant K add mul (ordsucc n) A))
         (matrix_adjugate K add mul n A)).
+let K add mul.
+let n.
+assume hn.
+let A.
+assume hA hRing.
+apply andI.
+//GOD1PRF:696830 If X is invertible, then Theorem 7 of § 23 shows that
+//GOD1PRF:697081 so that $\operatorname{det}(\mathrm{X})$ is an invertible element of K . Conversely, if this condition is satisfied, Theorem 2 shows that the matrix
+//GOD1PRF:697303 is the inverse of X .\\
 Admitted.
 
 Theorem god1_s24_theorem2_corollary2_basis_iff_determinant_unit :
@@ -40866,6 +41345,13 @@ Theorem god1_s24_theorem2_corollary2_basis_iff_determinant_unit :
     <-> ring_unit K addK mulK
       (determinant_of_vectors_in_basis
         K addK mulK X addX smulX n a x)).
+let K addK mulK X addX smulX.
+let n.
+assume hn.
+let a x.
+assume hRing hBasis.
+apply iffI.
+//GOD1PRF:697808 For we have to express that the coordinates of the $x_{i}$ with respect to the given basis form a matrix which is invertible in the ring $\mathbf{M}_{n}(\mathbf{K})$.
 Admitted.
 
 //GOD1:700191 matrix_replace_column : "the matrix obtained from #6 by replacing column #7 by #8" | $#6[#7\leftarrow #8]$
@@ -40891,6 +41377,18 @@ Theorem god1_s24_cramer_formulae :
           (ring_inverse K add mul (matrix_determinant K add mul n A))
           (matrix_determinant K add mul n
             (matrix_replace_column n A i b)).
+let K add mul.
+let n.
+assume hn.
+let A.
+assume hA.
+let b.
+assume hb hRing hUnit.
+apply andI.
+//GOD1PRF:699329 Now in the last section (Theorem 2, Corollary 1) we have given an explicit formula for calculating the inverse of A; making use of this formula, the solution of (12) is
+//GOD1PRF:699576 or, explicitly,
+//GOD1PRF:699730 where $\mathbf{A}_{j i}$ is the matrix obtained from $\mathbf{A}$ by deleting the $j$ th row and the $i$ th column. But, by Theorem 1, the right-hand side of this formula is just the determinant of the matrix obtained from A by replacing the elements $\alpha_{1 i}, \ldots, \alpha_{n i}$ of the $i$ th column of A by the constant terms $\beta_{1}, \ldots, \beta_{n}$ of the equations (12). Hence the solution of the Cramer system (12) is given by the formulae
+//GOD1PRF:700191 These are Cramer's formulae.
 Admitted.
 
 (** § 25. Affine spaces. **)
@@ -40902,6 +41400,7 @@ Definition affine_space :
   set -> (set -> set -> set) -> prop :=
   fun K addK mulK T addT smulT E action =>
     left_vector_space K addK mulK T addT smulT
+    /\ E <> 0
     /\ (forall s :e T, forall P :e E, action s P :e E)
     /\ (forall s t :e T, forall P :e E,
       action s (action t P) = action (addT s t) P)
@@ -40954,6 +41453,16 @@ Theorem god1_affine_space_with_origin_is_vector_space :
       (affine_origin_addition T addT E action O)
       (affine_origin_scalar T smulT E action O)
       (fun s => action s O).
+let K addK mulK T addT smulT E action O.
+assume hO hAffine.
+apply andI.
+//GOD1PRF:722738 We shall now show that E , endowed with these operations, is a vector space isomorphic to T .
+//GOD1PRF:722833 Consider the mapping $f: \mathrm{T} \rightarrow \mathrm{E}$ defined by
+//GOD1PRF:722932 it is bijective by (AS 3).
+//GOD1PRF:723329 f(s+t)=f(s)+f(t) .
+//GOD1PRF:723352 A similar calculation based on (3) shows that
+//GOD1PRF:723402 f(\lambda s)=\lambda . f(s) .
+//GOD1PRF:723436 Hence, because the vector space axioms are satisfied in T , and because $f$ is a bijection of T onto E , it is clear that the vector space axioms are satisfied in E , and that $f$ is an isomorphism of vector spaces.
 Admitted.
 
 //GOD1:727842 affine_coefficients_sum_one : "the coefficient family #4 indexed by #3 has sum one in #1" | $\sum_i#4_i=1$
@@ -40990,6 +41499,19 @@ Theorem god1_affine_barycenter_is_origin_independent :
       = module_finitely_supported_sum T addT I
         (fun i => smulT (coeff i)
           (affine_difference T E action O (P i))).
+let K addK mulK T addT smulT E action I P coeff.
+assume hAffine hI hP hCoeff.
+let O.
+assume hO.
+//GOD1PRF:725662 Now if A, B, C are any three points of E we have always
+//GOD1PRF:725836 for if we put $s=\mathrm{A}-\mathrm{B}$ and $t=\mathrm{B}-\mathrm{C}$ we have $\mathrm{A}=s+\mathrm{B}$ and $\mathrm{B}=t+\mathrm{C}$, so that
+//GOD1PRF:726032 by axiom (AS 1), and therefore $\mathbf{A}-\mathbf{C}=s+t$ as asserted. Hence we have
+//GOD1PRF:726122 \mathrm{P}_{i}-\mathrm{O}^{\prime}=\left(\mathrm{P}_{i}-\mathrm{O}\right)+\left(\mathrm{O}-\mathrm{O}^{\prime}\right)
+//GOD1PRF:726889 since $\mathrm{P}^{\prime}-\mathrm{O}^{\prime}=\left(\mathrm{P}^{\prime}-\mathrm{O}\right)+\left(\mathrm{O}-\mathrm{O}^{\prime}\right)$, we obtain
+//GOD1PRF:727190 since $\mathbf{P}^{\prime}-\mathbf{O}=\left(\mathbf{P}^{\prime}-\mathbf{P}\right)+(\mathbf{P}-\mathbf{O})$, we therefore end up with
+//GOD1PRF:727343 \mathrm{P}^{\prime}-\mathrm{P}=\left(\lambda_{1}+\cdots+\lambda_{n}-1\right) .\left(\mathrm{O}-\mathrm{O}^{\prime}\right) . \tag{7}
+//GOD1PRF:727493 This formula shows that in general $\mathbf{P} \neq \mathbf{P}^{\prime}$, in other words that the vector space structure in E depends effectively on the choice of origin O in E. However, (7) also shows that we shall have $\mathrm{P}=\mathrm{P}^{\prime}$ provided that
+//GOD1PRF:727842 and therefore when this condition (8) is satisfied, the point $\lambda_{1} \mathrm{P}_{1}+\cdots+\lambda_{n} \mathrm{P}_{n}$ (which was originally defined by choosing an origin O in E ) is in fact independent of the choice of O, and therefore has an "intrinsic" or "canonical" significance. It is called the barycentre (or centre of mass) of the points $\mathrm{P}_{1}, \ldots, \mathrm{P}_{n}$ with masses $\lambda_{1}, \ldots, \lambda_{n}$.
 Admitted.
 
 Theorem god1_affine_barycenter_distributive_law :
@@ -41010,6 +41532,17 @@ Theorem god1_affine_barycenter_distributive_law :
     = affine_barycenter T addT smulT E action (I :*: J)
       (fun u => P (u 0) (u 1))
       (fun u => mulK (mu (u 0)) (lambda (u 0) (u 1))).
+let K addK mulK T addT smulT E action I J P mu lambda.
+assume hAffine hI hJ hP hMu hLambda.
+//GOD1PRF:731641 The following distributive law for barycentres is often useful:
+//GOD1PRF:731725 \sum_{i} \mu_{i} \sum_{j} \lambda_{i j} \mathrm{P}_{i j}=\sum_{i, j} \mu_{i} \lambda_{i j} . \mathrm{P}_{i j} ; \tag{10}
+//GOD1PRF:731864 this is valid whenever it has a meaning, i.e., whenever the scalars $\mu_{i}, \lambda_{i j}$ satisfy
+//GOD1PRF:732097 \sum_{i, j} \mu_{i} \lambda_{i j}=1,
+//GOD1PRF:732138 so that the right-hand side of (10) is defined.) To prove (10) it is enough to show that, if $O$ is any point of $E$,
+//GOD1PRF:732260 \sum_{i} \mu_{i}\left(\sum_{j} \lambda_{i j} \cdot \mathrm{P}_{i j}-\mathrm{O}\right)=\sum_{i, j} \mu_{i} \lambda_{i j}\left(\mathrm{P}_{i j}-\mathrm{O}\right) ;
+//GOD1PRF:732426 but by definition we have
+//GOD1PRF:732456 \sum_{j} \lambda_{i j} \cdot \mathrm{P}_{i j}-\mathrm{O}=\sum_{j} \lambda_{i j}\left(\mathrm{P}_{i j}-\mathrm{O}\right),
+//GOD1PRF:732581 so that (10) reduces to the distributive law in the vector space T .
 Admitted.
 
 //GOD1:732701 affine_linear_variety : "#9 is a linear variety in the affine space #7" | $#9\subseteq_{\mathrm{aff}}#7$
@@ -41071,6 +41604,24 @@ Theorem god1_s25_theorem1_characterization_of_nonempty_linear_varieties :
         = affine_director_subspace T E action V)
       /\ affine_director_subspace T E action V
         = {s :e T|forall P :e V, action s P :e V}).
+let K addK mulK T addT smulT E action V.
+assume hAffine hVE hV.
+apply andI.
+//GOD1PRF:736840 We start by proving that $a$ ) implies $b$ ). We have to show that, for all $\mathrm{Q}, \mathrm{R} \in \mathrm{V}$ and scalars $\lambda, \mu \in \mathrm{K}$, there exists $\mathrm{S} \in \mathrm{V}$ such that
+//GOD1PRF:737054 \mathrm{S}-\mathrm{P}_{0}=\lambda\left(\mathrm{Q}-\mathrm{P}_{0}\right)+\mu\left(\mathrm{R}-\mathrm{P}_{0}\right)
+//GOD1PRF:737172 which is equivalent to
+//GOD1PRF:737199 \mathrm{S}-\mathrm{P}_{0}=\lambda\left(\mathrm{Q}-\mathrm{P}_{0}\right)+\mu\left(\mathrm{R}-\mathrm{P}_{0}\right)+(1-\lambda-\mu)\left(\mathrm{P}_{0}-\mathrm{P}_{0}\right)
+//GOD1PRF:737479 Since V is a linear variety, the point S given by this relation does lie in V .\\
+//GOD1PRF:737561 That $b$ ) implies $c$ ) is trivial ; we shall next prove that $c$ ) implies $a$ ). Consider the point
+//GOD1PRF:737785 we have to show that $P \in V$ whenever $P_{1}, \ldots, P_{n} \in V$. Now we have
+//GOD1PRF:737871 \mathrm{P}-\mathrm{P}_{0}=\Sigma \lambda_{i}\left(\mathrm{P}_{i}-\mathrm{P}_{0}\right) ;
+//GOD1PRF:737964 if $V$ contains the $P_{i}$, the hypothesis $c$ ) shows that $P-P_{0}=P^{\prime}-P_{0}$ for some $P^{\prime} \in V$, and this evidently implies that $P=P^{\prime}$. Hence $P \in V$, as required.
+//GOD1PRF:738160 Next, we must show that if V is a non-empty linear variety, then the subspace of T consisting of all vectors $P-P_{0}(P \in V)$ does not depend on the choice of $P_{0} \in V$.
+//GOD1PRF:738337 Let $\mathrm{H}_{0}$ be the vector subspace of T corresponding in this way to $\mathrm{P}_{0} \in \mathrm{~V}$, and let $H_{1}$ be the subspace of $T$ corresponding to another point $P_{1} \in V$. Then, for all $P \in V$, we have
+//GOD1PRF:738571 \mathrm{P}-\mathrm{P}_{0}=\left(\mathrm{P}-\mathrm{P}_{1}\right)+\left(\mathrm{P}_{1}-\mathrm{P}_{0}\right)=\left(\mathrm{P}-\mathrm{P}_{1}\right)-\left(\mathrm{P}_{0}-\mathrm{P}_{1}\right) .
+//GOD1PRF:738767 Since by definition $H_{1}$ contains $P-P_{1}$ and $P_{0}-P_{1}$, it contains $P-P_{0}$, and therefore $\mathrm{H}_{0} \subset \mathrm{H}_{1}$. Similarly $\mathrm{H}_{1} \subset \mathrm{H}_{0}$, and therefore $\mathrm{H}_{0}=\mathrm{H}_{1}$.
+//GOD1PRF:739010 Hence the vector subspace consisting of all vectors $\mathrm{P}-\mathrm{P}_{0}(\mathrm{P} \in \mathrm{V})$ is independent of the choice of $P_{0} \in V$; let us denote this subspace by $H$. It is clear that $H$ is the set of all vectors $\mathrm{P}-\mathrm{Q}$, where $\mathrm{P}, \mathrm{Q}$ run through V . Let $s \in \mathrm{H}$ and $\mathrm{P} \in \mathrm{V}$. Taking P to be $\mathrm{P}_{0}$, we see that there exists $\mathrm{Q} \in \mathrm{V}$ such that $s=\mathrm{Q}-\mathrm{P}$, i.e., $\mathrm{Q}=s+\mathrm{P}$. Hence $s+\mathrm{P} \in \mathrm{V}$ for all $s \in \mathrm{H}$ and all $\mathrm{P} \in \mathrm{V}$.
+//GOD1PRF:739632 Conversely, consider an element $s \in \mathrm{~T}$ such that $s+\mathrm{P} \in \mathrm{V}$ for all $\mathrm{P} \in \mathrm{V}$. Choose $\mathrm{P} \in \mathrm{V}$ and put $s+\mathrm{P}=\mathrm{Q}$; then $\mathrm{Q} \in \mathrm{V}$ and $s=\mathrm{Q}-\mathrm{P}$, and hence $s \in \mathrm{H}$. The proof is now complete.\\
 Admitted.
 
 Theorem god1_linear_varieties_with_same_director_are_translates :
@@ -41085,6 +41636,11 @@ Theorem god1_linear_varieties_with_same_director_are_translates :
       = affine_director_subspace T E action W ->
     exists s :e T,
       {action s P|P :e V} = W.
+let K addK mulK T addT smulT E action V W.
+assume hAffine hV hW hVne hWne hDirector.
+//GOD1PRF:740115 Knowledge of H is not sufficient to determine V uniquely. But if two non-empty linear varieties $\mathrm{V}^{\prime}$ and $\mathrm{V}^{\prime \prime}$ have the same director subspace H in T , then there exists a translation in $E$ which maps $V^{\prime}$ onto $V^{\prime \prime}$. To see this, choose a point $P^{\prime} \in V^{\prime}$ and a point $\mathrm{P}^{\prime \prime} \in \mathrm{V}^{\prime \prime}$, and consider the vector $a=\mathrm{P}^{\prime \prime}-\mathrm{P}^{\prime}$. A point $\mathrm{P} \in \mathrm{V}$ lies in $\mathrm{V}^{\prime}$ if and only if $\mathrm{P}-\mathrm{P}^{\prime} \in \mathrm{H}$; since
+//GOD1PRF:740741 \mathrm{P}-\mathrm{P}^{\prime}=(\mathrm{P}+a)-\mathrm{P}^{\prime \prime}
+//GOD1PRF:740818 and since H is also the director subspace of $\mathrm{V}^{\prime \prime}$, it follows that the relations $\mathrm{P} \in \mathrm{V}^{\prime}$ and $\mathrm{P}+a \in \mathrm{~V}^{\prime \prime}$ are equivalent; in other words, the translation $\mathrm{P} \rightarrow \mathrm{P}+a$ maps $\mathrm{V}^{\prime}$ onto $\mathrm{V}^{\prime \prime}$.
 Admitted.
 
 //GOD1:744870 affine_line : "the line joining the points #9 and #10" | $\overline{#9#10}$
@@ -41106,6 +41662,19 @@ Theorem god1_s25_theorem2_generation_of_linear_variety_by_lines :
     (affine_linear_variety K addK mulK T addT smulT E action V
     <-> forall P Q :e V, P <> Q ->
       affine_line K addK mulK T addT smulT E action P Q c= V).
+let K addK mulK T addT smulT E action V.
+assume hAffine hChar hVE.
+apply iffI.
+//GOD1PRF:745791 Suppose that V is a linear variety. If V contains two distinct points $\mathrm{P}, \mathrm{Q}$, then V also contains the linear variety generated by P and Q (Example 10), i.e., the line joining $P$ and $Q$.
+//GOD1PRF:745999 Conversely, suppose that this condition is satisfied. Since the empty set is a linear variety, we may assume that $V$ is not empty. Choosing a point $P_{0} \in V$, we have (by Theorem 1) to show that the set of vectors $\mathrm{Q}-\mathrm{P}_{0}$, where $\mathrm{Q} \in \mathrm{V}$, is a vector subspace of T , i.e., that for all choices of scalars $\lambda, \mu \in \mathrm{K}$ and points $\mathrm{Q}, \mathrm{R} \in \mathrm{V}$, there exists $S \in V$ such that
+//GOD1PRF:746467 \mathrm{S}-\mathrm{P}_{0}=\lambda\left(\mathrm{Q}-\mathrm{P}_{0}\right)+\mu\left(\mathrm{R}-\mathrm{P}_{0}\right) .
+//GOD1PRF:746587 But the point S defined by this formula is clearly
+//GOD1PRF:746642 \mathbf{S}=\lambda \mathbf{Q}+\mu \mathbf{R}+(1-\lambda-\mu) \mathbf{P}_{\mathbf{0}} .
+//GOD1PRF:746733 Hence, changing the notation, we are reduced to showing that, for all points $\mathrm{P}, \mathrm{Q}, \mathrm{R} \in \mathrm{V}$ and all scalars $\lambda, \mu, v, \in \mathrm{~K}$ such that
+//GOD1PRF:747069 Now, because the characteristic of K is not 2 , we have $2 \neq 0$ and therefore $3 \neq 1$ in K; hence it cannot happen that $\lambda=\mu=\nu=1$, and we may therefore suppose that $\lambda \neq 1$, for example. Then $1-\lambda$ is invertible, and formula (10) of section 4 enables us to write
+//GOD1PRF:747367 \lambda \mathbf{P}+\mu \mathbf{Q}+\nu \mathbf{R}=\lambda \mathbf{P}+(1-\lambda) \mathbf{M},
+//GOD1PRF:747473 \mathbf{M}=\frac{\mu}{1-\lambda} \mathbf{Q}+\frac{v}{1-\lambda} \mathbf{R} .
+//GOD1PRF:747554 If $Q=R$, we have $M=Q=R$, so that $M \in V$. If $Q \neq R$, the point $M$ is on the line joining $Q$ and $R$, hence $M \in V$ by hypothesis. So $M \in V$ in all cases. The same argument then shows that V contains the point $\lambda \mathrm{P}+(1-\lambda) \mathrm{M}$, and this completes the proof. \(\square\)\\
 Admitted.
 
 //GOD1:749545 affine_space_dimension : "the dimension of the affine space #7" | $\dim(#7)$
@@ -41163,6 +41732,7 @@ Theorem god1_s25_theorem3_affine_basis_spanning_characterization :
   forall E, forall action:set -> set -> set,
   forall n :e omega, forall P:set -> set,
     affine_space K addK mulK T addT smulT E action ->
+    finite_dimensional_vector_space K addK mulK T addT smulT ->
     affine_space_dimension K addK mulK T addT smulT E = n ->
     (forall i :e ordsucc n, P i :e E) ->
     (affine_basis K addK mulK T addT smulT E action n P
@@ -41171,6 +41741,18 @@ Theorem god1_s25_theorem3_affine_basis_spanning_characterization :
     <-> forall V,
       affine_linear_variety K addK mulK T addT smulT E action V ->
       (forall i :e ordsucc n, P i :e V) -> V = E).
+let K addK mulK T addT smulT E action.
+let n.
+assume hn.
+let P.
+assume hAffine hFinite hDim hP.
+apply andI.
+//GOD1PRF:748193 Let T be a vector space over a division ring K , and let E be an affine space associated with T . The affine space E is said to be finite-dimensional if T is finite-dimensional\\
+//GOD1PRF:751442 Let E be an affine space associated with a finite-dimensional vector space T . We have seen above that points $\mathrm{P}_{0}, \ldots, \mathrm{P}_{n} \in \mathrm{E}$ form an affine basis of E if and only if the vectors $\mathrm{P}_{i}-\mathrm{P}_{0}(1 \leqslant i \leqslant n)$ form a basis of T . It follows immediately that all affine bases of $E$ have the same number of points, namely $n+1$, where $n=\operatorname{dim}(E)$.
+//GOD1PRF:751872 The vectors $\mathrm{P}_{i}-\mathrm{P}_{0}(1 \leqslant i \leqslant n)$ form a basis of T if and only if they generate T (§ 19, Theorem 10), i.e., if and only if every $\mathrm{P} \in \mathrm{E}$ can be written in at least one way in the form
+//GOD1PRF:752119 \mathrm{P}=\sum_{i=0}^{n} \xi_{i} \mathrm{P}_{i}, \quad \text { with } \quad \sum_{i=0}^{n} \xi_{i}=1,
+//GOD1PRF:752226 or, equivalently, if and only if the linear variety generated by the $\mathrm{P}_{i}$ is the whole of E . Since this linear variety is the smallest one which contains the $P_{i}$, we have the following result:
+//GOD1PRF:752437 THEOREM 3. Let E be an affine space of dimension $n$ over a division ring K . In order that $n+1$ points of E should form an affine basis of E , it is necessary and sufficient that they should not be contained in any linear variety other than E itself.
 Admitted.
 
 Theorem god1_affine_variety_dimension_monotonicity :
@@ -41178,6 +41760,7 @@ Theorem god1_affine_variety_dimension_monotonicity :
   forall T, forall addT smulT:set -> set -> set,
   forall E, forall action:set -> set -> set, forall V W,
     affine_space K addK mulK T addT smulT E action ->
+    finite_dimensional_vector_space K addK mulK T addT smulT ->
     affine_linear_variety K addK mulK T addT smulT E action V ->
     affine_linear_variety K addK mulK T addT smulT E action W ->
     V <> 0 -> V c= W ->
@@ -41186,6 +41769,14 @@ Theorem god1_affine_variety_dimension_monotonicity :
     /\ (affine_variety_dimension K addK mulK T addT smulT E action V
       = affine_variety_dimension K addK mulK T addT smulT E action W
       <-> V = W).
+let K addK mulK T addT smulT E action V W.
+assume hAffine hFinite hV hW hVne hVW.
+apply andI.
+//GOD1PRF:748193 Let T be a vector space over a division ring K , and let E be an affine space associated with T . The affine space E is said to be finite-dimensional if T is finite-dimensional\\
+//GOD1PRF:750692 Remark 5. Let V be a non-empty linear variety in E . We have seen (Remark 2) that we may regard $V$ as an affine space in its own right, associated with its director subspace $H$. The dimension of the linear variety $V$ is therefore defined to be the dimension of $H$. If $V$ is generated by points $\mathrm{P}_{0}, \ldots, \mathrm{P}_{n}$, then by Remark 3 the dimension of V is equal to the rank of the family of vectors $\mathrm{P}_{i}-\mathrm{P}_{0}(1 \leqslant i \leqslant n)$.
+//GOD1PRF:751176 Let $\mathrm{V}, \mathrm{W}$ be two linear varieties in E , such that $\mathrm{V} \subset \mathrm{W}$. Then we have
+//GOD1PRF:751296 \operatorname{dim}(V) \leqslant \operatorname{dim}(W)
+//GOD1PRF:751354 with equality if and only if $\mathrm{V}=\mathrm{W}$. The proof is left to the reader.
 Admitted.
 
 //GOD1:753757 affine_coordinate_matrix : "the affine-coordinate matrix of point family #13 in affine basis #12" | $([#13_j]_{#12,i}^{\mathrm{aff}})_{i,j}$
@@ -41213,6 +41804,40 @@ Theorem god1_s25_theorem4_rank_of_affine_coordinate_matrix :
     = ordsucc (affine_variety_dimension K addK mulK T addT smulT
       E action
       (affine_span K addK mulK T addT smulT E action (ordsucc n) Q)).
+let K addK mulK T addT smulT E action.
+let m.
+assume hm.
+let n.
+assume hn.
+let P Q.
+assume hAffine hBasis hQ.
+//GOD1PRF:754264 By Remark 5, the dimension $r$ is equal to the rank of the family of vectors
+//GOD1PRF:754345 \mathrm{Q}_{j}-\mathrm{Q}_{0}(1 \leqslant j \leqslant n) .
+//GOD1PRF:754408 Now we have
+//GOD1PRF:754440 \mathrm{Q}_{j}-\mathrm{Q}_{0}=\left(\mathrm{Q}_{j}-\mathrm{P}_{0}\right)-\left(\mathrm{Q}_{0}-\mathrm{P}_{0}\right) & =\sum_{i} \alpha_{i j}\left(\mathrm{P}_{i}-\mathrm{P}_{0}\right)-\sum_{i} \alpha_{i 0}\left(\mathrm{P}_{i}-\mathrm{P}_{0}\right) \\
+//GOD1PRF:754690 & =\sum_{i=1}^{m}\left(\alpha_{i j}-\alpha_{i 0}\right) \cdot a_{i}
+//GOD1PRF:754871 form a basis of T. Consequently (§ 19, Theorem 15) the number $r$ is equal to the rank of the matrix
+//GOD1PRF:754977 \mathbf{A}^{\prime}=\left(\alpha_{i j}-\alpha_{i 0}\right)_{1 \leqslant i \leqslant m, 1 \leqslant j \leqslant n} .
+//GOD1PRF:755097 Hence it remains to be shown, using of course the relations
+//GOD1PRF:755177 \sum_{i=0}^{m} \alpha_{i j}=1 \quad(0 \leqslant j \leqslant n) \tag{14}
+//GOD1PRF:755267 between the affine coordinates of the points $Q_{j}$, that the rank of $A$ is equal to $1+\operatorname{rank}\left(\mathbf{A}^{\prime}\right)$.
+//GOD1PRF:755412 Consider the system of homogeneous linear equations
+//GOD1PRF:755744 The solutions of (15) form a subspace $M$ of $K^{m+1}$, and the solutions of (16) form a subspace N of $\mathrm{K}^{m}$. Since the matrix $\mathrm{A}^{\prime}$ has rank $r$, we have
+//GOD1PRF:755930 \operatorname{dim}(\mathrm{N})=m-r
+//GOD1PRF:755969 by § 19, Theorem 17. If we denote the rank of A by $s$, then we have likewise
+//GOD1PRF:756052 \operatorname{dim}(\mathrm{M})=m+1-s ;
+//GOD1PRF:756095 hence to show that $s=r+1$ it is enough to show that M and N have the same dimension, i.e., are isomorphic.
+//GOD1PRF:756204 Now, by adding up the equations (15) and using (14), we obtain
+//GOD1PRF:756271 \xi_{0}+\xi_{1}+\cdots+\xi_{m}=0,
+//GOD1PRF:756309 so that (15) implies that
+//GOD1PRF:756339 \sum_{j=1}^{n} \alpha_{i j} \xi_{j}-\alpha_{i 0}\left(\xi_{1}+\cdots+\xi_{m}\right)=0
+//GOD1PRF:756429 i.e.,
+//GOD1PRF:756439 \sum_{j=1}^{n}\left(\alpha_{i j}-\alpha_{i 0}\right) \xi_{j}=0 .
+//GOD1PRF:756508 Hence we obtain a mapping $u: \mathrm{M} \rightarrow \mathrm{N}$ by writing
+//GOD1PRF:756588 u\left(\xi_{0}, \ldots, \xi_{m}\right)=\left(\xi_{1}, \ldots, \xi_{m}\right) .
+//GOD1PRF:756671 Analogous considerations show that we can construct a mapping $v: \mathrm{N} \rightarrow \mathrm{M}$ by putting
+//GOD1PRF:756787 v\left(\eta_{1}, \ldots, \eta_{m}\right)=\left(-\eta_{1}-\cdots-\eta_{m}, \eta_{1}, \ldots, \eta_{m}\right) .
+//GOD1PRF:756901 It is now obvious that the mappings $u$ and $v$ are inverses of each other, i.e., are isomorphisms of M onto N and of N onto M . This completes the proof.
 Admitted.
 
 //GOD1:759058 affine_membership_coordinate_matrix : "the affine-coordinate matrix with first column #14 and remaining columns #13" | $[[#14]_{#12}^{\mathrm{aff}}\mid[#13]_{#12}^{\mathrm{aff}}]$
@@ -41233,6 +41858,7 @@ Theorem god1_affine_variety_equations_in_affine_coordinates :
   forall T, forall addT smulT:set -> set -> set,
   forall E, forall action:set -> set -> set,
   forall n m :e omega, forall P Q:set -> set, forall R :e E,
+    field K addK mulK ->
     affine_space K addK mulK T addT smulT E action ->
     affine_basis K addK mulK T addT smulT E action n P ->
     affinely_independent_family K addK mulK T addT smulT E action m Q ->
@@ -41246,6 +41872,21 @@ Theorem god1_affine_variety_equations_in_affine_coordinates :
           (affine_membership_coordinate_matrix K addK mulK
             T addT smulT E action n (ordsucc m) P Q R))
       = ring_zero K addK).
+let K addK mulK T addT smulT E action.
+let n.
+assume hn.
+let m.
+assume hm.
+let P Q R.
+assume hR hField hAffine hBasis hIndependent hmn.
+apply iffI.
+//GOD1PRF:757123 Let E be a finite-dimensional affine space over a field K , and let $\left(\mathrm{P}_{0}, \ldots, \mathrm{P}_{n}\right)$ be an affine basis of E . Consider $r$ independent points
+//GOD1PRF:757402 in E , and let V be the linear variety, of dimension $r-1$, which they generate. Let
+//GOD1PRF:757544 be any point of E . For P to belong to V it is necessary and sufficient that the linear variety W generated by $\mathrm{P}, \mathrm{Q}_{1}, \ldots, \mathrm{Q}_{r}$, should be of dimension $r-1$; for if $\mathrm{P} \in \mathrm{V}$ it is clear that $\mathrm{W}=\mathrm{V}$, so that $\operatorname{dim}(\mathrm{W})=r-1$; and conversely, if $\operatorname{dim}(\mathrm{W})=r-1$, we have $\mathrm{W} \subset \mathrm{V}$ in any case, hence $\mathrm{V}=\mathrm{W}$ and therefore $\mathrm{P} \in \mathrm{V}$.
+//GOD1PRF:758046 By Theorem 4, it therefore follows that $P \in V$ if and only if the matrix
+//GOD1PRF:758386 is of rank $r$; that is, since K is commutative, if and only if every square submatrix of order $s>r$ in this matrix has zero determinant (§ 23, section 8, Remark 5). Clearly we have only to express this condition for $s=r+1$. Hence $\mathrm{P} \in \mathrm{V}$ if and only if
+//GOD1PRF:758990 whenever
+//GOD1PRF:759003 0 \leqslant i_{0}<i_{1}<\cdots<i_{r} \leqslant n .
 Admitted.
 
 (** § 26. Algebraic relations. **)
