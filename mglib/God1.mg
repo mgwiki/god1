@@ -48950,6 +48950,926 @@ Definition int_mod_addition : set -> set -> set -> set :=
         (int_mod_representative p A)
         (int_mod_representative p B)).
 
+Theorem god1_int_mod_class_member_self :
+  forall p :e omega, forall x :e int,
+    x :e int_mod_class p x.
+let p.
+assume hp.
+let x.
+assume hx.
+exact (SepI int
+  (fun y => exists k :e int, y = add_SNo x (mul_SNo p k)) x hx
+  (ex_intro
+    (fun k => k :e int /\ x = add_SNo x (mul_SNo p k)) 0
+    (andI (0 :e int) (x = add_SNo x (mul_SNo p 0))
+      (Subq_omega_int 0 (nat_p_omega 0 nat_0))
+      (eq_sym (add_SNo x (mul_SNo p 0)) x
+        (eq_i_tra
+          (add_SNo x (mul_SNo p 0)) (add_SNo x 0) x
+          (f_eq_i (fun z => add_SNo x z) (mul_SNo p 0) 0
+            (mul_SNo_zeroR p (omega_SNo p hp)))
+          (add_SNo_0R x (int_SNo x hx))))))).
+Qed.
+
+Theorem god1_int_mod_class_in_quotient :
+  forall p :e omega, forall x :e int,
+    int_mod_class p x :e int_mod_quotient p.
+let p.
+assume hp.
+let x.
+assume hx.
+exact (ReplI int (fun z => int_mod_class p z) x hx).
+Qed.
+
+Theorem god1_int_mod_representative_data :
+  forall p :e omega, forall A :e int_mod_quotient p,
+    int_mod_representative p A :e int
+    /\ A = int_mod_class p (int_mod_representative p A).
+let p.
+assume hp.
+let A.
+assume hA.
+apply (Eps_i_ex
+  (fun x => x :e int /\ A = int_mod_class p x)).
+apply (ReplE_impred int (fun x => int_mod_class p x) A hA
+  (exists x, x :e int /\ A = int_mod_class p x)).
+let x.
+assume hx hAx.
+exact (ex_intro
+  (fun y => y :e int /\ A = int_mod_class p y) x
+  (andI (x :e int) (A = int_mod_class p x) hx hAx)).
+Qed.
+
+Theorem god1_int_mod_shift_sum_equation :
+  forall p :e omega, forall x y k l z :e int,
+    y = add_SNo x (mul_SNo p k) ->
+    z = add_SNo y (mul_SNo p l) ->
+    z = add_SNo x (mul_SNo p (add_SNo k l)).
+let p.
+assume hp.
+let x.
+assume hx.
+let y.
+assume hy.
+let k.
+assume hk.
+let l.
+assume hl.
+let z.
+assume hz hshift hzl.
+apply (eq_i_tra z (add_SNo y (mul_SNo p l))
+  (add_SNo x (mul_SNo p (add_SNo k l)))).
+- exact hzl.
+- apply (eq_i_tra
+    (add_SNo y (mul_SNo p l))
+    (add_SNo (add_SNo x (mul_SNo p k)) (mul_SNo p l))
+    (add_SNo x (mul_SNo p (add_SNo k l)))).
+  - exact (f_eq_i (fun w => add_SNo w (mul_SNo p l))
+      y (add_SNo x (mul_SNo p k)) hshift).
+  - apply (eq_i_tra
+      (add_SNo (add_SNo x (mul_SNo p k)) (mul_SNo p l))
+      (add_SNo x
+        (add_SNo (mul_SNo p k) (mul_SNo p l)))
+      (add_SNo x (mul_SNo p (add_SNo k l)))).
+    - apply eq_sym.
+      exact (add_SNo_assoc x (mul_SNo p k) (mul_SNo p l)
+        (int_SNo x hx)
+        (int_SNo (mul_SNo p k)
+          (int_mul_SNo p (Subq_omega_int p hp) k hk))
+        (int_SNo (mul_SNo p l)
+          (int_mul_SNo p (Subq_omega_int p hp) l hl))).
+    - exact (f_eq_i (fun w => add_SNo x w)
+        (add_SNo (mul_SNo p k) (mul_SNo p l))
+        (mul_SNo p (add_SNo k l))
+        (eq_sym
+          (mul_SNo p (add_SNo k l))
+          (add_SNo (mul_SNo p k) (mul_SNo p l))
+          (mul_SNo_distrL p k l
+            (omega_SNo p hp) (int_SNo k hk) (int_SNo l hl)))).
+Qed.
+
+Theorem god1_int_mod_class_membership_transport :
+  forall p :e omega, forall x y k :e int,
+    y = add_SNo x (mul_SNo p k) ->
+    forall z :e int_mod_class p y,
+      z :e int_mod_class p x.
+let p.
+assume hp.
+let x.
+assume hx.
+let y.
+assume hy.
+let k.
+assume hk hshift.
+let z.
+assume hz.
+claim hzint : z :e int.
+exact (SepE1 int
+  (fun w => exists l :e int,
+    w = add_SNo y (mul_SNo p l)) z hz).
+claim hzwitness : exists l :e int,
+  z = add_SNo y (mul_SNo p l).
+exact (SepE2 int
+  (fun w => exists l :e int,
+    w = add_SNo y (mul_SNo p l)) z hz).
+apply (exandE_i (fun l => l :e int)
+  (fun l => z = add_SNo y (mul_SNo p l)) hzwitness).
+let l.
+assume hl hzl.
+claim hkl : add_SNo k l :e int.
+exact (int_add_SNo k hk l hl).
+exact (SepI int
+  (fun w => exists q :e int,
+    w = add_SNo x (mul_SNo p q)) z hzint
+  (ex_intro
+    (fun q => q :e int /\ z = add_SNo x (mul_SNo p q))
+    (add_SNo k l)
+    (andI
+      (add_SNo k l :e int)
+      (z = add_SNo x (mul_SNo p (add_SNo k l))) hkl
+      (god1_int_mod_shift_sum_equation p hp x hx y hy k hk l hl z hzint
+        hshift hzl)))).
+Qed.
+
+Theorem god1_int_mod_reverse_shift :
+  forall p :e omega, forall x y k :e int,
+    y = add_SNo x (mul_SNo p k) ->
+    x = add_SNo y (mul_SNo p (minus_SNo k)).
+let p.
+assume hp.
+let x.
+assume hx.
+let y.
+assume hy.
+let k.
+assume hk hshift.
+apply eq_sym.
+apply (eq_i_tra
+  (add_SNo y (mul_SNo p (minus_SNo k)))
+  (add_SNo (add_SNo x (mul_SNo p k))
+    (mul_SNo p (minus_SNo k))) x).
+- exact (f_eq_i (fun w => add_SNo w (mul_SNo p (minus_SNo k)))
+    y (add_SNo x (mul_SNo p k)) hshift).
+- apply (eq_i_tra
+    (add_SNo (add_SNo x (mul_SNo p k))
+      (mul_SNo p (minus_SNo k)))
+    (add_SNo x
+      (add_SNo (mul_SNo p k) (mul_SNo p (minus_SNo k)))) x).
+  - apply eq_sym.
+    exact (add_SNo_assoc x (mul_SNo p k)
+      (mul_SNo p (minus_SNo k))
+      (int_SNo x hx)
+      (int_SNo (mul_SNo p k)
+        (int_mul_SNo p (Subq_omega_int p hp) k hk))
+      (int_SNo (mul_SNo p (minus_SNo k))
+        (int_mul_SNo p (Subq_omega_int p hp)
+          (minus_SNo k) (int_minus_SNo k hk)))).
+  - apply (eq_i_tra
+      (add_SNo x
+        (add_SNo (mul_SNo p k) (mul_SNo p (minus_SNo k))))
+      (add_SNo x
+        (add_SNo (mul_SNo p k) (minus_SNo (mul_SNo p k)))) x).
+    - exact (f_eq_i
+        (fun w => add_SNo x (add_SNo (mul_SNo p k) w))
+        (mul_SNo p (minus_SNo k))
+        (minus_SNo (mul_SNo p k))
+        (mul_minus_SNo_distrR p k (omega_SNo p hp) (int_SNo k hk))).
+    - apply (eq_i_tra
+        (add_SNo x
+          (add_SNo (mul_SNo p k) (minus_SNo (mul_SNo p k))))
+        (add_SNo x 0) x).
+      - exact (f_eq_i (fun w => add_SNo x w)
+          (add_SNo (mul_SNo p k) (minus_SNo (mul_SNo p k))) 0
+          (add_SNo_minus_SNo_rinv (mul_SNo p k)
+            (int_SNo (mul_SNo p k)
+              (int_mul_SNo p (Subq_omega_int p hp) k hk)))).
+      - exact (add_SNo_0R x (int_SNo x hx)).
+Qed.
+
+Theorem god1_int_mod_class_eq_of_shift :
+  forall p :e omega, forall x y k :e int,
+    y = add_SNo x (mul_SNo p k) ->
+    int_mod_class p y = int_mod_class p x.
+let p.
+assume hp.
+let x.
+assume hx.
+let y.
+assume hy.
+let k.
+assume hk hshift.
+apply set_ext.
+- exact (god1_int_mod_class_membership_transport
+    p hp x hx y hy k hk hshift).
+- exact (god1_int_mod_class_membership_transport
+    p hp y hy x hx (minus_SNo k) (int_minus_SNo k hk)
+    (god1_int_mod_reverse_shift p hp x hx y hy k hk hshift)).
+Qed.
+
+Theorem god1_int_mod_class_equal_gives_shift :
+  forall p :e omega, forall x y :e int,
+    int_mod_class p x = int_mod_class p y ->
+    exists k :e int, y = add_SNo x (mul_SNo p k).
+let p.
+assume hp.
+let x.
+assume hx.
+let y.
+assume hy hclasses.
+claim hyclass : y :e int_mod_class p x.
+exact (mem_eq_set_subst
+  (int_mod_class p y) (int_mod_class p x) y
+  (eq_sym (int_mod_class p x) (int_mod_class p y) hclasses)
+  (god1_int_mod_class_member_self p hp y hy)).
+exact (SepE2 int
+  (fun z => exists k :e int, z = add_SNo x (mul_SNo p k))
+  y hyclass).
+Qed.
+
+Theorem god1_int_mod_two_shifts_sum :
+  forall p :e omega, forall x x' y y' k l :e int,
+    x' = add_SNo x (mul_SNo p k) ->
+    y' = add_SNo y (mul_SNo p l) ->
+    add_SNo x' y'
+      = add_SNo (add_SNo x y) (mul_SNo p (add_SNo k l)).
+let p.
+assume hp.
+let x.
+assume hx.
+let x'.
+assume hx'.
+let y.
+assume hy.
+let y'.
+assume hy'.
+let k.
+assume hk.
+let l.
+assume hl hxx hyy.
+apply (eq_i_tra
+  (add_SNo x' y')
+  (add_SNo
+    (add_SNo x (mul_SNo p k))
+    (add_SNo y (mul_SNo p l)))
+  (add_SNo (add_SNo x y) (mul_SNo p (add_SNo k l)))).
+- apply (eq_i_tra
+    (add_SNo x' y')
+    (add_SNo (add_SNo x (mul_SNo p k)) y')
+    (add_SNo
+      (add_SNo x (mul_SNo p k))
+      (add_SNo y (mul_SNo p l)))).
+  - exact (f_eq_i (fun z => add_SNo z y')
+      x' (add_SNo x (mul_SNo p k)) hxx).
+  - exact (f_eq_i
+      (fun z => add_SNo (add_SNo x (mul_SNo p k)) z)
+      y' (add_SNo y (mul_SNo p l)) hyy).
+- apply (eq_i_tra
+    (add_SNo
+      (add_SNo x (mul_SNo p k))
+      (add_SNo y (mul_SNo p l)))
+    (add_SNo (add_SNo x y)
+      (add_SNo (mul_SNo p k) (mul_SNo p l)))
+    (add_SNo (add_SNo x y) (mul_SNo p (add_SNo k l)))).
+  - exact (add_SNo_com_4_inner_mid
+      x (mul_SNo p k) y (mul_SNo p l)
+      (int_SNo x hx)
+      (int_SNo (mul_SNo p k)
+        (int_mul_SNo p (Subq_omega_int p hp) k hk))
+      (int_SNo y hy)
+      (int_SNo (mul_SNo p l)
+        (int_mul_SNo p (Subq_omega_int p hp) l hl))).
+  - exact (f_eq_i (fun z => add_SNo (add_SNo x y) z)
+      (add_SNo (mul_SNo p k) (mul_SNo p l))
+      (mul_SNo p (add_SNo k l))
+      (eq_sym
+        (mul_SNo p (add_SNo k l))
+        (add_SNo (mul_SNo p k) (mul_SNo p l))
+        (mul_SNo_distrL p k l
+          (omega_SNo p hp) (int_SNo k hk) (int_SNo l hl)))).
+Qed.
+
+Theorem god1_int_mod_class_add_compatible :
+  forall p :e omega, forall x x' y y' :e int,
+    int_mod_class p x = int_mod_class p x' ->
+    int_mod_class p y = int_mod_class p y' ->
+    int_mod_class p (add_SNo x y)
+      = int_mod_class p (add_SNo x' y').
+let p.
+assume hp.
+let x.
+assume hx.
+let x'.
+assume hx'.
+let y.
+assume hy.
+let y'.
+assume hy' hxx hyy.
+claim hexk : exists k :e int,
+  x' = add_SNo x (mul_SNo p k).
+exact (god1_int_mod_class_equal_gives_shift
+  p hp x hx x' hx' hxx).
+claim hexl : exists l :e int,
+  y' = add_SNo y (mul_SNo p l).
+exact (god1_int_mod_class_equal_gives_shift
+  p hp y hy y' hy' hyy).
+apply (exandE_i (fun k => k :e int)
+  (fun k => x' = add_SNo x (mul_SNo p k)) hexk).
+let k.
+assume hk hxshift.
+apply (exandE_i (fun l => l :e int)
+  (fun l => y' = add_SNo y (mul_SNo p l)) hexl).
+let l.
+assume hl hyshift.
+apply eq_sym.
+exact (god1_int_mod_class_eq_of_shift p hp
+  (add_SNo x y) (int_add_SNo x hx y hy)
+  (add_SNo x' y') (int_add_SNo x' hx' y' hy')
+  (add_SNo k l) (int_add_SNo k hk l hl)
+  (god1_int_mod_two_shifts_sum p hp
+    x hx x' hx' y hy y' hy' k hk l hl hxshift hyshift)).
+Qed.
+
+Theorem god1_int_mod_addition_on_classes :
+  forall p :e omega, forall x y :e int,
+    int_mod_addition p (int_mod_class p x) (int_mod_class p y)
+      = int_mod_class p (add_SNo x y).
+let p.
+assume hp.
+let x.
+assume hx.
+let y.
+assume hy.
+claim hclassx : int_mod_class p x :e int_mod_quotient p.
+exact (god1_int_mod_class_in_quotient p hp x hx).
+claim hclassy : int_mod_class p y :e int_mod_quotient p.
+exact (god1_int_mod_class_in_quotient p hp y hy).
+claim hxdata : int_mod_representative p (int_mod_class p x) :e int
+  /\ int_mod_class p x = int_mod_class p
+    (int_mod_representative p (int_mod_class p x)).
+exact (god1_int_mod_representative_data p hp
+  (int_mod_class p x) hclassx).
+claim hydata : int_mod_representative p (int_mod_class p y) :e int
+  /\ int_mod_class p y = int_mod_class p
+    (int_mod_representative p (int_mod_class p y)).
+exact (god1_int_mod_representative_data p hp
+  (int_mod_class p y) hclassy).
+exact (god1_int_mod_class_add_compatible p hp
+  (int_mod_representative p (int_mod_class p x))
+  (andEL
+    (int_mod_representative p (int_mod_class p x) :e int)
+    (int_mod_class p x = int_mod_class p
+      (int_mod_representative p (int_mod_class p x))) hxdata)
+  x hx
+  (int_mod_representative p (int_mod_class p y))
+  (andEL
+    (int_mod_representative p (int_mod_class p y) :e int)
+    (int_mod_class p y = int_mod_class p
+      (int_mod_representative p (int_mod_class p y))) hydata)
+  y hy
+  (eq_sym
+    (int_mod_class p x)
+    (int_mod_class p (int_mod_representative p (int_mod_class p x)))
+    (andER
+      (int_mod_representative p (int_mod_class p x) :e int)
+      (int_mod_class p x = int_mod_class p
+        (int_mod_representative p (int_mod_class p x))) hxdata))
+  (eq_sym
+    (int_mod_class p y)
+    (int_mod_class p (int_mod_representative p (int_mod_class p y)))
+    (andER
+      (int_mod_representative p (int_mod_class p y) :e int)
+      (int_mod_class p y = int_mod_class p
+        (int_mod_representative p (int_mod_class p y))) hydata))).
+Qed.
+
+Theorem god1_int_mod_addition_closed :
+  forall p :e omega, forall A B :e int_mod_quotient p,
+    int_mod_addition p A B :e int_mod_quotient p.
+let p.
+assume hp.
+let A.
+assume hA.
+let B.
+assume hB.
+claim hAdata : int_mod_representative p A :e int
+  /\ A = int_mod_class p (int_mod_representative p A).
+exact (god1_int_mod_representative_data p hp A hA).
+claim hBdata : int_mod_representative p B :e int
+  /\ B = int_mod_class p (int_mod_representative p B).
+exact (god1_int_mod_representative_data p hp B hB).
+exact (god1_int_mod_class_in_quotient p hp
+  (add_SNo (int_mod_representative p A) (int_mod_representative p B))
+  (int_add_SNo
+    (int_mod_representative p A)
+    (andEL
+      (int_mod_representative p A :e int)
+      (A = int_mod_class p (int_mod_representative p A)) hAdata)
+    (int_mod_representative p B)
+    (andEL
+      (int_mod_representative p B :e int)
+      (B = int_mod_class p (int_mod_representative p B)) hBdata))).
+Qed.
+
+Theorem god1_int_mod_addition_associative_classes :
+  forall p :e omega, forall x y z :e int,
+    int_mod_addition p (int_mod_class p x)
+      (int_mod_addition p (int_mod_class p y) (int_mod_class p z))
+    = int_mod_addition p
+      (int_mod_addition p (int_mod_class p x) (int_mod_class p y))
+      (int_mod_class p z).
+let p.
+assume hp.
+let x.
+assume hx.
+let y.
+assume hy.
+let z.
+assume hz.
+claim hyz : add_SNo y z :e int.
+exact (int_add_SNo y hy z hz).
+claim hxy : add_SNo x y :e int.
+exact (int_add_SNo x hx y hy).
+apply (eq_i_tra
+  (int_mod_addition p (int_mod_class p x)
+    (int_mod_addition p (int_mod_class p y) (int_mod_class p z)))
+  (int_mod_addition p (int_mod_class p x)
+    (int_mod_class p (add_SNo y z)))
+  (int_mod_addition p
+    (int_mod_addition p (int_mod_class p x) (int_mod_class p y))
+    (int_mod_class p z))).
+- exact (f_eq_i (fun C => int_mod_addition p (int_mod_class p x) C)
+    (int_mod_addition p (int_mod_class p y) (int_mod_class p z))
+    (int_mod_class p (add_SNo y z))
+    (god1_int_mod_addition_on_classes p hp y hy z hz)).
+- apply (eq_i_tra
+    (int_mod_addition p (int_mod_class p x)
+      (int_mod_class p (add_SNo y z)))
+    (int_mod_class p (add_SNo x (add_SNo y z)))
+    (int_mod_addition p
+      (int_mod_addition p (int_mod_class p x) (int_mod_class p y))
+      (int_mod_class p z))).
+  - exact (god1_int_mod_addition_on_classes p hp x hx
+      (add_SNo y z) hyz).
+  - apply (eq_i_tra
+      (int_mod_class p (add_SNo x (add_SNo y z)))
+      (int_mod_class p (add_SNo (add_SNo x y) z))
+      (int_mod_addition p
+        (int_mod_addition p (int_mod_class p x) (int_mod_class p y))
+        (int_mod_class p z))).
+    - exact (f_eq_i (fun w => int_mod_class p w)
+        (add_SNo x (add_SNo y z)) (add_SNo (add_SNo x y) z)
+        (add_SNo_assoc x y z (int_SNo x hx) (int_SNo y hy)
+          (int_SNo z hz))).
+    - apply (eq_i_tra
+        (int_mod_class p (add_SNo (add_SNo x y) z))
+        (int_mod_addition p (int_mod_class p (add_SNo x y))
+          (int_mod_class p z))
+        (int_mod_addition p
+          (int_mod_addition p (int_mod_class p x) (int_mod_class p y))
+          (int_mod_class p z))).
+      - apply eq_sym.
+        exact (god1_int_mod_addition_on_classes p hp
+          (add_SNo x y) hxy z hz).
+      - exact (f_eq_i (fun C => int_mod_addition p C (int_mod_class p z))
+          (int_mod_class p (add_SNo x y))
+          (int_mod_addition p (int_mod_class p x) (int_mod_class p y))
+          (eq_sym
+            (int_mod_addition p (int_mod_class p x) (int_mod_class p y))
+            (int_mod_class p (add_SNo x y))
+            (god1_int_mod_addition_on_classes p hp x hx y hy))).
+Qed.
+
+Theorem god1_int_mod_addition_associative :
+  forall p :e omega,
+    associative_on (int_mod_quotient p) (int_mod_addition p).
+let p.
+assume hp.
+let A.
+assume hA.
+let B.
+assume hB.
+let C.
+assume hC.
+claim hAdata : int_mod_representative p A :e int
+  /\ A = int_mod_class p (int_mod_representative p A).
+exact (god1_int_mod_representative_data p hp A hA).
+claim hBdata : int_mod_representative p B :e int
+  /\ B = int_mod_class p (int_mod_representative p B).
+exact (god1_int_mod_representative_data p hp B hB).
+claim hCdata : int_mod_representative p C :e int
+  /\ C = int_mod_class p (int_mod_representative p C).
+exact (god1_int_mod_representative_data p hp C hC).
+claim hleft :
+  int_mod_addition p A (int_mod_addition p B C)
+  = int_mod_addition p
+    (int_mod_class p (int_mod_representative p A))
+    (int_mod_addition p
+      (int_mod_class p (int_mod_representative p B))
+      (int_mod_class p (int_mod_representative p C))).
+exact (eq_i_tra
+  (int_mod_addition p A (int_mod_addition p B C))
+  (int_mod_addition p
+    (int_mod_class p (int_mod_representative p A))
+    (int_mod_addition p B C))
+  (int_mod_addition p
+    (int_mod_class p (int_mod_representative p A))
+    (int_mod_addition p
+      (int_mod_class p (int_mod_representative p B))
+      (int_mod_class p (int_mod_representative p C))))
+  (f_eq_i (fun Q => int_mod_addition p Q (int_mod_addition p B C))
+    A (int_mod_class p (int_mod_representative p A))
+    (andER
+      (int_mod_representative p A :e int)
+      (A = int_mod_class p (int_mod_representative p A)) hAdata))
+  (f_eq_i (fun Q => int_mod_addition p
+      (int_mod_class p (int_mod_representative p A)) Q)
+    (int_mod_addition p B C)
+    (int_mod_addition p
+      (int_mod_class p (int_mod_representative p B))
+      (int_mod_class p (int_mod_representative p C)))
+    (eq_i_tra
+      (int_mod_addition p B C)
+      (int_mod_addition p
+        (int_mod_class p (int_mod_representative p B)) C)
+      (int_mod_addition p
+        (int_mod_class p (int_mod_representative p B))
+        (int_mod_class p (int_mod_representative p C)))
+      (f_eq_i (fun Q => int_mod_addition p Q C)
+        B (int_mod_class p (int_mod_representative p B))
+        (andER
+          (int_mod_representative p B :e int)
+          (B = int_mod_class p (int_mod_representative p B)) hBdata))
+      (f_eq_i (fun Q => int_mod_addition p
+          (int_mod_class p (int_mod_representative p B)) Q)
+        C (int_mod_class p (int_mod_representative p C))
+        (andER
+          (int_mod_representative p C :e int)
+          (C = int_mod_class p (int_mod_representative p C)) hCdata))))).
+claim hright :
+  int_mod_addition p (int_mod_addition p A B) C
+  = int_mod_addition p
+    (int_mod_addition p
+      (int_mod_class p (int_mod_representative p A))
+      (int_mod_class p (int_mod_representative p B)))
+    (int_mod_class p (int_mod_representative p C)).
+exact (eq_i_tra
+  (int_mod_addition p (int_mod_addition p A B) C)
+  (int_mod_addition p
+    (int_mod_addition p
+      (int_mod_class p (int_mod_representative p A))
+      (int_mod_class p (int_mod_representative p B))) C)
+  (int_mod_addition p
+    (int_mod_addition p
+      (int_mod_class p (int_mod_representative p A))
+      (int_mod_class p (int_mod_representative p B)))
+    (int_mod_class p (int_mod_representative p C)))
+  (f_eq_i (fun Q => int_mod_addition p Q C)
+    (int_mod_addition p A B)
+    (int_mod_addition p
+      (int_mod_class p (int_mod_representative p A))
+      (int_mod_class p (int_mod_representative p B)))
+    (eq_i_tra
+      (int_mod_addition p A B)
+      (int_mod_addition p
+        (int_mod_class p (int_mod_representative p A)) B)
+      (int_mod_addition p
+        (int_mod_class p (int_mod_representative p A))
+        (int_mod_class p (int_mod_representative p B)))
+      (f_eq_i (fun Q => int_mod_addition p Q B)
+        A (int_mod_class p (int_mod_representative p A))
+        (andER
+          (int_mod_representative p A :e int)
+          (A = int_mod_class p (int_mod_representative p A)) hAdata))
+      (f_eq_i (fun Q => int_mod_addition p
+          (int_mod_class p (int_mod_representative p A)) Q)
+        B (int_mod_class p (int_mod_representative p B))
+        (andER
+          (int_mod_representative p B :e int)
+          (B = int_mod_class p (int_mod_representative p B)) hBdata))))
+  (f_eq_i (fun Q => int_mod_addition p
+      (int_mod_addition p
+        (int_mod_class p (int_mod_representative p A))
+        (int_mod_class p (int_mod_representative p B))) Q)
+    C (int_mod_class p (int_mod_representative p C))
+    (andER
+      (int_mod_representative p C :e int)
+      (C = int_mod_class p (int_mod_representative p C)) hCdata))).
+apply (eq_i_tra
+  (int_mod_addition p A (int_mod_addition p B C))
+  (int_mod_addition p
+    (int_mod_class p (int_mod_representative p A))
+    (int_mod_addition p
+      (int_mod_class p (int_mod_representative p B))
+      (int_mod_class p (int_mod_representative p C))))
+  (int_mod_addition p (int_mod_addition p A B) C)).
+- exact hleft.
+- apply (eq_i_tra
+    (int_mod_addition p
+      (int_mod_class p (int_mod_representative p A))
+      (int_mod_addition p
+        (int_mod_class p (int_mod_representative p B))
+        (int_mod_class p (int_mod_representative p C))))
+    (int_mod_addition p
+      (int_mod_addition p
+        (int_mod_class p (int_mod_representative p A))
+        (int_mod_class p (int_mod_representative p B)))
+      (int_mod_class p (int_mod_representative p C)))
+    (int_mod_addition p (int_mod_addition p A B) C)).
+  - exact (god1_int_mod_addition_associative_classes p hp
+      (int_mod_representative p A)
+      (andEL
+        (int_mod_representative p A :e int)
+        (A = int_mod_class p (int_mod_representative p A)) hAdata)
+      (int_mod_representative p B)
+      (andEL
+        (int_mod_representative p B :e int)
+        (B = int_mod_class p (int_mod_representative p B)) hBdata)
+      (int_mod_representative p C)
+      (andEL
+        (int_mod_representative p C :e int)
+        (C = int_mod_class p (int_mod_representative p C)) hCdata)).
+  - apply eq_sym.
+    exact hright.
+Qed.
+
+Theorem god1_int_mod_zero_neutral :
+  forall p :e omega,
+    neutral_element (int_mod_quotient p) (int_mod_addition p)
+      (int_mod_class p 0).
+let p.
+assume hp.
+claim h0int : 0 :e int.
+exact (Subq_omega_int 0 (nat_p_omega 0 nat_0)).
+claim he : int_mod_class p 0 :e int_mod_quotient p.
+exact (god1_int_mod_class_in_quotient p hp 0 h0int).
+apply (andI
+  (int_mod_class p 0 :e int_mod_quotient p)
+  (forall A :e int_mod_quotient p,
+    int_mod_addition p A (int_mod_class p 0) = A
+    /\ int_mod_addition p (int_mod_class p 0) A = A) he).
+let A.
+assume hA.
+claim hAdata : int_mod_representative p A :e int
+  /\ A = int_mod_class p (int_mod_representative p A).
+exact (god1_int_mod_representative_data p hp A hA).
+claim hx : int_mod_representative p A :e int.
+exact (andEL
+  (int_mod_representative p A :e int)
+  (A = int_mod_class p (int_mod_representative p A)) hAdata).
+claim hAe : A = int_mod_class p (int_mod_representative p A).
+exact (andER
+  (int_mod_representative p A :e int)
+  (A = int_mod_class p (int_mod_representative p A)) hAdata).
+apply andI.
+- apply (eq_i_tra
+    (int_mod_addition p A (int_mod_class p 0))
+    (int_mod_addition p
+      (int_mod_class p (int_mod_representative p A))
+      (int_mod_class p 0)) A).
+  - exact (f_eq_i (fun Q => int_mod_addition p Q (int_mod_class p 0))
+      A (int_mod_class p (int_mod_representative p A)) hAe).
+  - apply (eq_i_tra
+      (int_mod_addition p
+        (int_mod_class p (int_mod_representative p A))
+        (int_mod_class p 0))
+      (int_mod_class p (add_SNo (int_mod_representative p A) 0)) A).
+    - exact (god1_int_mod_addition_on_classes p hp
+        (int_mod_representative p A) hx 0 h0int).
+    - apply (eq_i_tra
+        (int_mod_class p (add_SNo (int_mod_representative p A) 0))
+        (int_mod_class p (int_mod_representative p A)) A).
+      - exact (f_eq_i (fun z => int_mod_class p z)
+          (add_SNo (int_mod_representative p A) 0)
+          (int_mod_representative p A)
+          (add_SNo_0R (int_mod_representative p A)
+            (int_SNo (int_mod_representative p A) hx))).
+      - apply eq_sym.
+        exact hAe.
+- apply (eq_i_tra
+    (int_mod_addition p (int_mod_class p 0) A)
+    (int_mod_addition p (int_mod_class p 0)
+      (int_mod_class p (int_mod_representative p A))) A).
+  - exact (f_eq_i (fun Q => int_mod_addition p (int_mod_class p 0) Q)
+      A (int_mod_class p (int_mod_representative p A)) hAe).
+  - apply (eq_i_tra
+      (int_mod_addition p (int_mod_class p 0)
+        (int_mod_class p (int_mod_representative p A)))
+      (int_mod_class p (add_SNo 0 (int_mod_representative p A))) A).
+    - exact (god1_int_mod_addition_on_classes p hp
+        0 h0int (int_mod_representative p A) hx).
+    - apply (eq_i_tra
+        (int_mod_class p (add_SNo 0 (int_mod_representative p A)))
+        (int_mod_class p (int_mod_representative p A)) A).
+      - exact (f_eq_i (fun z => int_mod_class p z)
+          (add_SNo 0 (int_mod_representative p A))
+          (int_mod_representative p A)
+          (add_SNo_0L (int_mod_representative p A)
+            (int_SNo (int_mod_representative p A) hx))).
+      - apply eq_sym.
+        exact hAe.
+Qed.
+
+Theorem god1_int_mod_class_inverse_left :
+  forall p :e omega, forall x :e int,
+    int_mod_addition p
+      (int_mod_class p (minus_SNo x)) (int_mod_class p x)
+    = int_mod_class p 0.
+let p.
+assume hp.
+let x.
+assume hx.
+claim hmx : minus_SNo x :e int.
+exact (int_minus_SNo x hx).
+claim h0int : 0 :e int.
+exact (Subq_omega_int 0 (nat_p_omega 0 nat_0)).
+apply (eq_i_tra
+  (int_mod_addition p
+    (int_mod_class p (minus_SNo x)) (int_mod_class p x))
+  (int_mod_class p (add_SNo (minus_SNo x) x))
+  (int_mod_class p 0)).
+- exact (god1_int_mod_addition_on_classes p hp
+    (minus_SNo x) hmx x hx).
+- exact (f_eq_i (fun z => int_mod_class p z)
+    (add_SNo (minus_SNo x) x) 0
+    (add_SNo_minus_SNo_linv x (int_SNo x hx))).
+Qed.
+
+Theorem god1_int_mod_class_inverse_right :
+  forall p :e omega, forall x :e int,
+    int_mod_addition p
+      (int_mod_class p x) (int_mod_class p (minus_SNo x))
+    = int_mod_class p 0.
+let p.
+assume hp.
+let x.
+assume hx.
+claim hmx : minus_SNo x :e int.
+exact (int_minus_SNo x hx).
+claim h0int : 0 :e int.
+exact (Subq_omega_int 0 (nat_p_omega 0 nat_0)).
+apply (eq_i_tra
+  (int_mod_addition p
+    (int_mod_class p x) (int_mod_class p (minus_SNo x)))
+  (int_mod_class p (add_SNo x (minus_SNo x)))
+  (int_mod_class p 0)).
+- exact (god1_int_mod_addition_on_classes p hp
+    x hx (minus_SNo x) hmx).
+- exact (f_eq_i (fun z => int_mod_class p z)
+    (add_SNo x (minus_SNo x)) 0
+    (add_SNo_minus_SNo_rinv x (int_SNo x hx))).
+Qed.
+
+Theorem god1_int_mod_reflection_exists :
+  forall p :e omega, forall A :e int_mod_quotient p,
+    exists R :e int_mod_quotient p,
+      reflection (int_mod_quotient p) (int_mod_addition p)
+        (int_mod_class p 0) A R.
+let p.
+assume hp.
+let A.
+assume hA.
+claim hAdata : int_mod_representative p A :e int
+  /\ A = int_mod_class p (int_mod_representative p A).
+exact (god1_int_mod_representative_data p hp A hA).
+claim hx : int_mod_representative p A :e int.
+exact (andEL
+  (int_mod_representative p A :e int)
+  (A = int_mod_class p (int_mod_representative p A)) hAdata).
+claim hAe : A = int_mod_class p (int_mod_representative p A).
+exact (andER
+  (int_mod_representative p A :e int)
+  (A = int_mod_class p (int_mod_representative p A)) hAdata).
+claim hmx : minus_SNo (int_mod_representative p A) :e int.
+exact (int_minus_SNo (int_mod_representative p A) hx).
+claim hR : int_mod_class p (minus_SNo (int_mod_representative p A))
+  :e int_mod_quotient p.
+exact (god1_int_mod_class_in_quotient p hp
+  (minus_SNo (int_mod_representative p A)) hmx).
+claim hleft :
+  int_mod_addition p
+    (int_mod_class p (minus_SNo (int_mod_representative p A))) A
+  = int_mod_class p 0.
+exact (eq_i_tra
+  (int_mod_addition p
+    (int_mod_class p (minus_SNo (int_mod_representative p A))) A)
+  (int_mod_addition p
+    (int_mod_class p (minus_SNo (int_mod_representative p A)))
+    (int_mod_class p (int_mod_representative p A)))
+  (int_mod_class p 0)
+  (f_eq_i (fun Q => int_mod_addition p
+      (int_mod_class p (minus_SNo (int_mod_representative p A))) Q)
+    A (int_mod_class p (int_mod_representative p A)) hAe)
+  (god1_int_mod_class_inverse_left p hp
+    (int_mod_representative p A) hx)).
+claim hright :
+  int_mod_addition p A
+    (int_mod_class p (minus_SNo (int_mod_representative p A)))
+  = int_mod_class p 0.
+exact (eq_i_tra
+  (int_mod_addition p A
+    (int_mod_class p (minus_SNo (int_mod_representative p A))))
+  (int_mod_addition p
+    (int_mod_class p (int_mod_representative p A))
+    (int_mod_class p (minus_SNo (int_mod_representative p A))))
+  (int_mod_class p 0)
+  (f_eq_i (fun Q => int_mod_addition p Q
+      (int_mod_class p (minus_SNo (int_mod_representative p A))))
+    A (int_mod_class p (int_mod_representative p A)) hAe)
+  (god1_int_mod_class_inverse_right p hp
+    (int_mod_representative p A) hx)).
+apply (ex_intro
+  (fun R => R :e int_mod_quotient p
+    /\ reflection (int_mod_quotient p) (int_mod_addition p)
+      (int_mod_class p 0) A R)
+  (int_mod_class p (minus_SNo (int_mod_representative p A)))).
+exact (andI
+  (int_mod_class p (minus_SNo (int_mod_representative p A))
+    :e int_mod_quotient p)
+  (reflection (int_mod_quotient p) (int_mod_addition p)
+    (int_mod_class p 0) A
+    (int_mod_class p (minus_SNo (int_mod_representative p A))))
+  hR
+  (andI
+    (int_mod_class p (minus_SNo (int_mod_representative p A))
+      :e int_mod_quotient p
+      /\ int_mod_addition p
+        (int_mod_class p (minus_SNo (int_mod_representative p A))) A
+        = int_mod_class p 0)
+    (int_mod_addition p A
+      (int_mod_class p (minus_SNo (int_mod_representative p A)))
+      = int_mod_class p 0)
+    (andI
+      (int_mod_class p (minus_SNo (int_mod_representative p A))
+        :e int_mod_quotient p)
+      (int_mod_addition p
+        (int_mod_class p (minus_SNo (int_mod_representative p A))) A
+        = int_mod_class p 0) hR hleft)
+    hright)).
+Qed.
+
+Theorem god1_int_mod_quotient_group :
+  forall p :e omega,
+    group (int_mod_quotient p) (int_mod_addition p).
+let p.
+assume hp.
+claim hlaw : law_of_composition
+  (int_mod_quotient p) (int_mod_addition p).
+exact (god1_int_mod_addition_closed p hp).
+claim hassoc : associative_on
+  (int_mod_quotient p) (int_mod_addition p).
+exact (god1_int_mod_addition_associative p hp).
+claim hneutral : neutral_element
+  (int_mod_quotient p) (int_mod_addition p) (int_mod_class p 0).
+exact (god1_int_mod_zero_neutral p hp).
+claim he : int_mod_class p 0 :e int_mod_quotient p.
+exact (andEL
+  (int_mod_class p 0 :e int_mod_quotient p)
+  (forall A :e int_mod_quotient p,
+    int_mod_addition p A (int_mod_class p 0) = A
+    /\ int_mod_addition p (int_mod_class p 0) A = A) hneutral).
+claim hreflections : forall A :e int_mod_quotient p,
+  exists R :e int_mod_quotient p,
+    reflection (int_mod_quotient p) (int_mod_addition p)
+      (int_mod_class p 0) A R.
+exact (god1_int_mod_reflection_exists p hp).
+exact (andI
+  (law_of_composition (int_mod_quotient p) (int_mod_addition p)
+    /\ associative_on (int_mod_quotient p) (int_mod_addition p))
+  (exists e :e int_mod_quotient p,
+    neutral_element (int_mod_quotient p) (int_mod_addition p) e
+    /\ forall A :e int_mod_quotient p,
+      exists R :e int_mod_quotient p,
+        reflection (int_mod_quotient p) (int_mod_addition p) e A R)
+  (andI
+    (law_of_composition (int_mod_quotient p) (int_mod_addition p))
+    (associative_on (int_mod_quotient p) (int_mod_addition p))
+    hlaw hassoc)
+  (ex_intro
+    (fun e => e :e int_mod_quotient p
+      /\ (neutral_element (int_mod_quotient p) (int_mod_addition p) e
+        /\ forall A :e int_mod_quotient p,
+          exists R :e int_mod_quotient p,
+            reflection (int_mod_quotient p) (int_mod_addition p) e A R))
+    (int_mod_class p 0)
+    (andI
+      (int_mod_class p 0 :e int_mod_quotient p)
+      (neutral_element (int_mod_quotient p) (int_mod_addition p)
+          (int_mod_class p 0)
+        /\ forall A :e int_mod_quotient p,
+          exists R :e int_mod_quotient p,
+            reflection (int_mod_quotient p) (int_mod_addition p)
+              (int_mod_class p 0) A R)
+      he
+      (andI
+        (neutral_element (int_mod_quotient p) (int_mod_addition p)
+          (int_mod_class p 0))
+        (forall A :e int_mod_quotient p,
+          exists R :e int_mod_quotient p,
+            reflection (int_mod_quotient p) (int_mod_addition p)
+              (int_mod_class p 0) A R)
+        hneutral hreflections)))).
+Qed.
+
 Theorem god1_integers_modulo_p_form_additive_group :
   forall p :e omega,
     group (int_mod_quotient p) (int_mod_addition p).
@@ -48958,8 +49878,9 @@ assume hp.
 //GOD1PRF:54788 It can easily be shown that (cf. §8, section 3) the set $\mathbf{Z} / p \mathbf{Z}$, endowed with this law of composition, is a group (the additive group of integers modulo p).
 claim h_s7_mod_group_conclusion :
   group (int_mod_quotient p) (int_mod_addition p).
-admit.
-Admitted.
+exact (god1_int_mod_quotient_group p hp).
+exact h_s7_mod_group_conclusion.
+Qed.
 
 Theorem god1_s7_theorem10_classification_of_cyclic_groups :
   (forall G, forall mul:set -> set -> set,
