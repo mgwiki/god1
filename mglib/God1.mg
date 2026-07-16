@@ -69789,6 +69789,681 @@ Definition quadratic_extension_root :
   set -> (set -> set -> set) -> (set -> set -> set) -> set :=
   fun K add mul => (ring_zero K add, ring_one K mul).
 
+Theorem god1_quadratic_extension_coordinates :
+  forall K, forall z :e quadratic_extension K,
+    z 0 :e K /\ z 1 :e K.
+let K z.
+assume hz.
+exact (setprod_elim_0_1 K K z hz).
+Qed.
+
+Theorem god1_quadratic_extension_eta :
+  forall K, forall z :e quadratic_extension K,
+    (z 0,z 1) = z.
+let K z.
+assume hz.
+exact (tuple_Sigma_eta K (fun u => K) z hz).
+Qed.
+
+Theorem god1_quadratic_extension_addition_component_zero :
+  forall K, forall add:set -> set -> set, forall z w,
+    quadratic_extension_addition K add z w 0 = add (z 0) (w 0).
+let K add z w.
+exact (tuple_2_0_eq (add (z 0) (w 0)) (add (z 1) (w 1))).
+Qed.
+
+Theorem god1_quadratic_extension_addition_component_one :
+  forall K, forall add:set -> set -> set, forall z w,
+    quadratic_extension_addition K add z w 1 = add (z 1) (w 1).
+let K add z w.
+exact (tuple_2_1_eq (add (z 0) (w 0)) (add (z 1) (w 1))).
+Qed.
+
+Theorem god1_quadratic_extension_addition_law :
+  forall K, forall add mul:set -> set -> set,
+    ring K add mul ->
+    law_of_composition
+      (quadratic_extension K) (quadratic_extension_addition K add).
+let K add mul.
+assume hK.
+claim hG : group K add.
+exact (god1_ring_additive_group K add mul hK).
+let z.
+assume hz.
+let w.
+assume hw.
+claim hzcoords : z 0 :e K /\ z 1 :e K.
+exact (god1_quadratic_extension_coordinates K z hz).
+claim hwcoords : w 0 :e K /\ w 1 :e K.
+exact (god1_quadratic_extension_coordinates K w hw).
+exact (tuple_2_setprod K K
+  (add (z 0) (w 0))
+  (god1_group_law_of_composition K add hG
+    (z 0) (andEL (z 0 :e K) (z 1 :e K) hzcoords)
+    (w 0) (andEL (w 0 :e K) (w 1 :e K) hwcoords))
+  (add (z 1) (w 1))
+  (god1_group_law_of_composition K add hG
+    (z 1) (andER (z 0 :e K) (z 1 :e K) hzcoords)
+    (w 1) (andER (w 0 :e K) (w 1 :e K) hwcoords))).
+Qed.
+
+Theorem god1_quadratic_extension_addition_associative :
+  forall K, forall add mul:set -> set -> set,
+    ring K add mul ->
+    associative_on
+      (quadratic_extension K) (quadratic_extension_addition K add).
+let K add mul.
+assume hK.
+claim hG : group K add.
+exact (god1_ring_additive_group K add mul hK).
+let z.
+assume hz.
+let w.
+assume hw.
+let u.
+assume hu.
+claim hzcoords : z 0 :e K /\ z 1 :e K.
+exact (god1_quadratic_extension_coordinates K z hz).
+claim hwcoords : w 0 :e K /\ w 1 :e K.
+exact (god1_quadratic_extension_coordinates K w hw).
+claim hucoords : u 0 :e K /\ u 1 :e K.
+exact (god1_quadratic_extension_coordinates K u hu).
+claim hleft :
+  quadratic_extension_addition K add z
+    (quadratic_extension_addition K add w u)
+  = (add (z 0) (add (w 0) (u 0)),
+     add (z 1) (add (w 1) (u 1))).
+exact (god1_binary_operation_congruence (fun a b => (a,b))
+  (add (z 0) (quadratic_extension_addition K add w u 0))
+  (add (z 0) (add (w 0) (u 0)))
+  (add (z 1) (quadratic_extension_addition K add w u 1))
+  (add (z 1) (add (w 1) (u 1)))
+  (f_eq_i (fun q => add (z 0) q)
+    (quadratic_extension_addition K add w u 0)
+    (add (w 0) (u 0))
+    (god1_quadratic_extension_addition_component_zero K add w u))
+  (f_eq_i (fun q => add (z 1) q)
+    (quadratic_extension_addition K add w u 1)
+    (add (w 1) (u 1))
+    (god1_quadratic_extension_addition_component_one K add w u))).
+claim hright :
+  quadratic_extension_addition K add
+    (quadratic_extension_addition K add z w) u
+  = (add (add (z 0) (w 0)) (u 0),
+     add (add (z 1) (w 1)) (u 1)).
+exact (god1_binary_operation_congruence (fun a b => (a,b))
+  (add (quadratic_extension_addition K add z w 0) (u 0))
+  (add (add (z 0) (w 0)) (u 0))
+  (add (quadratic_extension_addition K add z w 1) (u 1))
+  (add (add (z 1) (w 1)) (u 1))
+  (f_eq_i (fun q => add q (u 0))
+    (quadratic_extension_addition K add z w 0)
+    (add (z 0) (w 0))
+    (god1_quadratic_extension_addition_component_zero K add z w))
+  (f_eq_i (fun q => add q (u 1))
+    (quadratic_extension_addition K add z w 1)
+    (add (z 1) (w 1))
+    (god1_quadratic_extension_addition_component_one K add z w))).
+exact (eq_i_tra
+  (quadratic_extension_addition K add z
+    (quadratic_extension_addition K add w u))
+  (add (z 0) (add (w 0) (u 0)),
+   add (z 1) (add (w 1) (u 1)))
+  (quadratic_extension_addition K add
+    (quadratic_extension_addition K add z w) u)
+  hleft
+  (eq_i_tra
+    (add (z 0) (add (w 0) (u 0)),
+     add (z 1) (add (w 1) (u 1)))
+    (add (add (z 0) (w 0)) (u 0),
+     add (add (z 1) (w 1)) (u 1))
+    (quadratic_extension_addition K add
+      (quadratic_extension_addition K add z w) u)
+    (god1_binary_operation_congruence (fun a b => (a,b))
+      (add (z 0) (add (w 0) (u 0)))
+      (add (add (z 0) (w 0)) (u 0))
+      (add (z 1) (add (w 1) (u 1)))
+      (add (add (z 1) (w 1)) (u 1))
+      (god1_group_associative K add hG
+        (z 0) (andEL (z 0 :e K) (z 1 :e K) hzcoords)
+        (w 0) (andEL (w 0 :e K) (w 1 :e K) hwcoords)
+        (u 0) (andEL (u 0 :e K) (u 1 :e K) hucoords))
+      (god1_group_associative K add hG
+        (z 1) (andER (z 0 :e K) (z 1 :e K) hzcoords)
+        (w 1) (andER (w 0 :e K) (w 1 :e K) hwcoords)
+        (u 1) (andER (u 0 :e K) (u 1 :e K) hucoords)))
+    (eq_sym
+      (quadratic_extension_addition K add
+        (quadratic_extension_addition K add z w) u)
+      (add (add (z 0) (w 0)) (u 0),
+       add (add (z 1) (w 1)) (u 1)) hright))).
+Qed.
+
+Theorem god1_quadratic_extension_addition_commutative :
+  forall K, forall add mul:set -> set -> set,
+    commutative_ring K add mul ->
+    commutative_on
+      (quadratic_extension K) (quadratic_extension_addition K add).
+let K add mul.
+assume hK.
+claim hring : ring K add mul.
+exact (andEL (ring K add mul) (commutative_on K mul) hK).
+claim haddcomm : commutative_on K add.
+exact (god1_ring_additive_commutative K add mul hring).
+let z.
+assume hz.
+let w.
+assume hw.
+claim hzcoords : z 0 :e K /\ z 1 :e K.
+exact (god1_quadratic_extension_coordinates K z hz).
+claim hwcoords : w 0 :e K /\ w 1 :e K.
+exact (god1_quadratic_extension_coordinates K w hw).
+exact (god1_binary_operation_congruence (fun a b => (a,b))
+  (add (z 0) (w 0)) (add (w 0) (z 0))
+  (add (z 1) (w 1)) (add (w 1) (z 1))
+  (haddcomm
+    (z 0) (andEL (z 0 :e K) (z 1 :e K) hzcoords)
+    (w 0) (andEL (w 0 :e K) (w 1 :e K) hwcoords))
+  (haddcomm
+    (z 1) (andER (z 0 :e K) (z 1 :e K) hzcoords)
+    (w 1) (andER (w 0 :e K) (w 1 :e K) hwcoords))).
+Qed.
+
+Theorem god1_quadratic_extension_additive_zero_neutral :
+  forall K, forall add mul:set -> set -> set,
+    ring K add mul ->
+    neutral_element (quadratic_extension K)
+      (quadratic_extension_addition K add)
+      (ring_zero K add, ring_zero K add).
+let K add mul.
+assume hK.
+claim hG : group K add.
+exact (god1_ring_additive_group K add mul hK).
+claim hzero :
+  (ring_zero K add, ring_zero K add) :e quadratic_extension K.
+exact (tuple_2_setprod K K
+  (ring_zero K add) (god1_group_identity_in K add hG)
+  (ring_zero K add) (god1_group_identity_in K add hG)).
+apply (andI
+  ((ring_zero K add, ring_zero K add) :e quadratic_extension K)
+  (forall z :e quadratic_extension K,
+    quadratic_extension_addition K add z
+      (ring_zero K add, ring_zero K add) = z
+    /\ quadratic_extension_addition K add
+      (ring_zero K add, ring_zero K add) z = z)).
+- exact hzero.
+- let z.
+  assume hz.
+  claim hzcoords : z 0 :e K /\ z 1 :e K.
+  exact (god1_quadratic_extension_coordinates K z hz).
+  claim hright :
+    quadratic_extension_addition K add z
+      (ring_zero K add, ring_zero K add) = z.
+  exact (eq_i_tra
+    (quadratic_extension_addition K add z
+      (ring_zero K add, ring_zero K add))
+    (z 0,z 1) z
+    (god1_binary_operation_congruence (fun a b => (a,b))
+      (add (z 0) ((ring_zero K add, ring_zero K add) 0)) (z 0)
+      (add (z 1) ((ring_zero K add, ring_zero K add) 1)) (z 1)
+      (eq_i_tra
+        (add (z 0) ((ring_zero K add, ring_zero K add) 0))
+        (add (z 0) (ring_zero K add)) (z 0)
+        (f_eq_i (fun q => add (z 0) q)
+          ((ring_zero K add, ring_zero K add) 0)
+          (ring_zero K add)
+          (tuple_2_0_eq (ring_zero K add) (ring_zero K add)))
+        (andEL
+          (add (z 0) (ring_zero K add) = z 0)
+          (add (ring_zero K add) (z 0) = z 0)
+          ((andER
+            (ring_zero K add :e K)
+            (forall q :e K,
+              add q (ring_zero K add) = q
+              /\ add (ring_zero K add) q = q)
+            (god1_group_identity_specification K add hG))
+            (z 0) (andEL (z 0 :e K) (z 1 :e K) hzcoords))))
+      (eq_i_tra
+        (add (z 1) ((ring_zero K add, ring_zero K add) 1))
+        (add (z 1) (ring_zero K add)) (z 1)
+        (f_eq_i (fun q => add (z 1) q)
+          ((ring_zero K add, ring_zero K add) 1)
+          (ring_zero K add)
+          (tuple_2_1_eq (ring_zero K add) (ring_zero K add)))
+        (andEL
+          (add (z 1) (ring_zero K add) = z 1)
+          (add (ring_zero K add) (z 1) = z 1)
+          ((andER
+            (ring_zero K add :e K)
+            (forall q :e K,
+              add q (ring_zero K add) = q
+              /\ add (ring_zero K add) q = q)
+            (god1_group_identity_specification K add hG))
+            (z 1) (andER (z 0 :e K) (z 1 :e K) hzcoords)))))
+    (god1_quadratic_extension_eta K z hz)).
+  claim hleft :
+    quadratic_extension_addition K add
+      (ring_zero K add, ring_zero K add) z = z.
+  exact (eq_i_tra
+    (quadratic_extension_addition K add
+      (ring_zero K add, ring_zero K add) z)
+    (z 0,z 1) z
+    (god1_binary_operation_congruence (fun a b => (a,b))
+      (add ((ring_zero K add, ring_zero K add) 0) (z 0)) (z 0)
+      (add ((ring_zero K add, ring_zero K add) 1) (z 1)) (z 1)
+      (eq_i_tra
+        (add ((ring_zero K add, ring_zero K add) 0) (z 0))
+        (add (ring_zero K add) (z 0)) (z 0)
+        (f_eq_i (fun q => add q (z 0))
+          ((ring_zero K add, ring_zero K add) 0)
+          (ring_zero K add)
+          (tuple_2_0_eq (ring_zero K add) (ring_zero K add)))
+        (andER
+          (add (z 0) (ring_zero K add) = z 0)
+          (add (ring_zero K add) (z 0) = z 0)
+          ((andER
+            (ring_zero K add :e K)
+            (forall q :e K,
+              add q (ring_zero K add) = q
+              /\ add (ring_zero K add) q = q)
+            (god1_group_identity_specification K add hG))
+            (z 0) (andEL (z 0 :e K) (z 1 :e K) hzcoords))))
+      (eq_i_tra
+        (add ((ring_zero K add, ring_zero K add) 1) (z 1))
+        (add (ring_zero K add) (z 1)) (z 1)
+        (f_eq_i (fun q => add q (z 1))
+          ((ring_zero K add, ring_zero K add) 1)
+          (ring_zero K add)
+          (tuple_2_1_eq (ring_zero K add) (ring_zero K add)))
+        (andER
+          (add (z 1) (ring_zero K add) = z 1)
+          (add (ring_zero K add) (z 1) = z 1)
+          ((andER
+            (ring_zero K add :e K)
+            (forall q :e K,
+              add q (ring_zero K add) = q
+              /\ add (ring_zero K add) q = q)
+            (god1_group_identity_specification K add hG))
+            (z 1) (andER (z 0 :e K) (z 1 :e K) hzcoords)))))
+    (god1_quadratic_extension_eta K z hz)).
+  exact (andI
+    (quadratic_extension_addition K add z
+      (ring_zero K add, ring_zero K add) = z)
+    (quadratic_extension_addition K add
+      (ring_zero K add, ring_zero K add) z = z)
+    hright hleft).
+Qed.
+
+Theorem god1_quadratic_extension_additive_inverses :
+  forall K, forall add mul:set -> set -> set,
+    ring K add mul -> forall z :e quadratic_extension K,
+  exists v :e quadratic_extension K,
+    reflection (quadratic_extension K)
+      (quadratic_extension_addition K add)
+      (ring_zero K add, ring_zero K add) z v.
+let K add mul.
+assume hK.
+claim hG : group K add.
+exact (god1_ring_additive_group K add mul hK).
+let z.
+assume hz.
+claim hzcoords : z 0 :e K /\ z 1 :e K.
+exact (god1_quadratic_extension_coordinates K z hz).
+claim hneg0 : ring_negation K add (z 0) :e K.
+exact (god1_group_inverse_in K add hG
+  (z 0) (andEL (z 0 :e K) (z 1 :e K) hzcoords)).
+claim hneg1 : ring_negation K add (z 1) :e K.
+exact (god1_group_inverse_in K add hG
+  (z 1) (andER (z 0 :e K) (z 1 :e K) hzcoords)).
+claim hnegMember :
+  (ring_negation K add (z 0), ring_negation K add (z 1))
+    :e quadratic_extension K.
+exact (tuple_2_setprod K K
+  (ring_negation K add (z 0)) hneg0
+  (ring_negation K add (z 1)) hneg1).
+claim href0 :
+  reflection K add (ring_zero K add) (z 0)
+    (ring_negation K add (z 0)).
+exact (god1_group_inverse_specification K add hG
+  (z 0) (andEL (z 0 :e K) (z 1 :e K) hzcoords)).
+claim href1 :
+  reflection K add (ring_zero K add) (z 1)
+    (ring_negation K add (z 1)).
+exact (god1_group_inverse_specification K add hG
+  (z 1) (andER (z 0 :e K) (z 1 :e K) hzcoords)).
+claim hsumLeft :
+  quadratic_extension_addition K add
+    (ring_negation K add (z 0), ring_negation K add (z 1)) z
+  = (ring_zero K add, ring_zero K add).
+exact (god1_binary_operation_congruence (fun a b => (a,b))
+  (add ((ring_negation K add (z 0), ring_negation K add (z 1)) 0)
+    (z 0)) (ring_zero K add)
+  (add ((ring_negation K add (z 0), ring_negation K add (z 1)) 1)
+    (z 1)) (ring_zero K add)
+  (eq_i_tra
+    (add ((ring_negation K add (z 0), ring_negation K add (z 1)) 0)
+      (z 0))
+    (add (ring_negation K add (z 0)) (z 0)) (ring_zero K add)
+    (f_eq_i (fun q => add q (z 0))
+      ((ring_negation K add (z 0), ring_negation K add (z 1)) 0)
+      (ring_negation K add (z 0))
+      (tuple_2_0_eq
+        (ring_negation K add (z 0)) (ring_negation K add (z 1))))
+    (andER
+      (ring_negation K add (z 0) :e K)
+      (add (ring_negation K add (z 0)) (z 0) = ring_zero K add)
+      (andEL
+        (ring_negation K add (z 0) :e K
+          /\ add (ring_negation K add (z 0)) (z 0) = ring_zero K add)
+        (add (z 0) (ring_negation K add (z 0)) = ring_zero K add)
+        href0)))
+  (eq_i_tra
+    (add ((ring_negation K add (z 0), ring_negation K add (z 1)) 1)
+      (z 1))
+    (add (ring_negation K add (z 1)) (z 1)) (ring_zero K add)
+    (f_eq_i (fun q => add q (z 1))
+      ((ring_negation K add (z 0), ring_negation K add (z 1)) 1)
+      (ring_negation K add (z 1))
+      (tuple_2_1_eq
+        (ring_negation K add (z 0)) (ring_negation K add (z 1))))
+    (andER
+      (ring_negation K add (z 1) :e K)
+      (add (ring_negation K add (z 1)) (z 1) = ring_zero K add)
+      (andEL
+        (ring_negation K add (z 1) :e K
+          /\ add (ring_negation K add (z 1)) (z 1) = ring_zero K add)
+        (add (z 1) (ring_negation K add (z 1)) = ring_zero K add)
+        href1)))).
+claim hsumRight :
+  quadratic_extension_addition K add z
+    (ring_negation K add (z 0), ring_negation K add (z 1))
+  = (ring_zero K add, ring_zero K add).
+exact (god1_binary_operation_congruence (fun a b => (a,b))
+  (add (z 0)
+    ((ring_negation K add (z 0), ring_negation K add (z 1)) 0))
+  (ring_zero K add)
+  (add (z 1)
+    ((ring_negation K add (z 0), ring_negation K add (z 1)) 1))
+  (ring_zero K add)
+  (eq_i_tra
+    (add (z 0)
+      ((ring_negation K add (z 0), ring_negation K add (z 1)) 0))
+    (add (z 0) (ring_negation K add (z 0))) (ring_zero K add)
+    (f_eq_i (fun q => add (z 0) q)
+      ((ring_negation K add (z 0), ring_negation K add (z 1)) 0)
+      (ring_negation K add (z 0))
+      (tuple_2_0_eq
+        (ring_negation K add (z 0)) (ring_negation K add (z 1))))
+    (andER
+      (ring_negation K add (z 0) :e K
+        /\ add (ring_negation K add (z 0)) (z 0) = ring_zero K add)
+      (add (z 0) (ring_negation K add (z 0)) = ring_zero K add)
+      href0))
+  (eq_i_tra
+    (add (z 1)
+      ((ring_negation K add (z 0), ring_negation K add (z 1)) 1))
+    (add (z 1) (ring_negation K add (z 1))) (ring_zero K add)
+    (f_eq_i (fun q => add (z 1) q)
+      ((ring_negation K add (z 0), ring_negation K add (z 1)) 1)
+      (ring_negation K add (z 1))
+      (tuple_2_1_eq
+        (ring_negation K add (z 0)) (ring_negation K add (z 1))))
+    (andER
+      (ring_negation K add (z 1) :e K
+        /\ add (ring_negation K add (z 1)) (z 1) = ring_zero K add)
+      (add (z 1) (ring_negation K add (z 1)) = ring_zero K add)
+      href1))).
+exact (ex_intro
+  (fun v => v :e quadratic_extension K
+    /\ reflection (quadratic_extension K)
+      (quadratic_extension_addition K add)
+      (ring_zero K add, ring_zero K add) z v)
+  (ring_negation K add (z 0), ring_negation K add (z 1))
+  (andI
+    ((ring_negation K add (z 0), ring_negation K add (z 1))
+      :e quadratic_extension K)
+    (reflection (quadratic_extension K)
+      (quadratic_extension_addition K add)
+      (ring_zero K add, ring_zero K add) z
+      (ring_negation K add (z 0), ring_negation K add (z 1)))
+    hnegMember
+    (andI
+      ((ring_negation K add (z 0), ring_negation K add (z 1))
+        :e quadratic_extension K
+        /\ quadratic_extension_addition K add
+          (ring_negation K add (z 0), ring_negation K add (z 1)) z
+          = (ring_zero K add, ring_zero K add))
+      (quadratic_extension_addition K add z
+        (ring_negation K add (z 0), ring_negation K add (z 1))
+        = (ring_zero K add, ring_zero K add))
+      (andI
+        ((ring_negation K add (z 0), ring_negation K add (z 1))
+          :e quadratic_extension K)
+        (quadratic_extension_addition K add
+          (ring_negation K add (z 0), ring_negation K add (z 1)) z
+          = (ring_zero K add, ring_zero K add))
+        hnegMember hsumLeft)
+      hsumRight))).
+Qed.
+
+Theorem god1_quadratic_extension_additive_group :
+  forall K, forall add mul:set -> set -> set,
+    ring K add mul ->
+    group (quadratic_extension K) (quadratic_extension_addition K add).
+let K add mul.
+assume hK.
+claim hG : group K add.
+exact (god1_ring_additive_group K add mul hK).
+claim hlaw : law_of_composition
+  (quadratic_extension K) (quadratic_extension_addition K add).
+exact (god1_quadratic_extension_addition_law K add mul hK).
+claim hassoc : associative_on
+  (quadratic_extension K) (quadratic_extension_addition K add).
+exact (god1_quadratic_extension_addition_associative K add mul hK).
+claim hzero :
+  (ring_zero K add, ring_zero K add) :e quadratic_extension K.
+exact (tuple_2_setprod K K
+  (ring_zero K add) (god1_group_identity_in K add hG)
+  (ring_zero K add) (god1_group_identity_in K add hG)).
+claim hneutral :
+  neutral_element (quadratic_extension K)
+    (quadratic_extension_addition K add)
+    (ring_zero K add, ring_zero K add).
+exact (god1_quadratic_extension_additive_zero_neutral K add mul hK).
+claim hinverses : forall z :e quadratic_extension K,
+  exists v :e quadratic_extension K,
+    reflection (quadratic_extension K)
+      (quadratic_extension_addition K add)
+      (ring_zero K add, ring_zero K add) z v.
+exact (god1_quadratic_extension_additive_inverses K add mul hK).
+exact (andI
+  (law_of_composition (quadratic_extension K)
+      (quadratic_extension_addition K add)
+    /\ associative_on (quadratic_extension K)
+      (quadratic_extension_addition K add))
+  (exists e :e quadratic_extension K,
+    neutral_element (quadratic_extension K)
+      (quadratic_extension_addition K add) e
+    /\ forall z :e quadratic_extension K,
+      exists v :e quadratic_extension K,
+        reflection (quadratic_extension K)
+          (quadratic_extension_addition K add) e z v)
+  (andI
+    (law_of_composition (quadratic_extension K)
+      (quadratic_extension_addition K add))
+    (associative_on (quadratic_extension K)
+      (quadratic_extension_addition K add))
+    hlaw hassoc)
+  (ex_intro
+    (fun e => e :e quadratic_extension K
+      /\ (neutral_element (quadratic_extension K)
+        (quadratic_extension_addition K add) e
+      /\ forall z :e quadratic_extension K,
+        exists v :e quadratic_extension K,
+          reflection (quadratic_extension K)
+            (quadratic_extension_addition K add) e z v))
+    (ring_zero K add, ring_zero K add)
+    (andI
+      ((ring_zero K add, ring_zero K add) :e quadratic_extension K)
+      (neutral_element (quadratic_extension K)
+          (quadratic_extension_addition K add)
+          (ring_zero K add, ring_zero K add)
+        /\ forall z :e quadratic_extension K,
+          exists v :e quadratic_extension K,
+            reflection (quadratic_extension K)
+              (quadratic_extension_addition K add)
+              (ring_zero K add, ring_zero K add) z v)
+      hzero
+      (andI
+        (neutral_element (quadratic_extension K)
+          (quadratic_extension_addition K add)
+          (ring_zero K add, ring_zero K add))
+        (forall z :e quadratic_extension K,
+          exists v :e quadratic_extension K,
+            reflection (quadratic_extension K)
+              (quadratic_extension_addition K add)
+              (ring_zero K add, ring_zero K add) z v)
+        hneutral hinverses)))).
+Qed.
+
+Theorem god1_quadratic_extension_additive_abelian_group :
+  forall K, forall add mul:set -> set -> set,
+    commutative_ring K add mul ->
+    abelian_group
+      (quadratic_extension K) (quadratic_extension_addition K add).
+let K add mul.
+assume hK.
+exact (andI
+  (group (quadratic_extension K) (quadratic_extension_addition K add))
+  (commutative_on
+    (quadratic_extension K) (quadratic_extension_addition K add))
+  (god1_quadratic_extension_additive_group K add mul
+    (andEL (ring K add mul) (commutative_on K mul) hK))
+  (god1_quadratic_extension_addition_commutative K add mul hK)).
+Qed.
+
+Theorem god1_quadratic_extension_multiplication_component_zero :
+  forall K, forall add mul:set -> set -> set, forall d z w,
+    quadratic_extension_multiplication K add mul d z w 0
+    = add (mul (z 0) (w 0)) (mul d (mul (z 1) (w 1))).
+let K add mul d z w.
+exact (tuple_2_0_eq
+  (add (mul (z 0) (w 0)) (mul d (mul (z 1) (w 1))))
+  (add (mul (z 0) (w 1)) (mul (w 0) (z 1)))).
+Qed.
+
+Theorem god1_quadratic_extension_multiplication_component_one :
+  forall K, forall add mul:set -> set -> set, forall d z w,
+    quadratic_extension_multiplication K add mul d z w 1
+    = add (mul (z 0) (w 1)) (mul (w 0) (z 1)).
+let K add mul d z w.
+exact (tuple_2_1_eq
+  (add (mul (z 0) (w 0)) (mul d (mul (z 1) (w 1))))
+  (add (mul (z 0) (w 1)) (mul (w 0) (z 1)))).
+Qed.
+
+Theorem god1_quadratic_extension_multiplication_law :
+  forall K, forall add mul:set -> set -> set, forall d :e K,
+    ring K add mul ->
+    law_of_composition (quadratic_extension K)
+      (quadratic_extension_multiplication K add mul d).
+let K add mul d.
+assume hd hK.
+claim hG : group K add.
+exact (god1_ring_additive_group K add mul hK).
+claim hM : law_of_composition K mul.
+exact (god1_ring_multiplicative_law K add mul hK).
+let z.
+assume hz.
+let w.
+assume hw.
+claim hzcoords : z 0 :e K /\ z 1 :e K.
+exact (god1_quadratic_extension_coordinates K z hz).
+claim hwcoords : w 0 :e K /\ w 1 :e K.
+exact (god1_quadratic_extension_coordinates K w hw).
+claim h00 : mul (z 0) (w 0) :e K.
+exact (hM (z 0) (andEL (z 0 :e K) (z 1 :e K) hzcoords)
+  (w 0) (andEL (w 0 :e K) (w 1 :e K) hwcoords)).
+claim h11 : mul (z 1) (w 1) :e K.
+exact (hM (z 1) (andER (z 0 :e K) (z 1 :e K) hzcoords)
+  (w 1) (andER (w 0 :e K) (w 1 :e K) hwcoords)).
+claim hd11 : mul d (mul (z 1) (w 1)) :e K.
+exact (hM d hd (mul (z 1) (w 1)) h11).
+claim h01 : mul (z 0) (w 1) :e K.
+exact (hM (z 0) (andEL (z 0 :e K) (z 1 :e K) hzcoords)
+  (w 1) (andER (w 0 :e K) (w 1 :e K) hwcoords)).
+claim h10 : mul (w 0) (z 1) :e K.
+exact (hM (w 0) (andEL (w 0 :e K) (w 1 :e K) hwcoords)
+  (z 1) (andER (z 0 :e K) (z 1 :e K) hzcoords)).
+exact (tuple_2_setprod K K
+  (add (mul (z 0) (w 0)) (mul d (mul (z 1) (w 1))))
+  (god1_group_law_of_composition K add hG
+    (mul (z 0) (w 0)) h00 (mul d (mul (z 1) (w 1))) hd11)
+  (add (mul (z 0) (w 1)) (mul (w 0) (z 1)))
+  (god1_group_law_of_composition K add hG
+    (mul (z 0) (w 1)) h01 (mul (w 0) (z 1)) h10)).
+Qed.
+
+Theorem god1_quadratic_extension_multiplication_commutative :
+  forall K, forall add mul:set -> set -> set, forall d :e K,
+    commutative_ring K add mul ->
+    commutative_on (quadratic_extension K)
+      (quadratic_extension_multiplication K add mul d).
+let K add mul d.
+assume hd hK.
+claim hring : ring K add mul.
+exact (andEL (ring K add mul) (commutative_on K mul) hK).
+claim hmulcomm : commutative_on K mul.
+exact (andER (ring K add mul) (commutative_on K mul) hK).
+claim haddcomm : commutative_on K add.
+exact (god1_ring_additive_commutative K add mul hring).
+let z.
+assume hz.
+let w.
+assume hw.
+claim hzcoords : z 0 :e K /\ z 1 :e K.
+exact (god1_quadratic_extension_coordinates K z hz).
+claim hwcoords : w 0 :e K /\ w 1 :e K.
+exact (god1_quadratic_extension_coordinates K w hw).
+claim hz0 : z 0 :e K.
+exact (andEL (z 0 :e K) (z 1 :e K) hzcoords).
+claim hz1 : z 1 :e K.
+exact (andER (z 0 :e K) (z 1 :e K) hzcoords).
+claim hw0 : w 0 :e K.
+exact (andEL (w 0 :e K) (w 1 :e K) hwcoords).
+claim hw1 : w 1 :e K.
+exact (andER (w 0 :e K) (w 1 :e K) hwcoords).
+claim h11 : mul (z 1) (w 1) :e K.
+exact (god1_ring_multiplicative_law K add mul hring
+  (z 1) hz1 (w 1) hw1).
+claim hfirst :
+  add (mul (z 0) (w 0)) (mul d (mul (z 1) (w 1)))
+  = add (mul (w 0) (z 0)) (mul d (mul (w 1) (z 1))).
+exact (god1_binary_operation_congruence add
+  (mul (z 0) (w 0)) (mul (w 0) (z 0))
+  (mul d (mul (z 1) (w 1))) (mul d (mul (w 1) (z 1)))
+  (hmulcomm (z 0) hz0 (w 0) hw0)
+  (f_eq_i (fun q => mul d q)
+    (mul (z 1) (w 1)) (mul (w 1) (z 1))
+    (hmulcomm (z 1) hz1 (w 1) hw1))).
+claim hz0w1 : mul (z 0) (w 1) :e K.
+exact (god1_ring_multiplicative_law K add mul hring
+  (z 0) hz0 (w 1) hw1).
+claim hw0z1 : mul (w 0) (z 1) :e K.
+exact (god1_ring_multiplicative_law K add mul hring
+  (w 0) hw0 (z 1) hz1).
+claim hsecond :
+  add (mul (z 0) (w 1)) (mul (w 0) (z 1))
+  = add (mul (w 0) (z 1)) (mul (z 0) (w 1)).
+exact (haddcomm (mul (z 0) (w 1)) hz0w1 (mul (w 0) (z 1)) hw0z1).
+exact (god1_binary_operation_congruence (fun a b => (a,b))
+  (add (mul (z 0) (w 0)) (mul d (mul (z 1) (w 1))))
+  (add (mul (w 0) (z 0)) (mul d (mul (w 1) (z 1))))
+  (add (mul (z 0) (w 1)) (mul (w 0) (z 1)))
+  (add (mul (w 0) (z 1)) (mul (z 0) (w 1)))
+  hfirst hsecond).
+Qed.
+
 Theorem god1_quadratic_extension_is_commutative_ring :
   forall K, forall add mul:set -> set -> set, forall d :e K,
     commutative_ring K add mul ->
@@ -69801,7 +70476,7 @@ assume hd hK.
 //GOD1PRF:157493 First of all, the set $\mathrm{K} \times \mathrm{K}$ together with the law of addition ( 2 ter) is a commutative group.
 claim h_s9_extension_additive_group :
   abelian_group (quadratic_extension K) (quadratic_extension_addition K add).
-admit.
+exact (god1_quadratic_extension_additive_abelian_group K add mul hK).
 //GOD1PRF:157613 This follows from § 7, section 2 (direct product of groups) and from the fact that the set K with the given law of addition is a commutative group.
 claim h_s9_extension_indexed_product_call :
   forall I, forall G:set -> set,
@@ -69813,7 +70488,8 @@ assume hgroups.
 apply (god1_indexed_direct_product_is_group I G op hgroups).
 claim h_s9_extension_direct_product_group :
   group (quadratic_extension K) (quadratic_extension_addition K add).
-admit.
+exact (god1_quadratic_extension_additive_group K add mul
+  (andEL (ring K add mul) (commutative_on K mul) hK)).
 //GOD1PRF:157763 Next let us show that the multiplication (3 ter) is associative.
 claim h_s9_extension_multiplication_associative_goal :
   associative_on (quadratic_extension K)
