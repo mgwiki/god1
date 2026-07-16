@@ -43662,6 +43662,275 @@ apply (god1_s5_theorem7_uniform_partition_cardinality
   h_s7_t4_cosets_cover h_s7_t4_cosets_unique).
 Qed.
 
+Theorem god1_inverse_image_left_coset :
+  forall G, forall mul:set -> set -> set, forall H,
+    subgroup G mul H -> forall x :e G,
+      {group_inverse G mul z|z :e left_coset G mul H x}
+      = right_coset G mul H (group_inverse G mul x).
+let G mul H.
+assume hH.
+let x.
+assume hx.
+claim hG : group G mul.
+exact (god1_subgroup_ambient_group G mul H hH).
+apply set_ext.
+- let y.
+  assume hy.
+  apply (ReplE_impred (left_coset G mul H x)
+    (fun z => group_inverse G mul z) y hy
+    (y :e right_coset G mul H (group_inverse G mul x))).
+  let z.
+  assume hz hyz.
+  apply (ReplE_impred H (fun h => mul x h) z hz
+    (y :e right_coset G mul H (group_inverse G mul x))).
+  let h.
+  assume hh hzh.
+  claim hhinv : group_inverse G mul h :e H.
+  exact (god1_subgroup_inverse_closed G mul H hH h hh).
+  apply (mem_eq_substL
+    (right_coset G mul H (group_inverse G mul x))
+    (mul (group_inverse G mul h) (group_inverse G mul x)) y).
+  - apply (eq_i_tra y (group_inverse G mul z)
+      (mul (group_inverse G mul h) (group_inverse G mul x))).
+    - exact hyz.
+    - apply (eq_i_tra
+        (group_inverse G mul z)
+        (group_inverse G mul (mul x h))
+        (mul (group_inverse G mul h) (group_inverse G mul x))).
+      - exact (f_eq_i (fun u => group_inverse G mul u)
+          z (mul x h) hzh).
+      - exact (god1_group_inverse_product G mul hG
+          x hx h ((god1_subgroup_subset G mul H hH) h hh)).
+  - exact (ReplI H
+      (fun k => mul k (group_inverse G mul x))
+      (group_inverse G mul h) hhinv).
+- let y.
+  assume hy.
+  apply (ReplE_impred H
+    (fun h => mul h (group_inverse G mul x)) y hy
+    (y :e {group_inverse G mul z|z :e left_coset G mul H x})).
+  let h.
+  assume hh hyh.
+  claim hhinv : group_inverse G mul h :e H.
+  exact (god1_subgroup_inverse_closed G mul H hH h hh).
+  apply (mem_eq_substR
+    {group_inverse G mul z|z :e left_coset G mul H x}
+    (group_inverse G mul (mul x (group_inverse G mul h))) y).
+  - apply (eq_i_tra
+      (group_inverse G mul (mul x (group_inverse G mul h)))
+      (mul h (group_inverse G mul x)) y).
+    - apply (eq_i_tra
+        (group_inverse G mul (mul x (group_inverse G mul h)))
+        (mul (group_inverse G mul (group_inverse G mul h))
+          (group_inverse G mul x))
+        (mul h (group_inverse G mul x))).
+      - exact (god1_group_inverse_product G mul hG
+          x hx (group_inverse G mul h)
+          (god1_group_inverse_in G mul hG h
+            ((god1_subgroup_subset G mul H hH) h hh))).
+      - f_equal.
+        exact (god1_group_inverse_involutive G mul hG h
+          ((god1_subgroup_subset G mul H hH) h hh)).
+    - exact (eq_sym y (mul h (group_inverse G mul x)) hyh).
+  - exact (ReplI (left_coset G mul H x)
+      (fun z => group_inverse G mul z)
+      (mul x (group_inverse G mul h))
+      (ReplI H (fun k => mul x k)
+        (group_inverse G mul h) hhinv)).
+Qed.
+
+Theorem god1_group_inverse_image_involutive :
+  forall G, forall mul:set -> set -> set,
+    group G mul -> forall C, C c= G ->
+      {group_inverse G mul y|
+        y :e {group_inverse G mul x|x :e C}}
+      = C.
+let G mul.
+assume hG.
+let C.
+assume hCG.
+apply set_ext.
+- let z.
+  assume hz.
+  apply (ReplE_impred
+    {group_inverse G mul x|x :e C}
+    (fun y => group_inverse G mul y) z hz (z :e C)).
+  let y.
+  assume hy hzy.
+  apply (ReplE_impred C
+    (fun x => group_inverse G mul x) y hy (z :e C)).
+  let x.
+  assume hx hyx.
+  apply (mem_eq_substL C x z).
+  - apply (eq_i_tra z (group_inverse G mul y) x).
+    - exact hzy.
+    - apply (eq_i_tra
+        (group_inverse G mul y)
+        (group_inverse G mul (group_inverse G mul x)) x).
+      - exact (f_eq_i (fun u => group_inverse G mul u)
+          y (group_inverse G mul x) hyx).
+      - exact (god1_group_inverse_involutive G mul hG x
+          (hCG x hx)).
+  - exact hx.
+- let x.
+  assume hx.
+  apply (mem_eq_substR
+    {group_inverse G mul y|
+      y :e {group_inverse G mul z|z :e C}}
+    (group_inverse G mul (group_inverse G mul x)) x).
+  - exact (god1_group_inverse_involutive G mul hG x
+      (hCG x hx)).
+  - exact (ReplI
+      {group_inverse G mul z|z :e C}
+      (fun y => group_inverse G mul y)
+      (group_inverse G mul x)
+      (ReplI C (fun z => group_inverse G mul z) x hx)).
+Qed.
+
+Theorem god1_group_inverse_image_injective_on_subsets :
+  forall G, forall mul:set -> set -> set,
+    group G mul -> forall C D,
+    C c= G -> D c= G ->
+    {group_inverse G mul z|z :e C}
+      = {group_inverse G mul z|z :e D} ->
+    C = D.
+let G mul.
+assume hG.
+let C D.
+assume hCG hDG hCD.
+apply (eq_i_tra C
+  {group_inverse G mul y|
+    y :e {group_inverse G mul z|z :e C}} D).
+- exact (eq_sym
+    {group_inverse G mul y|
+      y :e {group_inverse G mul z|z :e C}} C
+    (god1_group_inverse_image_involutive G mul hG C hCG)).
+- apply (eq_i_tra
+    {group_inverse G mul y|
+      y :e {group_inverse G mul z|z :e C}}
+    {group_inverse G mul y|
+      y :e {group_inverse G mul z|z :e D}} D).
+  - exact (f_eq_i
+      (fun E => {group_inverse G mul y|y :e E})
+      {group_inverse G mul z|z :e C}
+      {group_inverse G mul z|z :e D} hCD).
+  - exact (god1_group_inverse_image_involutive G mul hG D hDG).
+Qed.
+
+Theorem god1_left_coset_quotient_member_subset :
+  forall G, forall mul:set -> set -> set, forall H,
+    subgroup G mul H ->
+    forall C :e left_coset_quotient G mul H, C c= G.
+let G mul H.
+assume hH.
+exact (ReplE' G (fun x => left_coset G mul H x)
+  (fun C => C c= G)
+  (god1_left_coset_subset G mul H hH)).
+Qed.
+
+Theorem god1_left_coset_inverse_image_in_right_quotient :
+  forall G, forall mul:set -> set -> set, forall H,
+    subgroup G mul H ->
+    forall C :e left_coset_quotient G mul H,
+      {group_inverse G mul z|z :e C}
+        :e right_coset_quotient G mul H.
+let G mul H.
+assume hH.
+let C.
+assume hC.
+apply (ReplE_impred G (fun x => left_coset G mul H x) C hC
+  ({group_inverse G mul z|z :e C}
+    :e right_coset_quotient G mul H)).
+let x.
+assume hx hCx.
+apply (mem_eq_substL (right_coset_quotient G mul H)
+  (right_coset G mul H (group_inverse G mul x))
+  {group_inverse G mul z|z :e C}).
+- apply (eq_i_tra
+    {group_inverse G mul z|z :e C}
+    {group_inverse G mul z|z :e left_coset G mul H x}
+    (right_coset G mul H (group_inverse G mul x))).
+  - exact (f_eq_i
+      (fun E => {group_inverse G mul z|z :e E})
+      C (left_coset G mul H x) hCx).
+  - exact (god1_inverse_image_left_coset G mul H hH x hx).
+- exact (ReplI G (fun y => right_coset G mul H y)
+    (group_inverse G mul x)
+    (god1_group_inverse_in G mul
+      (god1_subgroup_ambient_group G mul H hH) x hx)).
+Qed.
+
+Theorem god1_left_coset_inverse_image_surjective :
+  forall G, forall mul:set -> set -> set, forall H,
+    subgroup G mul H ->
+    forall D :e right_coset_quotient G mul H,
+      exists C :e left_coset_quotient G mul H,
+        {group_inverse G mul z|z :e C} = D.
+let G mul H.
+assume hH.
+let D.
+assume hD.
+apply (ReplE_impred G (fun x => right_coset G mul H x) D hD
+  (exists C :e left_coset_quotient G mul H,
+    {group_inverse G mul z|z :e C} = D)).
+let x.
+assume hx hDx.
+apply (ex_intro
+  (fun C => C :e left_coset_quotient G mul H
+    /\ {group_inverse G mul z|z :e C} = D)
+  (left_coset G mul H (group_inverse G mul x))).
+apply andI.
+- exact (ReplI G (fun y => left_coset G mul H y)
+    (group_inverse G mul x)
+    (god1_group_inverse_in G mul
+      (god1_subgroup_ambient_group G mul H hH) x hx)).
+- apply (eq_i_tra
+    {group_inverse G mul z|
+      z :e left_coset G mul H (group_inverse G mul x)}
+    (right_coset G mul H
+      (group_inverse G mul (group_inverse G mul x))) D).
+  - exact (god1_inverse_image_left_coset G mul H hH
+      (group_inverse G mul x)
+      (god1_group_inverse_in G mul
+        (god1_subgroup_ambient_group G mul H hH) x hx)).
+  - apply (eq_i_tra
+      (right_coset G mul H
+        (group_inverse G mul (group_inverse G mul x)))
+      (right_coset G mul H x) D).
+    - exact (f_eq_i (fun y => right_coset G mul H y)
+        (group_inverse G mul (group_inverse G mul x)) x
+        (god1_group_inverse_involutive G mul
+          (god1_subgroup_ambient_group G mul H hH) x hx)).
+    - exact (eq_sym D (right_coset G mul H x) hDx).
+Qed.
+
+Theorem god1_left_right_coset_inverse_image_bijective :
+  forall G, forall mul:set -> set -> set, forall H,
+    subgroup G mul H ->
+    bij
+      (left_coset_quotient G mul H)
+      (right_coset_quotient G mul H)
+      (fun C => {group_inverse G mul z|z :e C}).
+let G mul H.
+assume hH.
+apply (bijI
+  (left_coset_quotient G mul H)
+  (right_coset_quotient G mul H)
+  (fun C => {group_inverse G mul z|z :e C})).
+- exact (god1_left_coset_inverse_image_in_right_quotient
+    G mul H hH).
+- let C.
+  assume hC.
+  let D.
+  assume hD hCD.
+  exact (god1_group_inverse_image_injective_on_subsets G mul
+    (god1_subgroup_ambient_group G mul H hH) C D
+    (god1_left_coset_quotient_member_subset G mul H hH C hC)
+    (god1_left_coset_quotient_member_subset G mul H hH D hD)
+    hCD).
+- exact (god1_left_coset_inverse_image_surjective G mul H hH).
+Qed.
+
 Theorem god1_left_and_right_coset_indices_equal :
   forall G, forall mul:set -> set -> set, forall H,
     subgroup G mul H ->
@@ -43676,13 +43945,1168 @@ claim h_s7_left_right_coset_bijection :
     (left_coset_quotient G mul H)
     (right_coset_quotient G mul H)
     (fun C => {group_inverse G mul z|z :e C}).
-admit.
+exact (god1_left_right_coset_inverse_image_bijective G mul H hH).
 claim h_s7_left_right_coset_equipotence :
   equip
     (left_coset_quotient G mul H)
     (right_coset_quotient G mul H).
-admit.
-Admitted.
+apply (ex_intro_setfun
+  (fun f => bij
+    (left_coset_quotient G mul H)
+    (right_coset_quotient G mul H) f)
+  (fun C => {group_inverse G mul z|z :e C})).
+exact h_s7_left_right_coset_bijection.
+exact h_s7_left_right_coset_equipotence.
+Qed.
+
+Theorem god1_group_product_inverse_right_cancels :
+  forall G, forall mul:set -> set -> set,
+    group G mul -> forall a x :e G,
+      mul (mul a x) (group_inverse G mul x) = a.
+let G mul.
+assume hG.
+let a.
+assume ha.
+let x.
+assume hx.
+apply (eq_i_tra
+  (mul (mul a x) (group_inverse G mul x))
+  (mul a (mul x (group_inverse G mul x))) a).
+- apply eq_sym.
+  exact (god1_group_associative G mul hG
+    a ha x hx (group_inverse G mul x)
+    (god1_group_inverse_in G mul hG x hx)).
+- apply (eq_i_tra
+    (mul a (mul x (group_inverse G mul x)))
+    (mul a (group_identity G mul)) a).
+  - f_equal.
+    exact (andER
+      (group_inverse G mul x :e G
+        /\ mul (group_inverse G mul x) x = group_identity G mul)
+      (mul x (group_inverse G mul x) = group_identity G mul)
+      (god1_group_inverse_specification G mul hG x hx)).
+  - exact (andEL
+      (mul a (group_identity G mul) = a)
+      (mul (group_identity G mul) a = a)
+      ((andER
+        (group_identity G mul :e G)
+        (forall z :e G,
+          mul z (group_identity G mul) = z
+          /\ mul (group_identity G mul) z = z)
+        (god1_group_identity_specification G mul hG)) a ha)).
+Qed.
+
+Theorem god1_group_right_cancel :
+  forall G, forall mul:set -> set -> set,
+    group G mul -> forall a b x :e G,
+      mul a x = mul b x -> a = b.
+let G mul.
+assume hG.
+let a.
+assume ha.
+let b.
+assume hb.
+let x.
+assume hx hab.
+apply (eq_i_tra a
+  (mul (mul a x) (group_inverse G mul x)) b).
+- apply eq_sym.
+  exact (god1_group_product_inverse_right_cancels
+    G mul hG a ha x hx).
+- apply (eq_i_tra
+    (mul (mul a x) (group_inverse G mul x))
+    (mul (mul b x) (group_inverse G mul x)) b).
+  - f_equal.
+    exact hab.
+  - exact (god1_group_product_inverse_right_cancels
+      G mul hG b hb x hx).
+Qed.
+
+Theorem god1_group_nat_power_identity_step :
+  forall G, forall mul:set -> set -> set,
+    group G mul -> forall n, nat_p n ->
+    group_nat_power G mul (group_identity G mul) n
+      = group_identity G mul ->
+    group_nat_power G mul (group_identity G mul) (ordsucc n)
+      = group_identity G mul.
+let G mul.
+assume hG.
+let n.
+assume hn hind.
+apply (eq_i_tra
+  (group_nat_power G mul (group_identity G mul) (ordsucc n))
+  (mul
+    (group_nat_power G mul (group_identity G mul) n)
+    (group_identity G mul))
+  (group_identity G mul)).
+- exact (god1_group_nat_power_successor G mul
+    (group_identity G mul) n hn).
+- apply (eq_i_tra
+    (mul
+      (group_nat_power G mul (group_identity G mul) n)
+      (group_identity G mul))
+    (mul (group_identity G mul) (group_identity G mul))
+    (group_identity G mul)).
+  - f_equal.
+    exact hind.
+  - exact (andEL
+      (mul (group_identity G mul) (group_identity G mul)
+        = group_identity G mul)
+      (mul (group_identity G mul) (group_identity G mul)
+        = group_identity G mul)
+      ((andER
+        (group_identity G mul :e G)
+        (forall z :e G,
+          mul z (group_identity G mul) = z
+          /\ mul (group_identity G mul) z = z)
+        (god1_group_identity_specification G mul hG))
+        (group_identity G mul)
+        (god1_group_identity_in G mul hG))).
+Qed.
+
+Theorem god1_group_nat_power_identity :
+  forall G, forall mul:set -> set -> set,
+    group G mul -> forall n, nat_p n ->
+      group_nat_power G mul (group_identity G mul) n
+        = group_identity G mul.
+let G mul.
+assume hG.
+let n.
+assume hn.
+exact (nat_ind
+  (fun k => group_nat_power G mul (group_identity G mul) k
+    = group_identity G mul)
+  (god1_group_nat_power_zero G mul (group_identity G mul))
+  (god1_group_nat_power_identity_step G mul hG)
+  n hn).
+Qed.
+
+Theorem god1_group_int_power_identity_nat :
+  forall G, forall mul:set -> set -> set,
+    group G mul -> forall n :e omega,
+      group_int_power G mul (group_identity G mul) n
+        = group_identity G mul.
+let G mul.
+assume hG.
+let n.
+assume hn.
+apply (eq_i_tra
+  (group_int_power G mul (group_identity G mul) n)
+  (group_nat_power G mul (group_identity G mul) n)
+  (group_identity G mul)).
+- exact (god1_group_int_power_nat G mul
+    (group_identity G mul) n (omega_nat_p n hn)).
+- exact (god1_group_nat_power_identity G mul hG n
+    (omega_nat_p n hn)).
+Qed.
+
+Theorem god1_group_int_power_identity_negative_nat :
+  forall G, forall mul:set -> set -> set,
+    group G mul -> forall n :e omega,
+      group_int_power G mul (group_identity G mul) (minus_SNo n)
+        = group_identity G mul.
+let G mul.
+assume hG.
+let n.
+assume hn.
+apply (eq_i_tra
+  (group_int_power G mul (group_identity G mul) (minus_SNo n))
+  (group_nat_power G mul
+    (group_inverse G mul (group_identity G mul)) n)
+  (group_identity G mul)).
+- exact (god1_group_int_power_negative_nat G mul
+    (group_identity G mul) n (omega_nat_p n hn)).
+- apply (eq_i_tra
+    (group_nat_power G mul
+      (group_inverse G mul (group_identity G mul)) n)
+    (group_nat_power G mul (group_identity G mul) n)
+    (group_identity G mul)).
+  - exact (f_eq_i (fun z => group_nat_power G mul z n)
+      (group_inverse G mul (group_identity G mul))
+      (group_identity G mul)
+      (god1_group_inverse_identity G mul hG)).
+  - exact (god1_group_nat_power_identity G mul hG n
+      (omega_nat_p n hn)).
+Qed.
+
+Theorem god1_group_int_power_identity :
+  forall G, forall mul:set -> set -> set,
+    group G mul -> forall q :e int,
+      group_int_power G mul (group_identity G mul) q
+        = group_identity G mul.
+let G mul.
+assume hG.
+let q.
+assume hq.
+exact (int_SNo_cases
+  (fun z => group_int_power G mul (group_identity G mul) z
+    = group_identity G mul)
+  (god1_group_int_power_identity_nat G mul hG)
+  (god1_group_int_power_identity_negative_nat G mul hG)
+  q hq).
+Qed.
+
+Theorem god1_surjection_gives_reverse_atleastp :
+  forall X Y, forall f:set -> set,
+    surj X Y f -> atleastp Y X.
+let X Y f.
+assume hf.
+apply (ex_intro_setfun (fun g => inj Y X g) (inv X f)).
+apply (injI Y X (inv X f)).
+- let y.
+  assume hy.
+  exact (andEL
+    (inv X f y :e X) (f (inv X f y) = y)
+    (surj_rinv X Y f
+      (andER
+        (forall x :e X, f x :e Y)
+        (forall z :e Y, exists x :e X, f x = z) hf)
+      y hy)).
+- let y.
+  assume hy.
+  let z.
+  assume hz hyz.
+  apply (eq_i_tra y (f (inv X f y)) z).
+  - apply eq_sym.
+    exact (andER
+      (inv X f y :e X) (f (inv X f y) = y)
+      (surj_rinv X Y f
+        (andER
+          (forall x :e X, f x :e Y)
+          (forall w :e Y, exists x :e X, f x = w) hf)
+        y hy)).
+  - apply (eq_i_tra (f (inv X f y)) (f (inv X f z)) z).
+    - f_equal.
+      exact hyz.
+    - exact (andER
+        (inv X f z :e X) (f (inv X f z) = z)
+        (surj_rinv X Y f
+          (andER
+            (forall x :e X, f x :e Y)
+            (forall w :e Y, exists x :e X, f x = w) hf)
+          z hz)).
+Qed.
+
+Theorem god1_group_int_power_reduces_mod_period :
+  forall G, forall mul:set -> set -> set, forall x,
+    group G mul -> x :e G ->
+    forall d :e omega, d <> 0 ->
+    group_nat_power G mul x d = group_identity G mul ->
+    forall p :e int, exists a :e d,
+      group_int_power G mul x p = group_nat_power G mul x a.
+let G mul x.
+assume hG hx.
+let d.
+assume hd hd0 hperiod.
+let p.
+assume hp.
+claim hdnonzero : d :e omega :\: {0}.
+apply (setminusI omega {0} d hd).
+assume hdSing.
+exact (hd0 (SingE 0 d hdSing)).
+apply (exandE_i (fun q => q :e int)
+  (fun q => exists a :e d,
+    p = add_SNo (mul_SNo q d) a)
+  (quotient_remainder_int d hdnonzero p hp)).
+let q.
+assume hq hrem.
+apply (exandE_i (fun a => a :e d)
+  (fun a => p = add_SNo (mul_SNo q d) a) hrem).
+let a.
+assume ha hpa.
+claim haomega : a :e omega.
+exact (omega_TransSet d hd a ha).
+apply (ex_intro (fun b => b :e d /\
+  group_int_power G mul x p = group_nat_power G mul x b) a).
+apply (andI (a :e d)
+  (group_int_power G mul x p = group_nat_power G mul x a)).
+- exact ha.
+- apply (eq_i_tra
+    (group_int_power G mul x p)
+    (group_int_power G mul x
+      (add_SNo (mul_SNo q d) a))
+    (group_nat_power G mul x a)).
+  - exact (f_eq_i (fun z => group_int_power G mul x z)
+      p (add_SNo (mul_SNo q d) a) hpa).
+  - apply (eq_i_tra
+      (group_int_power G mul x
+        (add_SNo (mul_SNo q d) a))
+      (mul
+        (group_int_power G mul x (mul_SNo q d))
+        (group_int_power G mul x a))
+      (group_nat_power G mul x a)).
+    - apply eq_sym.
+      exact (god1_group_int_power_add G mul x hG hx
+        (mul_SNo q d)
+        (int_mul_SNo q hq d (Subq_omega_int d hd))
+        a (Subq_omega_int a haomega)).
+    - apply (eq_i_tra
+        (mul
+          (group_int_power G mul x (mul_SNo q d))
+          (group_int_power G mul x a))
+        (mul (group_identity G mul)
+          (group_int_power G mul x a))
+        (group_nat_power G mul x a)).
+      - f_equal.
+        apply (eq_i_tra
+          (group_int_power G mul x (mul_SNo q d))
+          (group_int_power G mul x (mul_SNo d q))
+          (group_identity G mul)).
+        - exact (f_eq_i (fun z => group_int_power G mul x z)
+            (mul_SNo q d) (mul_SNo d q)
+            (mul_SNo_com q d (int_SNo q hq) (omega_SNo d hd))).
+        - apply (eq_i_tra
+            (group_int_power G mul x (mul_SNo d q))
+            (group_int_power G mul
+              (group_int_power G mul x d) q)
+            (group_identity G mul)).
+          - apply eq_sym.
+            exact (god1_group_int_power_power G mul x hG hx
+              d (Subq_omega_int d hd) q hq).
+          - apply (eq_i_tra
+              (group_int_power G mul
+                (group_int_power G mul x d) q)
+              (group_int_power G mul (group_identity G mul) q)
+              (group_identity G mul)).
+            - exact (f_eq_i
+                (fun z => group_int_power G mul z q)
+                (group_int_power G mul x d)
+                (group_identity G mul)
+                (eq_i_tra
+                  (group_int_power G mul x d)
+                  (group_nat_power G mul x d)
+                  (group_identity G mul)
+                  (god1_group_int_power_nat G mul x d
+                    (omega_nat_p d hd))
+                  hperiod)).
+            - exact (god1_group_int_power_identity G mul hG q hq).
+      - apply (eq_i_tra
+          (mul (group_identity G mul)
+            (group_int_power G mul x a))
+          (group_int_power G mul x a)
+          (group_nat_power G mul x a)).
+        - exact (andER
+            (mul (group_int_power G mul x a)
+              (group_identity G mul)
+              = group_int_power G mul x a)
+            (mul (group_identity G mul)
+              (group_int_power G mul x a)
+              = group_int_power G mul x a)
+            ((andER
+              (group_identity G mul :e G)
+              (forall z :e G,
+                mul z (group_identity G mul) = z
+                /\ mul (group_identity G mul) z = z)
+              (god1_group_identity_specification G mul hG))
+              (group_int_power G mul x a)
+              (god1_group_int_power_in G mul x hG hx
+                a (Subq_omega_int a haomega)))).
+        - exact (god1_group_int_power_nat G mul x a
+            (omega_nat_p a haomega)).
+Qed.
+
+Theorem god1_group_period_surjects_onto_cyclic_subgroup :
+  forall G, forall mul:set -> set -> set, forall x,
+    group G mul -> x :e G ->
+    forall d :e omega, d <> 0 ->
+    group_nat_power G mul x d = group_identity G mul ->
+    surj d (cyclic_subgroup G mul x)
+      (fun a => group_nat_power G mul x a).
+let G mul x.
+assume hG hx.
+let d.
+assume hd hd0 hperiod.
+apply (andI
+  (forall a :e d,
+    group_nat_power G mul x a :e cyclic_subgroup G mul x)
+  (forall y :e cyclic_subgroup G mul x,
+    exists a :e d, group_nat_power G mul x a = y)).
+- let a.
+  assume ha.
+  claim haomega : a :e omega.
+  exact (omega_TransSet d hd a ha).
+  apply (mem_eq_substR (cyclic_subgroup G mul x)
+    (group_int_power G mul x a)
+    (group_nat_power G mul x a)).
+  - exact (god1_group_int_power_nat G mul x a
+      (omega_nat_p a haomega)).
+  - exact (ReplI int (fun q => group_int_power G mul x q)
+      a (Subq_omega_int a haomega)).
+- let y.
+  assume hy.
+  apply (ReplE_impred int
+    (fun p => group_int_power G mul x p) y hy
+    (exists a :e d, group_nat_power G mul x a = y)).
+  let p.
+  assume hp hyp.
+  apply (exandE_i (fun a => a :e d)
+    (fun a => group_int_power G mul x p
+      = group_nat_power G mul x a)
+    (god1_group_int_power_reduces_mod_period
+      G mul x hG hx d hd hd0 hperiod p hp)).
+  let a.
+  assume ha hreduce.
+  apply (ex_intro
+    (fun b => b :e d /\ group_nat_power G mul x b = y) a).
+  exact (andI (a :e d) (group_nat_power G mul x a = y)
+    ha
+    (eq_i_tra
+      (group_nat_power G mul x a)
+      (group_int_power G mul x p) y
+      (eq_sym
+        (group_int_power G mul x p)
+        (group_nat_power G mul x a) hreduce)
+      (eq_sym y (group_int_power G mul x p) hyp))).
+Qed.
+
+Theorem god1_group_nat_power_in_cyclic_subgroup :
+  forall G, forall mul:set -> set -> set, forall x,
+    forall a :e omega,
+      group_nat_power G mul x a :e cyclic_subgroup G mul x.
+let G mul x.
+let a.
+assume ha.
+apply (mem_eq_substR (cyclic_subgroup G mul x)
+  (group_int_power G mul x a) (group_nat_power G mul x a)).
+- exact (god1_group_int_power_nat G mul x a
+    (omega_nat_p a ha)).
+- exact (ReplI int (fun q => group_int_power G mul x q)
+    a (Subq_omega_int a ha)).
+Qed.
+
+Theorem god1_group_power_strict_collision_gives_period :
+  forall G, forall mul:set -> set -> set, forall x,
+    group G mul -> x :e G -> forall r :e omega,
+    forall a b :e ordsucc r, a :e b ->
+    group_nat_power G mul x a = group_nat_power G mul x b ->
+    exists d :e omega,
+      d <> 0 /\ d c= r
+      /\ group_nat_power G mul x d = group_identity G mul.
+let G mul x.
+assume hG hx.
+let r.
+assume hr.
+let a.
+assume ha.
+let b.
+assume hb hab hpowers.
+claim haomega : a :e omega.
+exact (omega_TransSet (ordsucc r) (omega_ordsucc r hr) a ha).
+claim hbomega : b :e omega.
+exact (omega_TransSet (ordsucc r) (omega_ordsucc r hr) b hb).
+claim habsub : a c= b.
+apply (ordinal_TransSet b
+  (nat_p_ordinal b (omega_nat_p b hbomega))).
+exact hab.
+claim hdspec :
+  nat_p (nat_sub_witness a b)
+  /\ b = add_nat (nat_sub_witness a b) a.
+exact (nat_sub_witness_spec a (omega_nat_p a haomega)
+  b (omega_nat_p b hbomega) habsub).
+claim hdomega : nat_sub_witness a b :e omega.
+exact (nat_p_omega (nat_sub_witness a b)
+  (andEL
+    (nat_p (nat_sub_witness a b))
+    (b = add_nat (nat_sub_witness a b) a) hdspec)).
+apply (ex_intro
+  (fun d => d :e omega /\
+    ((d <> 0 /\ d c= r)
+    /\ group_nat_power G mul x d = group_identity G mul))
+  (nat_sub_witness a b)).
+apply (andI
+  (nat_sub_witness a b :e omega)
+  ((nat_sub_witness a b <> 0 /\ nat_sub_witness a b c= r)
+    /\ group_nat_power G mul x (nat_sub_witness a b)
+      = group_identity G mul)).
+- exact hdomega.
+- apply andI.
+  - apply andI.
+    - assume hd0.
+      apply (In_irref a).
+      apply (mem_eq_set_subst b a a).
+      - apply (eq_i_tra b
+          (add_nat (nat_sub_witness a b) a) a).
+        - exact (andER
+            (nat_p (nat_sub_witness a b))
+            (b = add_nat (nat_sub_witness a b) a) hdspec).
+        - apply (eq_i_tra
+            (add_nat (nat_sub_witness a b) a)
+            (add_nat 0 a) a).
+          - exact (f_eq_i (fun d => add_nat d a)
+              (nat_sub_witness a b) 0 hd0).
+          - exact (add_nat_0L a (omega_nat_p a haomega)).
+      - exact hab.
+    - apply (Subq_tra (nat_sub_witness a b) b r).
+      - let z.
+        assume hz.
+        exact (mem_eq_set_subst
+          (add_nat (nat_sub_witness a b) a) b z
+          (eq_sym b (add_nat (nat_sub_witness a b) a)
+            (andER
+              (nat_p (nat_sub_witness a b))
+              (b = add_nat (nat_sub_witness a b) a) hdspec))
+          ((add_nat_Subq_R'
+            (nat_sub_witness a b)
+            (andEL
+              (nat_p (nat_sub_witness a b))
+              (b = add_nat (nat_sub_witness a b) a) hdspec)
+            a (omega_nat_p a haomega)) z hz)).
+      - exact (TransSet_In_ordsucc_Subq b r
+          (ordinal_TransSet r
+            (nat_p_ordinal r (omega_nat_p r hr))) hb).
+  - apply (god1_group_right_cancel G mul hG
+      (group_nat_power G mul x (nat_sub_witness a b))
+      (god1_group_nat_power_in G mul x hG hx
+        (nat_sub_witness a b)
+        (andEL
+          (nat_p (nat_sub_witness a b))
+          (b = add_nat (nat_sub_witness a b) a) hdspec))
+      (group_identity G mul) (god1_group_identity_in G mul hG)
+      (group_nat_power G mul x a)
+      (god1_group_nat_power_in G mul x hG hx a
+        (omega_nat_p a haomega))).
+    apply (eq_i_tra
+      (mul
+        (group_nat_power G mul x (nat_sub_witness a b))
+        (group_nat_power G mul x a))
+      (group_nat_power G mul x b)
+      (mul (group_identity G mul)
+        (group_nat_power G mul x a))).
+    - apply (eq_i_tra
+        (mul
+          (group_nat_power G mul x (nat_sub_witness a b))
+          (group_nat_power G mul x a))
+        (group_nat_power G mul x
+          (add_nat (nat_sub_witness a b) a))
+        (group_nat_power G mul x b)).
+      - exact (god1_group_nat_power_add G mul x hG hx
+          (nat_sub_witness a b) a
+          (andEL
+            (nat_p (nat_sub_witness a b))
+            (b = add_nat (nat_sub_witness a b) a) hdspec)
+          (omega_nat_p a haomega)).
+      - exact (f_eq_i (fun z => group_nat_power G mul x z)
+          (add_nat (nat_sub_witness a b) a) b
+          (eq_sym b (add_nat (nat_sub_witness a b) a)
+            (andER
+              (nat_p (nat_sub_witness a b))
+              (b = add_nat (nat_sub_witness a b) a) hdspec))).
+    - apply (eq_i_tra
+        (group_nat_power G mul x b)
+        (group_nat_power G mul x a)
+        (mul (group_identity G mul)
+          (group_nat_power G mul x a))).
+      - exact (eq_sym
+          (group_nat_power G mul x a)
+          (group_nat_power G mul x b) hpowers).
+      - apply eq_sym.
+        exact (andER
+          (mul (group_nat_power G mul x a)
+            (group_identity G mul)
+            = group_nat_power G mul x a)
+          (mul (group_identity G mul)
+            (group_nat_power G mul x a)
+            = group_nat_power G mul x a)
+          ((andER
+            (group_identity G mul :e G)
+            (forall z :e G,
+              mul z (group_identity G mul) = z
+              /\ mul (group_identity G mul) z = z)
+            (god1_group_identity_specification G mul hG))
+            (group_nat_power G mul x a)
+            (god1_group_nat_power_in G mul x hG hx a
+              (omega_nat_p a haomega)))).
+Qed.
+
+Theorem god1_finite_cyclic_subgroup_has_bounded_positive_period :
+  forall G, forall mul:set -> set -> set, forall x,
+    group G mul -> x :e G -> forall r :e omega,
+    equip (cyclic_subgroup G mul x) r ->
+    exists d :e omega,
+      d <> 0 /\ d c= r
+      /\ group_nat_power G mul x d = group_identity G mul.
+let G mul x.
+assume hG hx.
+let r.
+assume hr hequip.
+apply hequip.
+let f.
+assume hf.
+claim hcollision :
+  exists i :e ordsucc r, exists j :e ordsucc r,
+    i <> j /\
+    group_nat_power G mul x i = group_nat_power G mul x j.
+apply dneg.
+assume hncollision.
+apply ((PigeonHole_nat r (omega_nat_p r hr)
+  (fun i => f (group_nat_power G mul x i)))
+  (fun i hi => god1_bijection_maps_into
+    (cyclic_subgroup G mul x) r f hf
+    (group_nat_power G mul x i)
+    (god1_group_nat_power_in_cyclic_subgroup G mul x i
+      (omega_TransSet (ordsucc r) (omega_ordsucc r hr) i hi)))
+  (fun i hi j hj hij =>
+    orE (i = j) (i <> j) (xm (i = j)) (i = j)
+      (fun heq => heq)
+      (fun hneq => FalseE
+        (hncollision
+          (ex_intro
+            (fun a => a :e ordsucc r /\
+              exists b :e ordsucc r,
+                a <> b /\
+                group_nat_power G mul x a
+                  = group_nat_power G mul x b)
+            i
+            (andI (i :e ordsucc r)
+              (exists b :e ordsucc r,
+                i <> b /\
+                group_nat_power G mul x i
+                  = group_nat_power G mul x b)
+              hi
+              (ex_intro
+                (fun b => b :e ordsucc r /\
+                  (i <> b /\
+                  group_nat_power G mul x i
+                    = group_nat_power G mul x b))
+                j
+                (andI (j :e ordsucc r)
+                  (i <> j /\
+                    group_nat_power G mul x i
+                      = group_nat_power G mul x j)
+                  hj
+                  (andI (i <> j)
+                    (group_nat_power G mul x i
+                      = group_nat_power G mul x j)
+                    hneq
+                    (god1_bijection_injective
+                      (cyclic_subgroup G mul x) r f hf
+                      (group_nat_power G mul x i)
+                      (god1_group_nat_power_in_cyclic_subgroup
+                        G mul x i
+                        (omega_TransSet (ordsucc r)
+                          (omega_ordsucc r hr) i hi))
+                      (group_nat_power G mul x j)
+                      (god1_group_nat_power_in_cyclic_subgroup
+                        G mul x j
+                        (omega_TransSet (ordsucc r)
+                          (omega_ordsucc r hr) j hj))
+                      hij)))))))
+        (i = j)))).
+apply (exandE_i (fun i => i :e ordsucc r)
+  (fun i => exists j :e ordsucc r,
+    i <> j /\
+    group_nat_power G mul x i = group_nat_power G mul x j)
+  hcollision).
+let i.
+assume hi hicollision.
+apply (exandE_i (fun j => j :e ordsucc r)
+  (fun j => i <> j /\
+    group_nat_power G mul x i = group_nat_power G mul x j)
+  hicollision).
+let j.
+assume hj hdata.
+apply (ordinal_trichotomy_or_impred i j
+  (nat_p_ordinal i
+    (omega_nat_p i
+      (omega_TransSet (ordsucc r) (omega_ordsucc r hr) i hi)))
+  (nat_p_ordinal j
+    (omega_nat_p j
+      (omega_TransSet (ordsucc r) (omega_ordsucc r hr) j hj)))
+  (exists d :e omega,
+    d <> 0 /\ d c= r
+    /\ group_nat_power G mul x d = group_identity G mul)).
+- assume hij.
+  exact (god1_group_power_strict_collision_gives_period
+    G mul x hG hx r hr i hi j hj hij
+    (andER (i <> j)
+      (group_nat_power G mul x i = group_nat_power G mul x j)
+      hdata)).
+- assume hij.
+  exact (FalseE
+    ((andEL (i <> j)
+      (group_nat_power G mul x i = group_nat_power G mul x j)
+      hdata) hij)
+    (exists d :e omega,
+      d <> 0 /\ d c= r
+      /\ group_nat_power G mul x d = group_identity G mul)).
+- assume hji.
+  exact (god1_group_power_strict_collision_gives_period
+    G mul x hG hx r hr j hj i hi hji
+    (eq_sym
+      (group_nat_power G mul x i)
+      (group_nat_power G mul x j)
+      (andER (i <> j)
+        (group_nat_power G mul x i = group_nat_power G mul x j)
+        hdata))).
+Qed.
+
+Theorem god1_finite_cyclic_subgroup_cardinality_power_identity :
+  forall G, forall mul:set -> set -> set, forall x,
+    group G mul -> x :e G -> forall r :e omega,
+    equip (cyclic_subgroup G mul x) r ->
+    group_nat_power G mul x r = group_identity G mul.
+let G mul x.
+assume hG hx.
+let r.
+assume hr hequip.
+apply (exandE_i (fun d => d :e omega)
+  (fun d => (d <> 0 /\ d c= r)
+    /\ group_nat_power G mul x d = group_identity G mul)
+  (god1_finite_cyclic_subgroup_has_bounded_positive_period
+    G mul x hG hx r hr hequip)).
+let d.
+assume hd hdata.
+claim hd0 : d <> 0.
+exact (andEL (d <> 0) (d c= r)
+  (andEL (d <> 0 /\ d c= r)
+    (group_nat_power G mul x d = group_identity G mul) hdata)).
+claim hdr : d c= r.
+exact (andER (d <> 0) (d c= r)
+  (andEL (d <> 0 /\ d c= r)
+    (group_nat_power G mul x d = group_identity G mul) hdata)).
+claim hperiod :
+  group_nat_power G mul x d = group_identity G mul.
+exact (andER (d <> 0 /\ d c= r)
+  (group_nat_power G mul x d = group_identity G mul) hdata).
+claim hsurj :
+  surj d (cyclic_subgroup G mul x)
+    (fun a => group_nat_power G mul x a).
+exact (god1_group_period_surjects_onto_cyclic_subgroup
+  G mul x hG hx d hd hd0 hperiod).
+claim hatleast_rd : atleastp r d.
+exact (atleastp_tra r (cyclic_subgroup G mul x) d
+  (equip_atleastp r (cyclic_subgroup G mul x)
+    (equip_sym (cyclic_subgroup G mul x) r hequip))
+  (god1_surjection_gives_reverse_atleastp
+    d (cyclic_subgroup G mul x)
+    (fun a => group_nat_power G mul x a) hsurj)).
+claim hatleast_dr : atleastp d r.
+exact (Subq_atleastp d r hdr).
+claim hequip_rd : equip r d.
+exact (atleastp_antisym_equip r d hatleast_rd hatleast_dr).
+claim hrd : r = d.
+exact (god1_nat_equip_eq r d
+  (omega_nat_p r hr) (omega_nat_p d hd) hequip_rd).
+apply (eq_i_tra
+  (group_nat_power G mul x r)
+  (group_nat_power G mul x d)
+  (group_identity G mul)).
+- exact (f_eq_i (fun a => group_nat_power G mul x a) r d hrd).
+- exact hperiod.
+Qed.
+
+Theorem god1_group_nat_power_multiple_of_period :
+  forall G, forall mul:set -> set -> set, forall x,
+    group G mul -> x :e G -> forall r q,
+    nat_p r -> nat_p q ->
+    group_nat_power G mul x r = group_identity G mul ->
+    group_nat_power G mul x (mul_nat q r)
+      = group_identity G mul.
+let G mul x.
+assume hG hx.
+let r q.
+assume hr hq hperiod.
+apply (eq_i_tra
+  (group_nat_power G mul x (mul_nat q r))
+  (group_nat_power G mul x (mul_nat r q))
+  (group_identity G mul)).
+- exact (f_eq_i (fun a => group_nat_power G mul x a)
+    (mul_nat q r) (mul_nat r q)
+    (mul_nat_com q hq r hr)).
+- apply (eq_i_tra
+    (group_nat_power G mul x (mul_nat r q))
+    (group_nat_power G mul (group_nat_power G mul x r) q)
+    (group_identity G mul)).
+  - apply eq_sym.
+    exact (god1_group_nat_power_power G mul x hG hx r q hr hq).
+  - apply (eq_i_tra
+      (group_nat_power G mul (group_nat_power G mul x r) q)
+      (group_nat_power G mul (group_identity G mul) q)
+      (group_identity G mul)).
+    - exact (f_eq_i (fun z => group_nat_power G mul z q)
+        (group_nat_power G mul x r) (group_identity G mul) hperiod).
+    - exact (god1_group_nat_power_identity G mul hG q hq).
+Qed.
+
+Theorem god1_group_product_inverse_right_reconstructs :
+  forall G, forall mul:set -> set -> set,
+    group G mul -> forall a b :e G,
+      mul (mul a (group_inverse G mul b)) b = a.
+let G mul.
+assume hG.
+let a.
+assume ha.
+let b.
+assume hb.
+apply (eq_i_tra
+  (mul (mul a (group_inverse G mul b)) b)
+  (mul a (mul (group_inverse G mul b) b)) a).
+- apply eq_sym.
+  exact (god1_group_associative G mul hG
+    a ha (group_inverse G mul b)
+    (god1_group_inverse_in G mul hG b hb) b hb).
+- apply (eq_i_tra
+    (mul a (mul (group_inverse G mul b) b))
+    (mul a (group_identity G mul)) a).
+  - f_equal.
+    exact (andER
+      (group_inverse G mul b :e G)
+      (mul (group_inverse G mul b) b = group_identity G mul)
+      (andEL
+        (group_inverse G mul b :e G
+          /\ mul (group_inverse G mul b) b = group_identity G mul)
+        (mul b (group_inverse G mul b) = group_identity G mul)
+        (god1_group_inverse_specification G mul hG b hb))).
+  - exact (andEL
+      (mul a (group_identity G mul) = a)
+      (mul (group_identity G mul) a = a)
+      ((andER
+        (group_identity G mul :e G)
+        (forall z :e G,
+          mul z (group_identity G mul) = z
+          /\ mul (group_identity G mul) z = z)
+        (god1_group_identity_specification G mul hG)) a ha)).
+Qed.
+
+Theorem god1_finite_group_power_from_cyclic_period :
+  forall G, forall mul:set -> set -> set, forall x,
+    group G mul -> x :e G -> forall n :e omega,
+    equip G n -> forall r :e omega,
+    equip (cyclic_subgroup G mul x) r ->
+    group_nat_power G mul x r = group_identity G mul ->
+    group_nat_power G mul x n = group_identity G mul.
+let G mul x.
+assume hG hx.
+let n.
+assume hn heG.
+let r.
+assume hr heHr hperiod.
+claim hfinG : finite G.
+exact (ex_intro (fun m => m :e omega /\ equip G m) n
+  (andI (n :e omega) (equip G n) hn heG)).
+claim hcyclic : subgroup G mul (cyclic_subgroup G mul x).
+exact (god1_powers_form_cyclic_subgroup G mul x hx hG).
+claim hfinQ :
+  finite (left_coset_quotient G mul (cyclic_subgroup G mul x)).
+exact (Repl_finite
+  (fun z => left_coset G mul (cyclic_subgroup G mul x) z)
+  G hfinG).
+apply (exandE_i (fun q => q :e omega)
+  (fun q => equip
+    (left_coset_quotient G mul (cyclic_subgroup G mul x)) q)
+  hfinQ).
+let q.
+assume hq heQ.
+claim hnqr : n = mul_nat q r.
+exact (god1_s7_theorem4_lagrange_cardinality_formula
+  G mul (cyclic_subgroup G mul x)
+  hG hcyclic hfinG n hn q hq r hr heG heQ heHr).
+apply (eq_i_tra
+  (group_nat_power G mul x n)
+  (group_nat_power G mul x (mul_nat q r))
+  (group_identity G mul)).
+- exact (f_eq_i (fun m => group_nat_power G mul x m)
+    n (mul_nat q r) hnqr).
+- exact (god1_group_nat_power_multiple_of_period
+    G mul x hG hx r q
+    (omega_nat_p r hr) (omega_nat_p q hq) hperiod).
+Qed.
+
+Theorem god1_cyclic_power_map_surjective :
+  forall G, forall mul:set -> set -> set, forall x,
+    group G mul -> x :e G ->
+    cyclic_subgroup G mul x = G ->
+    surj int G (fun q => group_int_power G mul x q).
+let G mul x.
+assume hG hx hcyclicG.
+apply (andI
+  (forall q :e int, group_int_power G mul x q :e G)
+  (forall y :e G, exists q :e int,
+    group_int_power G mul x q = y)).
+- exact (god1_group_int_power_in G mul x hG hx).
+- let y.
+  assume hy.
+  apply (ReplE_impred int
+    (fun q => group_int_power G mul x q) y
+    (mem_eq_set_subst G (cyclic_subgroup G mul x) y
+      (eq_sym (cyclic_subgroup G mul x) G hcyclicG) hy)
+    (exists q :e int, group_int_power G mul x q = y)).
+  let q.
+  assume hq hyq.
+  apply (ex_intro
+    (fun p => p :e int /\ group_int_power G mul x p = y) q).
+  exact (andI (q :e int) (group_int_power G mul x q = y)
+    hq (eq_sym y (group_int_power G mul x q) hyq)).
+Qed.
+
+Theorem god1_group_int_power_difference :
+  forall G, forall mul:set -> set -> set, forall x,
+    group G mul -> x :e G -> forall p q :e int,
+    group_int_power G mul x (add_SNo p (minus_SNo q))
+      = mul (group_int_power G mul x p)
+        (group_inverse G mul (group_int_power G mul x q)).
+let G mul x.
+assume hG hx.
+let p.
+assume hp.
+let q.
+assume hq.
+apply (eq_i_tra
+  (group_int_power G mul x (add_SNo p (minus_SNo q)))
+  (mul (group_int_power G mul x p)
+    (group_int_power G mul x (minus_SNo q)))
+  (mul (group_int_power G mul x p)
+    (group_inverse G mul (group_int_power G mul x q)))).
+- apply eq_sym.
+  exact (god1_group_int_power_add G mul x hG hx
+    p hp (minus_SNo q) (int_minus_SNo q hq)).
+- f_equal.
+  apply eq_sym.
+  exact (god1_group_int_power_inverse G mul x hG hx q hq).
+Qed.
+
+Theorem god1_group_int_powers_equal_iff_difference_identity :
+  forall G, forall mul:set -> set -> set, forall x,
+    group G mul -> x :e G -> forall p q :e int,
+    (group_int_power G mul x p = group_int_power G mul x q <->
+      mul (group_int_power G mul x p)
+        (group_inverse G mul (group_int_power G mul x q))
+      = group_identity G mul).
+let G mul x.
+assume hG hx.
+let p.
+assume hp.
+let q.
+assume hq.
+apply iffI.
+- assume hpq.
+  apply (eq_i_tra
+    (mul (group_int_power G mul x p)
+      (group_inverse G mul (group_int_power G mul x q)))
+    (mul (group_int_power G mul x q)
+      (group_inverse G mul (group_int_power G mul x q)))
+    (group_identity G mul)).
+  - f_equal.
+    exact hpq.
+  - exact (andER
+      (group_inverse G mul (group_int_power G mul x q) :e G
+        /\ mul
+          (group_inverse G mul (group_int_power G mul x q))
+          (group_int_power G mul x q) = group_identity G mul)
+      (mul (group_int_power G mul x q)
+        (group_inverse G mul (group_int_power G mul x q))
+        = group_identity G mul)
+      (god1_group_inverse_specification G mul hG
+        (group_int_power G mul x q)
+        (god1_group_int_power_in G mul x hG hx q hq))).
+- assume hdiff.
+  apply (eq_i_tra
+    (group_int_power G mul x p)
+    (mul
+      (mul (group_int_power G mul x p)
+        (group_inverse G mul (group_int_power G mul x q)))
+      (group_int_power G mul x q))
+    (group_int_power G mul x q)).
+  - apply eq_sym.
+    exact (god1_group_product_inverse_right_reconstructs G mul hG
+      (group_int_power G mul x p)
+      (god1_group_int_power_in G mul x hG hx p hp)
+      (group_int_power G mul x q)
+      (god1_group_int_power_in G mul x hG hx q hq)).
+  - apply (eq_i_tra
+      (mul
+        (mul (group_int_power G mul x p)
+          (group_inverse G mul (group_int_power G mul x q)))
+        (group_int_power G mul x q))
+      (mul (group_identity G mul) (group_int_power G mul x q))
+      (group_int_power G mul x q)).
+    - f_equal.
+      exact hdiff.
+    - exact (andER
+        (mul (group_int_power G mul x q) (group_identity G mul)
+          = group_int_power G mul x q)
+        (mul (group_identity G mul) (group_int_power G mul x q)
+          = group_int_power G mul x q)
+        ((andER
+          (group_identity G mul :e G)
+          (forall z :e G,
+            mul z (group_identity G mul) = z
+            /\ mul (group_identity G mul) z = z)
+          (god1_group_identity_specification G mul hG))
+          (group_int_power G mul x q)
+          (god1_group_int_power_in G mul x hG hx q hq))).
+Qed.
+
+Theorem god1_group_int_powers_equal_iff_kernel_congruence :
+  forall G, forall mul:set -> set -> set, forall x,
+    group G mul -> x :e G -> forall p q :e int,
+    forall s :e omega,
+    (forall z :e int,
+      (group_int_power G mul x z = group_identity G mul <->
+        exists k :e int, z = mul_SNo s k)) ->
+    (group_int_power G mul x p = group_int_power G mul x q <->
+      exists k :e int,
+        add_SNo p (minus_SNo q) = mul_SNo s k).
+let G mul x.
+assume hG hx.
+let p.
+assume hp.
+let q.
+assume hq.
+let s.
+assume hs hkernel.
+apply iffI.
+- assume hpq.
+  apply (iffEL
+    (group_int_power G mul x (add_SNo p (minus_SNo q))
+      = group_identity G mul)
+    (exists k :e int,
+      add_SNo p (minus_SNo q) = mul_SNo s k)
+    (hkernel (add_SNo p (minus_SNo q))
+      (int_add_SNo p hp (minus_SNo q) (int_minus_SNo q hq)))).
+  apply (eq_i_tra
+    (group_int_power G mul x (add_SNo p (minus_SNo q)))
+    (mul (group_int_power G mul x p)
+      (group_inverse G mul (group_int_power G mul x q)))
+    (group_identity G mul)).
+  - exact (god1_group_int_power_difference G mul x hG hx p hp q hq).
+  - exact (iffEL
+      (group_int_power G mul x p = group_int_power G mul x q)
+      (mul (group_int_power G mul x p)
+        (group_inverse G mul (group_int_power G mul x q))
+        = group_identity G mul)
+      (god1_group_int_powers_equal_iff_difference_identity
+        G mul x hG hx p hp q hq) hpq).
+- assume hmultiple.
+  apply (iffER
+    (group_int_power G mul x p = group_int_power G mul x q)
+    (mul (group_int_power G mul x p)
+      (group_inverse G mul (group_int_power G mul x q))
+      = group_identity G mul)
+    (god1_group_int_powers_equal_iff_difference_identity
+      G mul x hG hx p hp q hq)).
+  apply (eq_i_tra
+    (mul (group_int_power G mul x p)
+      (group_inverse G mul (group_int_power G mul x q)))
+    (group_int_power G mul x (add_SNo p (minus_SNo q)))
+    (group_identity G mul)).
+  - apply eq_sym.
+    exact (god1_group_int_power_difference G mul x hG hx p hp q hq).
+  - exact (iffER
+      (group_int_power G mul x (add_SNo p (minus_SNo q))
+        = group_identity G mul)
+      (exists k :e int,
+        add_SNo p (minus_SNo q) = mul_SNo s k)
+      (hkernel (add_SNo p (minus_SNo q))
+        (int_add_SNo p hp (minus_SNo q) (int_minus_SNo q hq)))
+      hmultiple).
+Qed.
+
+Theorem god1_finite_group_element_has_positive_int_period :
+  forall G, forall mul:set -> set -> set, forall x,
+    group G mul -> x :e G -> finite G ->
+    exists s :e omega,
+      s <> 0
+      /\ group_int_power G mul x s = group_identity G mul.
+let G mul x.
+assume hG hx hfinG.
+claim hcyclic : subgroup G mul (cyclic_subgroup G mul x).
+exact (god1_powers_form_cyclic_subgroup G mul x hx hG).
+claim hfinC : finite (cyclic_subgroup G mul x).
+exact (Subq_finite G hfinG (cyclic_subgroup G mul x)
+  (god1_subgroup_subset G mul (cyclic_subgroup G mul x) hcyclic)).
+apply (exandE_i (fun r => r :e omega)
+  (fun r => equip (cyclic_subgroup G mul x) r) hfinC).
+let r.
+assume hr heHr.
+apply (exandE_i (fun s => s :e omega)
+  (fun s => (s <> 0 /\ s c= r)
+    /\ group_nat_power G mul x s = group_identity G mul)
+  (god1_finite_cyclic_subgroup_has_bounded_positive_period
+    G mul x hG hx r hr heHr)).
+let s.
+assume hs hsdata.
+apply (ex_intro
+  (fun t => t :e omega /\
+    (t <> 0 /\
+      group_int_power G mul x t = group_identity G mul)) s).
+apply (andI (s :e omega)
+  (s <> 0 /\
+    group_int_power G mul x s = group_identity G mul)).
+- exact hs.
+- apply andI.
+  - exact (andEL (s <> 0) (s c= r)
+      (andEL (s <> 0 /\ s c= r)
+        (group_nat_power G mul x s = group_identity G mul)
+        hsdata)).
+  - apply (eq_i_tra
+      (group_int_power G mul x s)
+      (group_nat_power G mul x s)
+      (group_identity G mul)).
+    - exact (god1_group_int_power_nat G mul x s
+        (omega_nat_p s hs)).
+    - exact (andER (s <> 0 /\ s c= r)
+        (group_nat_power G mul x s = group_identity G mul)
+        hsdata).
+Qed.
+
+Theorem god1_kernel_generator_is_natural_period :
+  forall G, forall mul:set -> set -> set, forall x,
+    forall s :e omega,
+    (forall q :e int,
+      (group_int_power G mul x q = group_identity G mul <->
+        exists k :e int, q = mul_SNo s k)) ->
+    group_nat_power G mul x s = group_identity G mul.
+let G mul x.
+let s.
+assume hs hkernel.
+apply (eq_i_tra
+  (group_nat_power G mul x s)
+  (group_int_power G mul x s)
+  (group_identity G mul)).
+- apply eq_sym.
+  exact (god1_group_int_power_nat G mul x s (omega_nat_p s hs)).
+- apply (iffER
+    (group_int_power G mul x s = group_identity G mul)
+    (exists k :e int, s = mul_SNo s k)
+    (hkernel s (Subq_omega_int s hs))).
+  apply (ex_intro
+    (fun k => k :e int /\ s = mul_SNo s k) 1).
+  exact (andI (1 :e int) (s = mul_SNo s 1)
+    (Subq_omega_int 1 (nat_p_omega 1 nat_1))
+    (eq_sym (mul_SNo s 1) s
+      (mul_SNo_oneR s (omega_SNo s hs)))).
+Qed.
+
+Theorem god1_finite_group_cardinality_power_identity_aux :
+  forall G, forall mul:set -> set -> set, forall n :e omega,
+    group G mul -> equip G n -> forall x :e G,
+      finite G
+      /\ group_nat_power G mul x n = group_identity G mul.
+let G mul n.
+assume hn hG heG.
+let x.
+assume hx.
+claim hfinG : finite G.
+exact (ex_intro (fun m => m :e omega /\ equip G m) n
+  (andI (n :e omega) (equip G n) hn heG)).
+claim hcyclic : subgroup G mul (cyclic_subgroup G mul x).
+exact (god1_powers_form_cyclic_subgroup G mul x hx hG).
+claim hfinC : finite (cyclic_subgroup G mul x).
+exact (Subq_finite G hfinG (cyclic_subgroup G mul x)
+  (god1_subgroup_subset G mul (cyclic_subgroup G mul x) hcyclic)).
+apply (andI (finite G)
+  (group_nat_power G mul x n = group_identity G mul)).
+- exact hfinG.
+- apply (exandE_i (fun r => r :e omega)
+    (fun r => equip (cyclic_subgroup G mul x) r) hfinC).
+  let r.
+  assume hr heHr.
+  exact (god1_finite_group_power_from_cyclic_period
+    G mul x hG hx n hn heG r hr heHr
+    (god1_finite_cyclic_subgroup_cardinality_power_identity
+      G mul x hG hx r hr heHr)).
+Qed.
 
 Theorem god1_s7_theorem5_finite_group_power_is_identity :
   forall G, forall mul:set -> set -> set, forall n :e omega,
@@ -43693,32 +45117,51 @@ let G mul n.
 assume hn hG hequip.
 let x.
 assume hx.
+claim h_s7_t5_finite_group : finite G.
+exact (ex_intro (fun m => m :e omega /\ equip G m) n
+  (andI (n :e omega) (equip G n) hn hequip)).
+claim h_s7_t5_cyclic_is_subgroup :
+  subgroup G mul (cyclic_subgroup G mul x).
+exact (god1_powers_form_cyclic_subgroup G mul x hx hG).
 //GOD1PRF:56559 Let H be the subgroup of G generated by $x$, and let $r=\operatorname{Card}(\mathrm{H})$.
 claim h_s7_t5_cyclic_subgroup_data :
   subgroup G mul (cyclic_subgroup G mul x)
   /\ exists r :e omega, equip (cyclic_subgroup G mul x) r.
-admit.
+exact (andI
+  (subgroup G mul (cyclic_subgroup G mul x))
+  (exists r :e omega, equip (cyclic_subgroup G mul x) r)
+  h_s7_t5_cyclic_is_subgroup
+  (Subq_finite G h_s7_t5_finite_group
+    (cyclic_subgroup G mul x)
+    (god1_subgroup_subset G mul (cyclic_subgroup G mul x)
+      h_s7_t5_cyclic_is_subgroup))).
 //GOD1PRF:56649 Since $n$ is a multiple of $r$, it is enough to prove that $x^{r}=e$.
 claim h_s7_t5_reduce_from_subgroup_order :
   forall r :e omega,
     equip (cyclic_subgroup G mul x) r ->
     group_nat_power G mul x r = group_identity G mul ->
     group_nat_power G mul x n = group_identity G mul.
-admit.
+exact (god1_finite_group_power_from_cyclic_period
+  G mul x hG hx n hn hequip).
 //GOD1PRF:56719 In other words, it is enough to prove Theorem 5 in the case where G is generated by $x$.
 claim h_s7_t5_reduce_to_cyclic_case :
   cyclic_subgroup G mul x = G ->
   group_nat_power G mul x n = group_identity G mul.
-admit.
+assume hcyclicG.
+apply (god1_finite_cyclic_subgroup_cardinality_power_identity
+  G mul x hG hx n hn).
+exact (god1_equip_domain_eq_subst G
+  (cyclic_subgroup G mul x) n
+  (eq_sym (cyclic_subgroup G mul x) G hcyclicG) hequip).
 //GOD1PRF:56809 So let G be generated by an element $x$, and consider the mapping $f: \mathbf{Z} \rightarrow \mathrm{G}$ defined by
 claim h_s7_t5_power_map_closed :
   forall q :e int, group_int_power G mul x q :e G.
-admit.
+exact (god1_group_int_power_in G mul x hG hx).
 //GOD1PRF:56944 by hypothesis, $f$ is surjective.
 claim h_s7_t5_power_map_surjective :
   cyclic_subgroup G mul x = G ->
   surj int G (fun q => group_int_power G mul x q).
-admit.
+exact (god1_cyclic_power_map_surjective G mul x hG hx).
 //GOD1PRF:56978 The formulae for calculating with powers (Example 9) show that we have the relations
 claim h_s7_t5_example9_call :
   (forall p q :e int,
@@ -43737,15 +45180,21 @@ claim h_s7_t5_power_map_relations :
     group_int_power G mul x (add_SNo p (minus_SNo q))
     = mul (group_int_power G mul x p)
       (group_inverse G mul (group_int_power G mul x q)).
-admit.
+exact (andI
+  (group_int_power G mul x 0 = group_identity G mul)
+  (forall p q :e int,
+    group_int_power G mul x (add_SNo p (minus_SNo q))
+    = mul (group_int_power G mul x p)
+      (group_inverse G mul (group_int_power G mul x q)))
+  (god1_group_int_power_zero G mul x)
+  (god1_group_int_power_difference G mul x hG hx)).
 //GOD1PRF:57190 from these relations it follows immediately that the $q \in \mathbf{Z}$ such that $f(q)=e$ form a subgroup of $\mathbf{Z}$, which is therefore of the form $s \mathbf{Z}$ where $s$ is a well-determined positive integer.
 claim h_s7_t5_power_kernel_generator :
   exists s :e omega,
-    0 :e s
-    /\ forall q :e int,
-      (group_int_power G mul x q = group_identity G mul <->
-        exists k :e int, q = mul_SNo s k).
-admit.
+    s <> 0
+    /\ group_int_power G mul x s = group_identity G mul.
+exact (god1_finite_group_element_has_positive_int_period
+  G mul x hG hx h_s7_t5_finite_group).
 //GOD1PRF:57410 Furthermore, the relation $f\left(q^{\prime}\right)=f\left(q^{\prime \prime}\right)$ is equivalent to
 claim h_s7_t5_equal_powers_difference_identity :
   forall p q :e int,
@@ -43753,7 +45202,8 @@ claim h_s7_t5_equal_powers_difference_identity :
       mul (group_int_power G mul x p)
         (group_inverse G mul (group_int_power G mul x q))
       = group_identity G mul).
-admit.
+exact (god1_group_int_powers_equal_iff_difference_identity
+  G mul x hG hx).
 //GOD1PRF:57584 and from the formulae above this in turn is equivalent to $f\left(q^{\prime}-q^{\prime \prime}\right)=e$, i.e., to
 claim h_s7_t5_equal_powers_congruence :
   forall p q :e int, forall s :e omega,
@@ -43763,22 +45213,25 @@ claim h_s7_t5_equal_powers_congruence :
     (group_int_power G mul x p = group_int_power G mul x q <->
       exists k :e int,
         add_SNo p (minus_SNo q) = mul_SNo s k).
-admit.
+exact (god1_group_int_powers_equal_iff_kernel_congruence
+  G mul x hG hx).
 //GOD1PRF:57812 Since $f$ is surjective, it follows that the number of elements of $\mathbf{G}$ is equal to the number of classes modulo $s$ in $\mathbf{Z}$; in other words, the order of $\mathbf{G}$ is $s$, and since $x^{s}=e$ the proof is complete.
 claim h_s7_t5_order_equals_kernel_generator :
   forall s :e omega,
-    0 :e s ->
     (forall q :e int,
       (group_int_power G mul x q = group_identity G mul <->
         exists k :e int, q = mul_SNo s k)) ->
-    equip G n -> n = s
-    /\ group_nat_power G mul x n = group_identity G mul.
-admit.
+    group_nat_power G mul x s = group_identity G mul.
+exact (god1_kernel_generator_is_natural_period G mul x).
 //GOD1PRF:58049 Q.E.D.
 claim h_s7_t5_book_conclusion :
   group_nat_power G mul x n = group_identity G mul.
-admit.
-Admitted.
+exact (andER (finite G)
+  (group_nat_power G mul x n = group_identity G mul)
+  (god1_finite_group_cardinality_power_identity_aux
+    G mul n hn hG hequip x hx)).
+exact h_s7_t5_book_conclusion.
+Qed.
 
 (** Formal interface for the equivalence-class/image theorem cited as §4, Theorem 2. **)
 Theorem god1_s4_theorem2_classes_equip_image :
