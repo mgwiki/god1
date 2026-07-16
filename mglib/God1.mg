@@ -55097,6 +55097,240 @@ Definition subfield :
     /\ forall x :e A,
       x <> ring_zero K add -> ring_inverse K add mul x :e A.
 
+Theorem god1_subfield_ambient_field :
+  forall K, forall add mul:set -> set -> set, forall A,
+    subfield K add mul A -> field K add mul.
+let K add mul A.
+assume hA.
+exact (andEL
+  (field K add mul) (subring K add mul A)
+  (andEL
+    (field K add mul /\ subring K add mul A)
+    (forall x :e A,
+      x <> ring_zero K add -> ring_inverse K add mul x :e A)
+    hA)).
+Qed.
+
+Theorem god1_subfield_subring :
+  forall K, forall add mul:set -> set -> set, forall A,
+    subfield K add mul A -> subring K add mul A.
+let K add mul A.
+assume hA.
+exact (andER
+  (field K add mul) (subring K add mul A)
+  (andEL
+    (field K add mul /\ subring K add mul A)
+    (forall x :e A,
+      x <> ring_zero K add -> ring_inverse K add mul x :e A)
+    hA)).
+Qed.
+
+Theorem god1_subfield_inverse_closed :
+  forall K, forall add mul:set -> set -> set, forall A,
+    subfield K add mul A -> forall x :e A,
+      x <> ring_zero K add -> ring_inverse K add mul x :e A.
+let K add mul A.
+assume hA.
+exact (andER
+  (field K add mul /\ subring K add mul A)
+  (forall x :e A,
+    x <> ring_zero K add -> ring_inverse K add mul x :e A)
+  hA).
+Qed.
+
+Theorem god1_field_division_ring :
+  forall K, forall add mul:set -> set -> set,
+    field K add mul -> division_ring K add mul.
+let K add mul.
+assume hK.
+exact (andEL
+  (division_ring K add mul) (commutative_on K mul) hK).
+Qed.
+
+Theorem god1_field_multiplication_commutative :
+  forall K, forall add mul:set -> set -> set,
+    field K add mul -> commutative_on K mul.
+let K add mul.
+assume hK.
+exact (andER
+  (division_ring K add mul) (commutative_on K mul) hK).
+Qed.
+
+Theorem god1_subring_additive_zero_neutral :
+  forall K, forall add mul:set -> set -> set, forall A,
+    subring K add mul A -> neutral_element A add (ring_zero K add).
+let K add mul A.
+assume hA.
+claim hsubgroup : subgroup K add A.
+exact (god1_subring_additive_subgroup K add mul A hA).
+claim hG : group K add.
+exact (god1_ring_additive_group K add mul
+  (god1_subring_ambient_ring K add mul A hA)).
+apply (andI
+  (ring_zero K add :e A)
+  (forall x :e A,
+    add x (ring_zero K add) = x /\ add (ring_zero K add) x = x)).
+- exact (god1_subgroup_contains_identity K add A hsubgroup).
+- let x.
+  assume hx.
+  exact ((andER
+    (ring_zero K add :e K)
+    (forall y :e K,
+      add y (ring_zero K add) = y /\ add (ring_zero K add) y = y)
+    (god1_group_identity_specification K add hG))
+    x ((god1_subgroup_subset K add A hsubgroup) x hx)).
+Qed.
+
+Theorem god1_subring_zero_eq :
+  forall K, forall add mul:set -> set -> set, forall A,
+    subring K add mul A -> ring_zero A add = ring_zero K add.
+let K add mul A.
+assume hA.
+claim hringA : ring A add mul.
+exact (god1_subring_induced_ring_core K add mul A hA).
+claim hgroupA : group A add.
+exact (god1_ring_additive_group A add mul hringA).
+exact (god1_s6_theorem1_neutral_element_unique A add
+  (god1_group_law_of_composition A add hgroupA)
+  (ring_zero A add) (ring_zero K add)
+  (god1_group_identity_specification A add hgroupA)
+  (god1_subring_additive_zero_neutral K add mul A hA)).
+Qed.
+
+Theorem god1_subring_one_eq :
+  forall K, forall add mul:set -> set -> set, forall A,
+    subring K add mul A -> ring_one A mul = ring_one K mul.
+let K add mul A.
+assume hA.
+claim hringA : ring A add mul.
+exact (god1_subring_induced_ring_core K add mul A hA).
+exact (god1_s6_theorem1_neutral_element_unique A mul
+  (god1_ring_multiplicative_law A add mul hringA)
+  (ring_one A mul) (ring_one K mul)
+  (god1_ring_multiplicative_identity_specification A add mul hringA)
+  (god1_subring_multiplicative_identity K add mul A hA)).
+Qed.
+
+Theorem god1_subfield_nonzero_is_unit :
+  forall K, forall add mul:set -> set -> set, forall A,
+    subfield K add mul A -> forall x :e A,
+      x <> ring_zero A add -> ring_unit A add mul x.
+let K add mul A.
+assume hA.
+let x.
+assume hx hxzeroA.
+claim hfieldK : field K add mul.
+exact (god1_subfield_ambient_field K add mul A hA).
+claim hdivisionK : division_ring K add mul.
+exact (god1_field_division_ring K add mul hfieldK).
+claim hsubring : subring K add mul A.
+exact (god1_subfield_subring K add mul A hA).
+claim hAK : A c= K.
+exact (god1_subring_subset K add mul A hsubring).
+claim hzeroeq : ring_zero A add = ring_zero K add.
+exact (god1_subring_zero_eq K add mul A hsubring).
+claim honeeq : ring_one A mul = ring_one K mul.
+exact (god1_subring_one_eq K add mul A hsubring).
+claim hxzeroK : x <> ring_zero K add.
+assume hxzeroK_eq.
+exact (hxzeroA
+  (eq_i_tra x (ring_zero K add) (ring_zero A add)
+    hxzeroK_eq (eq_sym (ring_zero A add) (ring_zero K add) hzeroeq))).
+claim hunitK : ring_unit K add mul x.
+exact (god1_division_ring_nonzero_is_unit K add mul hdivisionK
+  x (hAK x hx) hxzeroK).
+claim hinverseA : ring_inverse K add mul x :e A.
+exact (god1_subfield_inverse_closed K add mul A hA x hx hxzeroK).
+claim hreflection :
+  reflection K mul (ring_one K mul) x (ring_inverse K add mul x).
+exact (god1_ring_inverse_specification K add mul x hunitK).
+apply (andI
+  (x :e A)
+  (exists y :e A,
+    mul y x = ring_one A mul /\ mul x y = ring_one A mul)).
+- exact hx.
+- witness (ring_inverse K add mul x).
+  exact (andI
+    (ring_inverse K add mul x :e A)
+    (mul (ring_inverse K add mul x) x = ring_one A mul
+      /\ mul x (ring_inverse K add mul x) = ring_one A mul)
+    hinverseA
+    (andI
+      (mul (ring_inverse K add mul x) x = ring_one A mul)
+      (mul x (ring_inverse K add mul x) = ring_one A mul)
+      (eq_i_tra
+        (mul (ring_inverse K add mul x) x)
+        (ring_one K mul) (ring_one A mul)
+        (andER
+          (ring_inverse K add mul x :e K)
+          (mul (ring_inverse K add mul x) x = ring_one K mul)
+          (andEL
+            (ring_inverse K add mul x :e K
+              /\ mul (ring_inverse K add mul x) x = ring_one K mul)
+            (mul x (ring_inverse K add mul x) = ring_one K mul)
+            hreflection))
+        (eq_sym (ring_one A mul) (ring_one K mul) honeeq))
+      (eq_i_tra
+        (mul x (ring_inverse K add mul x))
+        (ring_one K mul) (ring_one A mul)
+        (andER
+          (ring_inverse K add mul x :e K
+            /\ mul (ring_inverse K add mul x) x = ring_one K mul)
+          (mul x (ring_inverse K add mul x) = ring_one K mul)
+          hreflection)
+        (eq_sym (ring_one A mul) (ring_one K mul) honeeq)))).
+Qed.
+
+Theorem god1_subfield_induced_field_core :
+  forall K, forall add mul:set -> set -> set, forall A,
+    subfield K add mul A -> field A add mul.
+let K add mul A.
+assume hA.
+claim hfieldK : field K add mul.
+exact (god1_subfield_ambient_field K add mul A hA).
+claim hdivisionK : division_ring K add mul.
+exact (god1_field_division_ring K add mul hfieldK).
+claim hsubring : subring K add mul A.
+exact (god1_subfield_subring K add mul A hA).
+claim hringA : ring A add mul.
+exact (god1_subring_induced_ring_core K add mul A hsubring).
+claim hAK : A c= K.
+exact (god1_subring_subset K add mul A hsubring).
+claim hzeroeq : ring_zero A add = ring_zero K add.
+exact (god1_subring_zero_eq K add mul A hsubring).
+claim honeeq : ring_one A mul = ring_one K mul.
+exact (god1_subring_one_eq K add mul A hsubring).
+claim honezeroA : ring_one A mul <> ring_zero A add.
+assume honezeroeq.
+exact ((god1_division_ring_one_ne_zero K add mul hdivisionK)
+  (eq_i_tra (ring_one K mul) (ring_one A mul) (ring_zero K add)
+    (eq_sym (ring_one A mul) (ring_one K mul) honeeq)
+    (eq_i_tra (ring_one A mul) (ring_zero A add) (ring_zero K add)
+      honezeroeq hzeroeq))).
+claim hcommA : commutative_on A mul.
+let x.
+assume hx.
+let y.
+assume hy.
+exact (god1_field_multiplication_commutative K add mul hfieldK
+  x (hAK x hx) y (hAK y hy)).
+claim hunitsA : forall x :e A,
+  x <> ring_zero A add -> ring_unit A add mul x.
+exact (god1_subfield_nonzero_is_unit K add mul A hA).
+claim hdivisionA : division_ring A add mul.
+exact (andI
+  (ring A add mul /\ ring_one A mul <> ring_zero A add)
+  (forall x :e A,
+    x <> ring_zero A add -> ring_unit A add mul x)
+  (andI
+    (ring A add mul) (ring_one A mul <> ring_zero A add)
+    hringA honezeroA)
+  hunitsA).
+exact (andI
+  (division_ring A add mul) (commutative_on A mul)
+  hdivisionA hcommA).
+Qed.
+
 Theorem god1_subfield_induced_field :
   forall K, forall add mul:set -> set -> set, forall A,
     subfield K add mul A -> field A add mul.
@@ -55104,8 +55338,9 @@ let K add mul A.
 assume hA.
 //GOD1PRF:111568 The set A , together with the laws of composition "induced" by those of K , is then not only a ring but a field.
 claim h_s8_subfield_induced_conclusion : field A add mul.
-admit.
-Admitted.
+exact (god1_subfield_induced_field_core K add mul A hA).
+exact h_s8_subfield_induced_conclusion.
+Qed.
 
 //GOD1:113410 int_mod_multiplication : "multiplication modulo #1" | $#2#3\pmod {#1}$
 Definition int_mod_multiplication : set -> set -> set -> set :=
@@ -55114,6 +55349,1169 @@ Definition int_mod_multiplication : set -> set -> set -> set :=
       (mul_SNo
         (int_mod_representative p A)
         (int_mod_representative p B)).
+
+Theorem god1_binary_operation_congruence :
+  forall op:set -> set -> set, forall x x' y y',
+    x = x' -> y = y' -> op x y = op x' y'.
+let op x x' y y'.
+assume hxx hyy.
+exact (eq_i_tra (op x y) (op x' y) (op x' y')
+  (f_eq_i (fun u => op u y) x x' hxx)
+  (f_eq_i (fun u => op x' u) y y' hyy)).
+Qed.
+
+Theorem god1_int_mod_shift_product_left :
+  forall p :e omega, forall x x' y k :e int,
+    x' = add_SNo x (mul_SNo p k) ->
+    mul_SNo x' y
+      = add_SNo (mul_SNo x y) (mul_SNo p (mul_SNo k y)).
+let p.
+assume hp.
+let x.
+assume hx.
+let x'.
+assume hx'.
+let y.
+assume hy.
+let k.
+assume hk hshift.
+apply (eq_i_tra
+  (mul_SNo x' y)
+  (mul_SNo (add_SNo x (mul_SNo p k)) y)
+  (add_SNo (mul_SNo x y) (mul_SNo p (mul_SNo k y)))).
+- exact (f_eq_i (fun u => mul_SNo u y)
+    x' (add_SNo x (mul_SNo p k)) hshift).
+- apply (eq_i_tra
+    (mul_SNo (add_SNo x (mul_SNo p k)) y)
+    (add_SNo (mul_SNo x y) (mul_SNo (mul_SNo p k) y))
+    (add_SNo (mul_SNo x y) (mul_SNo p (mul_SNo k y)))).
+  - exact (mul_SNo_distrR x (mul_SNo p k) y
+      (int_SNo x hx)
+      (int_SNo (mul_SNo p k)
+        (int_mul_SNo p (Subq_omega_int p hp) k hk))
+      (int_SNo y hy)).
+  - exact (f_eq_i (fun u => add_SNo (mul_SNo x y) u)
+      (mul_SNo (mul_SNo p k) y) (mul_SNo p (mul_SNo k y))
+      (eq_sym
+        (mul_SNo p (mul_SNo k y)) (mul_SNo (mul_SNo p k) y)
+        (mul_SNo_assoc p k y
+          (omega_SNo p hp) (int_SNo k hk) (int_SNo y hy)))).
+Qed.
+
+Theorem god1_int_mod_shift_product_right :
+  forall p :e omega, forall x y y' l :e int,
+    y' = add_SNo y (mul_SNo p l) ->
+    mul_SNo x y'
+      = add_SNo (mul_SNo x y) (mul_SNo p (mul_SNo x l)).
+let p.
+assume hp.
+let x.
+assume hx.
+let y.
+assume hy.
+let y'.
+assume hy'.
+let l.
+assume hl hshift.
+apply (eq_i_tra
+  (mul_SNo x y')
+  (mul_SNo x (add_SNo y (mul_SNo p l)))
+  (add_SNo (mul_SNo x y) (mul_SNo p (mul_SNo x l)))).
+- exact (f_eq_i (fun u => mul_SNo x u)
+    y' (add_SNo y (mul_SNo p l)) hshift).
+- apply (eq_i_tra
+    (mul_SNo x (add_SNo y (mul_SNo p l)))
+    (add_SNo (mul_SNo x y) (mul_SNo x (mul_SNo p l)))
+    (add_SNo (mul_SNo x y) (mul_SNo p (mul_SNo x l)))).
+  - exact (mul_SNo_distrL x y (mul_SNo p l)
+      (int_SNo x hx) (int_SNo y hy)
+      (int_SNo (mul_SNo p l)
+        (int_mul_SNo p (Subq_omega_int p hp) l hl))).
+  - apply (f_eq_i (fun u => add_SNo (mul_SNo x y) u)
+      (mul_SNo x (mul_SNo p l)) (mul_SNo p (mul_SNo x l))).
+    apply (eq_i_tra
+      (mul_SNo x (mul_SNo p l))
+      (mul_SNo (mul_SNo x p) l)
+      (mul_SNo p (mul_SNo x l))).
+    - exact (mul_SNo_assoc x p l
+        (int_SNo x hx) (omega_SNo p hp) (int_SNo l hl)).
+    - apply (eq_i_tra
+        (mul_SNo (mul_SNo x p) l)
+        (mul_SNo (mul_SNo p x) l)
+        (mul_SNo p (mul_SNo x l))).
+      - exact (f_eq_i (fun u => mul_SNo u l)
+          (mul_SNo x p) (mul_SNo p x)
+          (mul_SNo_com x p (int_SNo x hx) (omega_SNo p hp))).
+      - exact (eq_sym
+          (mul_SNo p (mul_SNo x l)) (mul_SNo (mul_SNo p x) l)
+          (mul_SNo_assoc p x l
+            (omega_SNo p hp) (int_SNo x hx) (int_SNo l hl))).
+Qed.
+
+Theorem god1_int_mod_class_mul_compatible :
+  forall p :e omega, forall x x' y y' :e int,
+    int_mod_class p x = int_mod_class p x' ->
+    int_mod_class p y = int_mod_class p y' ->
+    int_mod_class p (mul_SNo x y)
+      = int_mod_class p (mul_SNo x' y').
+let p.
+assume hp.
+let x.
+assume hx.
+let x'.
+assume hx'.
+let y.
+assume hy.
+let y'.
+assume hy' hxx hyy.
+claim hexk : exists k :e int,
+  x' = add_SNo x (mul_SNo p k).
+exact (god1_int_mod_class_equal_gives_shift p hp x hx x' hx' hxx).
+claim hexl : exists l :e int,
+  y' = add_SNo y (mul_SNo p l).
+exact (god1_int_mod_class_equal_gives_shift p hp y hy y' hy' hyy).
+apply (exandE_i (fun k => k :e int)
+  (fun k => x' = add_SNo x (mul_SNo p k)) hexk).
+let k.
+assume hk hxshift.
+apply (exandE_i (fun l => l :e int)
+  (fun l => y' = add_SNo y (mul_SNo p l)) hexl).
+let l.
+assume hl hyshift.
+claim hxy : mul_SNo x y :e int.
+exact (int_mul_SNo x hx y hy).
+claim hx'y : mul_SNo x' y :e int.
+exact (int_mul_SNo x' hx' y hy).
+claim hx'y' : mul_SNo x' y' :e int.
+exact (int_mul_SNo x' hx' y' hy').
+claim hleftshift :
+  mul_SNo x' y
+    = add_SNo (mul_SNo x y) (mul_SNo p (mul_SNo k y)).
+exact (god1_int_mod_shift_product_left p hp
+  x hx x' hx' y hy k hk hxshift).
+claim hrightshift :
+  mul_SNo x' y'
+    = add_SNo (mul_SNo x' y) (mul_SNo p (mul_SNo x' l)).
+exact (god1_int_mod_shift_product_right p hp
+  x' hx' y hy y' hy' l hl hyshift).
+apply (eq_i_tra
+  (int_mod_class p (mul_SNo x y))
+  (int_mod_class p (mul_SNo x' y))
+  (int_mod_class p (mul_SNo x' y'))).
+- exact (eq_sym
+    (int_mod_class p (mul_SNo x' y))
+    (int_mod_class p (mul_SNo x y))
+    (god1_int_mod_class_eq_of_shift p hp
+      (mul_SNo x y) hxy (mul_SNo x' y) hx'y
+      (mul_SNo k y) (int_mul_SNo k hk y hy) hleftshift)).
+- exact (eq_sym
+    (int_mod_class p (mul_SNo x' y'))
+    (int_mod_class p (mul_SNo x' y))
+    (god1_int_mod_class_eq_of_shift p hp
+      (mul_SNo x' y) hx'y (mul_SNo x' y') hx'y'
+      (mul_SNo x' l) (int_mul_SNo x' hx' l hl) hrightshift)).
+Qed.
+
+Theorem god1_int_mod_multiplication_on_classes :
+  forall p :e omega, forall x y :e int,
+    int_mod_multiplication p (int_mod_class p x) (int_mod_class p y)
+      = int_mod_class p (mul_SNo x y).
+let p.
+assume hp.
+let x.
+assume hx.
+let y.
+assume hy.
+claim hxdata :
+  int_mod_representative p (int_mod_class p x) :e int
+  /\ int_mod_class p x = int_mod_class p
+    (int_mod_representative p (int_mod_class p x)).
+exact (god1_int_mod_representative_data p hp (int_mod_class p x)
+  (god1_int_mod_class_in_quotient p hp x hx)).
+claim hydata :
+  int_mod_representative p (int_mod_class p y) :e int
+  /\ int_mod_class p y = int_mod_class p
+    (int_mod_representative p (int_mod_class p y)).
+exact (god1_int_mod_representative_data p hp (int_mod_class p y)
+  (god1_int_mod_class_in_quotient p hp y hy)).
+exact (god1_int_mod_class_mul_compatible p hp
+  (int_mod_representative p (int_mod_class p x))
+  (andEL
+    (int_mod_representative p (int_mod_class p x) :e int)
+    (int_mod_class p x = int_mod_class p
+      (int_mod_representative p (int_mod_class p x))) hxdata)
+  x hx
+  (int_mod_representative p (int_mod_class p y))
+  (andEL
+    (int_mod_representative p (int_mod_class p y) :e int)
+    (int_mod_class p y = int_mod_class p
+      (int_mod_representative p (int_mod_class p y))) hydata)
+  y hy
+  (eq_sym
+    (int_mod_class p x)
+    (int_mod_class p (int_mod_representative p (int_mod_class p x)))
+    (andER
+      (int_mod_representative p (int_mod_class p x) :e int)
+      (int_mod_class p x = int_mod_class p
+        (int_mod_representative p (int_mod_class p x))) hxdata))
+  (eq_sym
+    (int_mod_class p y)
+    (int_mod_class p (int_mod_representative p (int_mod_class p y)))
+    (andER
+      (int_mod_representative p (int_mod_class p y) :e int)
+      (int_mod_class p y = int_mod_class p
+        (int_mod_representative p (int_mod_class p y))) hydata))).
+Qed.
+
+Theorem god1_int_mod_multiplication_closed :
+  forall p :e omega, forall A B :e int_mod_quotient p,
+    int_mod_multiplication p A B :e int_mod_quotient p.
+let p.
+assume hp.
+let A.
+assume hA.
+let B.
+assume hB.
+claim hAdata :
+  int_mod_representative p A :e int
+  /\ A = int_mod_class p (int_mod_representative p A).
+exact (god1_int_mod_representative_data p hp A hA).
+claim hBdata :
+  int_mod_representative p B :e int
+  /\ B = int_mod_class p (int_mod_representative p B).
+exact (god1_int_mod_representative_data p hp B hB).
+exact (god1_int_mod_class_in_quotient p hp
+  (mul_SNo (int_mod_representative p A) (int_mod_representative p B))
+  (int_mul_SNo
+    (int_mod_representative p A)
+    (andEL
+      (int_mod_representative p A :e int)
+      (A = int_mod_class p (int_mod_representative p A)) hAdata)
+    (int_mod_representative p B)
+    (andEL
+      (int_mod_representative p B :e int)
+      (B = int_mod_class p (int_mod_representative p B)) hBdata))).
+Qed.
+
+Theorem god1_int_mod_addition_commutative_classes :
+  forall p :e omega, forall x y :e int,
+    int_mod_addition p (int_mod_class p x) (int_mod_class p y)
+    = int_mod_addition p (int_mod_class p y) (int_mod_class p x).
+let p.
+assume hp.
+let x.
+assume hx.
+let y.
+assume hy.
+apply (eq_i_tra
+  (int_mod_addition p (int_mod_class p x) (int_mod_class p y))
+  (int_mod_class p (add_SNo x y))
+  (int_mod_addition p (int_mod_class p y) (int_mod_class p x))).
+- exact (god1_int_mod_addition_on_classes p hp x hx y hy).
+- apply (eq_i_tra
+    (int_mod_class p (add_SNo x y))
+    (int_mod_class p (add_SNo y x))
+    (int_mod_addition p (int_mod_class p y) (int_mod_class p x))).
+  - exact (f_eq_i (fun u => int_mod_class p u)
+      (add_SNo x y) (add_SNo y x)
+      (add_SNo_com x y (int_SNo x hx) (int_SNo y hy))).
+  - exact (eq_sym
+      (int_mod_addition p (int_mod_class p y) (int_mod_class p x))
+      (int_mod_class p (add_SNo y x))
+      (god1_int_mod_addition_on_classes p hp y hy x hx)).
+Qed.
+
+Theorem god1_int_mod_multiplication_commutative_classes :
+  forall p :e omega, forall x y :e int,
+    int_mod_multiplication p (int_mod_class p x) (int_mod_class p y)
+    = int_mod_multiplication p (int_mod_class p y) (int_mod_class p x).
+let p.
+assume hp.
+let x.
+assume hx.
+let y.
+assume hy.
+apply (eq_i_tra
+  (int_mod_multiplication p (int_mod_class p x) (int_mod_class p y))
+  (int_mod_class p (mul_SNo x y))
+  (int_mod_multiplication p (int_mod_class p y) (int_mod_class p x))).
+- exact (god1_int_mod_multiplication_on_classes p hp x hx y hy).
+- apply (eq_i_tra
+    (int_mod_class p (mul_SNo x y))
+    (int_mod_class p (mul_SNo y x))
+    (int_mod_multiplication p (int_mod_class p y) (int_mod_class p x))).
+  - exact (f_eq_i (fun u => int_mod_class p u)
+      (mul_SNo x y) (mul_SNo y x)
+      (mul_SNo_com x y (int_SNo x hx) (int_SNo y hy))).
+  - exact (eq_sym
+      (int_mod_multiplication p (int_mod_class p y) (int_mod_class p x))
+      (int_mod_class p (mul_SNo y x))
+      (god1_int_mod_multiplication_on_classes p hp y hy x hx)).
+Qed.
+
+Theorem god1_int_mod_multiplication_associative_classes :
+  forall p :e omega, forall x y z :e int,
+    int_mod_multiplication p (int_mod_class p x)
+      (int_mod_multiplication p (int_mod_class p y) (int_mod_class p z))
+    = int_mod_multiplication p
+      (int_mod_multiplication p (int_mod_class p x) (int_mod_class p y))
+      (int_mod_class p z).
+let p.
+assume hp.
+let x.
+assume hx.
+let y.
+assume hy.
+let z.
+assume hz.
+claim hyz : mul_SNo y z :e int.
+exact (int_mul_SNo y hy z hz).
+claim hxy : mul_SNo x y :e int.
+exact (int_mul_SNo x hx y hy).
+apply (eq_i_tra
+  (int_mod_multiplication p (int_mod_class p x)
+    (int_mod_multiplication p (int_mod_class p y) (int_mod_class p z)))
+  (int_mod_multiplication p (int_mod_class p x)
+    (int_mod_class p (mul_SNo y z)))
+  (int_mod_multiplication p
+    (int_mod_multiplication p (int_mod_class p x) (int_mod_class p y))
+    (int_mod_class p z))).
+- exact (f_eq_i (fun C => int_mod_multiplication p (int_mod_class p x) C)
+    (int_mod_multiplication p (int_mod_class p y) (int_mod_class p z))
+    (int_mod_class p (mul_SNo y z))
+    (god1_int_mod_multiplication_on_classes p hp y hy z hz)).
+- apply (eq_i_tra
+    (int_mod_multiplication p (int_mod_class p x)
+      (int_mod_class p (mul_SNo y z)))
+    (int_mod_class p (mul_SNo x (mul_SNo y z)))
+    (int_mod_multiplication p
+      (int_mod_multiplication p (int_mod_class p x) (int_mod_class p y))
+      (int_mod_class p z))).
+  - exact (god1_int_mod_multiplication_on_classes p hp x hx
+      (mul_SNo y z) hyz).
+  - apply (eq_i_tra
+      (int_mod_class p (mul_SNo x (mul_SNo y z)))
+      (int_mod_class p (mul_SNo (mul_SNo x y) z))
+      (int_mod_multiplication p
+        (int_mod_multiplication p (int_mod_class p x) (int_mod_class p y))
+        (int_mod_class p z))).
+    - exact (f_eq_i (fun u => int_mod_class p u)
+        (mul_SNo x (mul_SNo y z)) (mul_SNo (mul_SNo x y) z)
+        (mul_SNo_assoc x y z
+          (int_SNo x hx) (int_SNo y hy) (int_SNo z hz))).
+    - apply (eq_i_tra
+        (int_mod_class p (mul_SNo (mul_SNo x y) z))
+        (int_mod_multiplication p (int_mod_class p (mul_SNo x y))
+          (int_mod_class p z))
+        (int_mod_multiplication p
+          (int_mod_multiplication p (int_mod_class p x) (int_mod_class p y))
+          (int_mod_class p z))).
+      - exact (eq_sym
+          (int_mod_multiplication p (int_mod_class p (mul_SNo x y))
+            (int_mod_class p z))
+          (int_mod_class p (mul_SNo (mul_SNo x y) z))
+          (god1_int_mod_multiplication_on_classes p hp
+            (mul_SNo x y) hxy z hz)).
+      - exact (f_eq_i (fun C => int_mod_multiplication p C (int_mod_class p z))
+          (int_mod_class p (mul_SNo x y))
+          (int_mod_multiplication p (int_mod_class p x) (int_mod_class p y))
+          (eq_sym
+            (int_mod_multiplication p (int_mod_class p x) (int_mod_class p y))
+            (int_mod_class p (mul_SNo x y))
+            (god1_int_mod_multiplication_on_classes p hp x hx y hy))).
+Qed.
+
+Theorem god1_int_mod_distributive_classes :
+  forall p :e omega, forall x y z :e int,
+    int_mod_multiplication p (int_mod_class p x)
+      (int_mod_addition p (int_mod_class p y) (int_mod_class p z))
+    = int_mod_addition p
+      (int_mod_multiplication p (int_mod_class p x) (int_mod_class p y))
+      (int_mod_multiplication p (int_mod_class p x) (int_mod_class p z))
+    /\ int_mod_multiplication p
+      (int_mod_addition p (int_mod_class p x) (int_mod_class p y))
+      (int_mod_class p z)
+    = int_mod_addition p
+      (int_mod_multiplication p (int_mod_class p x) (int_mod_class p z))
+      (int_mod_multiplication p (int_mod_class p y) (int_mod_class p z)).
+let p.
+assume hp.
+let x.
+assume hx.
+let y.
+assume hy.
+let z.
+assume hz.
+claim hyzadd : add_SNo y z :e int.
+exact (int_add_SNo y hy z hz).
+claim hxyadd : add_SNo x y :e int.
+exact (int_add_SNo x hx y hy).
+claim hxy : mul_SNo x y :e int.
+exact (int_mul_SNo x hx y hy).
+claim hxz : mul_SNo x z :e int.
+exact (int_mul_SNo x hx z hz).
+claim hyz : mul_SNo y z :e int.
+exact (int_mul_SNo y hy z hz).
+apply andI.
+- apply (eq_i_tra
+    (int_mod_multiplication p (int_mod_class p x)
+      (int_mod_addition p (int_mod_class p y) (int_mod_class p z)))
+    (int_mod_multiplication p (int_mod_class p x)
+      (int_mod_class p (add_SNo y z)))
+    (int_mod_addition p
+      (int_mod_multiplication p (int_mod_class p x) (int_mod_class p y))
+      (int_mod_multiplication p (int_mod_class p x) (int_mod_class p z)))).
+  - exact (f_eq_i (fun C => int_mod_multiplication p (int_mod_class p x) C)
+      (int_mod_addition p (int_mod_class p y) (int_mod_class p z))
+      (int_mod_class p (add_SNo y z))
+      (god1_int_mod_addition_on_classes p hp y hy z hz)).
+  - apply (eq_i_tra
+      (int_mod_multiplication p (int_mod_class p x)
+        (int_mod_class p (add_SNo y z)))
+      (int_mod_class p (mul_SNo x (add_SNo y z)))
+      (int_mod_addition p
+        (int_mod_multiplication p (int_mod_class p x) (int_mod_class p y))
+        (int_mod_multiplication p (int_mod_class p x) (int_mod_class p z)))).
+    - exact (god1_int_mod_multiplication_on_classes p hp x hx
+        (add_SNo y z) hyzadd).
+    - apply (eq_i_tra
+        (int_mod_class p (mul_SNo x (add_SNo y z)))
+        (int_mod_class p (add_SNo (mul_SNo x y) (mul_SNo x z)))
+        (int_mod_addition p
+          (int_mod_multiplication p (int_mod_class p x) (int_mod_class p y))
+          (int_mod_multiplication p (int_mod_class p x) (int_mod_class p z)))).
+      - exact (f_eq_i (fun u => int_mod_class p u)
+          (mul_SNo x (add_SNo y z))
+          (add_SNo (mul_SNo x y) (mul_SNo x z))
+          (mul_SNo_distrL x y z
+            (int_SNo x hx) (int_SNo y hy) (int_SNo z hz))).
+      - apply (eq_i_tra
+          (int_mod_class p (add_SNo (mul_SNo x y) (mul_SNo x z)))
+          (int_mod_addition p (int_mod_class p (mul_SNo x y))
+            (int_mod_class p (mul_SNo x z)))
+          (int_mod_addition p
+            (int_mod_multiplication p (int_mod_class p x) (int_mod_class p y))
+            (int_mod_multiplication p (int_mod_class p x) (int_mod_class p z)))).
+        - exact (eq_sym
+            (int_mod_addition p (int_mod_class p (mul_SNo x y))
+              (int_mod_class p (mul_SNo x z)))
+            (int_mod_class p (add_SNo (mul_SNo x y) (mul_SNo x z)))
+            (god1_int_mod_addition_on_classes p hp
+              (mul_SNo x y) hxy (mul_SNo x z) hxz)).
+        - exact (god1_binary_operation_congruence (int_mod_addition p)
+            (int_mod_class p (mul_SNo x y))
+            (int_mod_multiplication p (int_mod_class p x) (int_mod_class p y))
+            (int_mod_class p (mul_SNo x z))
+            (int_mod_multiplication p (int_mod_class p x) (int_mod_class p z))
+            (eq_sym
+              (int_mod_multiplication p (int_mod_class p x) (int_mod_class p y))
+              (int_mod_class p (mul_SNo x y))
+              (god1_int_mod_multiplication_on_classes p hp x hx y hy))
+            (eq_sym
+              (int_mod_multiplication p (int_mod_class p x) (int_mod_class p z))
+              (int_mod_class p (mul_SNo x z))
+              (god1_int_mod_multiplication_on_classes p hp x hx z hz))).
+- apply (eq_i_tra
+    (int_mod_multiplication p
+      (int_mod_addition p (int_mod_class p x) (int_mod_class p y))
+      (int_mod_class p z))
+    (int_mod_multiplication p (int_mod_class p (add_SNo x y))
+      (int_mod_class p z))
+    (int_mod_addition p
+      (int_mod_multiplication p (int_mod_class p x) (int_mod_class p z))
+      (int_mod_multiplication p (int_mod_class p y) (int_mod_class p z)))).
+  - exact (f_eq_i (fun C => int_mod_multiplication p C (int_mod_class p z))
+      (int_mod_addition p (int_mod_class p x) (int_mod_class p y))
+      (int_mod_class p (add_SNo x y))
+      (god1_int_mod_addition_on_classes p hp x hx y hy)).
+  - apply (eq_i_tra
+      (int_mod_multiplication p (int_mod_class p (add_SNo x y))
+        (int_mod_class p z))
+      (int_mod_class p (mul_SNo (add_SNo x y) z))
+      (int_mod_addition p
+        (int_mod_multiplication p (int_mod_class p x) (int_mod_class p z))
+        (int_mod_multiplication p (int_mod_class p y) (int_mod_class p z)))).
+    - exact (god1_int_mod_multiplication_on_classes p hp
+        (add_SNo x y) hxyadd z hz).
+    - apply (eq_i_tra
+        (int_mod_class p (mul_SNo (add_SNo x y) z))
+        (int_mod_class p (add_SNo (mul_SNo x z) (mul_SNo y z)))
+        (int_mod_addition p
+          (int_mod_multiplication p (int_mod_class p x) (int_mod_class p z))
+          (int_mod_multiplication p (int_mod_class p y) (int_mod_class p z)))).
+      - exact (f_eq_i (fun u => int_mod_class p u)
+          (mul_SNo (add_SNo x y) z)
+          (add_SNo (mul_SNo x z) (mul_SNo y z))
+          (mul_SNo_distrR x y z
+            (int_SNo x hx) (int_SNo y hy) (int_SNo z hz))).
+      - apply (eq_i_tra
+          (int_mod_class p (add_SNo (mul_SNo x z) (mul_SNo y z)))
+          (int_mod_addition p (int_mod_class p (mul_SNo x z))
+            (int_mod_class p (mul_SNo y z)))
+          (int_mod_addition p
+            (int_mod_multiplication p (int_mod_class p x) (int_mod_class p z))
+            (int_mod_multiplication p (int_mod_class p y) (int_mod_class p z)))).
+        - exact (eq_sym
+            (int_mod_addition p (int_mod_class p (mul_SNo x z))
+              (int_mod_class p (mul_SNo y z)))
+            (int_mod_class p (add_SNo (mul_SNo x z) (mul_SNo y z)))
+            (god1_int_mod_addition_on_classes p hp
+              (mul_SNo x z) hxz (mul_SNo y z) hyz)).
+        - exact (god1_binary_operation_congruence (int_mod_addition p)
+            (int_mod_class p (mul_SNo x z))
+            (int_mod_multiplication p (int_mod_class p x) (int_mod_class p z))
+            (int_mod_class p (mul_SNo y z))
+            (int_mod_multiplication p (int_mod_class p y) (int_mod_class p z))
+            (eq_sym
+              (int_mod_multiplication p (int_mod_class p x) (int_mod_class p z))
+              (int_mod_class p (mul_SNo x z))
+              (god1_int_mod_multiplication_on_classes p hp x hx z hz))
+            (eq_sym
+              (int_mod_multiplication p (int_mod_class p y) (int_mod_class p z))
+              (int_mod_class p (mul_SNo y z))
+              (god1_int_mod_multiplication_on_classes p hp y hy z hz))).
+Qed.
+
+Theorem god1_int_mod_addition_commutative :
+  forall p :e omega,
+    commutative_on (int_mod_quotient p) (int_mod_addition p).
+let p.
+assume hp.
+let A.
+assume hA.
+let B.
+assume hB.
+claim hAdata :
+  int_mod_representative p A :e int
+  /\ A = int_mod_class p (int_mod_representative p A).
+exact (god1_int_mod_representative_data p hp A hA).
+claim hBdata :
+  int_mod_representative p B :e int
+  /\ B = int_mod_class p (int_mod_representative p B).
+exact (god1_int_mod_representative_data p hp B hB).
+claim hAe : A = int_mod_class p (int_mod_representative p A).
+exact (andER
+  (int_mod_representative p A :e int)
+  (A = int_mod_class p (int_mod_representative p A)) hAdata).
+claim hBe : B = int_mod_class p (int_mod_representative p B).
+exact (andER
+  (int_mod_representative p B :e int)
+  (B = int_mod_class p (int_mod_representative p B)) hBdata).
+apply (eq_i_tra
+  (int_mod_addition p A B)
+  (int_mod_addition p
+    (int_mod_class p (int_mod_representative p A))
+    (int_mod_class p (int_mod_representative p B)))
+  (int_mod_addition p B A)).
+- exact (god1_binary_operation_congruence (int_mod_addition p)
+    A (int_mod_class p (int_mod_representative p A))
+    B (int_mod_class p (int_mod_representative p B)) hAe hBe).
+- apply (eq_i_tra
+    (int_mod_addition p
+      (int_mod_class p (int_mod_representative p A))
+      (int_mod_class p (int_mod_representative p B)))
+    (int_mod_addition p
+      (int_mod_class p (int_mod_representative p B))
+      (int_mod_class p (int_mod_representative p A)))
+    (int_mod_addition p B A)).
+  - exact (god1_int_mod_addition_commutative_classes p hp
+      (int_mod_representative p A)
+      (andEL
+        (int_mod_representative p A :e int)
+        (A = int_mod_class p (int_mod_representative p A)) hAdata)
+      (int_mod_representative p B)
+      (andEL
+        (int_mod_representative p B :e int)
+        (B = int_mod_class p (int_mod_representative p B)) hBdata)).
+  - exact (eq_sym
+      (int_mod_addition p B A)
+      (int_mod_addition p
+        (int_mod_class p (int_mod_representative p B))
+        (int_mod_class p (int_mod_representative p A)))
+      (god1_binary_operation_congruence (int_mod_addition p)
+        B (int_mod_class p (int_mod_representative p B))
+        A (int_mod_class p (int_mod_representative p A)) hBe hAe)).
+Qed.
+
+Theorem god1_int_mod_multiplication_commutative :
+  forall p :e omega,
+    commutative_on (int_mod_quotient p) (int_mod_multiplication p).
+let p.
+assume hp.
+let A.
+assume hA.
+let B.
+assume hB.
+claim hAdata :
+  int_mod_representative p A :e int
+  /\ A = int_mod_class p (int_mod_representative p A).
+exact (god1_int_mod_representative_data p hp A hA).
+claim hBdata :
+  int_mod_representative p B :e int
+  /\ B = int_mod_class p (int_mod_representative p B).
+exact (god1_int_mod_representative_data p hp B hB).
+claim hAe : A = int_mod_class p (int_mod_representative p A).
+exact (andER
+  (int_mod_representative p A :e int)
+  (A = int_mod_class p (int_mod_representative p A)) hAdata).
+claim hBe : B = int_mod_class p (int_mod_representative p B).
+exact (andER
+  (int_mod_representative p B :e int)
+  (B = int_mod_class p (int_mod_representative p B)) hBdata).
+apply (eq_i_tra
+  (int_mod_multiplication p A B)
+  (int_mod_multiplication p
+    (int_mod_class p (int_mod_representative p A))
+    (int_mod_class p (int_mod_representative p B)))
+  (int_mod_multiplication p B A)).
+- exact (god1_binary_operation_congruence (int_mod_multiplication p)
+    A (int_mod_class p (int_mod_representative p A))
+    B (int_mod_class p (int_mod_representative p B)) hAe hBe).
+- apply (eq_i_tra
+    (int_mod_multiplication p
+      (int_mod_class p (int_mod_representative p A))
+      (int_mod_class p (int_mod_representative p B)))
+    (int_mod_multiplication p
+      (int_mod_class p (int_mod_representative p B))
+      (int_mod_class p (int_mod_representative p A)))
+    (int_mod_multiplication p B A)).
+  - exact (god1_int_mod_multiplication_commutative_classes p hp
+      (int_mod_representative p A)
+      (andEL
+        (int_mod_representative p A :e int)
+        (A = int_mod_class p (int_mod_representative p A)) hAdata)
+      (int_mod_representative p B)
+      (andEL
+        (int_mod_representative p B :e int)
+        (B = int_mod_class p (int_mod_representative p B)) hBdata)).
+  - exact (eq_sym
+      (int_mod_multiplication p B A)
+      (int_mod_multiplication p
+        (int_mod_class p (int_mod_representative p B))
+        (int_mod_class p (int_mod_representative p A)))
+      (god1_binary_operation_congruence (int_mod_multiplication p)
+        B (int_mod_class p (int_mod_representative p B))
+        A (int_mod_class p (int_mod_representative p A)) hBe hAe)).
+Qed.
+
+Theorem god1_int_mod_multiplication_associative :
+  forall p :e omega,
+    associative_on (int_mod_quotient p) (int_mod_multiplication p).
+let p.
+assume hp.
+let A.
+assume hA.
+let B.
+assume hB.
+let C.
+assume hC.
+claim hAdata :
+  int_mod_representative p A :e int
+  /\ A = int_mod_class p (int_mod_representative p A).
+exact (god1_int_mod_representative_data p hp A hA).
+claim hBdata :
+  int_mod_representative p B :e int
+  /\ B = int_mod_class p (int_mod_representative p B).
+exact (god1_int_mod_representative_data p hp B hB).
+claim hCdata :
+  int_mod_representative p C :e int
+  /\ C = int_mod_class p (int_mod_representative p C).
+exact (god1_int_mod_representative_data p hp C hC).
+claim hAe : A = int_mod_class p (int_mod_representative p A).
+exact (andER
+  (int_mod_representative p A :e int)
+  (A = int_mod_class p (int_mod_representative p A)) hAdata).
+claim hBe : B = int_mod_class p (int_mod_representative p B).
+exact (andER
+  (int_mod_representative p B :e int)
+  (B = int_mod_class p (int_mod_representative p B)) hBdata).
+claim hCe : C = int_mod_class p (int_mod_representative p C).
+exact (andER
+  (int_mod_representative p C :e int)
+  (C = int_mod_class p (int_mod_representative p C)) hCdata).
+claim hleftcong :
+  int_mod_multiplication p A (int_mod_multiplication p B C)
+  = int_mod_multiplication p
+    (int_mod_class p (int_mod_representative p A))
+    (int_mod_multiplication p
+      (int_mod_class p (int_mod_representative p B))
+      (int_mod_class p (int_mod_representative p C))).
+exact (god1_binary_operation_congruence (int_mod_multiplication p)
+  A (int_mod_class p (int_mod_representative p A))
+  (int_mod_multiplication p B C)
+  (int_mod_multiplication p
+    (int_mod_class p (int_mod_representative p B))
+    (int_mod_class p (int_mod_representative p C)))
+  hAe
+  (god1_binary_operation_congruence (int_mod_multiplication p)
+    B (int_mod_class p (int_mod_representative p B))
+    C (int_mod_class p (int_mod_representative p C)) hBe hCe)).
+claim hrightcong :
+  int_mod_multiplication p (int_mod_multiplication p A B) C
+  = int_mod_multiplication p
+    (int_mod_multiplication p
+      (int_mod_class p (int_mod_representative p A))
+      (int_mod_class p (int_mod_representative p B)))
+    (int_mod_class p (int_mod_representative p C)).
+exact (god1_binary_operation_congruence (int_mod_multiplication p)
+  (int_mod_multiplication p A B)
+  (int_mod_multiplication p
+    (int_mod_class p (int_mod_representative p A))
+    (int_mod_class p (int_mod_representative p B)))
+  C (int_mod_class p (int_mod_representative p C))
+  (god1_binary_operation_congruence (int_mod_multiplication p)
+    A (int_mod_class p (int_mod_representative p A))
+    B (int_mod_class p (int_mod_representative p B)) hAe hBe)
+  hCe).
+exact (eq_i_tra
+  (int_mod_multiplication p A (int_mod_multiplication p B C))
+  (int_mod_multiplication p
+    (int_mod_class p (int_mod_representative p A))
+    (int_mod_multiplication p
+      (int_mod_class p (int_mod_representative p B))
+      (int_mod_class p (int_mod_representative p C))))
+  (int_mod_multiplication p (int_mod_multiplication p A B) C)
+  hleftcong
+  (eq_i_tra
+    (int_mod_multiplication p
+      (int_mod_class p (int_mod_representative p A))
+      (int_mod_multiplication p
+        (int_mod_class p (int_mod_representative p B))
+        (int_mod_class p (int_mod_representative p C))))
+    (int_mod_multiplication p
+      (int_mod_multiplication p
+        (int_mod_class p (int_mod_representative p A))
+        (int_mod_class p (int_mod_representative p B)))
+      (int_mod_class p (int_mod_representative p C)))
+    (int_mod_multiplication p (int_mod_multiplication p A B) C)
+    (god1_int_mod_multiplication_associative_classes p hp
+      (int_mod_representative p A)
+      (andEL
+        (int_mod_representative p A :e int)
+        (A = int_mod_class p (int_mod_representative p A)) hAdata)
+      (int_mod_representative p B)
+      (andEL
+        (int_mod_representative p B :e int)
+        (B = int_mod_class p (int_mod_representative p B)) hBdata)
+      (int_mod_representative p C)
+      (andEL
+        (int_mod_representative p C :e int)
+        (C = int_mod_class p (int_mod_representative p C)) hCdata))
+    (eq_sym
+      (int_mod_multiplication p (int_mod_multiplication p A B) C)
+      (int_mod_multiplication p
+        (int_mod_multiplication p
+          (int_mod_class p (int_mod_representative p A))
+          (int_mod_class p (int_mod_representative p B)))
+        (int_mod_class p (int_mod_representative p C)))
+      hrightcong))).
+Qed.
+
+Theorem god1_int_mod_distributive :
+  forall p :e omega, forall A B C :e int_mod_quotient p,
+    int_mod_multiplication p A (int_mod_addition p B C)
+    = int_mod_addition p
+      (int_mod_multiplication p A B) (int_mod_multiplication p A C)
+    /\ int_mod_multiplication p (int_mod_addition p A B) C
+    = int_mod_addition p
+      (int_mod_multiplication p A C) (int_mod_multiplication p B C).
+let p.
+assume hp.
+let A.
+assume hA.
+let B.
+assume hB.
+let C.
+assume hC.
+claim hAdata :
+  int_mod_representative p A :e int
+  /\ A = int_mod_class p (int_mod_representative p A).
+exact (god1_int_mod_representative_data p hp A hA).
+claim hBdata :
+  int_mod_representative p B :e int
+  /\ B = int_mod_class p (int_mod_representative p B).
+exact (god1_int_mod_representative_data p hp B hB).
+claim hCdata :
+  int_mod_representative p C :e int
+  /\ C = int_mod_class p (int_mod_representative p C).
+exact (god1_int_mod_representative_data p hp C hC).
+claim hAe : A = int_mod_class p (int_mod_representative p A).
+exact (andER
+  (int_mod_representative p A :e int)
+  (A = int_mod_class p (int_mod_representative p A)) hAdata).
+claim hBe : B = int_mod_class p (int_mod_representative p B).
+exact (andER
+  (int_mod_representative p B :e int)
+  (B = int_mod_class p (int_mod_representative p B)) hBdata).
+claim hCe : C = int_mod_class p (int_mod_representative p C).
+exact (andER
+  (int_mod_representative p C :e int)
+  (C = int_mod_class p (int_mod_representative p C)) hCdata).
+claim hclasses :
+  int_mod_multiplication p
+    (int_mod_class p (int_mod_representative p A))
+    (int_mod_addition p
+      (int_mod_class p (int_mod_representative p B))
+      (int_mod_class p (int_mod_representative p C)))
+  = int_mod_addition p
+    (int_mod_multiplication p
+      (int_mod_class p (int_mod_representative p A))
+      (int_mod_class p (int_mod_representative p B)))
+    (int_mod_multiplication p
+      (int_mod_class p (int_mod_representative p A))
+      (int_mod_class p (int_mod_representative p C)))
+  /\ int_mod_multiplication p
+    (int_mod_addition p
+      (int_mod_class p (int_mod_representative p A))
+      (int_mod_class p (int_mod_representative p B)))
+    (int_mod_class p (int_mod_representative p C))
+  = int_mod_addition p
+    (int_mod_multiplication p
+      (int_mod_class p (int_mod_representative p A))
+      (int_mod_class p (int_mod_representative p C)))
+    (int_mod_multiplication p
+      (int_mod_class p (int_mod_representative p B))
+      (int_mod_class p (int_mod_representative p C))).
+exact (god1_int_mod_distributive_classes p hp
+  (int_mod_representative p A)
+  (andEL
+    (int_mod_representative p A :e int)
+    (A = int_mod_class p (int_mod_representative p A)) hAdata)
+  (int_mod_representative p B)
+  (andEL
+    (int_mod_representative p B :e int)
+    (B = int_mod_class p (int_mod_representative p B)) hBdata)
+  (int_mod_representative p C)
+  (andEL
+    (int_mod_representative p C :e int)
+    (C = int_mod_class p (int_mod_representative p C)) hCdata)).
+apply andI.
+- apply (eq_i_tra
+    (int_mod_multiplication p A (int_mod_addition p B C))
+    (int_mod_multiplication p
+      (int_mod_class p (int_mod_representative p A))
+      (int_mod_addition p
+        (int_mod_class p (int_mod_representative p B))
+        (int_mod_class p (int_mod_representative p C))))
+    (int_mod_addition p
+      (int_mod_multiplication p A B) (int_mod_multiplication p A C))).
+  - exact (god1_binary_operation_congruence (int_mod_multiplication p)
+      A (int_mod_class p (int_mod_representative p A))
+      (int_mod_addition p B C)
+      (int_mod_addition p
+        (int_mod_class p (int_mod_representative p B))
+        (int_mod_class p (int_mod_representative p C)))
+      hAe
+      (god1_binary_operation_congruence (int_mod_addition p)
+        B (int_mod_class p (int_mod_representative p B))
+        C (int_mod_class p (int_mod_representative p C)) hBe hCe)).
+  - apply (eq_i_tra
+      (int_mod_multiplication p
+        (int_mod_class p (int_mod_representative p A))
+        (int_mod_addition p
+          (int_mod_class p (int_mod_representative p B))
+          (int_mod_class p (int_mod_representative p C))))
+      (int_mod_addition p
+        (int_mod_multiplication p
+          (int_mod_class p (int_mod_representative p A))
+          (int_mod_class p (int_mod_representative p B)))
+        (int_mod_multiplication p
+          (int_mod_class p (int_mod_representative p A))
+          (int_mod_class p (int_mod_representative p C))))
+      (int_mod_addition p
+        (int_mod_multiplication p A B) (int_mod_multiplication p A C))).
+    - exact (andEL
+        (int_mod_multiplication p
+          (int_mod_class p (int_mod_representative p A))
+          (int_mod_addition p
+            (int_mod_class p (int_mod_representative p B))
+            (int_mod_class p (int_mod_representative p C)))
+          = int_mod_addition p
+            (int_mod_multiplication p
+              (int_mod_class p (int_mod_representative p A))
+              (int_mod_class p (int_mod_representative p B)))
+            (int_mod_multiplication p
+              (int_mod_class p (int_mod_representative p A))
+              (int_mod_class p (int_mod_representative p C))))
+        (int_mod_multiplication p
+          (int_mod_addition p
+            (int_mod_class p (int_mod_representative p A))
+            (int_mod_class p (int_mod_representative p B)))
+          (int_mod_class p (int_mod_representative p C))
+          = int_mod_addition p
+            (int_mod_multiplication p
+              (int_mod_class p (int_mod_representative p A))
+              (int_mod_class p (int_mod_representative p C)))
+            (int_mod_multiplication p
+              (int_mod_class p (int_mod_representative p B))
+              (int_mod_class p (int_mod_representative p C))))
+        hclasses).
+    - exact (eq_sym
+        (int_mod_addition p
+          (int_mod_multiplication p A B) (int_mod_multiplication p A C))
+        (int_mod_addition p
+          (int_mod_multiplication p
+            (int_mod_class p (int_mod_representative p A))
+            (int_mod_class p (int_mod_representative p B)))
+          (int_mod_multiplication p
+            (int_mod_class p (int_mod_representative p A))
+            (int_mod_class p (int_mod_representative p C))))
+        (god1_binary_operation_congruence (int_mod_addition p)
+          (int_mod_multiplication p A B)
+          (int_mod_multiplication p
+            (int_mod_class p (int_mod_representative p A))
+            (int_mod_class p (int_mod_representative p B)))
+          (int_mod_multiplication p A C)
+          (int_mod_multiplication p
+            (int_mod_class p (int_mod_representative p A))
+            (int_mod_class p (int_mod_representative p C)))
+          (god1_binary_operation_congruence (int_mod_multiplication p)
+            A (int_mod_class p (int_mod_representative p A))
+            B (int_mod_class p (int_mod_representative p B)) hAe hBe)
+          (god1_binary_operation_congruence (int_mod_multiplication p)
+            A (int_mod_class p (int_mod_representative p A))
+            C (int_mod_class p (int_mod_representative p C)) hAe hCe))).
+- apply (eq_i_tra
+    (int_mod_multiplication p (int_mod_addition p A B) C)
+    (int_mod_multiplication p
+      (int_mod_addition p
+        (int_mod_class p (int_mod_representative p A))
+        (int_mod_class p (int_mod_representative p B)))
+      (int_mod_class p (int_mod_representative p C)))
+    (int_mod_addition p
+      (int_mod_multiplication p A C) (int_mod_multiplication p B C))).
+  - exact (god1_binary_operation_congruence (int_mod_multiplication p)
+      (int_mod_addition p A B)
+      (int_mod_addition p
+        (int_mod_class p (int_mod_representative p A))
+        (int_mod_class p (int_mod_representative p B)))
+      C (int_mod_class p (int_mod_representative p C))
+      (god1_binary_operation_congruence (int_mod_addition p)
+        A (int_mod_class p (int_mod_representative p A))
+        B (int_mod_class p (int_mod_representative p B)) hAe hBe)
+      hCe).
+  - apply (eq_i_tra
+      (int_mod_multiplication p
+        (int_mod_addition p
+          (int_mod_class p (int_mod_representative p A))
+          (int_mod_class p (int_mod_representative p B)))
+        (int_mod_class p (int_mod_representative p C)))
+      (int_mod_addition p
+        (int_mod_multiplication p
+          (int_mod_class p (int_mod_representative p A))
+          (int_mod_class p (int_mod_representative p C)))
+        (int_mod_multiplication p
+          (int_mod_class p (int_mod_representative p B))
+          (int_mod_class p (int_mod_representative p C))))
+      (int_mod_addition p
+        (int_mod_multiplication p A C) (int_mod_multiplication p B C))).
+    - exact (andER
+        (int_mod_multiplication p
+          (int_mod_class p (int_mod_representative p A))
+          (int_mod_addition p
+            (int_mod_class p (int_mod_representative p B))
+            (int_mod_class p (int_mod_representative p C)))
+          = int_mod_addition p
+            (int_mod_multiplication p
+              (int_mod_class p (int_mod_representative p A))
+              (int_mod_class p (int_mod_representative p B)))
+            (int_mod_multiplication p
+              (int_mod_class p (int_mod_representative p A))
+              (int_mod_class p (int_mod_representative p C))))
+        (int_mod_multiplication p
+          (int_mod_addition p
+            (int_mod_class p (int_mod_representative p A))
+            (int_mod_class p (int_mod_representative p B)))
+          (int_mod_class p (int_mod_representative p C))
+          = int_mod_addition p
+            (int_mod_multiplication p
+              (int_mod_class p (int_mod_representative p A))
+              (int_mod_class p (int_mod_representative p C)))
+            (int_mod_multiplication p
+              (int_mod_class p (int_mod_representative p B))
+              (int_mod_class p (int_mod_representative p C))))
+        hclasses).
+    - exact (eq_sym
+        (int_mod_addition p
+          (int_mod_multiplication p A C) (int_mod_multiplication p B C))
+        (int_mod_addition p
+          (int_mod_multiplication p
+            (int_mod_class p (int_mod_representative p A))
+            (int_mod_class p (int_mod_representative p C)))
+          (int_mod_multiplication p
+            (int_mod_class p (int_mod_representative p B))
+            (int_mod_class p (int_mod_representative p C))))
+        (god1_binary_operation_congruence (int_mod_addition p)
+          (int_mod_multiplication p A C)
+          (int_mod_multiplication p
+            (int_mod_class p (int_mod_representative p A))
+            (int_mod_class p (int_mod_representative p C)))
+          (int_mod_multiplication p B C)
+          (int_mod_multiplication p
+            (int_mod_class p (int_mod_representative p B))
+            (int_mod_class p (int_mod_representative p C)))
+          (god1_binary_operation_congruence (int_mod_multiplication p)
+            A (int_mod_class p (int_mod_representative p A))
+            C (int_mod_class p (int_mod_representative p C)) hAe hCe)
+          (god1_binary_operation_congruence (int_mod_multiplication p)
+            B (int_mod_class p (int_mod_representative p B))
+            C (int_mod_class p (int_mod_representative p C)) hBe hCe))).
+Qed.
+
+Theorem god1_int_mod_one_neutral :
+  forall p :e omega,
+    neutral_element (int_mod_quotient p) (int_mod_multiplication p)
+      (int_mod_class p 1).
+let p.
+assume hp.
+claim h1int : 1 :e int.
+exact (Subq_omega_int 1 (nat_p_omega 1 nat_1)).
+claim hone : int_mod_class p 1 :e int_mod_quotient p.
+exact (god1_int_mod_class_in_quotient p hp 1 h1int).
+apply (andI
+  (int_mod_class p 1 :e int_mod_quotient p)
+  (forall A :e int_mod_quotient p,
+    int_mod_multiplication p A (int_mod_class p 1) = A
+    /\ int_mod_multiplication p (int_mod_class p 1) A = A)).
+- exact hone.
+- let A.
+  assume hA.
+  claim hAdata :
+    int_mod_representative p A :e int
+    /\ A = int_mod_class p (int_mod_representative p A).
+  exact (god1_int_mod_representative_data p hp A hA).
+  claim hx : int_mod_representative p A :e int.
+  exact (andEL
+    (int_mod_representative p A :e int)
+    (A = int_mod_class p (int_mod_representative p A)) hAdata).
+  claim hAe : A = int_mod_class p (int_mod_representative p A).
+  exact (andER
+    (int_mod_representative p A :e int)
+    (A = int_mod_class p (int_mod_representative p A)) hAdata).
+  apply andI.
+  - apply (eq_i_tra
+      (int_mod_multiplication p A (int_mod_class p 1))
+      (int_mod_multiplication p
+        (int_mod_class p (int_mod_representative p A))
+        (int_mod_class p 1)) A).
+    - exact (f_eq_i (fun C => int_mod_multiplication p C (int_mod_class p 1))
+        A (int_mod_class p (int_mod_representative p A)) hAe).
+    - apply (eq_i_tra
+        (int_mod_multiplication p
+          (int_mod_class p (int_mod_representative p A))
+          (int_mod_class p 1))
+        (int_mod_class p (mul_SNo (int_mod_representative p A) 1)) A).
+      - exact (god1_int_mod_multiplication_on_classes p hp
+          (int_mod_representative p A) hx 1 h1int).
+      - apply (eq_i_tra
+          (int_mod_class p (mul_SNo (int_mod_representative p A) 1))
+          (int_mod_class p (int_mod_representative p A)) A).
+        - exact (f_eq_i (fun u => int_mod_class p u)
+            (mul_SNo (int_mod_representative p A) 1)
+            (int_mod_representative p A)
+            (mul_SNo_oneR (int_mod_representative p A)
+              (int_SNo (int_mod_representative p A) hx))).
+        - exact (eq_sym A
+            (int_mod_class p (int_mod_representative p A)) hAe).
+  - apply (eq_i_tra
+      (int_mod_multiplication p (int_mod_class p 1) A)
+      (int_mod_multiplication p (int_mod_class p 1)
+        (int_mod_class p (int_mod_representative p A))) A).
+    - exact (f_eq_i (fun C => int_mod_multiplication p (int_mod_class p 1) C)
+        A (int_mod_class p (int_mod_representative p A)) hAe).
+    - apply (eq_i_tra
+        (int_mod_multiplication p (int_mod_class p 1)
+          (int_mod_class p (int_mod_representative p A)))
+        (int_mod_class p (mul_SNo 1 (int_mod_representative p A))) A).
+      - exact (god1_int_mod_multiplication_on_classes p hp
+          1 h1int (int_mod_representative p A) hx).
+      - apply (eq_i_tra
+          (int_mod_class p (mul_SNo 1 (int_mod_representative p A)))
+          (int_mod_class p (int_mod_representative p A)) A).
+        - exact (f_eq_i (fun u => int_mod_class p u)
+            (mul_SNo 1 (int_mod_representative p A))
+            (int_mod_representative p A)
+            (mul_SNo_oneL (int_mod_representative p A)
+              (int_SNo (int_mod_representative p A) hx))).
+        - exact (eq_sym A
+            (int_mod_class p (int_mod_representative p A)) hAe).
+Qed.
+
+Theorem god1_int_mod_additive_abelian_group :
+  forall p :e omega,
+    abelian_group (int_mod_quotient p) (int_mod_addition p).
+let p.
+assume hp.
+exact (andI
+  (group (int_mod_quotient p) (int_mod_addition p))
+  (commutative_on (int_mod_quotient p) (int_mod_addition p))
+  (god1_int_mod_quotient_group p hp)
+  (god1_int_mod_addition_commutative p hp)).
+Qed.
+
+Theorem god1_int_mod_commutative_ring_core :
+  forall p :e omega,
+    commutative_ring
+      (int_mod_quotient p) (int_mod_addition p) (int_mod_multiplication p).
+let p.
+assume hp.
+claim honeutral :
+  neutral_element (int_mod_quotient p) (int_mod_multiplication p)
+    (int_mod_class p 1).
+exact (god1_int_mod_one_neutral p hp).
+claim honeexists :
+  exists one :e int_mod_quotient p,
+    neutral_element (int_mod_quotient p) (int_mod_multiplication p) one.
+witness (int_mod_class p 1).
+exact (andI
+  (int_mod_class p 1 :e int_mod_quotient p)
+  (neutral_element (int_mod_quotient p) (int_mod_multiplication p)
+    (int_mod_class p 1))
+  (andEL
+    (int_mod_class p 1 :e int_mod_quotient p)
+    (forall A :e int_mod_quotient p,
+      int_mod_multiplication p A (int_mod_class p 1) = A
+      /\ int_mod_multiplication p (int_mod_class p 1) A = A)
+    honeutral)
+  honeutral).
+claim hring : ring
+  (int_mod_quotient p) (int_mod_addition p) (int_mod_multiplication p).
+exact (andI
+  ((((abelian_group (int_mod_quotient p) (int_mod_addition p)
+    /\ law_of_composition (int_mod_quotient p) (int_mod_multiplication p))
+    /\ associative_on (int_mod_quotient p) (int_mod_multiplication p))
+    /\ exists one :e int_mod_quotient p,
+      neutral_element (int_mod_quotient p) (int_mod_multiplication p) one))
+  (forall A B C :e int_mod_quotient p,
+    int_mod_multiplication p A (int_mod_addition p B C)
+      = int_mod_addition p
+        (int_mod_multiplication p A B) (int_mod_multiplication p A C)
+    /\ int_mod_multiplication p (int_mod_addition p A B) C
+      = int_mod_addition p
+        (int_mod_multiplication p A C) (int_mod_multiplication p B C))
+  (andI
+    ((abelian_group (int_mod_quotient p) (int_mod_addition p)
+      /\ law_of_composition (int_mod_quotient p) (int_mod_multiplication p))
+      /\ associative_on (int_mod_quotient p) (int_mod_multiplication p))
+    (exists one :e int_mod_quotient p,
+      neutral_element (int_mod_quotient p) (int_mod_multiplication p) one)
+    (andI
+      (abelian_group (int_mod_quotient p) (int_mod_addition p)
+        /\ law_of_composition (int_mod_quotient p) (int_mod_multiplication p))
+      (associative_on (int_mod_quotient p) (int_mod_multiplication p))
+      (andI
+        (abelian_group (int_mod_quotient p) (int_mod_addition p))
+        (law_of_composition (int_mod_quotient p) (int_mod_multiplication p))
+        (god1_int_mod_additive_abelian_group p hp)
+        (god1_int_mod_multiplication_closed p hp))
+      (god1_int_mod_multiplication_associative p hp))
+    honeexists)
+  (god1_int_mod_distributive p hp)).
+exact (andI
+  (ring (int_mod_quotient p) (int_mod_addition p) (int_mod_multiplication p))
+  (commutative_on (int_mod_quotient p) (int_mod_multiplication p))
+  hring (god1_int_mod_multiplication_commutative p hp)).
+Qed.
 
 Theorem god1_integers_modulo_p_form_commutative_ring :
   forall p :e omega,
@@ -55127,15 +56525,15 @@ assume hp.
 claim h_s8_mod_ring_goal :
   commutative_ring
     (int_mod_quotient p) (int_mod_addition p) (int_mod_multiplication p).
-admit.
+exact (god1_int_mod_commutative_ring_core p hp).
 //GOD1PRF:112783 Let us first show that addition in $\mathbf{Z} / p \mathbf{Z}$ is associative.
 claim h_s8_mod_addition_associative :
   associative_on (int_mod_quotient p) (int_mod_addition p).
-admit.
+exact (god1_int_mod_addition_associative p hp).
 //GOD1PRF:113312 hence the associativity of addition in $\mathbf{Z} / p \mathbf{Z}$ follows from the associativity of addition in $\mathbf{Z}$.
 claim h_s8_mod_addition_associativity_conclusion :
   associative_on (int_mod_quotient p) (int_mod_addition p).
-admit.
+exact h_s8_mod_addition_associative.
 //GOD1PRF:113440 The proofs of associativity of multiplication, commutativity of addition and of multiplication, and distributivity of multiplication over addition in $\mathbf{Z} / p \mathbf{Z}$ all follow the same pattern.
 claim h_s8_mod_remaining_ring_laws :
   associative_on (int_mod_quotient p) (int_mod_multiplication p)
@@ -55145,39 +56543,125 @@ claim h_s8_mod_remaining_ring_laws :
     int_mod_multiplication p x (int_mod_addition p y z)
       = int_mod_addition p
         (int_mod_multiplication p x y) (int_mod_multiplication p x z).
-admit.
+exact (andI
+  (((associative_on (int_mod_quotient p) (int_mod_multiplication p)
+    /\ commutative_on (int_mod_quotient p) (int_mod_addition p))
+    /\ commutative_on (int_mod_quotient p) (int_mod_multiplication p)))
+  (forall x y z :e int_mod_quotient p,
+    int_mod_multiplication p x (int_mod_addition p y z)
+      = int_mod_addition p
+        (int_mod_multiplication p x y) (int_mod_multiplication p x z))
+  (andI
+    (associative_on (int_mod_quotient p) (int_mod_multiplication p)
+      /\ commutative_on (int_mod_quotient p) (int_mod_addition p))
+    (commutative_on (int_mod_quotient p) (int_mod_multiplication p))
+    (andI
+      (associative_on (int_mod_quotient p) (int_mod_multiplication p))
+      (commutative_on (int_mod_quotient p) (int_mod_addition p))
+      (god1_int_mod_multiplication_associative p hp)
+      (god1_int_mod_addition_commutative p hp))
+    (god1_int_mod_multiplication_commutative p hp))
+  (fun x hx y hy z hz => andEL
+    (int_mod_multiplication p x (int_mod_addition p y z)
+      = int_mod_addition p
+        (int_mod_multiplication p x y) (int_mod_multiplication p x z))
+    (int_mod_multiplication p (int_mod_addition p x y) z
+      = int_mod_addition p
+        (int_mod_multiplication p x z) (int_mod_multiplication p y z))
+    (god1_int_mod_distributive p hp x hx y hy z hz))).
 //GOD1PRF:113716 it is clear that $\theta(1)$ is neutral element for multiplication in $\mathbf{Z} / p \mathbf{Z}$, and likewise that $\theta(0)$ is the neutral element for addition.
 claim h_s8_mod_neutral_elements :
   exists one :e int_mod_quotient p,
     neutral_element (int_mod_quotient p) (int_mod_multiplication p) one
   /\ exists zero :e int_mod_quotient p,
     neutral_element (int_mod_quotient p) (int_mod_addition p) zero.
-admit.
+exact (ex_intro
+  (fun one => one :e int_mod_quotient p
+    /\ (neutral_element (int_mod_quotient p) (int_mod_multiplication p) one
+      /\ exists zero :e int_mod_quotient p,
+        neutral_element (int_mod_quotient p) (int_mod_addition p) zero))
+  (int_mod_class p 1)
+  (andI
+    (int_mod_class p 1 :e int_mod_quotient p)
+    (neutral_element (int_mod_quotient p) (int_mod_multiplication p)
+        (int_mod_class p 1)
+      /\ exists zero :e int_mod_quotient p,
+        neutral_element (int_mod_quotient p) (int_mod_addition p) zero)
+    (andEL
+      (int_mod_class p 1 :e int_mod_quotient p)
+      (forall A :e int_mod_quotient p,
+        int_mod_multiplication p A (int_mod_class p 1) = A
+        /\ int_mod_multiplication p (int_mod_class p 1) A = A)
+      (god1_int_mod_one_neutral p hp))
+    (andI
+      (neutral_element (int_mod_quotient p) (int_mod_multiplication p)
+        (int_mod_class p 1))
+      (exists zero :e int_mod_quotient p,
+        neutral_element (int_mod_quotient p) (int_mod_addition p) zero)
+      (god1_int_mod_one_neutral p hp)
+      (ex_intro
+        (fun zero => zero :e int_mod_quotient p
+          /\ neutral_element (int_mod_quotient p) (int_mod_addition p) zero)
+        (int_mod_class p 0)
+        (andI
+          (int_mod_class p 0 :e int_mod_quotient p)
+          (neutral_element (int_mod_quotient p) (int_mod_addition p)
+            (int_mod_class p 0))
+          (andEL
+            (int_mod_class p 0 :e int_mod_quotient p)
+            (forall A :e int_mod_quotient p,
+              int_mod_addition p A (int_mod_class p 0) = A
+              /\ int_mod_addition p (int_mod_class p 0) A = A)
+            (god1_int_mod_zero_neutral p hp))
+          (god1_int_mod_zero_neutral p hp)))))).
 //GOD1PRF:113883 It remains only to show that each element $\xi \in \mathbf{Z} / p \mathbf{Z}$ has a negative (with respect to addition).
 claim h_s8_mod_additive_inverses_goal :
   forall xi :e int_mod_quotient p,
     exists eta :e int_mod_quotient p,
       reflection (int_mod_quotient p) (int_mod_addition p)
         (int_mod_class p 0) xi eta.
-admit.
+exact (god1_int_mod_reflection_exists p hp).
 //GOD1PRF:114004 Let $\xi=\theta(x)$ for some $x \in \mathbf{Z}$; then we have
 claim h_s8_mod_representative :
   forall xi :e int_mod_quotient p,
     exists x :e int, xi = int_mod_class p x.
-admit.
+let xi.
+assume hxi.
+witness (int_mod_representative p xi).
+exact (god1_int_mod_representative_data p hp xi hxi).
 //GOD1PRF:114118 which shows that $\xi$ does have a negative, namely $\theta(-x)$.
 claim h_s8_mod_negative_representative :
   forall x :e int,
     reflection (int_mod_quotient p) (int_mod_addition p)
       (int_mod_class p 0) (int_mod_class p x)
       (int_mod_class p (minus_SNo x)).
-admit.
+let x.
+assume hx.
+claim hminus : minus_SNo x :e int.
+exact (int_minus_SNo x hx).
+exact (andI
+  (int_mod_class p (minus_SNo x) :e int_mod_quotient p
+    /\ int_mod_addition p
+      (int_mod_class p (minus_SNo x)) (int_mod_class p x)
+      = int_mod_class p 0)
+  (int_mod_addition p
+    (int_mod_class p x) (int_mod_class p (minus_SNo x))
+    = int_mod_class p 0)
+  (andI
+    (int_mod_class p (minus_SNo x) :e int_mod_quotient p)
+    (int_mod_addition p
+      (int_mod_class p (minus_SNo x)) (int_mod_class p x)
+      = int_mod_class p 0)
+    (god1_int_mod_class_in_quotient p hp (minus_SNo x) hminus)
+    (god1_int_mod_class_inverse_left p hp x hx))
+  (god1_int_mod_class_inverse_right p hp x hx)).
 //GOD1PRF:114186 Hence $\mathbf{Z} / p \mathbf{Z}$ is a commutative ring, and we may speak of the ring $\mathbf{Z} / p \mathbf{Z}$ of integers modulo $p$.
 claim h_s8_mod_commutative_ring_conclusion :
   commutative_ring
     (int_mod_quotient p) (int_mod_addition p) (int_mod_multiplication p).
-admit.
-Admitted.
+exact (god1_int_mod_commutative_ring_core p hp).
+exact h_s8_mod_commutative_ring_conclusion.
+Qed.
 
 (** Formal interface for the more general finite-domain result used below. **)
 Theorem god1_s8_finite_integral_domain_field_interface :
