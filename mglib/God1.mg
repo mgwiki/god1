@@ -58408,24 +58408,31 @@ Qed.
 Theorem god1_s5_theorem4_finite_injection_is_surjection :
   forall X, forall f:set -> set,
     finite X -> inj X X f -> surj X X f.
-Admitted.
+let X f.
+assume hfin hinj.
+exact (god1_finite_self_injection_surjective_core X hfin f hinj).
+Qed.
 
 Theorem god1_s8_theorem2_finite_integral_domain_is_field :
   forall K, forall add mul:set -> set -> set,
     finite K -> integral_domain K add mul -> field K add mul.
 let K add mul.
 assume hfin hK.
+claim hcommring : commutative_ring K add mul.
+exact (god1_integral_domain_commutative_ring K add mul hK).
+claim hring : ring K add mul.
+exact (andEL (ring K add mul) (commutative_on K mul) hcommring).
 //GOD1PRF:115794 Let K be a finite integral domain, let $a$ be a non-zero element of K , and consider the mapping $x \rightarrow a x$ of $\mathbf{K}$ into $\mathbf{K}$.
 claim h_s8_t2_multiplication_map_closed :
   forall a :e K,
     forall x :e K, mul a x :e K.
-admit.
+exact (god1_ring_multiplicative_law K add mul hring).
 //GOD1PRF:115946 Since $a x=a y$ implies $a(x-y)=0$, and therefore $x-y=0$ (because K is an integral domain), it follows that the mapping $x \rightarrow a x$ is injective.
 claim h_s8_t2_multiplication_map_injective :
   forall a :e K,
     a <> ring_zero K add ->
     inj K K (fun x => mul a x).
-admit.
+exact (god1_integral_domain_left_multiplication_injective K add mul hK).
 //GOD1PRF:116101 But the set K is finite and therefore this mapping is surjective (§ 5, Theorem 4); in particular, there is an element $x \in \mathrm{~K}$ such that $a x=1$.
 claim h_s8_t2_s5_theorem4_call :
   forall a :e K,
@@ -58440,16 +58447,41 @@ claim h_s8_t2_right_inverse_exists :
   forall a :e K,
     a <> ring_zero K add -> exists x :e K,
       mul a x = ring_one K mul.
-admit.
+let a.
+assume ha hane.
+claim hunit : ring_unit K add mul a.
+exact (god1_finite_integral_domain_nonzero_unit
+  K add mul hfin hK a ha hane).
+claim hinverses : exists x :e K,
+  mul x a = ring_one K mul /\ mul a x = ring_one K mul.
+exact (andER
+  (a :e K)
+  (exists x :e K,
+    mul x a = ring_one K mul /\ mul a x = ring_one K mul)
+  hunit).
+apply (exandE_i
+  (fun x => x :e K)
+  (fun x => mul x a = ring_one K mul
+    /\ mul a x = ring_one K mul)
+  hinverses).
+let x.
+assume hx hreflection.
+witness x.
+exact (andI
+  (x :e K) (mul a x = ring_one K mul) hx
+  (andER
+    (mul x a = ring_one K mul)
+    (mul a x = ring_one K mul) hreflection)).
 //GOD1PRF:116259 In other words, $a$ has an inverse in K , and therefore (since $a$ was any non-zero element of K ), K is a field.
 claim h_s8_t2_every_nonzero_is_unit :
   forall a :e K,
     a <> ring_zero K add -> ring_unit K add mul a.
-admit.
+exact (god1_finite_integral_domain_nonzero_unit K add mul hfin hK).
 //GOD1PRF:116375 Q.E.D.
 claim h_s8_t2_book_conclusion : field K add mul.
-admit.
-Admitted.
+exact (god1_finite_integral_domain_field_core K add mul hfin hK).
+exact h_s8_t2_book_conclusion.
+Qed.
 
 //GOD1:116635 ring_nat_power : "the natural-number power #5 of #4 in the ring #1" | $#4^{#5}$
 Definition ring_nat_power :
