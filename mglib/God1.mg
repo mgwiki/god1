@@ -35093,6 +35093,120 @@ Definition group_inverse :
 Definition abelian_group : set -> (set -> set -> set) -> prop :=
   fun G mul => group G mul /\ commutative_on G mul.
 
+//GOD1PRF:18611 b) there exists an element $e \in \mathrm{G}$ such that $x e=e x=x$ for all $x \in \mathrm{G}$ (existence of a neutral element);
+Theorem god1_group_identity_specification :
+  forall G, forall mul:set -> set -> set,
+    group G mul ->
+    neutral_element G mul (group_identity G mul).
+let G mul.
+assume hG.
+apply (Eps_i_ex (fun e => neutral_element G mul e)).
+apply (exandE_i
+  (fun e => e :e G)
+  (fun e => neutral_element G mul e
+    /\ forall x :e G, exists y :e G,
+      reflection G mul e x y)
+  (andER
+    (law_of_composition G mul /\ associative_on G mul)
+    (exists e :e G,
+      neutral_element G mul e
+      /\ forall x :e G, exists y :e G,
+        reflection G mul e x y)
+    hG)).
+let e.
+assume heG hedata.
+witness e.
+exact (andEL
+  (neutral_element G mul e)
+  (forall x :e G, exists y :e G, reflection G mul e x y)
+  hedata).
+Qed.
+
+//GOD1PRF:18742 c) for each $x \in \mathrm{G}$, there exists an element $x^{-1} \in \mathrm{G}$ such that $x^{-1} x=x x^{-1}=e$ (existence of an inverse for each element of G ).
+Theorem god1_group_inverse_specification :
+  forall G, forall mul:set -> set -> set,
+    group G mul ->
+    forall x :e G,
+      reflection G mul (group_identity G mul) x
+        (group_inverse G mul x).
+let G mul.
+assume hG.
+let x.
+assume hx.
+apply (Eps_i_ex
+  (fun y => reflection G mul (group_identity G mul) x y)).
+apply (exandE_i
+  (fun e => e :e G)
+  (fun e => neutral_element G mul e
+    /\ forall z :e G, exists y :e G,
+      reflection G mul e z y)
+  (andER
+    (law_of_composition G mul /\ associative_on G mul)
+    (exists e :e G,
+      neutral_element G mul e
+      /\ forall z :e G, exists y :e G,
+        reflection G mul e z y)
+    hG)).
+let e.
+assume heG hedata.
+apply (exandE_i
+  (fun y => y :e G)
+  (fun y => reflection G mul e x y)
+  ((andER
+    (neutral_element G mul e)
+    (forall z :e G, exists y :e G, reflection G mul e z y)
+    hedata) x hx)).
+let y.
+assume hyG hreflection.
+witness y.
+apply (andI
+  (y :e G /\ mul y x = group_identity G mul)
+  (mul x y = group_identity G mul)).
+- exact (andI
+    (y :e G)
+    (mul y x = group_identity G mul)
+    hyG
+    (eq_i_tra (mul y x) e (group_identity G mul)
+      (andER (y :e G) (mul y x = e)
+        (andEL (y :e G /\ mul y x = e) (mul x y = e) hreflection))
+      (god1_s6_theorem1_neutral_element_unique G mul
+        (andEL
+          (law_of_composition G mul)
+          (associative_on G mul)
+          (andEL
+            (law_of_composition G mul /\ associative_on G mul)
+            (exists e :e G,
+              neutral_element G mul e
+              /\ forall z :e G, exists w :e G,
+                reflection G mul e z w)
+            hG))
+        e (group_identity G mul)
+        (andEL
+          (neutral_element G mul e)
+          (forall z :e G, exists w :e G, reflection G mul e z w)
+          hedata)
+        (god1_group_identity_specification G mul hG)))).
+- exact (eq_i_tra (mul x y) e (group_identity G mul)
+    (andER (y :e G /\ mul y x = e) (mul x y = e) hreflection)
+    (god1_s6_theorem1_neutral_element_unique G mul
+      (andEL
+        (law_of_composition G mul)
+        (associative_on G mul)
+        (andEL
+          (law_of_composition G mul /\ associative_on G mul)
+          (exists e :e G,
+            neutral_element G mul e
+            /\ forall z :e G, exists w :e G,
+              reflection G mul e z w)
+          hG))
+      e (group_identity G mul)
+      (andEL
+        (neutral_element G mul e)
+        (forall z :e G, exists w :e G, reflection G mul e z w)
+        hedata)
+      (god1_group_identity_specification G mul hG))).
+Qed.
+
 Theorem god1_group_identity_and_inverse_specifications :
   forall G, forall mul:set -> set -> set,
     group G mul ->
@@ -35101,23 +35215,496 @@ Theorem god1_group_identity_and_inverse_specifications :
       reflection G mul (group_identity G mul) x (group_inverse G mul x).
 let G mul.
 assume hG.
-//GOD1PRF:18611 b) there exists an element $e \in \mathrm{G}$ such that $x e=e x=x$ for all $x \in \mathrm{G}$ (existence of a neutral element);
-claim h_s7_group_spec_identity :
-  neutral_element G mul (group_identity G mul).
-admit.
-//GOD1PRF:18742 c) for each $x \in \mathrm{G}$, there exists an element $x^{-1} \in \mathrm{G}$ such that $x^{-1} x=x x^{-1}=e$ (existence of an inverse for each element of G ).
-claim h_s7_group_spec_inverse :
-  forall x :e G,
-    reflection G mul (group_identity G mul) x (group_inverse G mul x).
-admit.
 apply andI.
-Admitted.
+- exact (god1_group_identity_specification G mul hG).
+- exact (god1_group_inverse_specification G mul hG).
+Qed.
+
+Theorem god1_group_law_of_composition :
+  forall G, forall mul:set -> set -> set,
+    group G mul -> law_of_composition G mul.
+let G mul.
+assume hG.
+exact (andEL
+  (law_of_composition G mul)
+  (associative_on G mul)
+  (andEL
+    (law_of_composition G mul /\ associative_on G mul)
+    (exists e :e G,
+      neutral_element G mul e
+      /\ forall x :e G, exists y :e G,
+        reflection G mul e x y)
+    hG)).
+Qed.
+
+Theorem god1_group_associative :
+  forall G, forall mul:set -> set -> set,
+    group G mul -> associative_on G mul.
+let G mul.
+assume hG.
+exact (andER
+  (law_of_composition G mul)
+  (associative_on G mul)
+  (andEL
+    (law_of_composition G mul /\ associative_on G mul)
+    (exists e :e G,
+      neutral_element G mul e
+      /\ forall x :e G, exists y :e G,
+        reflection G mul e x y)
+    hG)).
+Qed.
+
+Theorem god1_group_identity_in :
+  forall G, forall mul:set -> set -> set,
+    group G mul -> group_identity G mul :e G.
+let G mul.
+assume hG.
+exact (andEL
+  (group_identity G mul :e G)
+  (forall x :e G,
+    mul x (group_identity G mul) = x
+    /\ mul (group_identity G mul) x = x)
+  (god1_group_identity_specification G mul hG)).
+Qed.
+
+Theorem god1_group_inverse_in :
+  forall G, forall mul:set -> set -> set,
+    group G mul -> forall x :e G, group_inverse G mul x :e G.
+let G mul.
+assume hG.
+let x.
+assume hx.
+exact (andEL
+  (group_inverse G mul x :e G)
+  (mul (group_inverse G mul x) x = group_identity G mul)
+  (andEL
+    (group_inverse G mul x :e G
+      /\ mul (group_inverse G mul x) x = group_identity G mul)
+    (mul x (group_inverse G mul x) = group_identity G mul)
+    (god1_group_inverse_specification G mul hG x hx))).
+Qed.
 
 //GOD1:26816 indexed_group_product_operation : "componentwise multiplication on the product of the family of groups #2 indexed by #1" | $(x_i)(y_i)=(x_i y_i)_{i\in #1}$
 Definition indexed_group_product_operation :
   set -> (set -> set -> set -> set) -> set -> set -> set :=
   fun I mul x y =>
     fun i :e I => mul i (x i) (y i).
+
+Theorem god1_indexed_group_product_eval :
+  forall I, forall mul:set -> set -> set -> set,
+    forall x y i, i :e I ->
+      indexed_group_product_operation I mul x y i
+        = mul i (x i) (y i).
+let I mul x y i.
+assume hi.
+exact (beta I (fun j => mul j (x j) (y j)) i hi).
+Qed.
+
+Theorem god1_indexed_group_product_components_in :
+  forall I, forall G:set -> set,
+  forall mul:set -> set -> set -> set,
+    (forall i :e I, group (G i) (mul i)) ->
+    forall x y :e (Pi_ i :e I, G i),
+      forall i :e I, mul i (x i) (y i) :e G i.
+let I G mul.
+assume hgroups.
+let x.
+assume hx.
+let y.
+assume hy.
+let i.
+assume hi.
+exact (god1_group_law_of_composition
+  (G i) (mul i) (hgroups i hi)
+  (x i) (ap_Pi I G x i hx hi)
+  (y i) (ap_Pi I G y i hy hi)).
+Qed.
+
+//GOD1PRF:27181 Then the pair consisting of the set $\mathbf{G}$ and this law of composition is a group.
+Theorem god1_indexed_group_product_law :
+  forall I, forall G:set -> set,
+  forall mul:set -> set -> set -> set,
+    (forall i :e I, group (G i) (mul i)) ->
+    law_of_composition
+      (Pi_ i :e I, G i)
+      (indexed_group_product_operation I mul).
+let I G mul.
+assume hgroups.
+let x.
+assume hx.
+let y.
+assume hy.
+exact (lam_Pi I G (fun i => mul i (x i) (y i))
+  (god1_indexed_group_product_components_in
+    I G mul hgroups x hx y hy)).
+Qed.
+
+//GOD1PRF:27272 To prove associativity, consider three elements
+Theorem god1_indexed_group_product_three_elements :
+  forall I, forall G:set -> set,
+  forall mul:set -> set -> set -> set,
+    (forall i :e I, group (G i) (mul i)) ->
+    forall x y z :e (Pi_ i :e I, G i),
+      indexed_group_product_operation I mul
+        (indexed_group_product_operation I mul x y) z
+      = indexed_group_product_operation I mul
+        x (indexed_group_product_operation I mul y z).
+let I G mul.
+assume hgroups.
+let x.
+assume hx.
+let y.
+assume hy.
+let z.
+assume hz.
+apply (Pi_ext I G
+  (indexed_group_product_operation I mul
+    (indexed_group_product_operation I mul x y) z)
+  (god1_indexed_group_product_law I G mul hgroups
+    (indexed_group_product_operation I mul x y)
+    (god1_indexed_group_product_law I G mul hgroups x hx y hy)
+    z hz)
+  (indexed_group_product_operation I mul
+    x (indexed_group_product_operation I mul y z))
+  (god1_indexed_group_product_law I G mul hgroups
+    x hx
+    (indexed_group_product_operation I mul y z)
+    (god1_indexed_group_product_law I G mul hgroups y hy z hz))).
+let i.
+assume hi.
+apply (eq_i_tra
+  (indexed_group_product_operation I mul
+    (indexed_group_product_operation I mul x y) z i)
+  (mul i (indexed_group_product_operation I mul x y i) (z i))
+  (indexed_group_product_operation I mul
+    x (indexed_group_product_operation I mul y z) i)).
+- exact (god1_indexed_group_product_eval I mul
+    (indexed_group_product_operation I mul x y) z i hi).
+- apply (eq_i_tra
+    (mul i (indexed_group_product_operation I mul x y i) (z i))
+    (mul i (mul i (x i) (y i)) (z i))
+    (indexed_group_product_operation I mul
+      x (indexed_group_product_operation I mul y z) i)).
+  - f_equal.
+    exact (god1_indexed_group_product_eval I mul x y i hi).
+  - apply (eq_i_tra
+      (mul i (mul i (x i) (y i)) (z i))
+      (mul i (x i) (mul i (y i) (z i)))
+      (indexed_group_product_operation I mul
+        x (indexed_group_product_operation I mul y z) i)).
+    - apply eq_sym.
+      exact (god1_group_associative
+        (G i) (mul i) (hgroups i hi)
+        (x i) (ap_Pi I G x i hx hi)
+        (y i) (ap_Pi I G y i hy hi)
+        (z i) (ap_Pi I G z i hz hi)).
+    - apply (eq_i_tra
+        (mul i (x i) (mul i (y i) (z i)))
+        (mul i (x i)
+          (indexed_group_product_operation I mul y z i))
+        (indexed_group_product_operation I mul
+          x (indexed_group_product_operation I mul y z) i)).
+      - f_equal.
+        apply eq_sym.
+        exact (god1_indexed_group_product_eval I mul y z i hi).
+      - apply eq_sym.
+        exact (god1_indexed_group_product_eval I mul
+          x (indexed_group_product_operation I mul y z) i hi).
+Qed.
+
+//GOD1PRF:27458 then, by definition
+Theorem god1_indexed_group_product_definition_call :
+  forall I, forall G:set -> set,
+  forall mul:set -> set -> set -> set,
+    forall x y :e (Pi_ i :e I, G i),
+      indexed_group_product_operation I mul x y
+        = (fun i :e I => mul i (x i) (y i)).
+let I G mul.
+let x.
+assume hx.
+let y.
+assume hy.
+exact (eq_ref (fun i :e I => mul i (x i) (y i))).
+Qed.
+
+//GOD1PRF:27805 Thus the associative law on G follows from the associativity of the laws of composition on the factors $\mathrm{G}_{1}, \ldots, \mathrm{G}_{n}$.
+Theorem god1_indexed_group_product_associative :
+  forall I, forall G:set -> set,
+  forall mul:set -> set -> set -> set,
+    (forall i :e I, group (G i) (mul i)) ->
+    associative_on
+      (Pi_ i :e I, G i)
+      (indexed_group_product_operation I mul).
+let I G mul.
+assume hgroups.
+let x.
+assume hx.
+let y.
+assume hy.
+let z.
+assume hz.
+apply eq_sym.
+exact (god1_indexed_group_product_three_elements
+  I G mul hgroups x hx y hy z hz).
+Qed.
+
+//GOD1PRF:27951 To show that G has a neutral element, consider the element
+Theorem god1_indexed_group_product_identity_in :
+  forall I, forall G:set -> set,
+  forall mul:set -> set -> set -> set,
+    (forall i :e I, group (G i) (mul i)) ->
+    (fun i :e I => group_identity (G i) (mul i))
+      :e (Pi_ i :e I, G i).
+let I G mul.
+assume hgroups.
+apply (lam_Pi I G
+  (fun i => group_identity (G i) (mul i))).
+let i.
+assume hi.
+exact (god1_group_identity_in (G i) (mul i) (hgroups i hi)).
+Qed.
+
+//GOD1PRF:28155 A trivial calculation shows immediately that $e$ is a neutral element for the law of composition on G.
+Theorem god1_indexed_group_product_identity_is_neutral :
+  forall I, forall G:set -> set,
+  forall mul:set -> set -> set -> set,
+    (forall i :e I, group (G i) (mul i)) ->
+    neutral_element
+      (Pi_ i :e I, G i)
+      (indexed_group_product_operation I mul)
+      (fun i :e I => group_identity (G i) (mul i)).
+let I G mul.
+assume hgroups.
+apply (andI
+  ((fun i :e I => group_identity (G i) (mul i))
+    :e (Pi_ i :e I, G i))
+  (forall x :e (Pi_ i :e I, G i),
+    indexed_group_product_operation I mul x
+      (fun i :e I => group_identity (G i) (mul i)) = x
+    /\ indexed_group_product_operation I mul
+      (fun i :e I => group_identity (G i) (mul i)) x = x)).
+- exact (god1_indexed_group_product_identity_in I G mul hgroups).
+- let x.
+  assume hx.
+  apply andI.
+  - apply (Pi_ext I G
+      (indexed_group_product_operation I mul x
+        (fun i :e I => group_identity (G i) (mul i)))
+      (god1_indexed_group_product_law I G mul hgroups
+        x hx
+        (fun i :e I => group_identity (G i) (mul i))
+        (god1_indexed_group_product_identity_in I G mul hgroups))
+      x hx).
+    let i.
+    assume hi.
+    apply (eq_i_tra
+      (indexed_group_product_operation I mul x
+        (fun j :e I => group_identity (G j) (mul j)) i)
+      (mul i (x i)
+        ((fun j :e I => group_identity (G j) (mul j)) i))
+      (x i)).
+    - exact (god1_indexed_group_product_eval I mul x
+        (fun j :e I => group_identity (G j) (mul j)) i hi).
+    - apply (eq_i_tra
+        (mul i (x i)
+          ((fun j :e I => group_identity (G j) (mul j)) i))
+        (mul i (x i) (group_identity (G i) (mul i)))
+        (x i)).
+      - f_equal.
+        exact (beta I
+          (fun j => group_identity (G j) (mul j)) i hi).
+      - exact (andEL
+          (mul i (x i) (group_identity (G i) (mul i)) = x i)
+          (mul i (group_identity (G i) (mul i)) (x i) = x i)
+          ((andER
+            (group_identity (G i) (mul i) :e G i)
+            (forall z :e G i,
+              mul i z (group_identity (G i) (mul i)) = z
+              /\ mul i (group_identity (G i) (mul i)) z = z)
+            (god1_group_identity_specification
+              (G i) (mul i) (hgroups i hi)))
+            (x i) (ap_Pi I G x i hx hi))).
+  - apply (Pi_ext I G
+      (indexed_group_product_operation I mul
+        (fun i :e I => group_identity (G i) (mul i)) x)
+      (god1_indexed_group_product_law I G mul hgroups
+        (fun i :e I => group_identity (G i) (mul i))
+        (god1_indexed_group_product_identity_in I G mul hgroups)
+        x hx)
+      x hx).
+    let i.
+    assume hi.
+    apply (eq_i_tra
+      (indexed_group_product_operation I mul
+        (fun j :e I => group_identity (G j) (mul j)) x i)
+      (mul i
+        ((fun j :e I => group_identity (G j) (mul j)) i)
+        (x i))
+      (x i)).
+    - exact (god1_indexed_group_product_eval I mul
+        (fun j :e I => group_identity (G j) (mul j)) x i hi).
+    - apply (eq_i_tra
+        (mul i
+          ((fun j :e I => group_identity (G j) (mul j)) i)
+          (x i))
+        (mul i (group_identity (G i) (mul i)) (x i))
+        (x i)).
+      - f_equal.
+        exact (beta I
+          (fun j => group_identity (G j) (mul j)) i hi).
+      - exact (andER
+          (mul i (x i) (group_identity (G i) (mul i)) = x i)
+          (mul i (group_identity (G i) (mul i)) (x i) = x i)
+          ((andER
+            (group_identity (G i) (mul i) :e G i)
+            (forall z :e G i,
+              mul i z (group_identity (G i) (mul i)) = z
+              /\ mul i (group_identity (G i) (mul i)) z = z)
+            (god1_group_identity_specification
+              (G i) (mul i) (hgroups i hi)))
+            (x i) (ap_Pi I G x i hx hi))).
+Qed.
+
+//GOD1PRF:28258 Finally, if
+Theorem god1_indexed_group_product_inverse_in :
+  forall I, forall G:set -> set,
+  forall mul:set -> set -> set -> set,
+    (forall i :e I, group (G i) (mul i)) ->
+    forall x :e (Pi_ i :e I, G i),
+      (fun i :e I => group_inverse (G i) (mul i) (x i))
+        :e (Pi_ i :e I, G i).
+let I G mul.
+assume hgroups.
+let x.
+assume hx.
+apply (lam_Pi I G
+  (fun i => group_inverse (G i) (mul i) (x i))).
+let i.
+assume hi.
+exact (god1_group_inverse_in
+  (G i) (mul i) (hgroups i hi)
+  (x i) (ap_Pi I G x i hx hi)).
+Qed.
+
+//GOD1PRF:28314 is any element of G , it is immediate that $x$ has an inverse given by the formula
+Theorem god1_indexed_group_product_inverse_is_reflection :
+  forall I, forall G:set -> set,
+  forall mul:set -> set -> set -> set,
+    (forall i :e I, group (G i) (mul i)) ->
+    forall x :e (Pi_ i :e I, G i),
+      reflection
+        (Pi_ i :e I, G i)
+        (indexed_group_product_operation I mul)
+        (fun i :e I => group_identity (G i) (mul i)) x
+        (fun i :e I => group_inverse (G i) (mul i) (x i)).
+let I G mul.
+assume hgroups.
+let x.
+assume hx.
+apply (andI
+  ((fun i :e I => group_inverse (G i) (mul i) (x i))
+    :e (Pi_ i :e I, G i)
+    /\ indexed_group_product_operation I mul
+      (fun i :e I => group_inverse (G i) (mul i) (x i)) x
+      = (fun i :e I => group_identity (G i) (mul i)))
+  (indexed_group_product_operation I mul x
+    (fun i :e I => group_inverse (G i) (mul i) (x i))
+    = (fun i :e I => group_identity (G i) (mul i)))).
+- apply andI.
+  - exact (god1_indexed_group_product_inverse_in I G mul hgroups x hx).
+  - apply (Pi_ext I G
+      (indexed_group_product_operation I mul
+        (fun i :e I => group_inverse (G i) (mul i) (x i)) x)
+      (god1_indexed_group_product_law I G mul hgroups
+        (fun i :e I => group_inverse (G i) (mul i) (x i))
+        (god1_indexed_group_product_inverse_in I G mul hgroups x hx)
+        x hx)
+      (fun i :e I => group_identity (G i) (mul i))
+      (god1_indexed_group_product_identity_in I G mul hgroups)).
+    let i.
+    assume hi.
+    apply (eq_i_tra
+      (indexed_group_product_operation I mul
+        (fun j :e I => group_inverse (G j) (mul j) (x j)) x i)
+      (mul i
+        ((fun j :e I => group_inverse (G j) (mul j) (x j)) i)
+        (x i))
+      ((fun j :e I => group_identity (G j) (mul j)) i)).
+    - exact (god1_indexed_group_product_eval I mul
+        (fun j :e I => group_inverse (G j) (mul j) (x j)) x i hi).
+    - apply (eq_i_tra
+        (mul i
+          ((fun j :e I => group_inverse (G j) (mul j) (x j)) i)
+          (x i))
+        (mul i (group_inverse (G i) (mul i) (x i)) (x i))
+        ((fun j :e I => group_identity (G j) (mul j)) i)).
+      - f_equal.
+        exact (beta I
+          (fun j => group_inverse (G j) (mul j) (x j)) i hi).
+      - apply (eq_i_tra
+          (mul i (group_inverse (G i) (mul i) (x i)) (x i))
+          (group_identity (G i) (mul i))
+          ((fun j :e I => group_identity (G j) (mul j)) i)).
+        - exact (andER
+            (group_inverse (G i) (mul i) (x i) :e G i)
+            (mul i (group_inverse (G i) (mul i) (x i)) (x i)
+              = group_identity (G i) (mul i))
+            (andEL
+              (group_inverse (G i) (mul i) (x i) :e G i
+                /\ mul i (group_inverse (G i) (mul i) (x i)) (x i)
+                  = group_identity (G i) (mul i))
+              (mul i (x i) (group_inverse (G i) (mul i) (x i))
+                = group_identity (G i) (mul i))
+              (god1_group_inverse_specification
+                (G i) (mul i) (hgroups i hi)
+                (x i) (ap_Pi I G x i hx hi)))).
+        - apply eq_sym.
+          exact (beta I
+            (fun j => group_identity (G j) (mul j)) i hi).
+- apply (Pi_ext I G
+    (indexed_group_product_operation I mul x
+      (fun i :e I => group_inverse (G i) (mul i) (x i)))
+    (god1_indexed_group_product_law I G mul hgroups
+      x hx
+      (fun i :e I => group_inverse (G i) (mul i) (x i))
+      (god1_indexed_group_product_inverse_in I G mul hgroups x hx))
+    (fun i :e I => group_identity (G i) (mul i))
+    (god1_indexed_group_product_identity_in I G mul hgroups)).
+  let i.
+  assume hi.
+  apply (eq_i_tra
+    (indexed_group_product_operation I mul x
+      (fun j :e I => group_inverse (G j) (mul j) (x j)) i)
+    (mul i (x i)
+      ((fun j :e I => group_inverse (G j) (mul j) (x j)) i))
+    ((fun j :e I => group_identity (G j) (mul j)) i)).
+  - exact (god1_indexed_group_product_eval I mul x
+      (fun j :e I => group_inverse (G j) (mul j) (x j)) i hi).
+  - apply (eq_i_tra
+      (mul i (x i)
+        ((fun j :e I => group_inverse (G j) (mul j) (x j)) i))
+      (mul i (x i) (group_inverse (G i) (mul i) (x i)))
+      ((fun j :e I => group_identity (G j) (mul j)) i)).
+    - f_equal.
+      exact (beta I
+        (fun j => group_inverse (G j) (mul j) (x j)) i hi).
+    - apply (eq_i_tra
+        (mul i (x i) (group_inverse (G i) (mul i) (x i)))
+        (group_identity (G i) (mul i))
+        ((fun j :e I => group_identity (G j) (mul j)) i)).
+      - exact (andER
+          (group_inverse (G i) (mul i) (x i) :e G i
+            /\ mul i (group_inverse (G i) (mul i) (x i)) (x i)
+              = group_identity (G i) (mul i))
+          (mul i (x i) (group_inverse (G i) (mul i) (x i))
+            = group_identity (G i) (mul i))
+          (god1_group_inverse_specification
+            (G i) (mul i) (hgroups i hi)
+            (x i) (ap_Pi I G x i hx hi))).
+      - apply eq_sym.
+        exact (beta I
+          (fun j => group_identity (G j) (mul j)) i hi).
+Qed.
 
 Theorem god1_indexed_direct_product_is_group :
   forall I, forall G:set -> set,
@@ -35128,70 +35715,96 @@ Theorem god1_indexed_direct_product_is_group :
       (indexed_group_product_operation I mul).
 let I G mul.
 assume hgroups.
-//GOD1PRF:27181 Then the pair consisting of the set $\mathbf{G}$ and this law of composition is a group.
-claim h_s7_product_group_goal :
-  group (Pi_ i :e I, G i) (indexed_group_product_operation I mul).
-admit.
-//GOD1PRF:27272 To prove associativity, consider three elements
-claim h_s7_product_three_elements :
-  forall x y z :e (Pi_ i :e I, G i),
-    indexed_group_product_operation I mul
-      (indexed_group_product_operation I mul x y) z
-    = indexed_group_product_operation I mul
-      x (indexed_group_product_operation I mul y z).
-admit.
-//GOD1PRF:27458 then, by definition
-claim h_s7_product_definition_call :
-  forall x y :e (Pi_ i :e I, G i),
-    indexed_group_product_operation I mul x y
-      = (fun i :e I => mul i (x i) (y i)).
-let x.
-assume hx.
-let y.
-assume hy.
-apply (eq_ref (fun i :e I => mul i (x i) (y i))).
-//GOD1PRF:27805 Thus the associative law on G follows from the associativity of the laws of composition on the factors $\mathrm{G}_{1}, \ldots, \mathrm{G}_{n}$.
-claim h_s7_product_associative :
-  associative_on
-    (Pi_ i :e I, G i)
-    (indexed_group_product_operation I mul).
-admit.
-//GOD1PRF:27951 To show that G has a neutral element, consider the element
-claim h_s7_product_identity_exists :
-  exists e :e (Pi_ i :e I, G i),
-    neutral_element
-      (Pi_ i :e I, G i)
-      (indexed_group_product_operation I mul) e.
-admit.
-//GOD1PRF:28155 A trivial calculation shows immediately that $e$ is a neutral element for the law of composition on G.
-claim h_s7_product_identity_calculation :
-  neutral_element
+//GOD1PRF:28458 Thus the product set $\mathrm{G}_{1} \times \ldots \times \mathrm{G}_{n}$, together with the law of composition defined above, is a group.
+apply (andI
+  (law_of_composition
     (Pi_ i :e I, G i)
     (indexed_group_product_operation I mul)
-    (fun i :e I => group_identity (G i) (mul i)).
-admit.
-//GOD1PRF:28258 Finally, if
-claim h_s7_product_arbitrary_element :
-  forall x :e (Pi_ i :e I, G i), x :e (Pi_ i :e I, G i).
-admit.
-//GOD1PRF:28314 is any element of G , it is immediate that $x$ has an inverse given by the formula
-claim h_s7_product_inverse_exists :
-  forall x :e (Pi_ i :e I, G i),
-    exists y :e (Pi_ i :e I, G i),
-      reflection
-        (Pi_ i :e I, G i)
-        (indexed_group_product_operation I mul)
-        (fun i :e I => group_identity (G i) (mul i)) x y.
-admit.
-//GOD1PRF:28458 Thus the product set $\mathrm{G}_{1} \times \ldots \times \mathrm{G}_{n}$, together with the law of composition defined above, is a group.
-claim h_s7_product_conclusion :
-  group (Pi_ i :e I, G i) (indexed_group_product_operation I mul).
-admit.
-Admitted.
+    /\ associative_on
+      (Pi_ i :e I, G i)
+      (indexed_group_product_operation I mul))
+  (exists e :e (Pi_ i :e I, G i),
+    neutral_element
+      (Pi_ i :e I, G i)
+      (indexed_group_product_operation I mul) e
+    /\ forall x :e (Pi_ i :e I, G i),
+      exists y :e (Pi_ i :e I, G i),
+        reflection
+          (Pi_ i :e I, G i)
+          (indexed_group_product_operation I mul) e x y)).
+- apply andI.
+  - exact (god1_indexed_group_product_law I G mul hgroups).
+  - exact (god1_indexed_group_product_associative I G mul hgroups).
+- witness (fun i :e I => group_identity (G i) (mul i)).
+  apply andI.
+  - exact (god1_indexed_group_product_identity_in I G mul hgroups).
+  - apply andI.
+    - exact (god1_indexed_group_product_identity_is_neutral I G mul hgroups).
+    - let x.
+      assume hx.
+      witness (fun i :e I => group_inverse (G i) (mul i) (x i)).
+      apply andI.
+      - exact (god1_indexed_group_product_inverse_in I G mul hgroups x hx).
+      - exact (god1_indexed_group_product_inverse_is_reflection
+          I G mul hgroups x hx).
+Qed.
 
 //GOD1:29275 group_direct_power : "the direct power of #1 indexed by #3" | $#1^{#3}$
 Definition group_direct_power : set -> set -> set :=
   fun G I => G :^: I.
+
+Theorem god1_nonempty_of_ne_empty :
+  forall X, X <> 0 -> nonempty X.
+let X.
+assume hne.
+apply (orE (nonempty X) (~nonempty X) (xm (nonempty X))
+  (nonempty X)).
+- assume hnonempty.
+  exact hnonempty.
+- assume hempty.
+  exact (FalseE (hne (not_nonempty_imp_eq_Empty X hempty))
+    (nonempty X)).
+Qed.
+
+Theorem god1_group_inverse_involutive :
+  forall G, forall mul:set -> set -> set,
+    group G mul -> forall x :e G,
+      group_inverse G mul (group_inverse G mul x) = x.
+let G mul.
+assume hG.
+let x.
+assume hx.
+apply (god1_s6_left_and_right_reflections_equal
+  G mul (group_identity G mul)
+  (group_inverse G mul x)
+  (group_inverse G mul (group_inverse G mul x)) x
+  (god1_group_associative G mul hG)
+  (god1_group_identity_specification G mul hG)
+  (god1_group_inverse_in G mul hG x hx)).
+- exact (andEL
+    (group_inverse G mul (group_inverse G mul x) :e G
+      /\ mul
+        (group_inverse G mul (group_inverse G mul x))
+        (group_inverse G mul x) = group_identity G mul)
+    (mul
+      (group_inverse G mul x)
+      (group_inverse G mul (group_inverse G mul x))
+      = group_identity G mul)
+    (god1_group_inverse_specification G mul hG
+      (group_inverse G mul x)
+      (god1_group_inverse_in G mul hG x hx))).
+- exact (andI
+    (x :e G)
+    (mul (group_inverse G mul x) x = group_identity G mul)
+    hx
+    (andER
+      (x :e G /\ mul x (group_inverse G mul x) = group_identity G mul)
+      (mul (group_inverse G mul x) x = group_identity G mul)
+      (god1_s6_reflection_reverses
+        G mul (group_identity G mul)
+        x (group_inverse G mul x) hx
+        (god1_group_inverse_specification G mul hG x hx)))).
+Qed.
 
 //GOD1:31080 subgroup : "#3 is a subgroup of the group #1 with multiplication #2" | $#3\leq #1$
 Definition subgroup : set -> (set -> set -> set) -> set -> prop :=
@@ -35200,6 +35813,199 @@ Definition subgroup : set -> (set -> set -> set) -> set -> prop :=
     /\ H c= G
     /\ H <> 0
     /\ forall x y :e H, mul x (group_inverse G mul y) :e H.
+
+Theorem god1_subgroup_ambient_group :
+  forall G, forall mul:set -> set -> set, forall H,
+    subgroup G mul H -> group G mul.
+let G mul H.
+assume hH.
+exact (andEL
+  (group G mul) (H c= G)
+  (andEL
+    (group G mul /\ H c= G) (H <> 0)
+    (andEL
+      ((group G mul /\ H c= G) /\ H <> 0)
+      (forall x y :e H, mul x (group_inverse G mul y) :e H)
+      hH))).
+Qed.
+
+Theorem god1_subgroup_subset :
+  forall G, forall mul:set -> set -> set, forall H,
+    subgroup G mul H -> H c= G.
+let G mul H.
+assume hH.
+exact (andER
+  (group G mul) (H c= G)
+  (andEL
+    (group G mul /\ H c= G) (H <> 0)
+    (andEL
+      ((group G mul /\ H c= G) /\ H <> 0)
+      (forall x y :e H, mul x (group_inverse G mul y) :e H)
+      hH))).
+Qed.
+
+Theorem god1_subgroup_ne_empty :
+  forall G, forall mul:set -> set -> set, forall H,
+    subgroup G mul H -> H <> 0.
+let G mul H.
+assume hH.
+exact (andER
+  (group G mul /\ H c= G) (H <> 0)
+  (andEL
+    ((group G mul /\ H c= G) /\ H <> 0)
+    (forall x y :e H, mul x (group_inverse G mul y) :e H)
+    hH)).
+Qed.
+
+Theorem god1_subgroup_difference_closed :
+  forall G, forall mul:set -> set -> set, forall H,
+    subgroup G mul H ->
+    forall x y :e H, mul x (group_inverse G mul y) :e H.
+let G mul H.
+assume hH.
+exact (andER
+  ((group G mul /\ H c= G) /\ H <> 0)
+  (forall x y :e H, mul x (group_inverse G mul y) :e H)
+  hH).
+Qed.
+
+//GOD1PRF:31594 Let H be a subgroup of a group G .
+//GOD1PRF:31629 Since H is not empty, it contains at least one element $a$.
+Theorem god1_subgroup_chosen_member_in :
+  forall G, forall mul:set -> set -> set, forall H,
+    subgroup G mul H -> Eps_i (fun a => a :e H) :e H.
+let G mul H.
+assume hH.
+exact (Eps_i_ex (fun a => a :e H)
+  (god1_nonempty_of_ne_empty H
+    (god1_subgroup_ne_empty G mul H hH))).
+Qed.
+
+//GOD1PRF:31689 From the relations $a \in \mathrm{H}$ and $a \in \mathrm{H}$ it follows therefore that H contains
+//GOD1PRF:31808 in other words, a subgroup H of G always contains the neutral element of G .
+Theorem god1_subgroup_contains_identity :
+  forall G, forall mul:set -> set -> set, forall H,
+    subgroup G mul H -> group_identity G mul :e H.
+let G mul H.
+assume hH.
+exact (mem_eq_substR H
+  (mul
+    (Eps_i (fun a => a :e H))
+    (group_inverse G mul (Eps_i (fun a => a :e H))))
+  (group_identity G mul)
+  (andER
+    (group_inverse G mul (Eps_i (fun a => a :e H)) :e G
+      /\ mul
+        (group_inverse G mul (Eps_i (fun a => a :e H)))
+        (Eps_i (fun a => a :e H)) = group_identity G mul)
+    (mul
+      (Eps_i (fun a => a :e H))
+      (group_inverse G mul (Eps_i (fun a => a :e H)))
+      = group_identity G mul)
+    (god1_group_inverse_specification G mul
+      (god1_subgroup_ambient_group G mul H hH)
+      (Eps_i (fun a => a :e H))
+      ((god1_subgroup_subset G mul H hH)
+        (Eps_i (fun a => a :e H))
+        (god1_subgroup_chosen_member_in G mul H hH))))
+  (god1_subgroup_difference_closed G mul H hH
+    (Eps_i (fun a => a :e H))
+    (god1_subgroup_chosen_member_in G mul H hH)
+    (Eps_i (fun a => a :e H))
+    (god1_subgroup_chosen_member_in G mul H hH))).
+Qed.
+
+//GOD1PRF:31885 Next, if H contains an element $x$, then since it contains $e$ and $x$ it also contains
+//GOD1PRF:31997 and therefore the relation $x \in H$ implies the relation $x^{-1} \in H$.
+Theorem god1_subgroup_inverse_closed :
+  forall G, forall mul:set -> set -> set, forall H,
+    subgroup G mul H ->
+    forall x :e H, group_inverse G mul x :e H.
+let G mul H.
+assume hH.
+let x.
+assume hx.
+exact (mem_eq_substR H
+  (mul (group_identity G mul) (group_inverse G mul x))
+  (group_inverse G mul x)
+  (andER
+    (mul (group_inverse G mul x) (group_identity G mul)
+      = group_inverse G mul x)
+    (mul (group_identity G mul) (group_inverse G mul x)
+      = group_inverse G mul x)
+    ((andER
+      (group_identity G mul :e G)
+      (forall z :e G,
+        mul z (group_identity G mul) = z
+        /\ mul (group_identity G mul) z = z)
+      (god1_group_identity_specification G mul
+        (god1_subgroup_ambient_group G mul H hH)))
+      (group_inverse G mul x)
+      (god1_group_inverse_in G mul
+        (god1_subgroup_ambient_group G mul H hH)
+        x ((god1_subgroup_subset G mul H hH) x hx))))
+  (god1_subgroup_difference_closed G mul H hH
+    (group_identity G mul)
+    (god1_subgroup_contains_identity G mul H hH)
+    x hx)).
+Qed.
+
+//GOD1PRF:32073 Let $x, y$ be any elements of H .
+//GOD1PRF:32107 Since H contains $x$ and $y^{-1}$ (by what has just been proved), H must contain
+//GOD1PRF:32228 and therefore the relations $x \in \mathrm{H}$ and $y \in \mathrm{H}$ imply the relation $x y \in \mathrm{H}$.
+Theorem god1_subgroup_product_closed :
+  forall G, forall mul:set -> set -> set, forall H,
+    subgroup G mul H ->
+    forall x y :e H, mul x y :e H.
+let G mul H.
+assume hH.
+let x.
+assume hx.
+let y.
+assume hy.
+apply (mem_eq_substR H
+  (mul x (group_inverse G mul (group_inverse G mul y)))
+  (mul x y)).
+- f_equal.
+  exact (god1_group_inverse_involutive G mul
+    (god1_subgroup_ambient_group G mul H hH)
+    y ((god1_subgroup_subset G mul H hH) y hy)).
+- exact (god1_subgroup_difference_closed G mul H hH
+    x hx
+    (group_inverse G mul y)
+    (god1_subgroup_inverse_closed G mul H hH y hy)).
+Qed.
+
+//GOD1PRF:32341 Conversely, let H be a subset of G which has the following three properties:
+//GOD1PRF:32620 Then H is a subgroup of G .
+//GOD1PRF:32648 For H is not empty, by $b$ ); and if $x, y$ are any two elements of H , then H contains $x$ and $y^{-1}$, by $c$ ), and hence also $x y^{-1}$, by a).
+//GOD1PRF:32798 Hence the conditions a), b), c) above characterize subgroups ; in practice they are often used in place of the original definition.
+Theorem god1_subgroup_of_identity_product_inverse :
+  forall G, forall mul:set -> set -> set, forall H,
+    group G mul -> H c= G ->
+    group_identity G mul :e H ->
+    (forall x y :e H, mul x y :e H) ->
+    (forall x :e H, group_inverse G mul x :e H) ->
+    subgroup G mul H.
+let G mul H.
+assume hG hHG heH hprod hinv.
+apply (andI
+  ((group G mul /\ H c= G) /\ H <> 0)
+  (forall x y :e H, mul x (group_inverse G mul y) :e H)).
+- apply andI.
+  - apply andI.
+    - exact hG.
+    - exact hHG.
+  - assume hzero.
+    exact (EmptyE (group_identity G mul)
+      (mem_eq_set_subst H 0 (group_identity G mul) hzero heH)).
+- let x.
+  assume hx.
+  let y.
+  assume hy.
+  exact (hprod x hx
+    (group_inverse G mul y) (hinv y hy)).
+Qed.
 
 Theorem god1_subgroup_characterization :
   forall G, forall mul:set -> set -> set, forall H,
@@ -35211,73 +36017,36 @@ Theorem god1_subgroup_characterization :
 let G mul H.
 assume hG hHG.
 apply iffI.
-//GOD1PRF:31594 Let H be a subgroup of a group G .
-claim h_s7_subgroup_forward_start :
-  subgroup G mul H -> H c= G.
-admit.
-//GOD1PRF:31629 Since H is not empty, it contains at least one element $a$.
-claim h_s7_subgroup_has_element :
-  subgroup G mul H -> exists a :e H, a :e H.
-admit.
-//GOD1PRF:31689 From the relations $a \in \mathrm{H}$ and $a \in \mathrm{H}$ it follows therefore that H contains
-claim h_s7_subgroup_contains_aa_inverse :
-  subgroup G mul H ->
-  forall a :e H, mul a (group_inverse G mul a) :e H.
-admit.
-//GOD1PRF:31808 in other words, a subgroup H of G always contains the neutral element of G .
-claim h_s7_subgroup_contains_identity :
-  subgroup G mul H -> group_identity G mul :e H.
-admit.
-//GOD1PRF:31885 Next, if H contains an element $x$, then since it contains $e$ and $x$ it also contains
-claim h_s7_subgroup_identity_times_inverse :
-  subgroup G mul H -> forall x :e H,
-    mul (group_identity G mul) (group_inverse G mul x) :e H.
-admit.
-//GOD1PRF:31997 and therefore the relation $x \in H$ implies the relation $x^{-1} \in H$.
-claim h_s7_subgroup_inverse_closed :
-  subgroup G mul H ->
-  forall x :e H, group_inverse G mul x :e H.
-admit.
-//GOD1PRF:32073 Let $x, y$ be any elements of H .
-claim h_s7_subgroup_two_elements :
-  forall x y :e H, x :e H /\ y :e H.
-admit.
-//GOD1PRF:32107 Since H contains $x$ and $y^{-1}$ (by what has just been proved), H must contain
-claim h_s7_subgroup_product_via_inverse_inverse :
-  subgroup G mul H -> forall x y :e H,
-    mul x (group_inverse G mul (group_inverse G mul y)) :e H.
-admit.
-//GOD1PRF:32228 and therefore the relations $x \in \mathrm{H}$ and $y \in \mathrm{H}$ imply the relation $x y \in \mathrm{H}$.
-claim h_s7_subgroup_product_closed :
-  subgroup G mul H -> forall x y :e H, mul x y :e H.
-admit.
-//GOD1PRF:32341 Conversely, let H be a subset of G which has the following three properties:
-claim h_s7_subgroup_reverse_hypotheses :
-  (group_identity G mul :e H
-    /\ (forall x y :e H, mul x y :e H)
-    /\ (forall x :e H, group_inverse G mul x :e H)) -> H c= G -> H <> 0.
-admit.
-//GOD1PRF:32620 Then H is a subgroup of G .
-claim h_s7_subgroup_reverse_conclusion :
-  (group_identity G mul :e H
-    /\ (forall x y :e H, mul x y :e H)
-    /\ (forall x :e H, group_inverse G mul x :e H)) -> subgroup G mul H.
-admit.
-//GOD1PRF:32648 For H is not empty, by $b$ ); and if $x, y$ are any two elements of H , then H contains $x$ and $y^{-1}$, by $c$ ), and hence also $x y^{-1}$, by a).
-claim h_s7_subgroup_reverse_closure :
-  (group_identity G mul :e H
-    /\ (forall x y :e H, mul x y :e H)
-    /\ (forall x :e H, group_inverse G mul x :e H)) ->
-  H <> 0 /\ forall x y :e H, mul x (group_inverse G mul y) :e H.
-admit.
-//GOD1PRF:32798 Hence the conditions a), b), c) above characterize subgroups ; in practice they are often used in place of the original definition.
-claim h_s7_subgroup_characterization_conclusion :
-  subgroup G mul H <->
-    group_identity G mul :e H
-    /\ (forall x y :e H, mul x y :e H)
-    /\ (forall x :e H, group_inverse G mul x :e H).
-admit.
-Admitted.
+- assume hH.
+  apply andI.
+  - apply andI.
+    - exact (god1_subgroup_contains_identity G mul H hH).
+    - exact (god1_subgroup_product_closed G mul H hH).
+  - exact (god1_subgroup_inverse_closed G mul H hH).
+- assume hchar.
+  exact (god1_subgroup_of_identity_product_inverse G mul H hG hHG
+    (andEL
+      (group_identity G mul :e H)
+      (forall x y :e H, mul x y :e H)
+      (andEL
+        (group_identity G mul :e H
+          /\ forall x y :e H, mul x y :e H)
+        (forall x :e H, group_inverse G mul x :e H)
+        hchar))
+    (andER
+      (group_identity G mul :e H)
+      (forall x y :e H, mul x y :e H)
+      (andEL
+        (group_identity G mul :e H
+          /\ forall x y :e H, mul x y :e H)
+        (forall x :e H, group_inverse G mul x :e H)
+        hchar))
+    (andER
+      (group_identity G mul :e H
+        /\ forall x y :e H, mul x y :e H)
+      (forall x :e H, group_inverse G mul x :e H)
+      hchar)).
+Qed.
 
 Theorem god1_subgroup_induced_group :
   forall G, forall mul:set -> set -> set, forall H,
@@ -35285,16 +36054,80 @@ Theorem god1_subgroup_induced_group :
 let G mul H.
 assume hH.
 //GOD1PRF:33511 The set H , endowed with this law of composition, is a group.
-claim h_s7_induced_group_goal : group H mul.
-admit.
 //GOD1PRF:33573 For since the law of composition is associative on G , a fortiori it is associative on H ; since H contains the neutral element $e$ of G , the law of composition on H clearly has $e$ as neutral element; and every $x \in H$ has an inverse in $H$, by condition $c$ ).
-claim h_s7_induced_group_components :
-  associative_on H mul
-  /\ neutral_element H mul (group_identity G mul)
-  /\ forall x :e H, exists y :e H,
-    reflection H mul (group_identity G mul) x y.
-admit.
-Admitted.
+apply (andI
+  (law_of_composition H mul /\ associative_on H mul)
+  (exists e :e H,
+    neutral_element H mul e
+    /\ forall x :e H, exists y :e H, reflection H mul e x y)).
+- apply andI.
+  - let x.
+    assume hx.
+    let y.
+    assume hy.
+    exact (god1_subgroup_product_closed G mul H hH x hx y hy).
+  - let x.
+    assume hx.
+    let y.
+    assume hy.
+    let z.
+    assume hz.
+    exact (god1_group_associative G mul
+      (god1_subgroup_ambient_group G mul H hH)
+      x ((god1_subgroup_subset G mul H hH) x hx)
+      y ((god1_subgroup_subset G mul H hH) y hy)
+      z ((god1_subgroup_subset G mul H hH) z hz)).
+- witness (group_identity G mul).
+  apply andI.
+  - exact (god1_subgroup_contains_identity G mul H hH).
+  - apply andI.
+    - apply (andI
+        (group_identity G mul :e H)
+        (forall x :e H,
+          mul x (group_identity G mul) = x
+          /\ mul (group_identity G mul) x = x)).
+      - exact (god1_subgroup_contains_identity G mul H hH).
+      - let x.
+        assume hx.
+        exact ((andER
+          (group_identity G mul :e G)
+          (forall z :e G,
+            mul z (group_identity G mul) = z
+            /\ mul (group_identity G mul) z = z)
+          (god1_group_identity_specification G mul
+            (god1_subgroup_ambient_group G mul H hH)))
+          x ((god1_subgroup_subset G mul H hH) x hx)).
+    - let x.
+      assume hx.
+      witness (group_inverse G mul x).
+      apply andI.
+      - exact (god1_subgroup_inverse_closed G mul H hH x hx).
+      - apply (andI
+          (group_inverse G mul x :e H
+            /\ mul (group_inverse G mul x) x = group_identity G mul)
+          (mul x (group_inverse G mul x) = group_identity G mul)).
+        - exact (andI
+            (group_inverse G mul x :e H)
+            (mul (group_inverse G mul x) x = group_identity G mul)
+            (god1_subgroup_inverse_closed G mul H hH x hx)
+            (andER
+              (group_inverse G mul x :e G)
+              (mul (group_inverse G mul x) x = group_identity G mul)
+              (andEL
+                (group_inverse G mul x :e G
+                  /\ mul (group_inverse G mul x) x = group_identity G mul)
+                (mul x (group_inverse G mul x) = group_identity G mul)
+                (god1_group_inverse_specification G mul
+                  (god1_subgroup_ambient_group G mul H hH)
+                  x ((god1_subgroup_subset G mul H hH) x hx))))).
+        - exact (andER
+            (group_inverse G mul x :e G
+              /\ mul (group_inverse G mul x) x = group_identity G mul)
+            (mul x (group_inverse G mul x) = group_identity G mul)
+            (god1_group_inverse_specification G mul
+              (god1_subgroup_ambient_group G mul H hH)
+              x ((god1_subgroup_subset G mul H hH) x hx))).
+Qed.
 
 //GOD1:39560 group_nat_power : "the natural-number power #4 of #3 in the group #1" | $#3^{#4}$
 Definition group_nat_power :
@@ -35313,6 +36146,1932 @@ Definition group_int_power :
     then group_nat_power G mul x n
     else group_nat_power G mul (group_inverse G mul x) (minus_SNo n).
 
+Theorem god1_group_inverse_identity :
+  forall G, forall mul:set -> set -> set,
+    group G mul ->
+    group_inverse G mul (group_identity G mul) = group_identity G mul.
+let G mul.
+assume hG.
+apply (god1_s6_left_and_right_reflections_equal
+  G mul (group_identity G mul) (group_identity G mul)
+  (group_inverse G mul (group_identity G mul))
+  (group_identity G mul)
+  (god1_group_associative G mul hG)
+  (god1_group_identity_specification G mul hG)
+  (god1_group_identity_in G mul hG)).
+- exact (andEL
+    (group_inverse G mul (group_identity G mul) :e G
+      /\ mul
+        (group_inverse G mul (group_identity G mul))
+        (group_identity G mul) = group_identity G mul)
+    (mul
+      (group_identity G mul)
+      (group_inverse G mul (group_identity G mul))
+      = group_identity G mul)
+    (god1_group_inverse_specification G mul hG
+      (group_identity G mul) (god1_group_identity_in G mul hG))).
+- exact (andI
+    (group_identity G mul :e G)
+    (mul (group_identity G mul) (group_identity G mul)
+      = group_identity G mul)
+    (god1_group_identity_in G mul hG)
+    (andER
+      (mul (group_identity G mul) (group_identity G mul)
+        = group_identity G mul)
+      (mul (group_identity G mul) (group_identity G mul)
+        = group_identity G mul)
+      ((andER
+        (group_identity G mul :e G)
+        (forall z :e G,
+          mul z (group_identity G mul) = z
+          /\ mul (group_identity G mul) z = z)
+        (god1_group_identity_specification G mul hG))
+        (group_identity G mul) (god1_group_identity_in G mul hG)))).
+Qed.
+
+Theorem god1_group_nat_power_zero :
+  forall G, forall mul:set -> set -> set, forall x,
+    group_nat_power G mul x 0 = group_identity G mul.
+let G mul x.
+exact (nat_primrec_0
+  (group_identity G mul) (fun i r => mul r x)).
+Qed.
+
+Theorem god1_group_nat_power_successor :
+  forall G, forall mul:set -> set -> set, forall x n,
+    nat_p n ->
+    group_nat_power G mul x (ordsucc n)
+      = mul (group_nat_power G mul x n) x.
+let G mul x n.
+assume hn.
+exact (nat_primrec_S
+  (group_identity G mul) (fun i r => mul r x) n hn).
+Qed.
+
+Theorem god1_group_nat_power_zero_in :
+  forall G, forall mul:set -> set -> set, forall x,
+    group G mul -> group_nat_power G mul x 0 :e G.
+let G mul x.
+assume hG.
+exact (mem_eq_substL G
+  (group_identity G mul) (group_nat_power G mul x 0)
+  (god1_group_nat_power_zero G mul x)
+  (god1_group_identity_in G mul hG)).
+Qed.
+
+Theorem god1_group_nat_power_successor_in :
+  forall G, forall mul:set -> set -> set, forall x,
+    group G mul -> x :e G ->
+    forall n, nat_p n ->
+      group_nat_power G mul x n :e G ->
+      group_nat_power G mul x (ordsucc n) :e G.
+let G mul x.
+assume hG hx.
+let n.
+assume hn hpower.
+exact (mem_eq_substL G
+  (mul (group_nat_power G mul x n) x)
+  (group_nat_power G mul x (ordsucc n))
+  (god1_group_nat_power_successor G mul x n hn)
+  (god1_group_law_of_composition G mul hG
+    (group_nat_power G mul x n) hpower x hx)).
+Qed.
+
+Theorem god1_group_nat_power_in :
+  forall G, forall mul:set -> set -> set, forall x,
+    group G mul -> x :e G ->
+    forall n, nat_p n -> group_nat_power G mul x n :e G.
+let G mul x.
+assume hG hx.
+let n.
+assume hn.
+exact (nat_ind
+  (fun m => group_nat_power G mul x m :e G)
+  (god1_group_nat_power_zero_in G mul x hG)
+  (god1_group_nat_power_successor_in G mul x hG hx)
+  n hn).
+Qed.
+
+Theorem god1_group_nat_power_left_successor_zero :
+  forall G, forall mul:set -> set -> set, forall x,
+    group G mul -> x :e G ->
+    mul x (group_nat_power G mul x 0)
+      = group_nat_power G mul x (ordsucc 0).
+let G mul x.
+assume hG hx.
+apply (eq_i_tra
+  (mul x (group_nat_power G mul x 0))
+  (mul x (group_identity G mul))
+  (group_nat_power G mul x (ordsucc 0))).
+- f_equal.
+  exact (god1_group_nat_power_zero G mul x).
+- apply (eq_i_tra
+    (mul x (group_identity G mul)) x
+    (group_nat_power G mul x (ordsucc 0))).
+  - exact (andEL
+      (mul x (group_identity G mul) = x)
+      (mul (group_identity G mul) x = x)
+      ((andER
+        (group_identity G mul :e G)
+        (forall z :e G,
+          mul z (group_identity G mul) = z
+          /\ mul (group_identity G mul) z = z)
+        (god1_group_identity_specification G mul hG)) x hx)).
+  - apply eq_sym.
+    apply (eq_i_tra
+      (group_nat_power G mul x (ordsucc 0))
+      (mul (group_nat_power G mul x 0) x) x).
+    - exact (god1_group_nat_power_successor G mul x 0 nat_0).
+    - apply (eq_i_tra
+        (mul (group_nat_power G mul x 0) x)
+        (mul (group_identity G mul) x) x).
+      - f_equal.
+        exact (god1_group_nat_power_zero G mul x).
+      - exact (andER
+          (mul x (group_identity G mul) = x)
+          (mul (group_identity G mul) x = x)
+          ((andER
+            (group_identity G mul :e G)
+            (forall z :e G,
+              mul z (group_identity G mul) = z
+              /\ mul (group_identity G mul) z = z)
+            (god1_group_identity_specification G mul hG)) x hx)).
+Qed.
+
+Theorem god1_group_nat_power_left_successor_step :
+  forall G, forall mul:set -> set -> set, forall x,
+    group G mul -> x :e G ->
+    forall n, nat_p n ->
+      mul x (group_nat_power G mul x n)
+        = group_nat_power G mul x (ordsucc n) ->
+      mul x (group_nat_power G mul x (ordsucc n))
+        = group_nat_power G mul x (ordsucc (ordsucc n)).
+let G mul x.
+assume hG hx.
+let n.
+assume hn hind.
+apply (eq_i_tra
+  (mul x (group_nat_power G mul x (ordsucc n)))
+  (mul x (mul (group_nat_power G mul x n) x))
+  (group_nat_power G mul x (ordsucc (ordsucc n)))).
+- f_equal.
+  exact (god1_group_nat_power_successor G mul x n hn).
+- apply (eq_i_tra
+    (mul x (mul (group_nat_power G mul x n) x))
+    (mul (mul x (group_nat_power G mul x n)) x)
+    (group_nat_power G mul x (ordsucc (ordsucc n)))).
+  - exact (god1_group_associative G mul hG
+      x hx
+      (group_nat_power G mul x n)
+      (god1_group_nat_power_in G mul x hG hx n hn)
+      x hx).
+  - apply (eq_i_tra
+      (mul (mul x (group_nat_power G mul x n)) x)
+      (mul (group_nat_power G mul x (ordsucc n)) x)
+      (group_nat_power G mul x (ordsucc (ordsucc n)))).
+    - f_equal.
+      exact hind.
+    - apply eq_sym.
+      exact (god1_group_nat_power_successor G mul x
+        (ordsucc n) (nat_ordsucc n hn)).
+Qed.
+
+Theorem god1_group_nat_power_left_successor :
+  forall G, forall mul:set -> set -> set, forall x,
+    group G mul -> x :e G ->
+    forall n, nat_p n ->
+      mul x (group_nat_power G mul x n)
+        = group_nat_power G mul x (ordsucc n).
+let G mul x.
+assume hG hx.
+let n.
+assume hn.
+exact (nat_ind
+  (fun m => mul x (group_nat_power G mul x m)
+    = group_nat_power G mul x (ordsucc m))
+  (god1_group_nat_power_left_successor_zero G mul x hG hx)
+  (god1_group_nat_power_left_successor_step G mul x hG hx)
+  n hn).
+Qed.
+
+Theorem god1_group_nat_power_add_zero :
+  forall G, forall mul:set -> set -> set, forall x,
+    group G mul -> x :e G ->
+    forall p, nat_p p ->
+      mul (group_nat_power G mul x p) (group_nat_power G mul x 0)
+        = group_nat_power G mul x (add_nat p 0).
+let G mul x.
+assume hG hx.
+let p.
+assume hp.
+apply (eq_i_tra
+  (mul (group_nat_power G mul x p) (group_nat_power G mul x 0))
+  (mul (group_nat_power G mul x p) (group_identity G mul))
+  (group_nat_power G mul x (add_nat p 0))).
+- f_equal.
+  exact (god1_group_nat_power_zero G mul x).
+- apply (eq_i_tra
+    (mul (group_nat_power G mul x p) (group_identity G mul))
+    (group_nat_power G mul x p)
+    (group_nat_power G mul x (add_nat p 0))).
+  - exact (andEL
+      (mul (group_nat_power G mul x p) (group_identity G mul)
+        = group_nat_power G mul x p)
+      (mul (group_identity G mul) (group_nat_power G mul x p)
+        = group_nat_power G mul x p)
+      ((andER
+        (group_identity G mul :e G)
+        (forall z :e G,
+          mul z (group_identity G mul) = z
+          /\ mul (group_identity G mul) z = z)
+        (god1_group_identity_specification G mul hG))
+        (group_nat_power G mul x p)
+        (god1_group_nat_power_in G mul x hG hx p hp))).
+  - f_equal.
+    apply eq_sym.
+    exact (add_nat_0R p).
+Qed.
+
+Theorem god1_group_nat_power_add_step :
+  forall G, forall mul:set -> set -> set, forall x,
+    group G mul -> x :e G ->
+    forall p, nat_p p ->
+    forall q, nat_p q ->
+      mul (group_nat_power G mul x p) (group_nat_power G mul x q)
+        = group_nat_power G mul x (add_nat p q) ->
+      mul (group_nat_power G mul x p)
+        (group_nat_power G mul x (ordsucc q))
+        = group_nat_power G mul x (add_nat p (ordsucc q)).
+let G mul x.
+assume hG hx.
+let p.
+assume hp.
+let q.
+assume hq hind.
+apply (eq_i_tra
+  (mul (group_nat_power G mul x p)
+    (group_nat_power G mul x (ordsucc q)))
+  (mul (group_nat_power G mul x p)
+    (mul (group_nat_power G mul x q) x))
+  (group_nat_power G mul x (add_nat p (ordsucc q)))).
+- f_equal.
+  exact (god1_group_nat_power_successor G mul x q hq).
+- apply (eq_i_tra
+    (mul (group_nat_power G mul x p)
+      (mul (group_nat_power G mul x q) x))
+    (mul
+      (mul (group_nat_power G mul x p)
+        (group_nat_power G mul x q)) x)
+    (group_nat_power G mul x (add_nat p (ordsucc q)))).
+  - exact (god1_group_associative G mul hG
+      (group_nat_power G mul x p)
+      (god1_group_nat_power_in G mul x hG hx p hp)
+      (group_nat_power G mul x q)
+      (god1_group_nat_power_in G mul x hG hx q hq)
+      x hx).
+  - apply (eq_i_tra
+      (mul
+        (mul (group_nat_power G mul x p)
+          (group_nat_power G mul x q)) x)
+      (mul (group_nat_power G mul x (add_nat p q)) x)
+      (group_nat_power G mul x (add_nat p (ordsucc q)))).
+    - f_equal.
+      exact hind.
+    - apply (eq_i_tra
+        (mul (group_nat_power G mul x (add_nat p q)) x)
+        (group_nat_power G mul x (ordsucc (add_nat p q)))
+        (group_nat_power G mul x (add_nat p (ordsucc q)))).
+      - apply eq_sym.
+        exact (god1_group_nat_power_successor G mul x
+          (add_nat p q) (add_nat_p p hp q hq)).
+      - f_equal.
+        apply eq_sym.
+        exact (add_nat_SR p q hq).
+Qed.
+
+Theorem god1_group_nat_power_add :
+  forall G, forall mul:set -> set -> set, forall x,
+    group G mul -> x :e G ->
+    forall p q, nat_p p -> nat_p q ->
+      mul (group_nat_power G mul x p) (group_nat_power G mul x q)
+        = group_nat_power G mul x (add_nat p q).
+let G mul x.
+assume hG hx.
+let p q.
+assume hp hq.
+exact (nat_ind
+  (fun m =>
+    mul (group_nat_power G mul x p) (group_nat_power G mul x m)
+      = group_nat_power G mul x (add_nat p m))
+  (god1_group_nat_power_add_zero G mul x hG hx p hp)
+  (god1_group_nat_power_add_step G mul x hG hx p hp)
+  q hq).
+Qed.
+
+Theorem god1_group_inverse_product :
+  forall G, forall mul:set -> set -> set,
+    group G mul -> forall a b :e G,
+      group_inverse G mul (mul a b)
+        = mul (group_inverse G mul b) (group_inverse G mul a).
+let G mul.
+assume hG.
+let a.
+assume ha.
+let b.
+assume hb.
+apply (god1_s6_left_and_right_reflections_equal
+  G mul (group_identity G mul) (mul a b)
+  (group_inverse G mul (mul a b))
+  (mul (group_inverse G mul b) (group_inverse G mul a))
+  (god1_group_associative G mul hG)
+  (god1_group_identity_specification G mul hG)
+  (god1_group_law_of_composition G mul hG a ha b hb)).
+- exact (andEL
+    (group_inverse G mul (mul a b) :e G
+      /\ mul (group_inverse G mul (mul a b)) (mul a b)
+        = group_identity G mul)
+    (mul (mul a b) (group_inverse G mul (mul a b))
+      = group_identity G mul)
+    (god1_group_inverse_specification G mul hG
+      (mul a b) (god1_group_law_of_composition G mul hG a ha b hb))).
+- exact (andI
+    (mul (group_inverse G mul b) (group_inverse G mul a) :e G)
+    (mul (mul a b)
+      (mul (group_inverse G mul b) (group_inverse G mul a))
+      = group_identity G mul)
+    (god1_group_law_of_composition G mul hG
+      (group_inverse G mul b) (god1_group_inverse_in G mul hG b hb)
+      (group_inverse G mul a) (god1_group_inverse_in G mul hG a ha))
+    (andER
+      (mul (group_inverse G mul b) (group_inverse G mul a) :e G
+        /\ mul
+          (mul (group_inverse G mul b) (group_inverse G mul a))
+          (mul a b) = group_identity G mul)
+      (mul (mul a b)
+        (mul (group_inverse G mul b) (group_inverse G mul a))
+        = group_identity G mul)
+      (andER
+        (reflexible G mul (group_identity G mul) (mul a b))
+        (reflection G mul (group_identity G mul) (mul a b)
+          (mul (group_inverse G mul b) (group_inverse G mul a)))
+        (god1_s6_product_has_reversed_product_reflection
+          G mul (group_identity G mul)
+          a b (group_inverse G mul a) (group_inverse G mul b)
+          (god1_group_law_of_composition G mul hG)
+          (god1_group_associative G mul hG)
+          (god1_group_identity_specification G mul hG)
+          ha hb
+          (god1_group_inverse_specification G mul hG a ha)
+          (god1_group_inverse_specification G mul hG b hb))))).
+Qed.
+
+Theorem god1_group_nat_power_inverse_zero :
+  forall G, forall mul:set -> set -> set, forall x,
+    group G mul ->
+    group_inverse G mul (group_nat_power G mul x 0)
+      = group_nat_power G mul (group_inverse G mul x) 0.
+let G mul x.
+assume hG.
+apply (eq_i_tra
+  (group_inverse G mul (group_nat_power G mul x 0))
+  (group_inverse G mul (group_identity G mul))
+  (group_nat_power G mul (group_inverse G mul x) 0)).
+- f_equal.
+  exact (god1_group_nat_power_zero G mul x).
+- apply (eq_i_tra
+    (group_inverse G mul (group_identity G mul))
+    (group_identity G mul)
+    (group_nat_power G mul (group_inverse G mul x) 0)).
+  - exact (god1_group_inverse_identity G mul hG).
+  - apply eq_sym.
+    exact (god1_group_nat_power_zero G mul (group_inverse G mul x)).
+Qed.
+
+Theorem god1_group_nat_power_inverse_step :
+  forall G, forall mul:set -> set -> set, forall x,
+    group G mul -> x :e G ->
+    forall n, nat_p n ->
+      group_inverse G mul (group_nat_power G mul x n)
+        = group_nat_power G mul (group_inverse G mul x) n ->
+      group_inverse G mul (group_nat_power G mul x (ordsucc n))
+        = group_nat_power G mul (group_inverse G mul x) (ordsucc n).
+let G mul x.
+assume hG hx.
+let n.
+assume hn hind.
+apply (eq_i_tra
+  (group_inverse G mul (group_nat_power G mul x (ordsucc n)))
+  (group_inverse G mul (mul (group_nat_power G mul x n) x))
+  (group_nat_power G mul (group_inverse G mul x) (ordsucc n))).
+- f_equal.
+  exact (god1_group_nat_power_successor G mul x n hn).
+- apply (eq_i_tra
+    (group_inverse G mul (mul (group_nat_power G mul x n) x))
+    (mul (group_inverse G mul x)
+      (group_inverse G mul (group_nat_power G mul x n)))
+    (group_nat_power G mul (group_inverse G mul x) (ordsucc n))).
+  - exact (god1_group_inverse_product G mul hG
+      (group_nat_power G mul x n)
+      (god1_group_nat_power_in G mul x hG hx n hn)
+      x hx).
+  - apply (eq_i_tra
+      (mul (group_inverse G mul x)
+        (group_inverse G mul (group_nat_power G mul x n)))
+      (mul (group_inverse G mul x)
+        (group_nat_power G mul (group_inverse G mul x) n))
+      (group_nat_power G mul (group_inverse G mul x) (ordsucc n))).
+    - f_equal.
+      exact hind.
+    - exact (god1_group_nat_power_left_successor G mul
+        (group_inverse G mul x) hG
+        (god1_group_inverse_in G mul hG x hx) n hn).
+Qed.
+
+Theorem god1_group_nat_power_inverse :
+  forall G, forall mul:set -> set -> set, forall x,
+    group G mul -> x :e G ->
+    forall n, nat_p n ->
+      group_inverse G mul (group_nat_power G mul x n)
+        = group_nat_power G mul (group_inverse G mul x) n.
+let G mul x.
+assume hG hx.
+let n.
+assume hn.
+exact (nat_ind
+  (fun m =>
+    group_inverse G mul (group_nat_power G mul x m)
+      = group_nat_power G mul (group_inverse G mul x) m)
+  (god1_group_nat_power_inverse_zero G mul x hG)
+  (god1_group_nat_power_inverse_step G mul x hG hx)
+  n hn).
+Qed.
+
+Theorem god1_group_nat_power_power_zero :
+  forall G, forall mul:set -> set -> set, forall x,
+    group G mul ->
+    forall p, nat_p p ->
+      group_nat_power G mul (group_nat_power G mul x p) 0
+        = group_nat_power G mul x (mul_nat p 0).
+let G mul x.
+assume hG.
+let p.
+assume hp.
+apply (eq_i_tra
+  (group_nat_power G mul (group_nat_power G mul x p) 0)
+  (group_identity G mul)
+  (group_nat_power G mul x (mul_nat p 0))).
+- exact (god1_group_nat_power_zero G mul
+    (group_nat_power G mul x p)).
+- apply (eq_i_tra
+    (group_identity G mul)
+    (group_nat_power G mul x 0)
+    (group_nat_power G mul x (mul_nat p 0))).
+  - apply eq_sym.
+    exact (god1_group_nat_power_zero G mul x).
+  - f_equal.
+    apply eq_sym.
+    exact (mul_nat_0R p).
+Qed.
+
+Theorem god1_group_nat_power_power_step :
+  forall G, forall mul:set -> set -> set, forall x,
+    group G mul -> x :e G ->
+    forall p, nat_p p ->
+    forall q, nat_p q ->
+      group_nat_power G mul (group_nat_power G mul x p) q
+        = group_nat_power G mul x (mul_nat p q) ->
+      group_nat_power G mul (group_nat_power G mul x p) (ordsucc q)
+        = group_nat_power G mul x (mul_nat p (ordsucc q)).
+let G mul x.
+assume hG hx.
+let p.
+assume hp.
+let q.
+assume hq hind.
+apply (eq_i_tra
+  (group_nat_power G mul (group_nat_power G mul x p) (ordsucc q))
+  (mul
+    (group_nat_power G mul (group_nat_power G mul x p) q)
+    (group_nat_power G mul x p))
+  (group_nat_power G mul x (mul_nat p (ordsucc q)))).
+- exact (god1_group_nat_power_successor G mul
+    (group_nat_power G mul x p) q hq).
+- apply (eq_i_tra
+    (mul
+      (group_nat_power G mul (group_nat_power G mul x p) q)
+      (group_nat_power G mul x p))
+    (mul
+      (group_nat_power G mul x (mul_nat p q))
+      (group_nat_power G mul x p))
+    (group_nat_power G mul x (mul_nat p (ordsucc q)))).
+  - f_equal.
+    exact hind.
+  - apply (eq_i_tra
+      (mul
+        (group_nat_power G mul x (mul_nat p q))
+        (group_nat_power G mul x p))
+      (group_nat_power G mul x (add_nat (mul_nat p q) p))
+      (group_nat_power G mul x (mul_nat p (ordsucc q)))).
+    - exact (god1_group_nat_power_add G mul x hG hx
+        (mul_nat p q) p (mul_nat_p p hp q hq) hp).
+    - f_equal.
+      apply (eq_i_tra
+        (add_nat (mul_nat p q) p)
+        (add_nat p (mul_nat p q))
+        (mul_nat p (ordsucc q))).
+      - exact (add_nat_com
+          (mul_nat p q) (mul_nat_p p hp q hq) p hp).
+      - apply eq_sym.
+        exact (mul_nat_SR p q hq).
+Qed.
+
+Theorem god1_group_nat_power_power :
+  forall G, forall mul:set -> set -> set, forall x,
+    group G mul -> x :e G ->
+    forall p q, nat_p p -> nat_p q ->
+      group_nat_power G mul (group_nat_power G mul x p) q
+        = group_nat_power G mul x (mul_nat p q).
+let G mul x.
+assume hG hx.
+let p q.
+assume hp hq.
+exact (nat_ind
+  (fun m =>
+    group_nat_power G mul (group_nat_power G mul x p) m
+      = group_nat_power G mul x (mul_nat p m))
+  (god1_group_nat_power_power_zero G mul x hG p hp)
+  (god1_group_nat_power_power_step G mul x hG hx p hp)
+  q hq).
+Qed.
+
+Theorem god1_group_int_power_nat :
+  forall G, forall mul:set -> set -> set, forall x n,
+    nat_p n ->
+    group_int_power G mul x n = group_nat_power G mul x n.
+let G mul x n.
+assume hn.
+exact (If_i_1
+  (SNoLe 0 n)
+  (group_nat_power G mul x n)
+  (group_nat_power G mul (group_inverse G mul x) (minus_SNo n))
+  (omega_nonneg n (nat_p_omega n hn))).
+Qed.
+
+Theorem god1_negative_successor_lt_zero :
+  forall n, nat_p n -> SNoLt (minus_SNo (ordsucc n)) 0.
+let n.
+assume hn.
+exact (SNoLt_eq_substR
+  (minus_SNo (ordsucc n)) (minus_SNo 0) 0
+  minus_SNo_0
+  (minus_SNo_Lt_contra 0 (ordsucc n)
+    SNo_0 (omega_SNo (ordsucc n)
+      (nat_p_omega (ordsucc n) (nat_ordsucc n hn)))
+    (ordinal_ordsucc_pos n (nat_p_ordinal n hn)))).
+Qed.
+
+Theorem god1_not_nonnegative_negative_successor :
+  forall n, nat_p n -> ~SNoLe 0 (minus_SNo (ordsucc n)).
+let n.
+assume hn hnonneg.
+exact (SNoLt_irref 0
+  (SNoLeLt_tra 0 (minus_SNo (ordsucc n)) 0
+    SNo_0
+    (int_SNo (minus_SNo (ordsucc n))
+      (int_minus_SNo_omega (ordsucc n)
+        (nat_p_omega (ordsucc n) (nat_ordsucc n hn))))
+    SNo_0 hnonneg
+    (god1_negative_successor_lt_zero n hn))).
+Qed.
+
+Theorem god1_group_int_power_negative_successor :
+  forall G, forall mul:set -> set -> set, forall x n,
+    nat_p n ->
+    group_int_power G mul x (minus_SNo (ordsucc n))
+      = group_nat_power G mul (group_inverse G mul x) (ordsucc n).
+let G mul x n.
+assume hn.
+apply (eq_i_tra
+  (group_int_power G mul x (minus_SNo (ordsucc n)))
+  (group_nat_power G mul (group_inverse G mul x)
+    (minus_SNo (minus_SNo (ordsucc n))))
+  (group_nat_power G mul (group_inverse G mul x) (ordsucc n))).
+- exact (If_i_0
+    (SNoLe 0 (minus_SNo (ordsucc n)))
+    (group_nat_power G mul x (minus_SNo (ordsucc n)))
+    (group_nat_power G mul (group_inverse G mul x)
+      (minus_SNo (minus_SNo (ordsucc n))))
+    (god1_not_nonnegative_negative_successor n hn)).
+- f_equal.
+  exact (minus_SNo_invol (ordsucc n)
+    (omega_SNo (ordsucc n)
+      (nat_p_omega (ordsucc n) (nat_ordsucc n hn)))).
+Qed.
+
+Theorem god1_group_int_power_negative_nat_zero :
+  forall G, forall mul:set -> set -> set, forall x,
+    group_int_power G mul x (minus_SNo 0)
+      = group_nat_power G mul (group_inverse G mul x) 0.
+let G mul x.
+apply (eq_i_tra
+  (group_int_power G mul x (minus_SNo 0))
+  (group_int_power G mul x 0)
+  (group_nat_power G mul (group_inverse G mul x) 0)).
+- f_equal.
+  exact minus_SNo_0.
+- apply (eq_i_tra
+    (group_int_power G mul x 0)
+    (group_nat_power G mul x 0)
+    (group_nat_power G mul (group_inverse G mul x) 0)).
+  - exact (god1_group_int_power_nat G mul x 0 nat_0).
+  - apply (eq_i_tra
+      (group_nat_power G mul x 0)
+      (group_identity G mul)
+      (group_nat_power G mul (group_inverse G mul x) 0)).
+    - exact (god1_group_nat_power_zero G mul x).
+    - apply eq_sym.
+      exact (god1_group_nat_power_zero G mul (group_inverse G mul x)).
+Qed.
+
+Theorem god1_group_int_power_negative_nat_step :
+  forall G, forall mul:set -> set -> set, forall x n,
+    nat_p n ->
+    group_int_power G mul x (minus_SNo n)
+      = group_nat_power G mul (group_inverse G mul x) n ->
+    group_int_power G mul x (minus_SNo (ordsucc n))
+      = group_nat_power G mul (group_inverse G mul x) (ordsucc n).
+let G mul x n.
+assume hn hind.
+exact (god1_group_int_power_negative_successor G mul x n hn).
+Qed.
+
+Theorem god1_group_int_power_negative_nat :
+  forall G, forall mul:set -> set -> set, forall x n,
+    nat_p n ->
+    group_int_power G mul x (minus_SNo n)
+      = group_nat_power G mul (group_inverse G mul x) n.
+let G mul x n.
+assume hn.
+exact (nat_ind
+  (fun m =>
+    group_int_power G mul x (minus_SNo m)
+      = group_nat_power G mul (group_inverse G mul x) m)
+  (god1_group_int_power_negative_nat_zero G mul x)
+  (god1_group_int_power_negative_nat_step G mul x)
+  n hn).
+Qed.
+
+Theorem god1_group_int_power_zero :
+  forall G, forall mul:set -> set -> set, forall x,
+    group_int_power G mul x 0 = group_identity G mul.
+let G mul x.
+exact (eq_i_tra
+  (group_int_power G mul x 0)
+  (group_nat_power G mul x 0)
+  (group_identity G mul)
+  (god1_group_int_power_nat G mul x 0 nat_0)
+  (god1_group_nat_power_zero G mul x)).
+Qed.
+
+Theorem god1_group_int_power_nat_in :
+  forall G, forall mul:set -> set -> set, forall x,
+    group G mul -> x :e G ->
+    forall n :e omega, group_int_power G mul x n :e G.
+let G mul x.
+assume hG hx.
+let n.
+assume hn.
+exact (mem_eq_substL G
+  (group_nat_power G mul x n)
+  (group_int_power G mul x n)
+  (god1_group_int_power_nat G mul x n (omega_nat_p n hn))
+  (god1_group_nat_power_in G mul x hG hx n (omega_nat_p n hn))).
+Qed.
+
+Theorem god1_group_int_power_negative_nat_in :
+  forall G, forall mul:set -> set -> set, forall x,
+    group G mul -> x :e G ->
+    forall n :e omega,
+      group_int_power G mul x (minus_SNo n) :e G.
+let G mul x.
+assume hG hx.
+let n.
+assume hn.
+exact (mem_eq_substL G
+  (group_nat_power G mul (group_inverse G mul x) n)
+  (group_int_power G mul x (minus_SNo n))
+  (god1_group_int_power_negative_nat G mul x n (omega_nat_p n hn))
+  (god1_group_nat_power_in G mul (group_inverse G mul x)
+    hG (god1_group_inverse_in G mul hG x hx)
+    n (omega_nat_p n hn))).
+Qed.
+
+Theorem god1_group_int_power_in :
+  forall G, forall mul:set -> set -> set, forall x,
+    group G mul -> x :e G ->
+    forall p :e int, group_int_power G mul x p :e G.
+let G mul x.
+assume hG hx.
+let p.
+assume hp.
+exact (int_SNo_cases
+  (fun q => group_int_power G mul x q :e G)
+  (god1_group_int_power_nat_in G mul x hG hx)
+  (god1_group_int_power_negative_nat_in G mul x hG hx)
+  p hp).
+Qed.
+
+Theorem god1_group_int_power_inverse_nat_case :
+  forall G, forall mul:set -> set -> set, forall x,
+    group G mul -> x :e G ->
+    forall n :e omega,
+      group_inverse G mul (group_int_power G mul x n)
+        = group_int_power G mul x (minus_SNo n).
+let G mul x.
+assume hG hx.
+let n.
+assume hn.
+apply (eq_i_tra
+  (group_inverse G mul (group_int_power G mul x n))
+  (group_inverse G mul (group_nat_power G mul x n))
+  (group_int_power G mul x (minus_SNo n))).
+- f_equal.
+  exact (god1_group_int_power_nat G mul x n (omega_nat_p n hn)).
+- apply (eq_i_tra
+    (group_inverse G mul (group_nat_power G mul x n))
+    (group_nat_power G mul (group_inverse G mul x) n)
+    (group_int_power G mul x (minus_SNo n))).
+  - exact (god1_group_nat_power_inverse G mul x hG hx
+      n (omega_nat_p n hn)).
+  - apply eq_sym.
+    exact (god1_group_int_power_negative_nat G mul x
+      n (omega_nat_p n hn)).
+Qed.
+
+Theorem god1_group_int_power_inverse_negative_nat_case :
+  forall G, forall mul:set -> set -> set, forall x,
+    group G mul -> x :e G ->
+    forall n :e omega,
+      group_inverse G mul
+        (group_int_power G mul x (minus_SNo n))
+      = group_int_power G mul x
+        (minus_SNo (minus_SNo n)).
+let G mul x.
+assume hG hx.
+let n.
+assume hn.
+apply (eq_i_tra
+  (group_inverse G mul (group_int_power G mul x (minus_SNo n)))
+  (group_inverse G mul
+    (group_nat_power G mul (group_inverse G mul x) n))
+  (group_int_power G mul x (minus_SNo (minus_SNo n)))).
+- f_equal.
+  exact (god1_group_int_power_negative_nat G mul x
+    n (omega_nat_p n hn)).
+- apply (eq_i_tra
+    (group_inverse G mul
+      (group_nat_power G mul (group_inverse G mul x) n))
+    (group_nat_power G mul
+      (group_inverse G mul (group_inverse G mul x)) n)
+    (group_int_power G mul x (minus_SNo (minus_SNo n)))).
+  - exact (god1_group_nat_power_inverse G mul
+      (group_inverse G mul x) hG
+      (god1_group_inverse_in G mul hG x hx)
+      n (omega_nat_p n hn)).
+  - apply (eq_i_tra
+      (group_nat_power G mul
+        (group_inverse G mul (group_inverse G mul x)) n)
+      (group_nat_power G mul x n)
+      (group_int_power G mul x (minus_SNo (minus_SNo n)))).
+    - f_equal.
+      exact (god1_group_inverse_involutive G mul hG x hx).
+    - apply (eq_i_tra
+        (group_nat_power G mul x n)
+        (group_int_power G mul x n)
+        (group_int_power G mul x (minus_SNo (minus_SNo n)))).
+      - apply eq_sym.
+        exact (god1_group_int_power_nat G mul x n (omega_nat_p n hn)).
+      - f_equal.
+        apply eq_sym.
+        exact (minus_SNo_invol n (omega_SNo n hn)).
+Qed.
+
+Theorem god1_group_int_power_inverse :
+  forall G, forall mul:set -> set -> set, forall x,
+    group G mul -> x :e G ->
+    forall p :e int,
+      group_inverse G mul (group_int_power G mul x p)
+        = group_int_power G mul x (minus_SNo p).
+let G mul x.
+assume hG hx.
+let p.
+assume hp.
+exact (int_SNo_cases
+  (fun q =>
+    group_inverse G mul (group_int_power G mul x q)
+      = group_int_power G mul x (minus_SNo q))
+  (god1_group_int_power_inverse_nat_case G mul x hG hx)
+  (god1_group_int_power_inverse_negative_nat_case G mul x hG hx)
+  p hp).
+Qed.
+
+Theorem god1_negative_successor_add_one :
+  forall n :e omega,
+    add_SNo (minus_SNo (ordsucc n)) 1 = minus_SNo n.
+let n.
+assume hn.
+apply (add_SNo_cancel_L
+  (ordsucc n)
+  (add_SNo (minus_SNo (ordsucc n)) 1)
+  (minus_SNo n)
+  (omega_SNo (ordsucc n)
+    (nat_p_omega (ordsucc n) (nat_ordsucc n (omega_nat_p n hn))))
+  (int_SNo
+    (add_SNo (minus_SNo (ordsucc n)) 1)
+    (int_add_SNo
+      (minus_SNo (ordsucc n))
+      (int_minus_SNo_omega (ordsucc n)
+        (nat_p_omega (ordsucc n) (nat_ordsucc n (omega_nat_p n hn))))
+      1 (Subq_omega_int 1 (nat_p_omega 1 nat_1))))
+  (int_SNo (minus_SNo n) (int_minus_SNo_omega n hn))).
+apply (eq_i_tra
+  (add_SNo (ordsucc n)
+    (add_SNo (minus_SNo (ordsucc n)) 1))
+  1
+  (add_SNo (ordsucc n) (minus_SNo n))).
+- exact (add_SNo_minus_L2'
+    (ordsucc n) 1
+    (omega_SNo (ordsucc n)
+      (nat_p_omega (ordsucc n) (nat_ordsucc n (omega_nat_p n hn))))
+    SNo_1).
+- apply eq_sym.
+  apply (eq_i_tra
+    (add_SNo (ordsucc n) (minus_SNo n))
+    (add_SNo (add_SNo n 1) (minus_SNo n)) 1).
+  - f_equal.
+    apply eq_sym.
+    exact (add_SNo_1_ordsucc n hn).
+  - apply (eq_i_tra
+      (add_SNo (add_SNo n 1) (minus_SNo n))
+      (add_SNo (add_SNo 1 n) (minus_SNo n)) 1).
+    - f_equal.
+      exact (add_SNo_com n 1 (omega_SNo n hn) SNo_1).
+    - exact (add_SNo_minus_R2 1 n SNo_1 (omega_SNo n hn)).
+Qed.
+
+Theorem god1_negative_nat_add_negative_one :
+  forall n :e omega,
+    add_SNo (minus_SNo n) (minus_SNo 1)
+      = minus_SNo (ordsucc n).
+let n.
+assume hn.
+apply (add_SNo_cancel_L
+  (ordsucc n)
+  (add_SNo (minus_SNo n) (minus_SNo 1))
+  (minus_SNo (ordsucc n))
+  (omega_SNo (ordsucc n)
+    (nat_p_omega (ordsucc n) (nat_ordsucc n (omega_nat_p n hn))))
+  (int_SNo
+    (add_SNo (minus_SNo n) (minus_SNo 1))
+    (int_add_SNo
+      (minus_SNo n)
+      (int_minus_SNo_omega n hn)
+      (minus_SNo 1)
+      (int_minus_SNo_omega 1 (nat_p_omega 1 nat_1))))
+  (int_SNo (minus_SNo (ordsucc n))
+    (int_minus_SNo_omega (ordsucc n)
+      (nat_p_omega (ordsucc n) (nat_ordsucc n (omega_nat_p n hn)))))).
+apply (eq_i_tra
+  (add_SNo (ordsucc n)
+    (add_SNo (minus_SNo n) (minus_SNo 1)))
+  0
+  (add_SNo (ordsucc n) (minus_SNo (ordsucc n)))).
+- apply (eq_i_tra
+    (add_SNo (ordsucc n)
+      (add_SNo (minus_SNo n) (minus_SNo 1)))
+    (add_SNo (add_SNo n 1)
+      (add_SNo (minus_SNo n) (minus_SNo 1))) 0).
+  - f_equal.
+    apply eq_sym.
+    exact (add_SNo_1_ordsucc n hn).
+  - apply (eq_i_tra
+      (add_SNo (add_SNo n 1)
+        (add_SNo (minus_SNo n) (minus_SNo 1)))
+      (add_SNo (add_SNo n (minus_SNo n))
+        (add_SNo 1 (minus_SNo 1))) 0).
+    - exact (add_SNo_com_4_inner_mid
+        n 1 (minus_SNo n) (minus_SNo 1)
+        (omega_SNo n hn) SNo_1
+        (int_SNo (minus_SNo n) (int_minus_SNo_omega n hn))
+        (int_SNo (minus_SNo 1)
+          (int_minus_SNo_omega 1 (nat_p_omega 1 nat_1)))).
+    - apply (eq_i_tra
+        (add_SNo (add_SNo n (minus_SNo n))
+          (add_SNo 1 (minus_SNo 1)))
+        (add_SNo 0 0) 0).
+      - f_equal.
+        - exact (add_SNo_minus_SNo_rinv n (omega_SNo n hn)).
+        - exact (add_SNo_minus_SNo_rinv 1 SNo_1).
+      - exact (add_SNo_0L 0 SNo_0).
+- apply eq_sym.
+  exact (add_SNo_minus_SNo_rinv
+    (ordsucc n)
+    (omega_SNo (ordsucc n)
+      (nat_p_omega (ordsucc n) (nat_ordsucc n (omega_nat_p n hn))))).
+Qed.
+
+Theorem god1_group_int_power_successor_nat_case :
+  forall G, forall mul:set -> set -> set, forall x,
+    group G mul -> x :e G ->
+    forall n :e omega,
+      mul (group_int_power G mul x n) x
+        = group_int_power G mul x (add_SNo n 1).
+let G mul x.
+assume hG hx.
+let n.
+assume hn.
+apply (eq_i_tra
+  (mul (group_int_power G mul x n) x)
+  (mul (group_nat_power G mul x n) x)
+  (group_int_power G mul x (add_SNo n 1))).
+- f_equal.
+  exact (god1_group_int_power_nat G mul x n (omega_nat_p n hn)).
+- apply (eq_i_tra
+    (mul (group_nat_power G mul x n) x)
+    (group_nat_power G mul x (ordsucc n))
+    (group_int_power G mul x (add_SNo n 1))).
+  - apply eq_sym.
+    exact (god1_group_nat_power_successor G mul x n (omega_nat_p n hn)).
+  - apply (eq_i_tra
+      (group_nat_power G mul x (ordsucc n))
+      (group_int_power G mul x (ordsucc n))
+      (group_int_power G mul x (add_SNo n 1))).
+    - apply eq_sym.
+      exact (god1_group_int_power_nat G mul x (ordsucc n)
+        (nat_ordsucc n (omega_nat_p n hn))).
+    - f_equal.
+      apply eq_sym.
+      exact (add_SNo_1_ordsucc n hn).
+Qed.
+
+Theorem god1_group_int_power_successor_negative_successor_case :
+  forall G, forall mul:set -> set -> set, forall x,
+    group G mul -> x :e G ->
+    forall n :e omega,
+      mul
+        (group_int_power G mul x (minus_SNo (ordsucc n))) x
+        = group_int_power G mul x
+          (add_SNo (minus_SNo (ordsucc n)) 1).
+let G mul x.
+assume hG hx.
+let n.
+assume hn.
+apply (eq_i_tra
+  (mul (group_int_power G mul x (minus_SNo (ordsucc n))) x)
+  (mul
+    (group_nat_power G mul (group_inverse G mul x) (ordsucc n)) x)
+  (group_int_power G mul x
+    (add_SNo (minus_SNo (ordsucc n)) 1))).
+- f_equal.
+  exact (god1_group_int_power_negative_successor G mul x n
+    (omega_nat_p n hn)).
+- apply (eq_i_tra
+    (mul
+      (group_nat_power G mul (group_inverse G mul x) (ordsucc n)) x)
+    (mul
+      (mul
+        (group_nat_power G mul (group_inverse G mul x) n)
+        (group_inverse G mul x)) x)
+    (group_int_power G mul x
+      (add_SNo (minus_SNo (ordsucc n)) 1))).
+  - f_equal.
+    exact (god1_group_nat_power_successor G mul
+      (group_inverse G mul x) n (omega_nat_p n hn)).
+  - apply (eq_i_tra
+      (mul
+        (mul
+          (group_nat_power G mul (group_inverse G mul x) n)
+          (group_inverse G mul x)) x)
+      (mul
+        (group_nat_power G mul (group_inverse G mul x) n)
+        (mul (group_inverse G mul x) x))
+      (group_int_power G mul x
+        (add_SNo (minus_SNo (ordsucc n)) 1))).
+    - apply eq_sym.
+      exact (god1_group_associative G mul hG
+        (group_nat_power G mul (group_inverse G mul x) n)
+        (god1_group_nat_power_in G mul (group_inverse G mul x)
+          hG (god1_group_inverse_in G mul hG x hx)
+          n (omega_nat_p n hn))
+        (group_inverse G mul x)
+        (god1_group_inverse_in G mul hG x hx)
+        x hx).
+    - apply (eq_i_tra
+        (mul
+          (group_nat_power G mul (group_inverse G mul x) n)
+          (mul (group_inverse G mul x) x))
+        (mul
+          (group_nat_power G mul (group_inverse G mul x) n)
+          (group_identity G mul))
+        (group_int_power G mul x
+          (add_SNo (minus_SNo (ordsucc n)) 1))).
+      - f_equal.
+        exact (andER
+          (group_inverse G mul x :e G)
+          (mul (group_inverse G mul x) x = group_identity G mul)
+          (andEL
+            (group_inverse G mul x :e G
+              /\ mul (group_inverse G mul x) x = group_identity G mul)
+            (mul x (group_inverse G mul x) = group_identity G mul)
+            (god1_group_inverse_specification G mul hG x hx))).
+      - apply (eq_i_tra
+          (mul
+            (group_nat_power G mul (group_inverse G mul x) n)
+            (group_identity G mul))
+          (group_nat_power G mul (group_inverse G mul x) n)
+          (group_int_power G mul x
+            (add_SNo (minus_SNo (ordsucc n)) 1))).
+        - exact (andEL
+            (mul
+              (group_nat_power G mul (group_inverse G mul x) n)
+              (group_identity G mul)
+              = group_nat_power G mul (group_inverse G mul x) n)
+            (mul (group_identity G mul)
+              (group_nat_power G mul (group_inverse G mul x) n)
+              = group_nat_power G mul (group_inverse G mul x) n)
+            ((andER
+              (group_identity G mul :e G)
+              (forall z :e G,
+                mul z (group_identity G mul) = z
+                /\ mul (group_identity G mul) z = z)
+              (god1_group_identity_specification G mul hG))
+              (group_nat_power G mul (group_inverse G mul x) n)
+              (god1_group_nat_power_in G mul (group_inverse G mul x)
+                hG (god1_group_inverse_in G mul hG x hx)
+                n (omega_nat_p n hn)))).
+        - apply (eq_i_tra
+            (group_nat_power G mul (group_inverse G mul x) n)
+            (group_int_power G mul x (minus_SNo n))
+            (group_int_power G mul x
+              (add_SNo (minus_SNo (ordsucc n)) 1))).
+          - apply eq_sym.
+            exact (god1_group_int_power_negative_nat G mul x
+              n (omega_nat_p n hn)).
+          - f_equal.
+            apply eq_sym.
+            exact (god1_negative_successor_add_one n hn).
+Qed.
+
+Theorem god1_group_int_power_successor_negative_nat_zero :
+  forall G, forall mul:set -> set -> set, forall x,
+    group G mul -> x :e G ->
+    mul (group_int_power G mul x (minus_SNo 0)) x
+      = group_int_power G mul x (add_SNo (minus_SNo 0) 1).
+let G mul x.
+assume hG hx.
+apply (eq_i_tra
+  (mul (group_int_power G mul x (minus_SNo 0)) x)
+  (mul (group_int_power G mul x 0) x)
+  (group_int_power G mul x (add_SNo (minus_SNo 0) 1))).
+- f_equal.
+  f_equal.
+  exact minus_SNo_0.
+- apply (eq_i_tra
+    (mul (group_int_power G mul x 0) x)
+    (group_int_power G mul x (add_SNo 0 1))
+    (group_int_power G mul x (add_SNo (minus_SNo 0) 1))).
+  - exact (god1_group_int_power_successor_nat_case G mul x hG hx
+      0 (nat_p_omega 0 nat_0)).
+  - f_equal.
+    f_equal.
+    apply eq_sym.
+    exact minus_SNo_0.
+Qed.
+
+Theorem god1_group_int_power_successor_negative_nat_step :
+  forall G, forall mul:set -> set -> set, forall x,
+    group G mul -> x :e G ->
+    forall n, nat_p n ->
+      mul (group_int_power G mul x (minus_SNo n)) x
+        = group_int_power G mul x (add_SNo (minus_SNo n) 1) ->
+      mul (group_int_power G mul x (minus_SNo (ordsucc n))) x
+        = group_int_power G mul x
+          (add_SNo (minus_SNo (ordsucc n)) 1).
+let G mul x.
+assume hG hx.
+let n.
+assume hn hind.
+exact (god1_group_int_power_successor_negative_successor_case
+  G mul x hG hx n (nat_p_omega n hn)).
+Qed.
+
+Theorem god1_group_int_power_successor_negative_nat_case :
+  forall G, forall mul:set -> set -> set, forall x,
+    group G mul -> x :e G ->
+    forall n :e omega,
+      mul (group_int_power G mul x (minus_SNo n)) x
+        = group_int_power G mul x (add_SNo (minus_SNo n) 1).
+let G mul x.
+assume hG hx.
+let n.
+assume hn.
+exact (nat_ind
+  (fun m =>
+    mul (group_int_power G mul x (minus_SNo m)) x
+      = group_int_power G mul x (add_SNo (minus_SNo m) 1))
+  (god1_group_int_power_successor_negative_nat_zero G mul x hG hx)
+  (god1_group_int_power_successor_negative_nat_step G mul x hG hx)
+  n (omega_nat_p n hn)).
+Qed.
+
+Theorem god1_group_int_power_successor :
+  forall G, forall mul:set -> set -> set, forall x,
+    group G mul -> x :e G ->
+    forall p :e int,
+      mul (group_int_power G mul x p) x
+        = group_int_power G mul x (add_SNo p 1).
+let G mul x.
+assume hG hx.
+let p.
+assume hp.
+exact (int_SNo_cases
+  (fun q =>
+    mul (group_int_power G mul x q) x
+      = group_int_power G mul x (add_SNo q 1))
+  (god1_group_int_power_successor_nat_case G mul x hG hx)
+  (god1_group_int_power_successor_negative_nat_case G mul x hG hx)
+  p hp).
+Qed.
+
+Theorem god1_group_int_power_predecessor :
+  forall G, forall mul:set -> set -> set, forall x,
+    group G mul -> x :e G ->
+    forall p :e int,
+      mul (group_int_power G mul x p) (group_inverse G mul x)
+        = group_int_power G mul x (add_SNo p (minus_SNo 1)).
+let G mul x.
+assume hG hx.
+let p.
+assume hp.
+apply (eq_i_tra
+  (mul (group_int_power G mul x p) (group_inverse G mul x))
+  (mul
+    (group_int_power G mul x
+      (add_SNo (add_SNo p (minus_SNo 1)) 1))
+    (group_inverse G mul x))
+  (group_int_power G mul x (add_SNo p (minus_SNo 1)))).
+- f_equal.
+  f_equal.
+  apply eq_sym.
+  exact (add_SNo_minus_R2' p 1 (int_SNo p hp) SNo_1).
+- apply (eq_i_tra
+    (mul
+      (group_int_power G mul x
+        (add_SNo (add_SNo p (minus_SNo 1)) 1))
+      (group_inverse G mul x))
+    (mul
+      (mul
+        (group_int_power G mul x (add_SNo p (minus_SNo 1))) x)
+      (group_inverse G mul x))
+    (group_int_power G mul x (add_SNo p (minus_SNo 1)))).
+  - f_equal.
+    apply eq_sym.
+    exact (god1_group_int_power_successor G mul x hG hx
+      (add_SNo p (minus_SNo 1))
+      (int_add_SNo p hp
+        (minus_SNo 1)
+        (int_minus_SNo_omega 1 (nat_p_omega 1 nat_1)))).
+  - apply (eq_i_tra
+      (mul
+        (mul
+          (group_int_power G mul x (add_SNo p (minus_SNo 1))) x)
+        (group_inverse G mul x))
+      (mul
+        (group_int_power G mul x (add_SNo p (minus_SNo 1)))
+        (mul x (group_inverse G mul x)))
+      (group_int_power G mul x (add_SNo p (minus_SNo 1)))).
+    - apply eq_sym.
+      exact (god1_group_associative G mul hG
+        (group_int_power G mul x (add_SNo p (minus_SNo 1)))
+        (god1_group_int_power_in G mul x hG hx
+          (add_SNo p (minus_SNo 1))
+          (int_add_SNo p hp
+            (minus_SNo 1)
+            (int_minus_SNo_omega 1 (nat_p_omega 1 nat_1))))
+        x hx
+        (group_inverse G mul x) (god1_group_inverse_in G mul hG x hx)).
+    - apply (eq_i_tra
+        (mul
+          (group_int_power G mul x (add_SNo p (minus_SNo 1)))
+          (mul x (group_inverse G mul x)))
+        (mul
+          (group_int_power G mul x (add_SNo p (minus_SNo 1)))
+          (group_identity G mul))
+        (group_int_power G mul x (add_SNo p (minus_SNo 1)))).
+      - f_equal.
+        exact (andER
+          (group_inverse G mul x :e G
+            /\ mul (group_inverse G mul x) x = group_identity G mul)
+          (mul x (group_inverse G mul x) = group_identity G mul)
+          (god1_group_inverse_specification G mul hG x hx)).
+      - exact (andEL
+          (mul
+            (group_int_power G mul x (add_SNo p (minus_SNo 1)))
+            (group_identity G mul)
+            = group_int_power G mul x (add_SNo p (minus_SNo 1)))
+          (mul (group_identity G mul)
+            (group_int_power G mul x (add_SNo p (minus_SNo 1)))
+            = group_int_power G mul x (add_SNo p (minus_SNo 1)))
+          ((andER
+            (group_identity G mul :e G)
+            (forall z :e G,
+              mul z (group_identity G mul) = z
+              /\ mul (group_identity G mul) z = z)
+            (god1_group_identity_specification G mul hG))
+            (group_int_power G mul x (add_SNo p (minus_SNo 1)))
+            (god1_group_int_power_in G mul x hG hx
+              (add_SNo p (minus_SNo 1))
+              (int_add_SNo p hp
+                (minus_SNo 1)
+                (int_minus_SNo_omega 1 (nat_p_omega 1 nat_1)))))).
+Qed.
+
+Theorem god1_group_int_power_nat_successor_value :
+  forall G, forall mul:set -> set -> set, forall x,
+    group G mul -> x :e G ->
+    forall n :e omega,
+      group_int_power G mul x (ordsucc n)
+        = mul (group_int_power G mul x n) x.
+let G mul x.
+assume hG hx.
+let n.
+assume hn.
+apply (eq_i_tra
+  (group_int_power G mul x (ordsucc n))
+  (group_int_power G mul x (add_SNo n 1))
+  (mul (group_int_power G mul x n) x)).
+- f_equal.
+  apply eq_sym.
+  exact (add_SNo_1_ordsucc n hn).
+- apply eq_sym.
+  exact (god1_group_int_power_successor_nat_case G mul x hG hx n hn).
+Qed.
+
+Theorem god1_group_int_power_negative_successor_value :
+  forall G, forall mul:set -> set -> set, forall x,
+    group G mul -> x :e G ->
+    forall n :e omega,
+      group_int_power G mul x (minus_SNo (ordsucc n))
+        = mul (group_int_power G mul x (minus_SNo n))
+          (group_inverse G mul x).
+let G mul x.
+assume hG hx.
+let n.
+assume hn.
+apply (eq_i_tra
+  (group_int_power G mul x (minus_SNo (ordsucc n)))
+  (group_int_power G mul x
+    (add_SNo (minus_SNo n) (minus_SNo 1)))
+  (mul (group_int_power G mul x (minus_SNo n))
+    (group_inverse G mul x))).
+- f_equal.
+  apply eq_sym.
+  exact (god1_negative_nat_add_negative_one n hn).
+- apply eq_sym.
+  exact (god1_group_int_power_predecessor G mul x hG hx
+    (minus_SNo n) (int_minus_SNo_omega n hn)).
+Qed.
+
+Theorem god1_group_int_power_add_zero :
+  forall G, forall mul:set -> set -> set, forall x,
+    group G mul -> x :e G ->
+    forall p :e int,
+      mul (group_int_power G mul x p) (group_int_power G mul x 0)
+        = group_int_power G mul x (add_SNo p 0).
+let G mul x.
+assume hG hx.
+let p.
+assume hp.
+apply (eq_i_tra
+  (mul (group_int_power G mul x p) (group_int_power G mul x 0))
+  (mul (group_int_power G mul x p) (group_identity G mul))
+  (group_int_power G mul x (add_SNo p 0))).
+- f_equal.
+  exact (god1_group_int_power_zero G mul x).
+- apply (eq_i_tra
+    (mul (group_int_power G mul x p) (group_identity G mul))
+    (group_int_power G mul x p)
+    (group_int_power G mul x (add_SNo p 0))).
+  - exact (andEL
+      (mul (group_int_power G mul x p) (group_identity G mul)
+        = group_int_power G mul x p)
+      (mul (group_identity G mul) (group_int_power G mul x p)
+        = group_int_power G mul x p)
+      ((andER
+        (group_identity G mul :e G)
+        (forall z :e G,
+          mul z (group_identity G mul) = z
+          /\ mul (group_identity G mul) z = z)
+        (god1_group_identity_specification G mul hG))
+        (group_int_power G mul x p)
+        (god1_group_int_power_in G mul x hG hx p hp))).
+  - f_equal.
+    apply eq_sym.
+    exact (add_SNo_0R p (int_SNo p hp)).
+Qed.
+
+Theorem god1_group_int_power_add_nat_step :
+  forall G, forall mul:set -> set -> set, forall x,
+    group G mul -> x :e G ->
+    forall p :e int, forall n :e omega,
+      mul (group_int_power G mul x p) (group_int_power G mul x n)
+        = group_int_power G mul x (add_SNo p n) ->
+      mul (group_int_power G mul x p)
+        (group_int_power G mul x (ordsucc n))
+        = group_int_power G mul x (add_SNo p (ordsucc n)).
+let G mul x.
+assume hG hx.
+let p.
+assume hp.
+let n.
+assume hn hind.
+apply (eq_i_tra
+  (mul (group_int_power G mul x p)
+    (group_int_power G mul x (ordsucc n)))
+  (mul (group_int_power G mul x p)
+    (mul (group_int_power G mul x n) x))
+  (group_int_power G mul x (add_SNo p (ordsucc n)))).
+- f_equal.
+  exact (god1_group_int_power_nat_successor_value G mul x hG hx n hn).
+- apply (eq_i_tra
+    (mul (group_int_power G mul x p)
+      (mul (group_int_power G mul x n) x))
+    (mul
+      (mul (group_int_power G mul x p)
+        (group_int_power G mul x n)) x)
+    (group_int_power G mul x (add_SNo p (ordsucc n)))).
+  - exact (god1_group_associative G mul hG
+      (group_int_power G mul x p)
+      (god1_group_int_power_in G mul x hG hx p hp)
+      (group_int_power G mul x n)
+      (god1_group_int_power_in G mul x hG hx
+        n (Subq_omega_int n hn))
+      x hx).
+  - apply (eq_i_tra
+      (mul
+        (mul (group_int_power G mul x p)
+          (group_int_power G mul x n)) x)
+      (mul (group_int_power G mul x (add_SNo p n)) x)
+      (group_int_power G mul x (add_SNo p (ordsucc n)))).
+    - f_equal.
+      exact hind.
+    - apply (eq_i_tra
+        (mul (group_int_power G mul x (add_SNo p n)) x)
+        (group_int_power G mul x (add_SNo (add_SNo p n) 1))
+        (group_int_power G mul x (add_SNo p (ordsucc n)))).
+      - exact (god1_group_int_power_successor G mul x hG hx
+          (add_SNo p n)
+          (int_add_SNo p hp n (Subq_omega_int n hn))).
+      - f_equal.
+        apply (eq_i_tra
+          (add_SNo (add_SNo p n) 1)
+          (add_SNo p (add_SNo n 1))
+          (add_SNo p (ordsucc n))).
+        - apply eq_sym.
+          exact (add_SNo_assoc p n 1
+            (int_SNo p hp) (omega_SNo n hn) SNo_1).
+        - f_equal.
+          exact (add_SNo_1_ordsucc n hn).
+Qed.
+
+Theorem god1_group_int_power_add_nat_step_ind :
+  forall G, forall mul:set -> set -> set, forall x,
+    group G mul -> x :e G ->
+    forall p :e int, forall n, nat_p n ->
+      mul (group_int_power G mul x p) (group_int_power G mul x n)
+        = group_int_power G mul x (add_SNo p n) ->
+      mul (group_int_power G mul x p)
+        (group_int_power G mul x (ordsucc n))
+        = group_int_power G mul x (add_SNo p (ordsucc n)).
+let G mul x.
+assume hG hx.
+let p.
+assume hp.
+let n.
+assume hn hind.
+exact (god1_group_int_power_add_nat_step G mul x hG hx p hp
+  n (nat_p_omega n hn) hind).
+Qed.
+
+Theorem god1_group_int_power_add_nat_case :
+  forall G, forall mul:set -> set -> set, forall x,
+    group G mul -> x :e G ->
+    forall p :e int, forall n :e omega,
+      mul (group_int_power G mul x p) (group_int_power G mul x n)
+        = group_int_power G mul x (add_SNo p n).
+let G mul x.
+assume hG hx.
+let p.
+assume hp.
+let n.
+assume hn.
+exact (nat_ind
+  (fun m =>
+    mul (group_int_power G mul x p) (group_int_power G mul x m)
+      = group_int_power G mul x (add_SNo p m))
+  (god1_group_int_power_add_zero G mul x hG hx p hp)
+  (god1_group_int_power_add_nat_step_ind G mul x hG hx p hp)
+  n (omega_nat_p n hn)).
+Qed.
+
+Theorem god1_group_int_power_add_negative_nat_zero :
+  forall G, forall mul:set -> set -> set, forall x,
+    group G mul -> x :e G ->
+    forall p :e int,
+      mul (group_int_power G mul x p)
+        (group_int_power G mul x (minus_SNo 0))
+        = group_int_power G mul x (add_SNo p (minus_SNo 0)).
+let G mul x.
+assume hG hx.
+let p.
+assume hp.
+apply (eq_i_tra
+  (mul (group_int_power G mul x p)
+    (group_int_power G mul x (minus_SNo 0)))
+  (mul (group_int_power G mul x p) (group_int_power G mul x 0))
+  (group_int_power G mul x (add_SNo p (minus_SNo 0)))).
+- f_equal.
+  f_equal.
+  exact minus_SNo_0.
+- apply (eq_i_tra
+    (mul (group_int_power G mul x p) (group_int_power G mul x 0))
+    (group_int_power G mul x (add_SNo p 0))
+    (group_int_power G mul x (add_SNo p (minus_SNo 0)))).
+  - exact (god1_group_int_power_add_zero G mul x hG hx p hp).
+  - f_equal.
+    f_equal.
+    apply eq_sym.
+    exact minus_SNo_0.
+Qed.
+
+Theorem god1_group_int_power_add_negative_nat_step :
+  forall G, forall mul:set -> set -> set, forall x,
+    group G mul -> x :e G ->
+    forall p :e int, forall n :e omega,
+      mul (group_int_power G mul x p)
+        (group_int_power G mul x (minus_SNo n))
+        = group_int_power G mul x (add_SNo p (minus_SNo n)) ->
+      mul (group_int_power G mul x p)
+        (group_int_power G mul x (minus_SNo (ordsucc n)))
+        = group_int_power G mul x
+          (add_SNo p (minus_SNo (ordsucc n))).
+let G mul x.
+assume hG hx.
+let p.
+assume hp.
+let n.
+assume hn hind.
+apply (eq_i_tra
+  (mul (group_int_power G mul x p)
+    (group_int_power G mul x (minus_SNo (ordsucc n))))
+  (mul (group_int_power G mul x p)
+    (mul (group_int_power G mul x (minus_SNo n))
+      (group_inverse G mul x)))
+  (group_int_power G mul x
+    (add_SNo p (minus_SNo (ordsucc n))))).
+- f_equal.
+  exact (god1_group_int_power_negative_successor_value
+    G mul x hG hx n hn).
+- apply (eq_i_tra
+    (mul (group_int_power G mul x p)
+      (mul (group_int_power G mul x (minus_SNo n))
+        (group_inverse G mul x)))
+    (mul
+      (mul (group_int_power G mul x p)
+        (group_int_power G mul x (minus_SNo n)))
+      (group_inverse G mul x))
+    (group_int_power G mul x
+      (add_SNo p (minus_SNo (ordsucc n))))).
+  - exact (god1_group_associative G mul hG
+      (group_int_power G mul x p)
+      (god1_group_int_power_in G mul x hG hx p hp)
+      (group_int_power G mul x (minus_SNo n))
+      (god1_group_int_power_in G mul x hG hx
+        (minus_SNo n) (int_minus_SNo_omega n hn))
+      (group_inverse G mul x) (god1_group_inverse_in G mul hG x hx)).
+  - apply (eq_i_tra
+      (mul
+        (mul (group_int_power G mul x p)
+          (group_int_power G mul x (minus_SNo n)))
+        (group_inverse G mul x))
+      (mul (group_int_power G mul x (add_SNo p (minus_SNo n)))
+        (group_inverse G mul x))
+      (group_int_power G mul x
+        (add_SNo p (minus_SNo (ordsucc n))))).
+    - f_equal.
+      exact hind.
+    - apply (eq_i_tra
+        (mul (group_int_power G mul x (add_SNo p (minus_SNo n)))
+          (group_inverse G mul x))
+        (group_int_power G mul x
+          (add_SNo (add_SNo p (minus_SNo n)) (minus_SNo 1)))
+        (group_int_power G mul x
+          (add_SNo p (minus_SNo (ordsucc n))))).
+      - exact (god1_group_int_power_predecessor G mul x hG hx
+          (add_SNo p (minus_SNo n))
+          (int_add_SNo p hp (minus_SNo n)
+            (int_minus_SNo_omega n hn))).
+      - f_equal.
+        apply (eq_i_tra
+          (add_SNo (add_SNo p (minus_SNo n)) (minus_SNo 1))
+          (add_SNo p (add_SNo (minus_SNo n) (minus_SNo 1)))
+          (add_SNo p (minus_SNo (ordsucc n)))).
+        - apply eq_sym.
+          exact (add_SNo_assoc p (minus_SNo n) (minus_SNo 1)
+            (int_SNo p hp)
+            (int_SNo (minus_SNo n) (int_minus_SNo_omega n hn))
+            (int_SNo (minus_SNo 1)
+              (int_minus_SNo_omega 1 (nat_p_omega 1 nat_1)))).
+        - f_equal.
+          exact (god1_negative_nat_add_negative_one n hn).
+Qed.
+
+Theorem god1_group_int_power_add_negative_nat_step_ind :
+  forall G, forall mul:set -> set -> set, forall x,
+    group G mul -> x :e G ->
+    forall p :e int, forall n, nat_p n ->
+      mul (group_int_power G mul x p)
+        (group_int_power G mul x (minus_SNo n))
+        = group_int_power G mul x (add_SNo p (minus_SNo n)) ->
+      mul (group_int_power G mul x p)
+        (group_int_power G mul x (minus_SNo (ordsucc n)))
+        = group_int_power G mul x
+          (add_SNo p (minus_SNo (ordsucc n))).
+let G mul x.
+assume hG hx.
+let p.
+assume hp.
+let n.
+assume hn hind.
+exact (god1_group_int_power_add_negative_nat_step
+  G mul x hG hx p hp n (nat_p_omega n hn) hind).
+Qed.
+
+Theorem god1_group_int_power_add_negative_nat_case :
+  forall G, forall mul:set -> set -> set, forall x,
+    group G mul -> x :e G ->
+    forall p :e int, forall n :e omega,
+      mul (group_int_power G mul x p)
+        (group_int_power G mul x (minus_SNo n))
+        = group_int_power G mul x (add_SNo p (minus_SNo n)).
+let G mul x.
+assume hG hx.
+let p.
+assume hp.
+let n.
+assume hn.
+exact (nat_ind
+  (fun m =>
+    mul (group_int_power G mul x p)
+      (group_int_power G mul x (minus_SNo m))
+      = group_int_power G mul x (add_SNo p (minus_SNo m)))
+  (god1_group_int_power_add_negative_nat_zero G mul x hG hx p hp)
+  (god1_group_int_power_add_negative_nat_step_ind G mul x hG hx p hp)
+  n (omega_nat_p n hn)).
+Qed.
+
+Theorem god1_group_int_power_add :
+  forall G, forall mul:set -> set -> set, forall x,
+    group G mul -> x :e G ->
+    forall p q :e int,
+      mul (group_int_power G mul x p) (group_int_power G mul x q)
+        = group_int_power G mul x (add_SNo p q).
+let G mul x.
+assume hG hx.
+let p.
+assume hp.
+let q.
+assume hq.
+exact (int_SNo_cases
+  (fun r =>
+    mul (group_int_power G mul x p) (group_int_power G mul x r)
+      = group_int_power G mul x (add_SNo p r))
+  (god1_group_int_power_add_nat_case G mul x hG hx p hp)
+  (god1_group_int_power_add_negative_nat_case G mul x hG hx p hp)
+  q hq).
+Qed.
+
+Theorem god1_mul_negative_one :
+  forall p :e int,
+    mul_SNo p (minus_SNo 1) = minus_SNo p.
+let p.
+assume hp.
+apply (eq_i_tra
+  (mul_SNo p (minus_SNo 1))
+  (minus_SNo (mul_SNo p 1))
+  (minus_SNo p)).
+- exact (mul_SNo_minus_distrR p 1 (int_SNo p hp) SNo_1).
+- f_equal.
+  exact (mul_SNo_oneR p (int_SNo p hp)).
+Qed.
+
+Theorem god1_group_int_power_power_zero :
+  forall G, forall mul:set -> set -> set, forall x,
+    group G mul -> x :e G ->
+    forall p :e int,
+      group_int_power G mul (group_int_power G mul x p) 0
+        = group_int_power G mul x (mul_SNo p 0).
+let G mul x.
+assume hG hx.
+let p.
+assume hp.
+apply (eq_i_tra
+  (group_int_power G mul (group_int_power G mul x p) 0)
+  (group_identity G mul)
+  (group_int_power G mul x (mul_SNo p 0))).
+- exact (god1_group_int_power_zero G mul
+    (group_int_power G mul x p)).
+- apply (eq_i_tra
+    (group_identity G mul)
+    (group_int_power G mul x 0)
+    (group_int_power G mul x (mul_SNo p 0))).
+  - apply eq_sym.
+    exact (god1_group_int_power_zero G mul x).
+  - f_equal.
+    apply eq_sym.
+    exact (mul_SNo_zeroR p (int_SNo p hp)).
+Qed.
+
+Theorem god1_group_int_power_power_nat_step :
+  forall G, forall mul:set -> set -> set, forall x,
+    group G mul -> x :e G ->
+    forall p :e int, forall n :e omega,
+      group_int_power G mul (group_int_power G mul x p) n
+        = group_int_power G mul x (mul_SNo p n) ->
+      group_int_power G mul (group_int_power G mul x p) (ordsucc n)
+        = group_int_power G mul x (mul_SNo p (ordsucc n)).
+let G mul x.
+assume hG hx.
+let p.
+assume hp.
+let n.
+assume hn hind.
+apply (eq_i_tra
+  (group_int_power G mul (group_int_power G mul x p) (ordsucc n))
+  (mul
+    (group_int_power G mul (group_int_power G mul x p) n)
+    (group_int_power G mul x p))
+  (group_int_power G mul x (mul_SNo p (ordsucc n)))).
+- exact (god1_group_int_power_nat_successor_value G mul
+    (group_int_power G mul x p) hG
+    (god1_group_int_power_in G mul x hG hx p hp) n hn).
+- apply (eq_i_tra
+    (mul
+      (group_int_power G mul (group_int_power G mul x p) n)
+      (group_int_power G mul x p))
+    (mul
+      (group_int_power G mul x (mul_SNo p n))
+      (group_int_power G mul x p))
+    (group_int_power G mul x (mul_SNo p (ordsucc n)))).
+  - f_equal.
+    exact hind.
+  - apply (eq_i_tra
+      (mul
+        (group_int_power G mul x (mul_SNo p n))
+        (group_int_power G mul x p))
+      (group_int_power G mul x (add_SNo (mul_SNo p n) p))
+      (group_int_power G mul x (mul_SNo p (ordsucc n)))).
+    - exact (god1_group_int_power_add G mul x hG hx
+        (mul_SNo p n) (int_mul_SNo p hp n (Subq_omega_int n hn))
+        p hp).
+    - f_equal.
+      apply (eq_i_tra
+        (add_SNo (mul_SNo p n) p)
+        (add_SNo (mul_SNo p n) (mul_SNo p 1))
+        (mul_SNo p (ordsucc n))).
+      - f_equal.
+        apply eq_sym.
+        exact (mul_SNo_oneR p (int_SNo p hp)).
+      - apply (eq_i_tra
+          (add_SNo (mul_SNo p n) (mul_SNo p 1))
+          (mul_SNo p (add_SNo n 1))
+          (mul_SNo p (ordsucc n))).
+        - apply eq_sym.
+          exact (mul_SNo_distrL p n 1
+            (int_SNo p hp) (omega_SNo n hn) SNo_1).
+        - f_equal.
+          exact (add_SNo_1_ordsucc n hn).
+Qed.
+
+Theorem god1_group_int_power_power_nat_step_ind :
+  forall G, forall mul:set -> set -> set, forall x,
+    group G mul -> x :e G ->
+    forall p :e int, forall n, nat_p n ->
+      group_int_power G mul (group_int_power G mul x p) n
+        = group_int_power G mul x (mul_SNo p n) ->
+      group_int_power G mul (group_int_power G mul x p) (ordsucc n)
+        = group_int_power G mul x (mul_SNo p (ordsucc n)).
+let G mul x.
+assume hG hx.
+let p.
+assume hp.
+let n.
+assume hn hind.
+exact (god1_group_int_power_power_nat_step G mul x hG hx p hp
+  n (nat_p_omega n hn) hind).
+Qed.
+
+Theorem god1_group_int_power_power_nat_case :
+  forall G, forall mul:set -> set -> set, forall x,
+    group G mul -> x :e G ->
+    forall p :e int, forall n :e omega,
+      group_int_power G mul (group_int_power G mul x p) n
+        = group_int_power G mul x (mul_SNo p n).
+let G mul x.
+assume hG hx.
+let p.
+assume hp.
+let n.
+assume hn.
+exact (nat_ind
+  (fun m =>
+    group_int_power G mul (group_int_power G mul x p) m
+      = group_int_power G mul x (mul_SNo p m))
+  (god1_group_int_power_power_zero G mul x hG hx p hp)
+  (god1_group_int_power_power_nat_step_ind G mul x hG hx p hp)
+  n (omega_nat_p n hn)).
+Qed.
+
+Theorem god1_group_int_power_power_negative_nat_zero :
+  forall G, forall mul:set -> set -> set, forall x,
+    group G mul -> x :e G ->
+    forall p :e int,
+      group_int_power G mul (group_int_power G mul x p) (minus_SNo 0)
+        = group_int_power G mul x (mul_SNo p (minus_SNo 0)).
+let G mul x.
+assume hG hx.
+let p.
+assume hp.
+apply (eq_i_tra
+  (group_int_power G mul (group_int_power G mul x p) (minus_SNo 0))
+  (group_int_power G mul (group_int_power G mul x p) 0)
+  (group_int_power G mul x (mul_SNo p (minus_SNo 0)))).
+- f_equal.
+  exact minus_SNo_0.
+- apply (eq_i_tra
+    (group_int_power G mul (group_int_power G mul x p) 0)
+    (group_int_power G mul x (mul_SNo p 0))
+    (group_int_power G mul x (mul_SNo p (minus_SNo 0)))).
+  - exact (god1_group_int_power_power_zero G mul x hG hx p hp).
+  - f_equal.
+    f_equal.
+    apply eq_sym.
+    exact minus_SNo_0.
+Qed.
+
+Theorem god1_group_int_power_power_negative_nat_step :
+  forall G, forall mul:set -> set -> set, forall x,
+    group G mul -> x :e G ->
+    forall p :e int, forall n :e omega,
+      group_int_power G mul (group_int_power G mul x p) (minus_SNo n)
+        = group_int_power G mul x (mul_SNo p (minus_SNo n)) ->
+      group_int_power G mul (group_int_power G mul x p)
+        (minus_SNo (ordsucc n))
+        = group_int_power G mul x
+          (mul_SNo p (minus_SNo (ordsucc n))).
+let G mul x.
+assume hG hx.
+let p.
+assume hp.
+let n.
+assume hn hind.
+apply (eq_i_tra
+  (group_int_power G mul (group_int_power G mul x p)
+    (minus_SNo (ordsucc n)))
+  (mul
+    (group_int_power G mul (group_int_power G mul x p)
+      (minus_SNo n))
+    (group_inverse G mul (group_int_power G mul x p)))
+  (group_int_power G mul x
+    (mul_SNo p (minus_SNo (ordsucc n))))).
+- exact (god1_group_int_power_negative_successor_value G mul
+    (group_int_power G mul x p) hG
+    (god1_group_int_power_in G mul x hG hx p hp) n hn).
+- apply (eq_i_tra
+    (mul
+      (group_int_power G mul (group_int_power G mul x p)
+        (minus_SNo n))
+      (group_inverse G mul (group_int_power G mul x p)))
+    (mul
+      (group_int_power G mul x (mul_SNo p (minus_SNo n)))
+      (group_int_power G mul x (minus_SNo p)))
+    (group_int_power G mul x
+      (mul_SNo p (minus_SNo (ordsucc n))))).
+  - f_equal.
+    - exact hind.
+    - exact (god1_group_int_power_inverse G mul x hG hx p hp).
+  - apply (eq_i_tra
+      (mul
+        (group_int_power G mul x (mul_SNo p (minus_SNo n)))
+        (group_int_power G mul x (minus_SNo p)))
+      (group_int_power G mul x
+        (add_SNo (mul_SNo p (minus_SNo n)) (minus_SNo p)))
+      (group_int_power G mul x
+        (mul_SNo p (minus_SNo (ordsucc n))))).
+    - exact (god1_group_int_power_add G mul x hG hx
+        (mul_SNo p (minus_SNo n))
+        (int_mul_SNo p hp (minus_SNo n) (int_minus_SNo_omega n hn))
+        (minus_SNo p) (int_minus_SNo p hp)).
+    - f_equal.
+      apply (eq_i_tra
+        (add_SNo (mul_SNo p (minus_SNo n)) (minus_SNo p))
+        (add_SNo
+          (mul_SNo p (minus_SNo n))
+          (mul_SNo p (minus_SNo 1)))
+        (mul_SNo p (minus_SNo (ordsucc n)))).
+      - f_equal.
+        apply eq_sym.
+        exact (god1_mul_negative_one p hp).
+      - apply (eq_i_tra
+          (add_SNo
+            (mul_SNo p (minus_SNo n))
+            (mul_SNo p (minus_SNo 1)))
+          (mul_SNo p
+            (add_SNo (minus_SNo n) (minus_SNo 1)))
+          (mul_SNo p (minus_SNo (ordsucc n)))).
+        - apply eq_sym.
+          exact (mul_SNo_distrL p (minus_SNo n) (minus_SNo 1)
+            (int_SNo p hp)
+            (int_SNo (minus_SNo n) (int_minus_SNo_omega n hn))
+            (int_SNo (minus_SNo 1)
+              (int_minus_SNo_omega 1 (nat_p_omega 1 nat_1)))).
+        - f_equal.
+          exact (god1_negative_nat_add_negative_one n hn).
+Qed.
+
+Theorem god1_group_int_power_power_negative_nat_step_ind :
+  forall G, forall mul:set -> set -> set, forall x,
+    group G mul -> x :e G ->
+    forall p :e int, forall n, nat_p n ->
+      group_int_power G mul (group_int_power G mul x p) (minus_SNo n)
+        = group_int_power G mul x (mul_SNo p (minus_SNo n)) ->
+      group_int_power G mul (group_int_power G mul x p)
+        (minus_SNo (ordsucc n))
+        = group_int_power G mul x
+          (mul_SNo p (minus_SNo (ordsucc n))).
+let G mul x.
+assume hG hx.
+let p.
+assume hp.
+let n.
+assume hn hind.
+exact (god1_group_int_power_power_negative_nat_step
+  G mul x hG hx p hp n (nat_p_omega n hn) hind).
+Qed.
+
+Theorem god1_group_int_power_power_negative_nat_case :
+  forall G, forall mul:set -> set -> set, forall x,
+    group G mul -> x :e G ->
+    forall p :e int, forall n :e omega,
+      group_int_power G mul (group_int_power G mul x p) (minus_SNo n)
+        = group_int_power G mul x (mul_SNo p (minus_SNo n)).
+let G mul x.
+assume hG hx.
+let p.
+assume hp.
+let n.
+assume hn.
+exact (nat_ind
+  (fun m =>
+    group_int_power G mul (group_int_power G mul x p) (minus_SNo m)
+      = group_int_power G mul x (mul_SNo p (minus_SNo m)))
+  (god1_group_int_power_power_negative_nat_zero G mul x hG hx p hp)
+  (god1_group_int_power_power_negative_nat_step_ind
+    G mul x hG hx p hp)
+  n (omega_nat_p n hn)).
+Qed.
+
+Theorem god1_group_int_power_power :
+  forall G, forall mul:set -> set -> set, forall x,
+    group G mul -> x :e G ->
+    forall p q :e int,
+      group_int_power G mul (group_int_power G mul x p) q
+        = group_int_power G mul x (mul_SNo p q).
+let G mul x.
+assume hG hx.
+let p.
+assume hp.
+let q.
+assume hq.
+exact (int_SNo_cases
+  (fun r =>
+    group_int_power G mul (group_int_power G mul x p) r
+      = group_int_power G mul x (mul_SNo p r))
+  (god1_group_int_power_power_nat_case G mul x hG hx p hp)
+  (god1_group_int_power_power_negative_nat_case G mul x hG hx p hp)
+  q hq).
+Qed.
+
 Theorem god1_group_integer_power_laws :
   forall G, forall mul:set -> set -> set, forall x :e G,
     group G mul ->
@@ -35328,19 +38087,12 @@ Theorem god1_group_integer_power_laws :
 let G mul x.
 assume hx hG.
 //GOD1PRF:40125 By means of the associativity of multiplication in G , the following rules of calculation are easily verified :
-claim h_s7_integer_power_calculation_rules :
-  (forall p q :e int,
-    mul (group_int_power G mul x p) (group_int_power G mul x q)
-    = group_int_power G mul x (add_SNo p q))
-  /\ (forall p :e int,
-    group_inverse G mul (group_int_power G mul x p)
-    = group_int_power G mul x (minus_SNo p))
-  /\ (forall p q :e int,
-    group_int_power G mul (group_int_power G mul x p) q
-    = group_int_power G mul x (mul_SNo p q)).
-admit.
 apply andI.
-Admitted.
+- apply andI.
+  - exact (god1_group_int_power_add G mul x hG hx).
+  - exact (god1_group_int_power_inverse G mul x hG hx).
+- exact (god1_group_int_power_power G mul x hG hx).
+Qed.
 
 //GOD1:40617 cyclic_subgroup : "the subgroup of #1 generated by #3" | $\langle #3\rangle$
 Definition cyclic_subgroup :
@@ -35353,21 +38105,69 @@ Theorem god1_powers_form_cyclic_subgroup :
 let G mul x.
 assume hx hG.
 //GOD1PRF:40343 It follows that the set of elements $x^{p}$ (for fixed $x \in \mathrm{G}$ and variable $p \in \mathrm{Z}$ ) is a subgroup of G : for clearly it is not empty, and if it contains elements $u=x^{p}, v=x^{q}$, the formula $u v^{-1} =x^{p-q}$ shows that it contains $u v^{-1}$.
-claim h_s7_cyclic_power_laws :
-  (forall p q :e int,
-    mul (group_int_power G mul x p) (group_int_power G mul x q)
-    = group_int_power G mul x (add_SNo p q))
-  /\ (forall p :e int,
-    group_inverse G mul (group_int_power G mul x p)
-    = group_int_power G mul x (minus_SNo p))
-  /\ (forall p q :e int,
-    group_int_power G mul (group_int_power G mul x p) q
-    = group_int_power G mul x (mul_SNo p q)).
-apply (god1_group_integer_power_laws G mul x hx hG).
-claim h_s7_cyclic_subgroup_closure :
-  subgroup G mul (cyclic_subgroup G mul x).
-admit.
-Admitted.
+apply (god1_subgroup_of_identity_product_inverse
+  G mul (cyclic_subgroup G mul x) hG).
+- let z.
+  assume hz.
+  apply (ReplE_impred int
+    (fun p => group_int_power G mul x p) z hz (z :e G)).
+  let p.
+  assume hp heq.
+  exact (mem_eq_substL G
+    (group_int_power G mul x p) z heq
+    (god1_group_int_power_in G mul x hG hx p hp)).
+- exact (mem_eq_substR (cyclic_subgroup G mul x)
+    (group_int_power G mul x 0) (group_identity G mul)
+    (god1_group_int_power_zero G mul x)
+    (ReplI int (fun p => group_int_power G mul x p)
+      0 (Subq_omega_int 0 (nat_p_omega 0 nat_0)))).
+- let u.
+  assume hu.
+  let v.
+  assume hv.
+  apply (ReplE_impred int
+    (fun p => group_int_power G mul x p) u hu
+    (mul u v :e cyclic_subgroup G mul x)).
+  let p.
+  assume hp hup.
+  apply (ReplE_impred int
+    (fun q => group_int_power G mul x q) v hv
+    (mul u v :e cyclic_subgroup G mul x)).
+  let q.
+  assume hq hvq.
+  apply (mem_eq_substL (cyclic_subgroup G mul x)
+    (group_int_power G mul x (add_SNo p q)) (mul u v)).
+  - apply (eq_i_tra
+      (mul u v)
+      (mul (group_int_power G mul x p)
+        (group_int_power G mul x q))
+      (group_int_power G mul x (add_SNo p q))).
+    - f_equal.
+      - exact hup.
+      - exact hvq.
+    - exact (god1_group_int_power_add G mul x hG hx p hp q hq).
+  - exact (ReplI int (fun r => group_int_power G mul x r)
+      (add_SNo p q) (int_add_SNo p hp q hq)).
+- let u.
+  assume hu.
+  apply (ReplE_impred int
+    (fun p => group_int_power G mul x p) u hu
+    (group_inverse G mul u :e cyclic_subgroup G mul x)).
+  let p.
+  assume hp hup.
+  apply (mem_eq_substL (cyclic_subgroup G mul x)
+    (group_int_power G mul x (minus_SNo p))
+    (group_inverse G mul u)).
+  - apply (eq_i_tra
+      (group_inverse G mul u)
+      (group_inverse G mul (group_int_power G mul x p))
+      (group_int_power G mul x (minus_SNo p))).
+    - f_equal.
+      exact hup.
+    - exact (god1_group_int_power_inverse G mul x hG hx p hp).
+  - exact (ReplI int (fun r => group_int_power G mul x r)
+      (minus_SNo p) (int_minus_SNo p hp)).
+Qed.
 
 //GOD1:41978 cyclic_group : "#1 with multiplication #2 is a cyclic group" | $(#1,#2)\text{ is cyclic}$
 Definition cyclic_group : set -> (set -> set -> set) -> prop :=
@@ -35385,6 +38185,157 @@ Definition group_family_intersection :
 Definition group_family_union : set -> (set -> set) -> set :=
   fun I H => \/_ i :e I, H i.
 
+//GOD1PRF:42954 Let $M$ be the intersection of the $H_{i}$.
+//GOD1PRF:42998 $M$ is not empty, because the neutral element of G belongs to all the $\mathrm{H}_{i}$ and therefore to M ; if M contains two elements $x, y$, then these two elements belong to each $\mathrm{H}_{i}$ and therefore so does $x y^{-1}$.
+//GOD1PRF:43231 Hence $x y^{-1}$ belongs to M , and therefore M is a subgroup of G .
+Theorem god1_group_family_intersection_identity_components :
+  forall G, forall mul:set -> set -> set, forall I,
+  forall H:set -> set,
+    (forall i :e I, subgroup G mul (H i)) ->
+    forall i :e I, group_identity G mul :e H i.
+let G mul I H.
+assume hH.
+let i.
+assume hi.
+exact (god1_subgroup_contains_identity G mul (H i) (hH i hi)).
+Qed.
+
+Theorem god1_group_family_intersection_product_components :
+  forall G, forall mul:set -> set -> set, forall I,
+  forall H:set -> set,
+    (forall i :e I, subgroup G mul (H i)) ->
+    forall x y :e group_family_intersection I H G,
+      forall i :e I, mul x y :e H i.
+let G mul I H.
+assume hH.
+let x.
+assume hx.
+let y.
+assume hy.
+let i.
+assume hi.
+exact (god1_subgroup_product_closed G mul (H i) (hH i hi)
+  x ((SepE2 G (fun z => forall j :e I, z :e H j) x hx) i hi)
+  y ((SepE2 G (fun z => forall j :e I, z :e H j) y hy) i hi)).
+Qed.
+
+Theorem god1_group_family_intersection_inverse_components :
+  forall G, forall mul:set -> set -> set, forall I,
+  forall H:set -> set,
+    (forall i :e I, subgroup G mul (H i)) ->
+    forall x :e group_family_intersection I H G,
+      forall i :e I, group_inverse G mul x :e H i.
+let G mul I H.
+assume hH.
+let x.
+assume hx.
+let i.
+assume hi.
+exact (god1_subgroup_inverse_closed G mul (H i) (hH i hi)
+  x ((SepE2 G (fun z => forall j :e I, z :e H j) x hx) i hi)).
+Qed.
+
+Theorem god1_group_family_intersection_is_subgroup :
+  forall G, forall mul:set -> set -> set, forall I,
+  forall H:set -> set,
+    group G mul ->
+    (forall i :e I, subgroup G mul (H i)) ->
+    subgroup G mul (group_family_intersection I H G).
+let G mul I H.
+assume hG hH.
+apply (god1_subgroup_of_identity_product_inverse
+  G mul (group_family_intersection I H G) hG).
+- let x.
+  assume hx.
+  exact (SepE1 G (fun z => forall i :e I, z :e H i) x hx).
+- exact (SepI G (fun z => forall i :e I, z :e H i)
+    (group_identity G mul) (god1_group_identity_in G mul hG)
+    (god1_group_family_intersection_identity_components
+      G mul I H hH)).
+- let x.
+  assume hx.
+  let y.
+  assume hy.
+  exact (SepI G (fun z => forall i :e I, z :e H i)
+    (mul x y)
+    (god1_group_law_of_composition G mul hG
+      x (SepE1 G (fun z => forall i :e I, z :e H i) x hx)
+      y (SepE1 G (fun z => forall i :e I, z :e H i) y hy))
+    (god1_group_family_intersection_product_components
+      G mul I H hH x hx y hy)).
+- let x.
+  assume hx.
+  exact (SepI G (fun z => forall i :e I, z :e H i)
+    (group_inverse G mul x)
+    (god1_group_inverse_in G mul hG x
+      (SepE1 G (fun z => forall i :e I, z :e H i) x hx))
+    (god1_group_family_intersection_inverse_components
+      G mul I H hH x hx)).
+Qed.
+
+//GOD1PRF:43301 Now let U be the union of the $\mathrm{H}_{i}$.
+//GOD1PRF:43349 Clearly U is not empty.
+//GOD1PRF:43373 Let $x, y$ be two elements of U , then there exist indices $i, j \in \mathrm{I}$ such that $x \in \mathrm{H}_{i}$ and $y \in \mathrm{H}_{j}$.
+//GOD1PRF:43515 By the hypothesis of the theorem, there exists an index $k \in \mathrm{I}$ such that $\mathrm{H}_{k}$ contains both $x$ and $y$, and therefore also contains $x y^{-1}$.
+//GOD1PRF:43684 Hence $x y^{-1}$ belongs to U , and U is a subgroup of G .
+Theorem god1_directed_group_family_union_is_subgroup :
+  forall G, forall mul:set -> set -> set, forall I,
+  forall H:set -> set,
+    group G mul ->
+    (forall i :e I, subgroup G mul (H i)) ->
+    (exists i, i :e I) ->
+    (forall i j :e I, exists k :e I,
+      H i c= H k /\ H j c= H k) ->
+    subgroup G mul (group_family_union I H).
+let G mul I H.
+assume hG hH hI hdirected.
+apply (god1_subgroup_of_identity_product_inverse
+  G mul (group_family_union I H) hG).
+- let x.
+  assume hx.
+  apply (famunionE_impred I H x hx (x :e G)).
+  let i.
+  assume hi hxi.
+  exact ((god1_subgroup_subset G mul (H i) (hH i hi)) x hxi).
+- exact (famunionI I H
+    (Eps_i (fun i => i :e I)) (group_identity G mul)
+    (Eps_i_ex (fun i => i :e I) hI)
+    (god1_subgroup_contains_identity G mul
+      (H (Eps_i (fun i => i :e I)))
+      (hH (Eps_i (fun i => i :e I))
+        (Eps_i_ex (fun i => i :e I) hI)))).
+- let x.
+  assume hx.
+  let y.
+  assume hy.
+  apply (famunionE_impred I H x hx
+    (mul x y :e group_family_union I H)).
+  let i.
+  assume hi hxi.
+  apply (famunionE_impred I H y hy
+    (mul x y :e group_family_union I H)).
+  let j.
+  assume hj hyj.
+  apply (exandE_i
+    (fun k => k :e I)
+    (fun k => H i c= H k /\ H j c= H k)
+    (hdirected i hi j hj)).
+  let k.
+  assume hk hcontain.
+  exact (famunionI I H k (mul x y) hk
+    (god1_subgroup_product_closed G mul (H k) (hH k hk)
+      x ((andEL (H i c= H k) (H j c= H k) hcontain) x hxi)
+      y ((andER (H i c= H k) (H j c= H k) hcontain) y hyj))).
+- let x.
+  assume hx.
+  apply (famunionE_impred I H x hx
+    (group_inverse G mul x :e group_family_union I H)).
+  let i.
+  assume hi hxi.
+  exact (famunionI I H i (group_inverse G mul x) hi
+    (god1_subgroup_inverse_closed G mul (H i) (hH i hi) x hxi)).
+Qed.
+
 Theorem god1_s7_theorem1_intersection_and_directed_union_subgroups :
   forall G, forall mul:set -> set -> set, forall I,
   forall H:set -> set,
@@ -35399,54 +38350,20 @@ Theorem god1_s7_theorem1_intersection_and_directed_union_subgroups :
 let G mul I H.
 assume hG hH.
 apply andI.
-//GOD1PRF:42954 Let $M$ be the intersection of the $H_{i}$.
-claim h_s7_t1_intersection_membership :
-  forall x :e G,
-    (x :e group_family_intersection I H G <->
-      forall i :e I, x :e H i).
-admit.
-//GOD1PRF:42998 $M$ is not empty, because the neutral element of G belongs to all the $\mathrm{H}_{i}$ and therefore to M ; if M contains two elements $x, y$, then these two elements belong to each $\mathrm{H}_{i}$ and therefore so does $x y^{-1}$.
-claim h_s7_t1_intersection_identity_and_closure :
-  group_identity G mul :e group_family_intersection I H G
-  /\ forall x y :e group_family_intersection I H G,
-    mul x (group_inverse G mul y) :e group_family_intersection I H G.
-admit.
-//GOD1PRF:43231 Hence $x y^{-1}$ belongs to M , and therefore M is a subgroup of G .
-claim h_s7_t1_intersection_subgroup :
-  subgroup G mul (group_family_intersection I H G).
-admit.
-//GOD1PRF:43301 Now let U be the union of the $\mathrm{H}_{i}$.
-claim h_s7_t1_union_membership :
-  forall x,
-    (x :e group_family_union I H <->
-      exists i :e I, x :e H i).
-admit.
-//GOD1PRF:43349 Clearly U is not empty.
-claim h_s7_t1_directed_union_nonempty :
-  (exists i, i :e I) -> group_family_union I H <> 0.
-admit.
-//GOD1PRF:43373 Let $x, y$ be two elements of U , then there exist indices $i, j \in \mathrm{I}$ such that $x \in \mathrm{H}_{i}$ and $y \in \mathrm{H}_{j}$.
-claim h_s7_t1_union_indices :
-  forall x y :e group_family_union I H,
-    exists i j :e I, x :e H i /\ y :e H j.
-admit.
-//GOD1PRF:43515 By the hypothesis of the theorem, there exists an index $k \in \mathrm{I}$ such that $\mathrm{H}_{k}$ contains both $x$ and $y$, and therefore also contains $x y^{-1}$.
-claim h_s7_t1_directed_common_subgroup :
-  (forall i j :e I, exists k :e I,
-    H i c= H k /\ H j c= H k) ->
-  forall x y :e group_family_union I H,
-    exists k :e I,
-      x :e H k /\ y :e H k
-      /\ mul x (group_inverse G mul y) :e H k.
-admit.
-//GOD1PRF:43684 Hence $x y^{-1}$ belongs to U , and U is a subgroup of G .
-claim h_s7_t1_directed_union_subgroup :
-  ((exists i, i :e I)
-    /\ (forall i j :e I, exists k :e I,
-      H i c= H k /\ H j c= H k)) ->
-  subgroup G mul (group_family_union I H).
-admit.
-Admitted.
+- exact (god1_group_family_intersection_is_subgroup G mul I H hG hH).
+- assume hdirected.
+  exact (god1_directed_group_family_union_is_subgroup G mul I H hG hH
+    (andEL
+      (exists i, i :e I)
+      (forall i j :e I, exists k :e I,
+        H i c= H k /\ H j c= H k)
+      hdirected)
+    (andER
+      (exists i, i :e I)
+      (forall i j :e I, exists k :e I,
+        H i c= H k /\ H j c= H k)
+      hdirected)).
+Qed.
 
 //GOD1:43744 subgroup_generated_by : "the subgroup of #1 generated by #3" | $\langle #3\rangle_{#1}$
 Definition subgroup_generated_by :
@@ -35455,6 +38372,71 @@ Definition subgroup_generated_by :
     {x :e G|
       forall H :e Power G,
         subgroup G mul H -> B c= H -> x :e H}.
+
+//GOD1PRF:43744 Let B be a subset of a group G .
+//GOD1PRF:43777 There exist subgroups of G which contain B (for example, G itself); the intersection of all these subgroups is again a subgroup, by Theorem 1 ; this subgroup contains B and is contained in every subgroup of G containing B.
+Theorem god1_generated_subgroup_identity_property :
+  forall G, forall mul:set -> set -> set, forall B,
+    forall H :e Power G,
+      subgroup G mul H -> B c= H -> group_identity G mul :e H.
+let G mul B.
+let H.
+assume hHPower hH hBH.
+exact (god1_subgroup_contains_identity G mul H hH).
+Qed.
+
+Theorem god1_generated_subgroup_product_property :
+  forall G, forall mul:set -> set -> set, forall B,
+    forall x y :e subgroup_generated_by G mul B,
+      forall H :e Power G,
+        subgroup G mul H -> B c= H -> mul x y :e H.
+let G mul B.
+let x.
+assume hx.
+let y.
+assume hy.
+let H.
+assume hHPower hH hBH.
+exact (god1_subgroup_product_closed G mul H hH
+  x ((SepE2 G
+    (fun z => forall K :e Power G,
+      subgroup G mul K -> B c= K -> z :e K) x hx)
+    H hHPower hH hBH)
+  y ((SepE2 G
+    (fun z => forall K :e Power G,
+      subgroup G mul K -> B c= K -> z :e K) y hy)
+    H hHPower hH hBH)).
+Qed.
+
+Theorem god1_generated_subgroup_inverse_property :
+  forall G, forall mul:set -> set -> set, forall B,
+    forall x :e subgroup_generated_by G mul B,
+      forall H :e Power G,
+        subgroup G mul H -> B c= H -> group_inverse G mul x :e H.
+let G mul B.
+let x.
+assume hx.
+let H.
+assume hHPower hH hBH.
+exact (god1_subgroup_inverse_closed G mul H hH
+  x ((SepE2 G
+    (fun z => forall K :e Power G,
+      subgroup G mul K -> B c= K -> z :e K) x hx)
+    H hHPower hH hBH)).
+Qed.
+
+Theorem god1_generators_satisfy_generated_subgroup_property :
+  forall G, forall mul:set -> set -> set, forall B,
+    forall b :e B,
+      forall H :e Power G,
+        subgroup G mul H -> B c= H -> b :e H.
+let G mul B.
+let b.
+assume hb.
+let H.
+assume hHPower hH hBH.
+exact (hBH b hb).
+Qed.
 
 Theorem god1_generated_subgroup_is_smallest :
   forall G, forall mul:set -> set -> set, forall B,
@@ -35466,36 +38448,64 @@ Theorem god1_generated_subgroup_is_smallest :
       subgroup_generated_by G mul B c= H).
 let G mul B.
 assume hG hBG.
-//GOD1PRF:43744 Let B be a subset of a group G .
-claim h_s7_generated_input : group G mul /\ B c= G.
-admit.
-//GOD1PRF:43777 There exist subgroups of G which contain B (for example, G itself); the intersection of all these subgroups is again a subgroup, by Theorem 1 ; this subgroup contains B and is contained in every subgroup of G containing B.
-claim h_s7_generated_theorem1_call :
-  forall I, forall K:set -> set,
-    group G mul ->
-    (forall i :e I, subgroup G mul (K i)) ->
-    subgroup G mul (group_family_intersection I K G)
-    /\ (((exists i, i :e I)
-      /\ (forall i j :e I, exists k :e I,
-        K i c= K k /\ K j c= K k)) ->
-      subgroup G mul (group_family_union I K)).
-apply (god1_s7_theorem1_intersection_and_directed_union_subgroups G mul).
-claim h_s7_generated_intersection_properties :
-  subgroup G mul (subgroup_generated_by G mul B)
-  /\ B c= subgroup_generated_by G mul B
-  /\ forall H :e Power G,
-    subgroup G mul H -> B c= H ->
-    subgroup_generated_by G mul B c= H.
-admit.
 //GOD1PRF:44000 Hence this subgroup is the "smallest" of all the subgroups of G which contain B , and is called the subgroup of G generated by B .
-claim h_s7_generated_smallest :
-  B c= subgroup_generated_by G mul B
-  /\ forall H :e Power G,
-    subgroup G mul H -> B c= H ->
-    subgroup_generated_by G mul B c= H.
-admit.
 apply andI.
-Admitted.
+- apply andI.
+  - apply (god1_subgroup_of_identity_product_inverse
+      G mul (subgroup_generated_by G mul B) hG).
+    - let x.
+      assume hx.
+      exact (SepE1 G
+        (fun z => forall H :e Power G,
+          subgroup G mul H -> B c= H -> z :e H) x hx).
+    - exact (SepI G
+        (fun z => forall H :e Power G,
+          subgroup G mul H -> B c= H -> z :e H)
+        (group_identity G mul) (god1_group_identity_in G mul hG)
+        (god1_generated_subgroup_identity_property G mul B)).
+    - let x.
+      assume hx.
+      let y.
+      assume hy.
+      exact (SepI G
+        (fun z => forall H :e Power G,
+          subgroup G mul H -> B c= H -> z :e H)
+        (mul x y)
+        (god1_group_law_of_composition G mul hG
+          x (SepE1 G
+            (fun z => forall H :e Power G,
+              subgroup G mul H -> B c= H -> z :e H) x hx)
+          y (SepE1 G
+            (fun z => forall H :e Power G,
+              subgroup G mul H -> B c= H -> z :e H) y hy))
+        (god1_generated_subgroup_product_property G mul B x hx y hy)).
+    - let x.
+      assume hx.
+      exact (SepI G
+        (fun z => forall H :e Power G,
+          subgroup G mul H -> B c= H -> z :e H)
+        (group_inverse G mul x)
+        (god1_group_inverse_in G mul hG x
+          (SepE1 G
+            (fun z => forall H :e Power G,
+              subgroup G mul H -> B c= H -> z :e H) x hx))
+        (god1_generated_subgroup_inverse_property G mul B x hx)).
+  - let b.
+    assume hb.
+    exact (SepI G
+      (fun z => forall H :e Power G,
+        subgroup G mul H -> B c= H -> z :e H)
+      b (hBG b hb)
+      (god1_generators_satisfy_generated_subgroup_property G mul B b hb)).
+- let H.
+  assume hHPower hH hBH.
+  let x.
+  assume hx.
+  exact ((SepE2 G
+    (fun z => forall K :e Power G,
+      subgroup G mul K -> B c= K -> z :e K) x hx)
+    H hHPower hH hBH).
+Qed.
 
 //GOD1:45063 group_word_product : "the product of the first #5 terms of #4 in the group #1" | $\prod_{i<#5}#4_i$
 Definition group_word_product :
@@ -35505,6 +38515,1052 @@ Definition group_word_product :
       (group_identity G mul)
       (fun i r => mul r (f i))
       p.
+
+Definition group_word_letter :
+  set -> (set -> set -> set) -> set -> set -> prop :=
+  fun G mul B a =>
+    a :e G /\ (a :e B \/ group_inverse G mul a :e B).
+
+Definition group_word_represented :
+  set -> (set -> set -> set) -> set -> set -> prop :=
+  fun G mul B z =>
+    exists p :e omega, exists f:set -> set,
+      (forall i :e p, group_word_letter G mul B (f i))
+      /\ z = group_word_product G mul f p.
+
+//GOD1PRF:45406 To prove Theorem 2, consider the set H of all $x \in \mathrm{G}$ which satisfy the conditions of the theorem.
+Definition group_words :
+  set -> (set -> set -> set) -> set -> set :=
+  fun G mul B => {z :e G|group_word_represented G mul B z}.
+
+Theorem god1_group_word_product_zero :
+  forall G, forall mul:set -> set -> set,
+  forall f:set -> set,
+    group_word_product G mul f 0 = group_identity G mul.
+let G mul f.
+exact (nat_primrec_0
+  (group_identity G mul) (fun i r => mul r (f i))).
+Qed.
+
+Theorem god1_group_word_product_successor :
+  forall G, forall mul:set -> set -> set,
+  forall f:set -> set, forall n,
+    nat_p n ->
+    group_word_product G mul f (ordsucc n)
+      = mul (group_word_product G mul f n) (f n).
+let G mul f n.
+assume hn.
+exact (nat_primrec_S
+  (group_identity G mul) (fun i r => mul r (f i)) n hn).
+Qed.
+
+Theorem god1_group_word_letter_eq_subst :
+  forall G, forall mul:set -> set -> set, forall B a b,
+    a = b ->
+    group_word_letter G mul B b ->
+    group_word_letter G mul B a.
+let G mul B a b.
+assume hab hb.
+apply (andI (a :e G)
+  (a :e B \/ group_inverse G mul a :e B)).
+- exact (mem_eq_substL G b a hab
+    (andEL (b :e G)
+      (b :e B \/ group_inverse G mul b :e B) hb)).
+- apply (orE
+    (b :e B) (group_inverse G mul b :e B)
+    (andER (b :e G)
+      (b :e B \/ group_inverse G mul b :e B) hb)
+    (a :e B \/ group_inverse G mul a :e B)).
+  - assume hbB.
+    exact (orIL (a :e B) (group_inverse G mul a :e B)
+      (mem_eq_substL B b a hab hbB)).
+  - assume hibB.
+    apply (orIR (a :e B) (group_inverse G mul a :e B)).
+    apply (mem_eq_substL B
+      (group_inverse G mul b) (group_inverse G mul a)).
+    - f_equal.
+      exact hab.
+    - exact hibB.
+Qed.
+
+Theorem god1_group_word_letter_inverse :
+  forall G, forall mul:set -> set -> set, forall B a,
+    group G mul ->
+    group_word_letter G mul B a ->
+    group_word_letter G mul B (group_inverse G mul a).
+let G mul B a.
+assume hG ha.
+apply (andI
+  (group_inverse G mul a :e G)
+  (group_inverse G mul a :e B
+    \/ group_inverse G mul (group_inverse G mul a) :e B)).
+- exact (god1_group_inverse_in G mul hG a
+    (andEL (a :e G)
+      (a :e B \/ group_inverse G mul a :e B) ha)).
+- apply (orE
+    (a :e B) (group_inverse G mul a :e B)
+    (andER (a :e G)
+      (a :e B \/ group_inverse G mul a :e B) ha)
+    (group_inverse G mul a :e B
+      \/ group_inverse G mul (group_inverse G mul a) :e B)).
+  - assume haB.
+    apply (orIR
+      (group_inverse G mul a :e B)
+      (group_inverse G mul (group_inverse G mul a) :e B)).
+    exact (mem_eq_substL B a
+      (group_inverse G mul (group_inverse G mul a))
+      (god1_group_inverse_involutive G mul hG a
+        (andEL (a :e G)
+          (a :e B \/ group_inverse G mul a :e B) ha))
+      haB).
+  - assume hiaB.
+    exact (orIL
+      (group_inverse G mul a :e B)
+      (group_inverse G mul (group_inverse G mul a) :e B) hiaB).
+Qed.
+
+Theorem god1_group_word_product_congr_zero :
+  forall G, forall mul:set -> set -> set,
+  forall f g:set -> set,
+    group_word_product G mul f 0 = group_word_product G mul g 0.
+let G mul f g.
+apply (eq_i_tra
+  (group_word_product G mul f 0) (group_identity G mul)
+  (group_word_product G mul g 0)).
+- exact (god1_group_word_product_zero G mul f).
+- apply eq_sym.
+  exact (god1_group_word_product_zero G mul g).
+Qed.
+
+Theorem god1_group_word_product_congr_step :
+  forall G, forall mul:set -> set -> set,
+  forall f g:set -> set, forall n,
+    nat_p n ->
+    (forall i :e ordsucc n, f i = g i) ->
+    group_word_product G mul f n = group_word_product G mul g n ->
+    group_word_product G mul f (ordsucc n)
+      = group_word_product G mul g (ordsucc n).
+let G mul f g n.
+assume hn hfg hind.
+apply (eq_i_tra
+  (group_word_product G mul f (ordsucc n))
+  (mul (group_word_product G mul f n) (f n))
+  (group_word_product G mul g (ordsucc n))).
+- exact (god1_group_word_product_successor G mul f n hn).
+- apply (eq_i_tra
+    (mul (group_word_product G mul f n) (f n))
+    (mul (group_word_product G mul g n) (g n))
+    (group_word_product G mul g (ordsucc n))).
+  - f_equal.
+    - exact hind.
+    - exact (hfg n (ordsuccI2 n)).
+  - apply eq_sym.
+    exact (god1_group_word_product_successor G mul g n hn).
+Qed.
+
+Theorem god1_group_word_product_congr_zero_imp :
+  forall G, forall mul:set -> set -> set,
+  forall f g:set -> set,
+    (forall i :e 0, f i = g i) ->
+    group_word_product G mul f 0 = group_word_product G mul g 0.
+let G mul f g.
+assume hfg.
+exact (god1_group_word_product_congr_zero G mul f g).
+Qed.
+
+Theorem god1_group_word_product_congr_step_ind :
+  forall G, forall mul:set -> set -> set,
+  forall f g:set -> set, forall n,
+    nat_p n ->
+    ((forall i :e n, f i = g i) ->
+      group_word_product G mul f n = group_word_product G mul g n) ->
+    (forall i :e ordsucc n, f i = g i) ->
+    group_word_product G mul f (ordsucc n)
+      = group_word_product G mul g (ordsucc n).
+let G mul f g n.
+assume hn hind hfg.
+apply (god1_group_word_product_congr_step G mul f g n hn hfg).
+apply hind.
+let i.
+assume hi.
+exact (hfg i (ordsuccI1 n i hi)).
+Qed.
+
+Theorem god1_group_word_product_congr :
+  forall G, forall mul:set -> set -> set,
+  forall f g:set -> set, forall p,
+    nat_p p ->
+    (forall i :e p, f i = g i) ->
+    group_word_product G mul f p = group_word_product G mul g p.
+let G mul f g p.
+assume hp hfg.
+exact (nat_ind
+  (fun n =>
+    (forall i :e n, f i = g i) ->
+    group_word_product G mul f n = group_word_product G mul g n)
+  (god1_group_word_product_congr_zero_imp G mul f g)
+  (god1_group_word_product_congr_step_ind G mul f g)
+  p hp hfg).
+Qed.
+
+Definition group_word_append :
+  set -> (set -> set) -> set -> set -> set :=
+  fun p f a i => if i :e p then f i else a.
+
+Theorem god1_group_word_append_in :
+  forall p, forall f:set -> set, forall a i,
+    i :e p -> group_word_append p f a i = f i.
+let p f a i.
+assume hi.
+exact (If_i_1 (i :e p) (f i) a hi).
+Qed.
+
+Theorem god1_group_word_append_last :
+  forall p, nat_p p -> forall f:set -> set, forall a,
+    group_word_append p f a p = a.
+let p.
+assume hp.
+let f a.
+exact (If_i_0 (p :e p) (f p) a (nat_not_in_self p hp)).
+Qed.
+
+Theorem god1_group_word_append_letters :
+  forall G, forall mul:set -> set -> set, forall B p,
+  forall f:set -> set, forall a,
+    nat_p p ->
+    (forall i :e p, group_word_letter G mul B (f i)) ->
+    group_word_letter G mul B a ->
+    forall i :e ordsucc p,
+      group_word_letter G mul B (group_word_append p f a i).
+let G mul B p f a.
+assume hp hf ha.
+let i.
+assume hi.
+apply (orE
+  (i :e p) (i = p) (ordsuccE p i hi)
+  (group_word_letter G mul B (group_word_append p f a i))).
+- assume hip.
+  exact (god1_group_word_letter_eq_subst G mul B
+    (group_word_append p f a i) (f i)
+    (god1_group_word_append_in p f a i hip) (hf i hip)).
+- assume hip.
+  apply (god1_group_word_letter_eq_subst G mul B
+    (group_word_append p f a i) a).
+  - apply (eq_i_tra
+      (group_word_append p f a i)
+      (group_word_append p f a p) a).
+    - f_equal.
+      exact hip.
+    - exact (god1_group_word_append_last p hp f a).
+  - exact ha.
+Qed.
+
+Theorem god1_group_word_append_product :
+  forall G, forall mul:set -> set -> set, forall p,
+  forall f:set -> set, forall a,
+    nat_p p ->
+    group_word_product G mul (group_word_append p f a) (ordsucc p)
+      = mul (group_word_product G mul f p) a.
+let G mul p f a.
+assume hp.
+apply (eq_i_tra
+  (group_word_product G mul (group_word_append p f a) (ordsucc p))
+  (mul
+    (group_word_product G mul (group_word_append p f a) p)
+    (group_word_append p f a p))
+  (mul (group_word_product G mul f p) a)).
+- exact (god1_group_word_product_successor G mul
+    (group_word_append p f a) p hp).
+- f_equal.
+  - apply (god1_group_word_product_congr G mul
+      (group_word_append p f a) f p hp).
+    let i.
+    assume hi.
+    exact (god1_group_word_append_in p f a i hi).
+  - exact (god1_group_word_append_last p hp f a).
+Qed.
+
+Theorem god1_group_word_represented_eq_subst :
+  forall G, forall mul:set -> set -> set, forall B z w,
+    z = w ->
+    group_word_represented G mul B w ->
+    group_word_represented G mul B z.
+let G mul B z w.
+assume hzw hw.
+apply (exandE_i
+  (fun p => p :e omega)
+  (fun p => exists f:set -> set,
+    (forall i :e p, group_word_letter G mul B (f i))
+    /\ w = group_word_product G mul f p)
+  hw).
+let p.
+assume hp hpf.
+apply (exandE_ii
+  (fun f => forall i :e p, group_word_letter G mul B (f i))
+  (fun f => w = group_word_product G mul f p)
+  hpf).
+let f.
+assume hf heq.
+apply (ex_intro
+  (fun q => q :e omega /\ exists g:set -> set,
+    (forall i :e q, group_word_letter G mul B (g i))
+    /\ z = group_word_product G mul g q) p).
+apply andI.
+- exact hp.
+- apply (ex_intro_setfun
+    (fun g =>
+      (forall i :e p, group_word_letter G mul B (g i))
+      /\ z = group_word_product G mul g p) f).
+  apply andI.
+  - exact hf.
+  - exact (eq_i_tra z w (group_word_product G mul f p) hzw heq).
+Qed.
+
+Theorem god1_group_word_empty_letters :
+  forall G, forall mul:set -> set -> set, forall B,
+  forall f:set -> set,
+    forall i :e 0, group_word_letter G mul B (f i).
+let G mul B f.
+let i.
+assume hi.
+exact (FalseE (EmptyE i hi)
+  (group_word_letter G mul B (f i))).
+Qed.
+
+Theorem god1_group_identity_word_represented :
+  forall G, forall mul:set -> set -> set, forall B,
+    group_word_represented G mul B (group_identity G mul).
+let G mul B.
+apply (ex_intro
+  (fun p => p :e omega /\ exists f:set -> set,
+    (forall i :e p, group_word_letter G mul B (f i))
+    /\ group_identity G mul = group_word_product G mul f p) 0).
+apply andI.
+- exact (nat_p_omega 0 nat_0).
+- apply (ex_intro_setfun
+    (fun f =>
+      (forall i :e 0, group_word_letter G mul B (f i))
+      /\ group_identity G mul = group_word_product G mul f 0)
+    (fun i => group_identity G mul)).
+  apply andI.
+  - exact (god1_group_word_empty_letters G mul B
+      (fun i => group_identity G mul)).
+  - apply eq_sym.
+    exact (god1_group_word_product_zero G mul
+      (fun i => group_identity G mul)).
+Qed.
+
+Theorem god1_group_word_represented_append :
+  forall G, forall mul:set -> set -> set, forall B z a,
+    group_word_represented G mul B z ->
+    group_word_letter G mul B a ->
+    group_word_represented G mul B (mul z a).
+let G mul B z a.
+assume hz ha.
+apply (exandE_i
+  (fun p => p :e omega)
+  (fun p => exists f:set -> set,
+    (forall i :e p, group_word_letter G mul B (f i))
+    /\ z = group_word_product G mul f p)
+  hz).
+let p.
+assume hp hpf.
+apply (exandE_ii
+  (fun f => forall i :e p, group_word_letter G mul B (f i))
+  (fun f => z = group_word_product G mul f p)
+  hpf).
+let f.
+assume hf heq.
+apply (ex_intro
+  (fun q => q :e omega /\ exists g:set -> set,
+    (forall i :e q, group_word_letter G mul B (g i))
+    /\ mul z a = group_word_product G mul g q)
+  (ordsucc p)).
+apply andI.
+- exact (nat_p_omega (ordsucc p) (nat_ordsucc p (omega_nat_p p hp))).
+- apply (ex_intro_setfun
+    (fun g =>
+      (forall i :e ordsucc p, group_word_letter G mul B (g i))
+      /\ mul z a = group_word_product G mul g (ordsucc p))
+    (group_word_append p f a)).
+  apply andI.
+  - exact (god1_group_word_append_letters G mul B p f a
+      (omega_nat_p p hp) hf ha).
+  - apply (eq_i_tra
+      (mul z a)
+      (mul (group_word_product G mul f p) a)
+      (group_word_product G mul (group_word_append p f a) (ordsucc p))).
+    - f_equal.
+      exact heq.
+    - apply eq_sym.
+      exact (god1_group_word_append_product G mul p f a
+        (omega_nat_p p hp)).
+Qed.
+
+Theorem god1_group_word_letter_one_word :
+  forall G, forall mul:set -> set -> set, forall B a,
+    group G mul ->
+    group_word_letter G mul B a ->
+    group_word_represented G mul B a.
+let G mul B a.
+assume hG ha.
+apply (god1_group_word_represented_eq_subst G mul B
+  a (mul (group_identity G mul) a)).
+- apply eq_sym.
+  exact (andER
+    (mul a (group_identity G mul) = a)
+    (mul (group_identity G mul) a = a)
+    ((andER
+      (group_identity G mul :e G)
+      (forall z :e G,
+        mul z (group_identity G mul) = z
+        /\ mul (group_identity G mul) z = z)
+      (god1_group_identity_specification G mul hG))
+      a (andEL (a :e G)
+        (a :e B \/ group_inverse G mul a :e B) ha))).
+- exact (god1_group_word_represented_append G mul B
+    (group_identity G mul) a
+    (god1_group_identity_word_represented G mul B) ha).
+Qed.
+
+Theorem god1_group_word_product_in_zero :
+  forall G, forall mul:set -> set -> set,
+  forall f:set -> set,
+    group G mul ->
+    (forall i :e 0, f i :e G) ->
+    group_word_product G mul f 0 :e G.
+let G mul f.
+assume hG hf.
+exact (mem_eq_substL G
+  (group_identity G mul) (group_word_product G mul f 0)
+  (god1_group_word_product_zero G mul f)
+  (god1_group_identity_in G mul hG)).
+Qed.
+
+Theorem god1_group_word_product_in_step :
+  forall G, forall mul:set -> set -> set,
+  forall f:set -> set, forall n,
+    group G mul -> nat_p n ->
+    ((forall i :e n, f i :e G) -> group_word_product G mul f n :e G) ->
+    (forall i :e ordsucc n, f i :e G) ->
+    group_word_product G mul f (ordsucc n) :e G.
+let G mul f n.
+assume hG hn hind hf.
+apply (mem_eq_substL G
+  (mul (group_word_product G mul f n) (f n))
+  (group_word_product G mul f (ordsucc n))
+  (god1_group_word_product_successor G mul f n hn)).
+apply (god1_group_law_of_composition G mul hG).
+- apply hind.
+  let i.
+  assume hi.
+  exact (hf i (ordsuccI1 n i hi)).
+- exact (hf n (ordsuccI2 n)).
+Qed.
+
+Theorem god1_group_word_product_in_step_ind :
+  forall G, forall mul:set -> set -> set,
+  forall f:set -> set,
+    group G mul -> forall n, nat_p n ->
+    ((forall i :e n, f i :e G) -> group_word_product G mul f n :e G) ->
+    (forall i :e ordsucc n, f i :e G) ->
+    group_word_product G mul f (ordsucc n) :e G.
+let G mul f.
+assume hG.
+let n.
+assume hn hind hf.
+exact (god1_group_word_product_in_step G mul f n hG hn hind hf).
+Qed.
+
+Theorem god1_group_word_product_in :
+  forall G, forall mul:set -> set -> set,
+  forall f:set -> set, forall p,
+    group G mul -> nat_p p ->
+    (forall i :e p, f i :e G) ->
+    group_word_product G mul f p :e G.
+let G mul f p.
+assume hG hp hf.
+exact (nat_ind
+  (fun n => (forall i :e n, f i :e G) ->
+    group_word_product G mul f n :e G)
+  (god1_group_word_product_in_zero G mul f hG)
+  (god1_group_word_product_in_step_ind G mul f hG)
+  p hp hf).
+Qed.
+
+Theorem god1_group_word_product_in_of_letters :
+  forall G, forall mul:set -> set -> set, forall B,
+  forall f:set -> set, forall p,
+    group G mul -> nat_p p ->
+    (forall i :e p, group_word_letter G mul B (f i)) ->
+    group_word_product G mul f p :e G.
+let G mul B f p.
+assume hG hp hf.
+apply (god1_group_word_product_in G mul f p hG hp).
+let i.
+assume hi.
+exact (andEL (f i :e G)
+  (f i :e B \/ group_inverse G mul (f i) :e B) (hf i hi)).
+Qed.
+
+Theorem god1_group_word_letters_prefix :
+  forall G, forall mul:set -> set -> set, forall B,
+  forall f:set -> set, forall n,
+    (forall i :e ordsucc n, group_word_letter G mul B (f i)) ->
+    forall i :e n, group_word_letter G mul B (f i).
+let G mul B f n.
+assume hf.
+let i.
+assume hi.
+exact (hf i (ordsuccI1 n i hi)).
+Qed.
+
+Theorem god1_group_word_represented_in :
+  forall G, forall mul:set -> set -> set, forall B z,
+    group G mul ->
+    group_word_represented G mul B z -> z :e G.
+let G mul B z.
+assume hG hz.
+apply (exandE_i
+  (fun p => p :e omega)
+  (fun p => exists f:set -> set,
+    (forall i :e p, group_word_letter G mul B (f i))
+    /\ z = group_word_product G mul f p)
+  hz).
+let p.
+assume hp hpf.
+apply (exandE_ii
+  (fun f => forall i :e p, group_word_letter G mul B (f i))
+  (fun f => z = group_word_product G mul f p)
+  hpf).
+let f.
+assume hf heq.
+exact (mem_eq_substL G
+  (group_word_product G mul f p) z heq
+  (god1_group_word_product_in_of_letters G mul B f p hG
+    (omega_nat_p p hp) hf)).
+Qed.
+
+Theorem god1_group_word_represented_mul_word_zero :
+  forall G, forall mul:set -> set -> set, forall B z,
+  forall f:set -> set,
+    group G mul ->
+    group_word_represented G mul B z ->
+    (forall i :e 0, group_word_letter G mul B (f i)) ->
+    group_word_represented G mul B
+      (mul z (group_word_product G mul f 0)).
+let G mul B z f.
+assume hG hz hf.
+apply (god1_group_word_represented_eq_subst G mul B
+  (mul z (group_word_product G mul f 0)) z).
+- apply (eq_i_tra
+    (mul z (group_word_product G mul f 0))
+    (mul z (group_identity G mul)) z).
+  - f_equal.
+    exact (god1_group_word_product_zero G mul f).
+  - exact (andEL
+      (mul z (group_identity G mul) = z)
+      (mul (group_identity G mul) z = z)
+      ((andER
+        (group_identity G mul :e G)
+        (forall u :e G,
+          mul u (group_identity G mul) = u
+          /\ mul (group_identity G mul) u = u)
+        (god1_group_identity_specification G mul hG))
+        z (god1_group_word_represented_in G mul B z hG hz))).
+- exact hz.
+Qed.
+
+Theorem god1_group_word_represented_mul_word_step :
+  forall G, forall mul:set -> set -> set, forall B z,
+  forall f:set -> set, forall n,
+    group G mul -> nat_p n ->
+    group_word_represented G mul B z ->
+    ((forall i :e n, group_word_letter G mul B (f i)) ->
+      group_word_represented G mul B
+        (mul z (group_word_product G mul f n))) ->
+    (forall i :e ordsucc n, group_word_letter G mul B (f i)) ->
+    group_word_represented G mul B
+      (mul z (group_word_product G mul f (ordsucc n))).
+let G mul B z f n.
+assume hG hn hz hind hf.
+apply (god1_group_word_represented_eq_subst G mul B
+  (mul z (group_word_product G mul f (ordsucc n)))
+  (mul (mul z (group_word_product G mul f n)) (f n))).
+- apply (eq_i_tra
+    (mul z (group_word_product G mul f (ordsucc n)))
+    (mul z (mul (group_word_product G mul f n) (f n)))
+    (mul (mul z (group_word_product G mul f n)) (f n))).
+  - f_equal.
+    exact (god1_group_word_product_successor G mul f n hn).
+  - exact (god1_group_associative G mul hG
+      z (god1_group_word_represented_in G mul B z hG hz)
+      (group_word_product G mul f n)
+      (god1_group_word_product_in_of_letters G mul B f n hG hn
+        (god1_group_word_letters_prefix G mul B f n hf))
+      (f n) (andEL (f n :e G)
+        (f n :e B \/ group_inverse G mul (f n) :e B)
+        (hf n (ordsuccI2 n)))).
+- apply (god1_group_word_represented_append G mul B
+    (mul z (group_word_product G mul f n)) (f n)).
+  - apply hind.
+    let i.
+    assume hi.
+    exact (hf i (ordsuccI1 n i hi)).
+  - exact (hf n (ordsuccI2 n)).
+Qed.
+
+Theorem god1_group_word_represented_mul_word_step_ind :
+  forall G, forall mul:set -> set -> set, forall B z,
+  forall f:set -> set,
+    group G mul -> group_word_represented G mul B z ->
+    forall n, nat_p n ->
+    ((forall i :e n, group_word_letter G mul B (f i)) ->
+      group_word_represented G mul B
+        (mul z (group_word_product G mul f n))) ->
+    (forall i :e ordsucc n, group_word_letter G mul B (f i)) ->
+    group_word_represented G mul B
+      (mul z (group_word_product G mul f (ordsucc n))).
+let G mul B z f.
+assume hG hz.
+let n.
+assume hn hind hf.
+exact (god1_group_word_represented_mul_word_step
+  G mul B z f n hG hn hz hind hf).
+Qed.
+
+Theorem god1_group_word_represented_mul_word :
+  forall G, forall mul:set -> set -> set, forall B z,
+  forall f:set -> set, forall p,
+    group G mul ->
+    group_word_represented G mul B z -> nat_p p ->
+    (forall i :e p, group_word_letter G mul B (f i)) ->
+    group_word_represented G mul B
+      (mul z (group_word_product G mul f p)).
+let G mul B z f p.
+assume hG hz hp hf.
+exact (nat_ind
+  (fun n =>
+    (forall i :e n, group_word_letter G mul B (f i)) ->
+    group_word_represented G mul B
+      (mul z (group_word_product G mul f n)))
+  (god1_group_word_represented_mul_word_zero G mul B z f hG hz)
+  (god1_group_word_represented_mul_word_step_ind G mul B z f hG hz)
+  p hp hf).
+Qed.
+
+Theorem god1_group_word_represented_mul :
+  forall G, forall mul:set -> set -> set, forall B z y,
+    group G mul ->
+    group_word_represented G mul B z ->
+    group_word_represented G mul B y ->
+    group_word_represented G mul B (mul z y).
+let G mul B z y.
+assume hG hz hy.
+apply (exandE_i
+  (fun p => p :e omega)
+  (fun p => exists f:set -> set,
+    (forall i :e p, group_word_letter G mul B (f i))
+    /\ y = group_word_product G mul f p)
+  hy).
+let p.
+assume hp hpf.
+apply (exandE_ii
+  (fun f => forall i :e p, group_word_letter G mul B (f i))
+  (fun f => y = group_word_product G mul f p)
+  hpf).
+let f.
+assume hf heq.
+apply (god1_group_word_represented_eq_subst G mul B
+  (mul z y) (mul z (group_word_product G mul f p))).
+- f_equal.
+  exact heq.
+- exact (god1_group_word_represented_mul_word G mul B z f p
+    hG hz (omega_nat_p p hp) hf).
+Qed.
+
+Theorem god1_group_word_inverse_represented_zero :
+  forall G, forall mul:set -> set -> set, forall B,
+  forall f:set -> set,
+    group G mul ->
+    (forall i :e 0, group_word_letter G mul B (f i)) ->
+    group_word_represented G mul B
+      (group_inverse G mul (group_word_product G mul f 0)).
+let G mul B f.
+assume hG hf.
+apply (god1_group_word_represented_eq_subst G mul B
+  (group_inverse G mul (group_word_product G mul f 0))
+  (group_identity G mul)).
+- apply (eq_i_tra
+    (group_inverse G mul (group_word_product G mul f 0))
+    (group_inverse G mul (group_identity G mul))
+    (group_identity G mul)).
+  - f_equal.
+    exact (god1_group_word_product_zero G mul f).
+  - exact (god1_group_inverse_identity G mul hG).
+- exact (god1_group_identity_word_represented G mul B).
+Qed.
+
+Theorem god1_group_word_inverse_represented_step :
+  forall G, forall mul:set -> set -> set, forall B,
+  forall f:set -> set, forall n,
+    group G mul -> nat_p n ->
+    ((forall i :e n, group_word_letter G mul B (f i)) ->
+      group_word_represented G mul B
+        (group_inverse G mul (group_word_product G mul f n))) ->
+    (forall i :e ordsucc n, group_word_letter G mul B (f i)) ->
+    group_word_represented G mul B
+      (group_inverse G mul
+        (group_word_product G mul f (ordsucc n))).
+let G mul B f n.
+assume hG hn hind hf.
+apply (god1_group_word_represented_eq_subst G mul B
+  (group_inverse G mul (group_word_product G mul f (ordsucc n)))
+  (mul (group_inverse G mul (f n))
+    (group_inverse G mul (group_word_product G mul f n)))).
+- apply (eq_i_tra
+    (group_inverse G mul (group_word_product G mul f (ordsucc n)))
+    (group_inverse G mul
+      (mul (group_word_product G mul f n) (f n)))
+    (mul (group_inverse G mul (f n))
+      (group_inverse G mul (group_word_product G mul f n)))).
+  - f_equal.
+    exact (god1_group_word_product_successor G mul f n hn).
+  - exact (god1_group_inverse_product G mul hG
+      (group_word_product G mul f n)
+      (god1_group_word_product_in_of_letters G mul B f n hG hn
+        (god1_group_word_letters_prefix G mul B f n hf))
+      (f n) (andEL (f n :e G)
+        (f n :e B \/ group_inverse G mul (f n) :e B)
+        (hf n (ordsuccI2 n)))).
+- apply (god1_group_word_represented_mul G mul B
+    (group_inverse G mul (f n))
+    (group_inverse G mul (group_word_product G mul f n)) hG).
+  - exact (god1_group_word_letter_one_word G mul B
+      (group_inverse G mul (f n)) hG
+      (god1_group_word_letter_inverse G mul B (f n) hG
+        (hf n (ordsuccI2 n)))).
+  - apply hind.
+    exact (god1_group_word_letters_prefix G mul B f n hf).
+Qed.
+
+Theorem god1_group_word_inverse_represented_step_ind :
+  forall G, forall mul:set -> set -> set, forall B,
+  forall f:set -> set,
+    group G mul -> forall n, nat_p n ->
+    ((forall i :e n, group_word_letter G mul B (f i)) ->
+      group_word_represented G mul B
+        (group_inverse G mul (group_word_product G mul f n))) ->
+    (forall i :e ordsucc n, group_word_letter G mul B (f i)) ->
+    group_word_represented G mul B
+      (group_inverse G mul
+        (group_word_product G mul f (ordsucc n))).
+let G mul B f.
+assume hG.
+let n.
+assume hn hind hf.
+exact (god1_group_word_inverse_represented_step
+  G mul B f n hG hn hind hf).
+Qed.
+
+Theorem god1_group_word_inverse_represented :
+  forall G, forall mul:set -> set -> set, forall B,
+  forall f:set -> set, forall p,
+    group G mul -> nat_p p ->
+    (forall i :e p, group_word_letter G mul B (f i)) ->
+    group_word_represented G mul B
+      (group_inverse G mul (group_word_product G mul f p)).
+let G mul B f p.
+assume hG hp hf.
+exact (nat_ind
+  (fun n =>
+    (forall i :e n, group_word_letter G mul B (f i)) ->
+    group_word_represented G mul B
+      (group_inverse G mul (group_word_product G mul f n)))
+  (god1_group_word_inverse_represented_zero G mul B f hG)
+  (god1_group_word_inverse_represented_step_ind G mul B f hG)
+  p hp hf).
+Qed.
+
+Theorem god1_group_word_represented_inverse :
+  forall G, forall mul:set -> set -> set, forall B z,
+    group G mul ->
+    group_word_represented G mul B z ->
+    group_word_represented G mul B (group_inverse G mul z).
+let G mul B z.
+assume hG hz.
+apply (exandE_i
+  (fun p => p :e omega)
+  (fun p => exists f:set -> set,
+    (forall i :e p, group_word_letter G mul B (f i))
+    /\ z = group_word_product G mul f p)
+  hz).
+let p.
+assume hp hpf.
+apply (exandE_ii
+  (fun f => forall i :e p, group_word_letter G mul B (f i))
+  (fun f => z = group_word_product G mul f p)
+  hpf).
+let f.
+assume hf heq.
+apply (god1_group_word_represented_eq_subst G mul B
+  (group_inverse G mul z)
+  (group_inverse G mul (group_word_product G mul f p))).
+- f_equal.
+  exact heq.
+- exact (god1_group_word_inverse_represented G mul B f p hG
+    (omega_nat_p p hp) hf).
+Qed.
+
+Theorem god1_group_words_subset :
+  forall G, forall mul:set -> set -> set, forall B,
+    group_words G mul B c= G.
+let G mul B.
+let z.
+assume hz.
+exact (SepE1 G (fun u => group_word_represented G mul B u) z hz).
+Qed.
+
+Theorem god1_group_words_represented :
+  forall G, forall mul:set -> set -> set, forall B,
+  forall z :e group_words G mul B,
+    group_word_represented G mul B z.
+let G mul B.
+let z.
+assume hz.
+exact (SepE2 G (fun u => group_word_represented G mul B u) z hz).
+Qed.
+
+Theorem god1_group_word_represented_in_words :
+  forall G, forall mul:set -> set -> set, forall B z,
+    group G mul -> group_word_represented G mul B z ->
+    z :e group_words G mul B.
+let G mul B z.
+assume hG hz.
+exact (SepI G (fun u => group_word_represented G mul B u) z
+  (god1_group_word_represented_in G mul B z hG hz) hz).
+Qed.
+
+//GOD1PRF:45516 We have to show that H is a subgroup, that H contains B , and that H is contained in every subgroup which contains B .
+//GOD1PRF:45636 The last of these assertions is obvious: if a subgroup contains B then clearly it contains the elements $x_{i}$ in the statement of the theorem, hence it contains the element $x$.
+//GOD1PRF:45817 That H contains B is equally obvious, for an element $x \in \mathrm{~B}$ satisfies conditions $a$ ) and $b$ ), as we see by taking $p=1$ and $x_{1}=x$.
+//GOD1PRF:45970 It remains to prove that H is a subgroup.
+//GOD1PRF:46012 First of all, H contains the neutral element of G, by Remark 3 above.
+Theorem god1_group_words_is_subgroup :
+  forall G, forall mul:set -> set -> set, forall B,
+    group G mul -> subgroup G mul (group_words G mul B).
+let G mul B.
+assume hG.
+apply (god1_subgroup_of_identity_product_inverse
+  G mul (group_words G mul B) hG
+  (god1_group_words_subset G mul B)).
+- exact (god1_group_word_represented_in_words G mul B
+    (group_identity G mul) hG
+    (god1_group_identity_word_represented G mul B)).
+//GOD1PRF:46082 Let $x, y$ be two elements of H; then we have say
+- let x.
+  assume hx.
+  let y.
+  assume hy.
+  apply (god1_group_word_represented_in_words G mul B (mul x y) hG).
+  exact (god1_group_word_represented_mul G mul B x y hG
+    (god1_group_words_represented G mul B x hx)
+    (god1_group_words_represented G mul B y hy)).
+//GOD1PRF:46448 Hence
+//GOD1PRF:46587 by §6, Theorem 3.
+//GOD1PRF:46606 Thus $x y^{-1}$ is of the form
+//GOD1PRF:46675 where
+- let x.
+  assume hx.
+  apply (god1_group_word_represented_in_words G mul B
+    (group_inverse G mul x) hG).
+  exact (god1_group_word_represented_inverse G mul B x hG
+    (god1_group_words_represented G mul B x hx)).
+//GOD1PRF:46811 and consequently $x y^{-1} \in \mathrm{H}$.
+//GOD1PRF:46855 Hence H is a subgroup of G .
+Qed.
+
+Theorem god1_generators_in_group_words :
+  forall G, forall mul:set -> set -> set, forall B,
+    group G mul -> B c= G -> B c= group_words G mul B.
+let G mul B.
+assume hG hBG.
+let b.
+assume hb.
+apply (god1_group_word_represented_in_words G mul B b hG).
+apply (god1_group_word_letter_one_word G mul B b hG).
+exact (andI (b :e G)
+  (b :e B \/ group_inverse G mul b :e B)
+  (hBG b hb)
+  (orIL (b :e B) (group_inverse G mul b :e B) hb)).
+Qed.
+
+Theorem god1_generated_subgroup_subset_group_words :
+  forall G, forall mul:set -> set -> set, forall B,
+    group G mul -> B c= G ->
+    subgroup_generated_by G mul B c= group_words G mul B.
+let G mul B.
+assume hG hBG.
+exact ((andER
+  (subgroup G mul (subgroup_generated_by G mul B)
+    /\ B c= subgroup_generated_by G mul B)
+  (forall H :e Power G,
+    subgroup G mul H -> B c= H ->
+    subgroup_generated_by G mul B c= H)
+  (god1_generated_subgroup_is_smallest G mul B hG hBG))
+  (group_words G mul B)
+  (PowerI G (group_words G mul B) (god1_group_words_subset G mul B))
+  (god1_group_words_is_subgroup G mul B hG)
+  (god1_generators_in_group_words G mul B hG hBG)).
+Qed.
+
+Theorem god1_group_word_letter_in_subgroup :
+  forall G, forall mul:set -> set -> set, forall B H a,
+    subgroup G mul H -> B c= H ->
+    group_word_letter G mul B a -> a :e H.
+let G mul B H a.
+assume hH hBH ha.
+apply (orE
+  (a :e B) (group_inverse G mul a :e B)
+  (andER (a :e G)
+    (a :e B \/ group_inverse G mul a :e B) ha)
+  (a :e H)).
+- assume haB.
+  exact (hBH a haB).
+- assume hiaB.
+  apply (mem_eq_substR H
+    (group_inverse G mul (group_inverse G mul a)) a).
+  - exact (god1_group_inverse_involutive G mul
+      (god1_subgroup_ambient_group G mul H hH) a
+      (andEL (a :e G)
+        (a :e B \/ group_inverse G mul a :e B) ha)).
+  - exact (god1_subgroup_inverse_closed G mul H hH
+      (group_inverse G mul a) (hBH (group_inverse G mul a) hiaB)).
+Qed.
+
+Theorem god1_group_word_product_in_subgroup_zero :
+  forall G, forall mul:set -> set -> set, forall B H,
+  forall f:set -> set,
+    subgroup G mul H ->
+    (forall i :e 0, group_word_letter G mul B (f i)) ->
+    group_word_product G mul f 0 :e H.
+let G mul B H f.
+assume hH hf.
+exact (mem_eq_substL H
+  (group_identity G mul) (group_word_product G mul f 0)
+  (god1_group_word_product_zero G mul f)
+  (god1_subgroup_contains_identity G mul H hH)).
+Qed.
+
+Theorem god1_group_word_product_in_subgroup_step :
+  forall G, forall mul:set -> set -> set, forall B H,
+  forall f:set -> set, forall n,
+    subgroup G mul H -> B c= H -> nat_p n ->
+    ((forall i :e n, group_word_letter G mul B (f i)) ->
+      group_word_product G mul f n :e H) ->
+    (forall i :e ordsucc n, group_word_letter G mul B (f i)) ->
+    group_word_product G mul f (ordsucc n) :e H.
+let G mul B H f n.
+assume hH hBH hn hind hf.
+apply (mem_eq_substL H
+  (mul (group_word_product G mul f n) (f n))
+  (group_word_product G mul f (ordsucc n))
+  (god1_group_word_product_successor G mul f n hn)).
+apply (god1_subgroup_product_closed G mul H hH).
+- apply hind.
+  exact (god1_group_word_letters_prefix G mul B f n hf).
+- exact (god1_group_word_letter_in_subgroup G mul B H (f n)
+    hH hBH (hf n (ordsuccI2 n))).
+Qed.
+
+Theorem god1_group_word_product_in_subgroup_step_ind :
+  forall G, forall mul:set -> set -> set, forall B H,
+  forall f:set -> set,
+    subgroup G mul H -> B c= H -> forall n, nat_p n ->
+    ((forall i :e n, group_word_letter G mul B (f i)) ->
+      group_word_product G mul f n :e H) ->
+    (forall i :e ordsucc n, group_word_letter G mul B (f i)) ->
+    group_word_product G mul f (ordsucc n) :e H.
+let G mul B H f.
+assume hH hBH.
+let n.
+assume hn hind hf.
+exact (god1_group_word_product_in_subgroup_step
+  G mul B H f n hH hBH hn hind hf).
+Qed.
+
+Theorem god1_group_word_product_in_subgroup :
+  forall G, forall mul:set -> set -> set, forall B H,
+  forall f:set -> set, forall p,
+    subgroup G mul H -> B c= H -> nat_p p ->
+    (forall i :e p, group_word_letter G mul B (f i)) ->
+    group_word_product G mul f p :e H.
+let G mul B H f p.
+assume hH hBH hp hf.
+exact (nat_ind
+  (fun n =>
+    (forall i :e n, group_word_letter G mul B (f i)) ->
+    group_word_product G mul f n :e H)
+  (god1_group_word_product_in_subgroup_zero G mul B H f hH)
+  (god1_group_word_product_in_subgroup_step_ind
+    G mul B H f hH hBH)
+  p hp hf).
+Qed.
+
+Theorem god1_group_word_represented_in_containing_subgroup :
+  forall G, forall mul:set -> set -> set, forall B H z,
+    subgroup G mul H -> B c= H ->
+    group_word_represented G mul B z -> z :e H.
+let G mul B H z.
+assume hH hBH hz.
+apply (exandE_i
+  (fun p => p :e omega)
+  (fun p => exists f:set -> set,
+    (forall i :e p, group_word_letter G mul B (f i))
+    /\ z = group_word_product G mul f p)
+  hz).
+let p.
+assume hp hpf.
+apply (exandE_ii
+  (fun f => forall i :e p, group_word_letter G mul B (f i))
+  (fun f => z = group_word_product G mul f p)
+  hpf).
+let f.
+assume hf heq.
+exact (mem_eq_substL H
+  (group_word_product G mul f p) z heq
+  (god1_group_word_product_in_subgroup G mul B H f p
+    hH hBH (omega_nat_p p hp) hf)).
+Qed.
+
+Theorem god1_group_words_universal_property :
+  forall G, forall mul:set -> set -> set, forall B z,
+    z :e group_words G mul B ->
+    forall H :e Power G,
+      subgroup G mul H -> B c= H -> z :e H.
+let G mul B z.
+assume hz.
+let H.
+assume hHPower hH hBH.
+exact (god1_group_word_represented_in_containing_subgroup
+  G mul B H z hH hBH
+  (god1_group_words_represented G mul B z hz)).
+Qed.
+
+Theorem god1_group_words_subset_generated_subgroup :
+  forall G, forall mul:set -> set -> set, forall B,
+    group G mul -> B c= G ->
+    group_words G mul B c= subgroup_generated_by G mul B.
+let G mul B.
+assume hG hBG.
+let z.
+assume hz.
+exact (SepI G
+  (fun u => forall H :e Power G,
+    subgroup G mul H -> B c= H -> u :e H) z
+  ((god1_group_words_subset G mul B) z hz)
+  (god1_group_words_universal_property G mul B z hz)).
+Qed.
 
 Theorem god1_s7_theorem2_generated_subgroup_words :
   forall G, forall mul:set -> set -> set, forall B,
@@ -35521,147 +39577,15 @@ assume hG hBG.
 let x.
 assume hx.
 apply iffI.
-//GOD1PRF:45406 To prove Theorem 2, consider the set H of all $x \in \mathrm{G}$ which satisfy the conditions of the theorem.
-claim h_s7_t2_candidate_membership :
-  (exists p :e omega, exists f:set -> set,
-    (forall i :e p,
-      f i :e G
-      /\ (f i :e B \/ group_inverse G mul (f i) :e B))
-    /\ x = group_word_product G mul f p) -> x :e G.
-admit.
-//GOD1PRF:45516 We have to show that H is a subgroup, that H contains B , and that H is contained in every subgroup which contains B .
-claim h_s7_t2_three_candidate_obligations :
-  subgroup G mul (subgroup_generated_by G mul B)
-  /\ B c= subgroup_generated_by G mul B
-  /\ forall H :e Power G,
-    subgroup G mul H -> B c= H ->
-    subgroup_generated_by G mul B c= H.
-admit.
-//GOD1PRF:45636 The last of these assertions is obvious: if a subgroup contains B then clearly it contains the elements $x_{i}$ in the statement of the theorem, hence it contains the element $x$.
-claim h_s7_t2_words_lie_in_every_containing_subgroup :
-  forall H :e Power G,
-    subgroup G mul H -> B c= H ->
-    forall p :e omega, forall f:set -> set,
-      (forall i :e p,
-        f i :e G
-        /\ (f i :e B \/ group_inverse G mul (f i) :e B)) ->
-      group_word_product G mul f p :e H.
-admit.
-//GOD1PRF:45817 That H contains B is equally obvious, for an element $x \in \mathrm{~B}$ satisfies conditions $a$ ) and $b$ ), as we see by taking $p=1$ and $x_{1}=x$.
-claim h_s7_t2_generators_are_one_letter_words :
-  forall b :e B,
-    exists f:set -> set,
-      (forall i :e 1,
-        f i :e G
-        /\ (f i :e B \/ group_inverse G mul (f i) :e B))
-      /\ b = group_word_product G mul f 1.
-admit.
-//GOD1PRF:45970 It remains to prove that H is a subgroup.
-claim h_s7_t2_candidate_is_subgroup :
-  subgroup G mul
-    {z :e G|exists p :e omega, exists f:set -> set,
-      (forall i :e p,
-        f i :e G
-        /\ (f i :e B \/ group_inverse G mul (f i) :e B))
-      /\ z = group_word_product G mul f p}.
-admit.
-//GOD1PRF:46012 First of all, H contains the neutral element of G, by Remark 3 above.
-claim h_s7_t2_empty_word_is_identity :
-  forall f:set -> set,
-    group_word_product G mul f 0 = group_identity G mul.
-admit.
-//GOD1PRF:46082 Let $x, y$ be two elements of H; then we have say
-claim h_s7_t2_two_word_decompositions :
-  (exists p :e omega, exists f:set -> set,
-    (forall i :e p,
-      f i :e G
-      /\ (f i :e B \/ group_inverse G mul (f i) :e B))
-    /\ x = group_word_product G mul f p) ->
-  forall y :e G,
-    (exists q :e omega, exists g:set -> set,
-      (forall j :e q,
-        g j :e G
-        /\ (g j :e B \/ group_inverse G mul (g j) :e B))
-      /\ y = group_word_product G mul g q) ->
-    x :e G /\ y :e G.
-admit.
-//GOD1PRF:46448 Hence
-claim h_s7_t2_product_with_inverse_is_word :
-  forall y :e G,
-    (exists p :e omega, exists f:set -> set,
-      (forall i :e p,
-        f i :e G
-        /\ (f i :e B \/ group_inverse G mul (f i) :e B))
-      /\ x = group_word_product G mul f p) ->
-    (exists q :e omega, exists g:set -> set,
-      (forall j :e q,
-        g j :e G
-        /\ (g j :e B \/ group_inverse G mul (g j) :e B))
-      /\ y = group_word_product G mul g q) ->
-    exists r :e omega, exists h:set -> set,
-      (forall k :e r,
-        h k :e G
-        /\ (h k :e B \/ group_inverse G mul (h k) :e B))
-      /\ mul x (group_inverse G mul y) = group_word_product G mul h r.
-admit.
-//GOD1PRF:46587 by §6, Theorem 3.
-claim h_s7_t2_group_law_for_s6_t3 : law_of_composition G mul.
-admit.
-claim h_s7_t2_associative_for_s6_t3 : associative_on G mul.
-admit.
-claim h_s7_t2_identity_for_s6_t3 :
-  neutral_element G mul (group_identity G mul).
-admit.
-claim h_s7_t2_s6_theorem3_call :
-  (forall u ru :e G,
-    reflection G mul (group_identity G mul) u ru ->
-    reflection G mul (group_identity G mul) ru u)
-  /\ (forall u v ru rv :e G,
-    reflection G mul (group_identity G mul) u ru ->
-    reflection G mul (group_identity G mul) v rv ->
-    reflexible G mul (group_identity G mul) (mul u v)
-    /\ reflection G mul (group_identity G mul)
-      (mul u v) (mul rv ru)).
-apply (god1_s6_theorem3_reflections_and_products
-  G mul (group_identity G mul)
-  h_s7_t2_group_law_for_s6_t3
-  h_s7_t2_associative_for_s6_t3
-  h_s7_t2_identity_for_s6_t3).
-//GOD1PRF:46606 Thus $x y^{-1}$ is of the form
-claim h_s7_t2_difference_word_form :
-  forall y :e G,
-    exists r :e omega, exists h:set -> set,
-      mul x (group_inverse G mul y) = group_word_product G mul h r.
-admit.
-//GOD1PRF:46675 where
-claim h_s7_t2_difference_letters :
-  forall y :e G,
-    exists r :e omega, exists h:set -> set,
-      (forall k :e r,
-        h k :e G
-        /\ (h k :e B \/ group_inverse G mul (h k) :e B))
-      /\ mul x (group_inverse G mul y) = group_word_product G mul h r.
-admit.
-//GOD1PRF:46811 and consequently $x y^{-1} \in \mathrm{H}$.
-claim h_s7_t2_candidate_difference_closed :
-  forall y :e G,
-    y :e subgroup_generated_by G mul B ->
-    mul x (group_inverse G mul y) :e subgroup_generated_by G mul B.
-admit.
-//GOD1PRF:46855 Hence H is a subgroup of G .
-claim h_s7_t2_subgroup_conclusion :
-  subgroup G mul (subgroup_generated_by G mul B).
-admit.
+- assume hgenerated.
+  exact (god1_group_words_represented G mul B x
+    ((god1_generated_subgroup_subset_group_words G mul B hG hBG)
+      x hgenerated)).
+- assume hword.
+  exact ((god1_group_words_subset_generated_subgroup G mul B hG hBG)
+    x (god1_group_word_represented_in_words G mul B x hG hword)).
 //GOD1PRF:46886 Q.E.D.
-claim h_s7_t2_book_conclusion :
-  x :e subgroup_generated_by G mul B <->
-    exists p :e omega, exists f:set -> set,
-      (forall i :e p,
-        f i :e G
-        /\ (f i :e B \/ group_inverse G mul (f i) :e B))
-      /\ x = group_word_product G mul f p.
-admit.
-Admitted.
+Qed.
 
 //GOD1:46894 generating_set : "#3 is a set of generators of the group #1" | $\langle #3\rangle=#1$
 Definition generating_set :
