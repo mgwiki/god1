@@ -35451,6 +35451,11 @@ Theorem god1_ring_zero_one_negation_specifications :
     /\ neutral_element K mul (ring_one K mul)
     /\ (forall x :e K,
       reflection K add (ring_zero K add) x (ring_negation K add x)).
+let K add mul.
+assume hK.
+//GOD1PRF:99505 Explicitly, axiom (R 1) asserts the following: the identities
+//GOD1PRF:100364 Axiom (R 2) means that in any ring $K$ the relation
+apply andI.
 Admitted.
 
 Theorem god1_ring_minus_one_and_zero_multiplication :
@@ -35460,6 +35465,16 @@ Theorem god1_ring_minus_one_and_zero_multiplication :
       mul (ring_negation K add (ring_one K mul)) x
         = ring_negation K add x
       /\ mul (ring_zero K add) x = ring_zero K add.
+let K add mul.
+assume hK.
+let x.
+assume hx.
+apply andI.
+//GOD1PRF:100925 In any ring we have the relations
+//GOD1PRF:101003 To prove the first of these, it is enough to show that $(-1) x+x=0$; but since
+//GOD1PRF:101123 we are reduced to proving the second relation $0 x=0$.
+//GOD1PRF:101178 For this, we calculate
+//GOD1PRF:101237 so that $0 x=x-x=0$ as in any additive group.
 Admitted.
 
 //GOD1:103366 mapping_ring_addition : "pointwise addition of mappings from #1 into #2" | $(f+g)(x)=f(x)+g(x)$
@@ -35484,6 +35499,14 @@ Theorem god1_mapping_ring_is_ring :
         (K :^: X)
         (mapping_ring_addition X add)
         (mapping_ring_multiplication X mul)).
+let X K add mul.
+assume hK.
+apply andI.
+//GOD1PRF:102450 The set A , together with the two laws of composition
+//GOD1PRF:102583 just defined, is a ring (which is commutative if and only if K is commutative).
+//GOD1PRF:102736 To prove this we must show that the two sides of this equation, which are mappings of X into K , take the same value at each element $x$ of $X$.
+//GOD1PRF:102881 The value of the left-hand side at $x$ is $f(x)(g(x)+h(x))$, and the value of the right-hand side is $f(x) g(x)+f(x) h(x)$.
+//GOD1PRF:103005 Hence the distributive law is true in A because it is true in K.
 Admitted.
 
 //GOD1:104124 subring : "#4 is a subring of the ring #1" | $#4\subseteq #1\text{ is a subring}$
@@ -35499,6 +35522,10 @@ Definition subring :
 Theorem god1_subring_induced_ring :
   forall K, forall add mul:set -> set -> set, forall A,
     subring K add mul A -> ring A add mul.
+let K add mul A.
+assume hA.
+//GOD1PRF:104675 The set A , together with these two laws of composition, is a ring.
+//GOD1PRF:104744 For the set A together with the law of addition is a commutative group (§ 7, section 3); the multiplication is associative in K , hence $a$ fortiori in A , and A contains a neutral element with respect to multiplication, because A contains the identity element of K ; finally the distributive laws are satisfied in A because they are satisfied in K.
 Admitted.
 
 Theorem god1_subring_test_using_minus_one :
@@ -35507,6 +35534,12 @@ Theorem god1_subring_test_using_minus_one :
     (subring K add mul A <->
       (forall x y :e A, add x y :e A /\ mul x y :e A)
       /\ ring_negation K add (ring_one K mul) :e A).
+let K add mul A.
+assume hK hAK.
+apply iffI.
+//GOD1PRF:105557 Indeed, suppose that these conditions are fulfilled.
+//GOD1PRF:105610 If $x \in \mathrm{~A}$, then $-x=(-1) x$ belongs to A; but then, if A contains $x$ and $y$, it contains $x$ and $-y$ and therefore also $x-y=x+(-y)$, so that A is a subgroup of the additive group of K , and therefore satisfies the first condition in the definition of a subring.
+//GOD1PRF:105889 The second is satisfied, by hypothesis, and the third is satisfied because $\mathbf{A}$ contains -1 and therefore also $-(-1)=1$.
 Admitted.
 
 //GOD1:106820 ring_unit : "#4 is a unit of the ring #1" | $#4\in #1^*$
@@ -35559,12 +35592,21 @@ Definition ring_units :
 Theorem god1_ring_units_form_group :
   forall K, forall add mul:set -> set -> set,
     ring K add mul -> group (ring_units K add mul) mul.
+let K add mul.
+assume hK.
+//GOD1PRF:110103 By Theorem 3 of § 6, if $\mathrm{K}^{*}$ contains $x$ and $y$ it also contains their product $x y$, and $\mathrm{K}^{*}$ may therefore be given the law of composition $(x, y) \rightarrow x y$.
+//GOD1PRF:110297 The set $\mathrm{K}^{*}$, together with this law of composition, is a group.
+//GOD1PRF:110374 For it is clear that the multiplication in $\mathrm{K}^{*}$ is associative (because it is associative in K ); also $1 \in \mathrm{~K}^{*}$, so that we have a neutral element for the law of composition on $\mathrm{K}^{*}$; finally, if $x \in \mathrm{~K}^{*}$ then also $x^{-1} \in \mathrm{~K}^{*}$ (by Theorem 3 of § 6), and since
+//GOD1PRF:110733 it follows that every element of $\mathrm{K}^{*}$ is invertible (in $\mathrm{K}^{*}$, not just in K ) with respect to the given law of composition on $\mathrm{K}^{*}$.
 Admitted.
 
 Theorem god1_division_ring_units_are_nonzero_elements :
   forall K, forall add mul:set -> set -> set,
     division_ring K add mul ->
     ring_units K add mul = K :\: {ring_zero K add}.
+let K add mul.
+assume hK.
+//GOD1PRF:111081 If K is a division ring (and in particular if K is a field) we have
 Admitted.
 
 //GOD1:111349 subfield : "#4 is a subfield of the field #1" | $#4\subseteq #1\text{ is a subfield}$
@@ -35579,6 +35621,9 @@ Definition subfield :
 Theorem god1_subfield_induced_field :
   forall K, forall add mul:set -> set -> set, forall A,
     subfield K add mul A -> field A add mul.
+let K add mul A.
+assume hA.
+//GOD1PRF:111568 The set A , together with the laws of composition "induced" by those of K , is then not only a ring but a field.
 Admitted.
 
 //GOD1:113410 int_mod_multiplication : "multiplication modulo #1" | $#2#3\pmod {#1}$
@@ -35595,6 +35640,17 @@ Theorem god1_integers_modulo_p_form_commutative_ring :
       (int_mod_quotient p)
       (int_mod_addition p)
       (int_mod_multiplication p).
+let p.
+assume hp.
+//GOD1PRF:112605 We shall deduce from this that the set $\mathbf{Z} / p \mathbf{Z}$ of integers modulo $p$, together with the addition and multiplication defined in § 4, is a commutative ring.
+//GOD1PRF:112783 Let us first show that addition in $\mathbf{Z} / p \mathbf{Z}$ is associative.
+//GOD1PRF:113312 hence the associativity of addition in $\mathbf{Z} / p \mathbf{Z}$ follows from the associativity of addition in $\mathbf{Z}$.
+//GOD1PRF:113440 The proofs of associativity of multiplication, commutativity of addition and of multiplication, and distributivity of multiplication over addition in $\mathbf{Z} / p \mathbf{Z}$ all follow the same pattern.
+//GOD1PRF:113716 it is clear that $\theta(1)$ is neutral element for multiplication in $\mathbf{Z} / p \mathbf{Z}$, and likewise that $\theta(0)$ is the neutral element for addition.
+//GOD1PRF:113883 It remains only to show that each element $\xi \in \mathbf{Z} / p \mathbf{Z}$ has a negative (with respect to addition).
+//GOD1PRF:114004 Let $\xi=\theta(x)$ for some $x \in \mathbf{Z}$; then we have
+//GOD1PRF:114118 which shows that $\xi$ does have a negative, namely $\theta(-x)$.
+//GOD1PRF:114186 Hence $\mathbf{Z} / p \mathbf{Z}$ is a commutative ring, and we may speak of the ring $\mathbf{Z} / p \mathbf{Z}$ of integers modulo $p$.
 Admitted.
 
 Theorem god1_s8_theorem1_integers_mod_p_domain_field_prime :
@@ -35613,11 +35669,29 @@ Theorem god1_s8_theorem1_integers_mod_p_domain_field_prime :
       (int_mod_addition p)
       (int_mod_multiplication p)
     <-> prime_nat p).
+let p.
+assume hp h1.
+apply andI.
+//GOD1PRF:114921 Let $\xi, \eta$ be two non-zero elements of $\mathbf{Z} / p \mathbf{Z}$.
+//GOD1PRF:114994 Then $\xi=\theta(x), \eta=\theta(y)$ where
+//GOD1PRF:115104 to deduce that $\xi \eta=\theta(x y)$ is also non-zero we have to show that
+//GOD1PRF:115217 in other words, $\mathbf{Z} / p \mathbf{Z}$ is an integral domain if and only if the relation
+//GOD1PRF:115424 or, equivalently, if $p$ divides a product $x y$, then it divides either $x$ or $y$.
+//GOD1PRF:115509 This proves the equivalence of $a$ ) and $c$ ).
+//GOD1PRF:115558 Clearly $b$ ) implies $a$ ).
+//GOD1PRF:115587 To complete the proof it is therefore only necessary to show that $a$ ) implies $b$ ), and this is a consequence of the following more general result:
 Admitted.
 
 Theorem god1_s8_theorem2_finite_integral_domain_is_field :
   forall K, forall add mul:set -> set -> set,
     finite K -> integral_domain K add mul -> field K add mul.
+let K add mul.
+assume hfin hK.
+//GOD1PRF:115794 Let K be a finite integral domain, let $a$ be a non-zero element of K , and consider the mapping $x \rightarrow a x$ of $\mathbf{K}$ into $\mathbf{K}$.
+//GOD1PRF:115946 Since $a x=a y$ implies $a(x-y)=0$, and therefore $x-y=0$ (because K is an integral domain), it follows that the mapping $x \rightarrow a x$ is injective.
+//GOD1PRF:116101 But the set K is finite and therefore this mapping is surjective (§ 5, Theorem 4); in particular, there is an element $x \in \mathrm{~K}$ such that $a x=1$.
+//GOD1PRF:116259 In other words, $a$ has an inverse in K , and therefore (since $a$ was any non-zero element of K ), K is a field.
+//GOD1PRF:116375 Q.E.D.
 Admitted.
 
 //GOD1:116635 ring_nat_power : "the natural-number power #5 of #4 in the ring #1" | $#4^{#5}$
@@ -35680,6 +35754,22 @@ Theorem god1_s8_theorem3_binomial_theorem :
               (mul
                 (ring_nat_power K add mul x (nat_sub_witness p n))
                 (ring_nat_power K add mul y p))).
+let K add mul.
+assume hK.
+let x.
+assume hx.
+let y.
+assume hy hcomm.
+let n.
+assume hn hpos.
+//GOD1PRF:117878 The formula to be proved is trivial for $n=1$, and it is therefore enough to show that the formula
+//GOD1PRF:118044 implies the corresponding formula for the exponent $n$.
+//GOD1PRF:118100 If we multiply each side of this formula by $x+y$, we obtain
+//GOD1PRF:118275 If $r$ is an integer such that $0<r<n$, there are two terms on the right-hand side which contain the monomial
+//GOD1PRF:118409 the first corresponds to $p=r$ in the first sum, which introduces a factor equal to
+//GOD1PRF:118517 and the second corresponds to $p=r-1$ in the second sum, which introduces a factor equal to
+//GOD1PRF:118634 Hence the proof will be complete if we verify that
+//GOD1PRF:118740 Now the right-hand side is equal to
 Admitted.
 
 Theorem god1_product_of_sums_expansion :
@@ -35695,6 +35785,16 @@ Theorem god1_product_of_sums_expansion :
             mul
               (ring_finite_product K add mul F x)
               (ring_finite_product K add mul (I :\: F) y)).
+let K add mul.
+assume hK.
+let I.
+assume hfin.
+let x y.
+assume hxy.
+//GOD1PRF:121701 To multiply the sums $x_{i}+y_{i}$ together, we have to choose one term in each sum in all possible ways, form the product of the chosen terms, and then add all these products together.
+//GOD1PRF:121887 The product of the $x_{i}+y_{i}$ will therefore be a sum of products obtained by multiplying the $x_{i}$ in some of the sums by the $y_{j}$ in the others.
+//GOD1PRF:122042 For such a product, let F denote the set of values of $i$ for which we choose $x_{i}$, so that $\mathrm{I}-\mathrm{F}$ is the set of values of $i$ for which we choose $y_{i}$.
+//GOD1PRF:122218 Clearly the product of the chosen terms is $x_{\mathrm{F}} y_{\mathrm{I}-\mathrm{F}}$, and so we arrive at the formula stated above.
 Admitted.
 
 //GOD1:122999 ring_homomorphism : "#7 is a homomorphism from the ring #1 to the ring #3" | $#7:#1\to #3$
@@ -35736,6 +35836,12 @@ Theorem god1_ring_homomorphism_composition_and_inverse :
     ring_homomorphism K addK mulK M addM mulM (fun x => g (f x))
     /\ (bij K L f ->
       ring_homomorphism L addL mulL K addK mulK (inv K f)).
+let K addK mulK L addL mulL M addM mulM f g.
+assume hf hg.
+apply andI.
+//GOD1PRF:123686 The properties of ring homomorphisms are analogous to those of group homomorphisms (§ 7, sections 8 and 9).
+//GOD1PRF:123888 are ring homomorphisms, then so is their composition $g \circ f$.
+//GOD1PRF:123956 If a homomorphism $f: \mathrm{K} \rightarrow \mathrm{L}$ is bijective, then the inverse mapping is also a homomorphism ; in this case $f$ is said to be an isomorphism, and two rings K , L are said to be isomorphic if there exists an isomorphism of K onto L .
 Admitted.
 
 //GOD1:124303 ring_homomorphism_kernel : "the kernel of the ring homomorphism #7" | $\operatorname{Ker}(#7)$
@@ -35754,6 +35860,10 @@ Theorem god1_ring_homomorphism_injective_iff_trivial_kernel :
     (inj K L f <->
       ring_homomorphism_kernel K addK mulK L addL mulL f
       = {ring_zero K addK}).
+let K addK mulK L addL mulL f.
+assume hf.
+apply iffI.
+//GOD1PRF:124627 The homomorphism $f$ is injective if and only if $\operatorname{Ker}(f)=\{0\}$.
 Admitted.
 
 //GOD1:125150 left_ideal : "#4 is a left ideal of the ring #1" | $#4\triangleleft_l #1$
@@ -35786,6 +35896,11 @@ Theorem god1_ring_homomorphism_kernel_is_two_sided_ideal :
     ring_homomorphism K addK mulK L addL mulL f ->
     two_sided_ideal K addK mulK
       (ring_homomorphism_kernel K addK mulK L addL mulL f).
+let K addK mulK L addL mulL f.
+assume hf.
+//GOD1PRF:124708 The relations
+//GOD1PRF:124779 show that the kernel I of a homomorphism $f: \mathrm{K} \rightarrow \mathrm{L}$ satisfies the following two conditions :
+//GOD1PRF:125047 A subset $I$ of a ring $K$ is called a two-sided ideal if it satisfies these conditions (i) and (ii).
 Admitted.
 
 Theorem god1_two_sided_ideal_iff_left_and_right :
@@ -35793,6 +35908,10 @@ Theorem god1_two_sided_ideal_iff_left_and_right :
     ring K add mul -> I c= K ->
     (two_sided_ideal K add mul I <->
       left_ideal K add mul I /\ right_ideal K add mul I).
+let K add mul I.
+assume hK hIK.
+apply iffI.
+//GOD1PRF:125815 Clearly, a subset of K is a two-sided ideal if and only if it is simultaneously a left ideal and a right ideal of K .
 Admitted.
 
 //GOD1:126502 principal_ideal : "the principal ideal generated by #4 in #1" | $#4#1$
@@ -35804,6 +35923,9 @@ Theorem god1_principal_ideal_is_ideal :
   forall K, forall add mul:set -> set -> set, forall x :e K,
     commutative_ring K add mul ->
     two_sided_ideal K add mul (principal_ideal K add mul x).
+let K add mul x.
+assume hx hK.
+//GOD1PRF:126720 This set $x \mathrm{~K}$ is an ideal in K .
 Admitted.
 
 //GOD1:126822 principal_ideal_domain : "#1 is a principal ideal domain" | $#1\text{ is a PID}$
@@ -35836,6 +35958,15 @@ Theorem god1_integral_domain_square_roots_unique_up_to_sign :
       square_root_in_ring K add mul d x ->
       square_root_in_ring K add mul d y ->
       y = x \/ y = ring_negation K add x.
+let K add mul.
+assume hK.
+let d.
+assume hd.
+let x.
+assume hx.
+let y.
+assume hy hdx hdy.
+//GOD1PRF:151560 Clearly, if $x$ is a square root of $d$ in K , so is $-x$; if also K is an integral domain, then $d$ cannot have more than two square roots in K , because the equation $x^{2}=y^{2}$ is equivalent to $(x-y)(x+y)=0$ and therefore implies that either $y=x$ or $y=-x$ when K is an integral domain.
 Admitted.
 
 //GOD1:153061 quadratic_linear_span : "the elements of #4 of the form #7(x)+#8#7(y), with x and y in #1" | $#7(#1)+#8#7(#1)$
@@ -35860,6 +35991,15 @@ Theorem god1_quadratic_linear_span_is_subring :
     /\ group_image_of_subset K j
       c= quadratic_linear_span K L addL mulL j omega
     /\ omega :e quadratic_linear_span K L addL mulL j omega.
+let K addK mulK L addL mulL j d omega.
+assume hK hL hj hinj hd homega hsquare.
+apply andI.
+//GOD1PRF:153273 We assert that $\mathrm{L}^{\prime}$ is a subring of L which contains K and in which $d$ has a square root.
+//GOD1PRF:153382 Clearly $\mathrm{L}^{\prime}$ contains K (put $y=0$ in (1)) and $\omega$ (put $x=0, y=1$ ).
+//GOD1PRF:153474 So we have to show that $\mathrm{L}^{\prime}$ is a subring of L .
+//GOD1PRF:153540 Since $\mathrm{L}^{\prime}$ contains K and therefore the element -1 , it is enough to show that the sum and product of two elements of $L^{\prime}$ are also in $L^{\prime}$.
+//GOD1PRF:153714 But this follows immediately from the formulae
+//GOD1PRF:154259 which are self-evident if we remember that
 Admitted.
 
 //GOD1:156229 quadratic_extension : "the quadratic extension of #1 obtained by adjoining a square root of #4" | $#1[\sqrt{#4}]$
@@ -35901,6 +36041,16 @@ Theorem god1_quadratic_extension_is_commutative_ring :
       (quadratic_extension K)
       (quadratic_extension_addition K add)
       (quadratic_extension_multiplication K add mul d).
+let K add mul d.
+assume hd hK.
+//GOD1PRF:157493 First of all, the set $\mathrm{K} \times \mathrm{K}$ together with the law of addition ( 2 ter) is a commutative group.
+//GOD1PRF:157613 This follows from § 7, section 2 (direct product of groups) and from the fact that the set K with the given law of addition is a commutative group.
+//GOD1PRF:157763 Next let us show that the multiplication (3 ter) is associative.
+//GOD1PRF:157828 By definition we have
+//GOD1PRF:158998 Associativity now follows trivially by comparing these two expressions (and, of course, using the rules of calculation in K).
+//GOD1PRF:159124 Analogous calculations show that the multiplication is commutative and distributive over addition.
+//GOD1PRF:159273 shows that the set $\mathrm{K} \times \mathrm{K}$, endowed with the law of multiplication ( 3 ter), admits a neutral element.
+//GOD1PRF:159400 Hence $\mathrm{L}=\mathrm{K} \times \mathrm{K}$, together with the laws of composition (2 ter) and (3 ter), is indeed a commutative ring.
 Admitted.
 
 Theorem god1_quadratic_extension_canonical_embedding :
@@ -35920,6 +36070,18 @@ Theorem god1_quadratic_extension_canonical_embedding :
       (quadratic_extension_multiplication K add mul d)
       (quadratic_extension_embedding K add d)
       (quadratic_extension_root K add mul).
+let K add mul d.
+assume hd hK.
+apply andI.
+//GOD1PRF:159539 Let us now show that L contains a subring isomorphic to K .
+//GOD1PRF:159599 For this we consider the mapping $j: \mathrm{K} \rightarrow \mathrm{L}$ defined by
+//GOD1PRF:159704 Clearly $j$ is injective.
+//GOD1PRF:159730 Moreover, an easy calculation shows that
+//GOD1PRF:160138 These formulae show that $j$ is an isomorphism of K onto a subring of L .
+//GOD1PRF:160447 To show that this constitutes a solution of the problem posed in section 1, it remains to be proved that the element $d$ of K is a square in L .
+//GOD1PRF:160592 Consider then the element
+//GOD1PRF:160677 of $L$; a trivial calculation shows that
+//GOD1PRF:160790 and since we have agreed to identify each element $x \in \mathrm{~K}$ with the element $j(x)$ of L , the proof is complete.
 Admitted.
 
 //GOD1:165500 quadratic_conjugate : "the conjugate of #5 in the quadratic extension #1" | $\overline{#5}$
@@ -35955,6 +36117,18 @@ Theorem god1_quadratic_conjugate_and_norm_laws :
       = mul
         (quadratic_norm K add mul d z)
         (quadratic_norm K add mul d w).
+let K add mul d.
+assume hd hK.
+let z.
+assume hz.
+let w.
+assume hw.
+apply andI.
+//GOD1PRF:166020 which show how to calculate the conjugate of a sum or product of elements of L .
+//GOD1PRF:166101 The simplest way of proving (10) and (11) is to go back to the formulae ( 2 ter) and (3 ter) of section 3, and examine what happens when we replace $y^{\prime}$ and $y^{\prime \prime}$ by their negatives, without changing $x^{\prime}$ or $x^{\prime \prime}$.
+//GOD1PRF:166360 The formula (11) shows that
+//GOD1PRF:166562 for all $z^{\prime}, z^{\prime \prime} \in \mathrm{L}$; for
+//GOD1PRF:167014 as asserted.
 Admitted.
 
 Theorem god1_s9_theorem1_units_in_quadratic_extension :
@@ -35977,6 +36151,19 @@ Theorem god1_s9_theorem1_units_in_quadratic_extension :
           (quadratic_extension_embedding K add
             (ring_inverse K add mul (quadratic_norm K add mul d z)))
           (quadratic_conjugate K add z)).
+let K add mul d.
+assume hd hK.
+let z.
+assume hz.
+apply andI.
+//GOD1PRF:167440 Suppose that $z$ is a unit.
+//GOD1PRF:167468 Then the relation $z^{-1} \cdot z=1$, bearing in mind (12) and (13), gives
+//GOD1PRF:167603 and therefore $\mathrm{N}(z)$ is a unit in K .
+//GOD1PRF:167652 Conversely, suppose that $\mathrm{N}(z)$ is a unit in K .
+//GOD1PRF:167710 Then the relation
+//GOD1PRF:167760 implies that
+//GOD1PRF:167825 and this shows that $z$ is a unit in $\mathrm{K}[\sqrt{d}]$ and that its inverse is given by (14).
+//GOD1PRF:167924 Q.E.D.
 Admitted.
 
 Theorem god1_s9_theorem2_quadratic_extension_field_iff_nonsquare :
@@ -35988,14 +36175,33 @@ Theorem god1_s9_theorem2_quadratic_extension_field_iff_nonsquare :
         (quadratic_extension_addition K add)
         (quadratic_extension_multiplication K add mul d)
       <-> ~square_in_ring K add mul d).
+let K add mul.
+assume hK.
+let d.
+assume hd.
+apply iffI.
+//GOD1PRF:168184 To show that $a$ ) implies $b$ ), suppose that there exists $x \in \mathrm{~K}$ such that
+//GOD1PRF:168290 then we have $x^{2}=\omega^{2}$, hence $(x-\omega)(x+\omega)=0$.
+//GOD1PRF:168355 If $\mathrm{K}[\sqrt{d}]$ is a field and therefore an integral domain, it follows that either $\omega=x$ or $\omega=-x$; but neither of these is possible since the relation $x+\omega y=0(x, y \in \mathrm{~K})$ implies that $x=y=0$.
+//GOD1PRF:168588 Conversely, let $x+\omega y=z$ be a non-zero element of $K[\sqrt{d}]$.
+//GOD1PRF:168659 To show that $z$ is a unit of $K[\sqrt{d}]$ it is enough, by Theorem 1, to show that $N(z)$ is a unit in K.
+//GOD1PRF:168767 Since K is a field, we are reduced to showing that $\mathrm{N}(z)=0$ implies that $z=0$, i.e., that
+//GOD1PRF:168927 Now if $y \neq 0$, then $y$ is a unit in K , and hence we have
+//GOD1PRF:169056 contrary to the hypothesis that $d$ is not the square of an element of K .
+//GOD1PRF:169131 Hence $y=0$, hence $x^{2}=0$, hence $x=0$ and the proof is complete.
+//GOD1PRF:169202 Q.E.D.
 Admitted.
 
 Theorem god1_complex_numbers_form_field :
   field complex add_CSNo mul_CSNo.
+prove (field complex add_CSNo mul_CSNo).
+//GOD1PRF:169221 Taking $\mathrm{K}=\mathbf{R}$ and $d=-1$, we see that the ring $\mathbf{C}$ of complex numbers is in fact a field; for this reason, $\mathbf{C}$ is called the field of complex numbers.
 Admitted.
 
 Theorem god1_reals_form_subfield_of_complex_numbers :
   subfield complex add_CSNo mul_CSNo real.
+prove (subfield complex add_CSNo mul_CSNo real).
+//GOD1PRF:164100 b) the field $\mathbf{R}$ of real numbers is a subfield of $\mathbf{C}$;
 Admitted.
 
 Theorem god1_complex_i_and_cartesian_representation :
@@ -36008,6 +36214,11 @@ Theorem god1_complex_i_and_cartesian_representation :
   /\ (forall z :e complex, forall x y :e real,
     z = add_CSNo x (mul_CSNo Complex_i y) ->
     x = CSNo_Re z /\ y = CSNo_Im z).
+apply andI.
+//GOD1PRF:163880 In practice one never uses these formulae, but only the following properties of complex numbers:
+//GOD1PRF:164175 c) there exists a complex number $i$ (this traditional notation replaces the notation $\omega$ which we have used for quadratic extensions in general) such that
+//GOD1PRF:164355 d) every complex number $z$ can be written in exactly one way in the form
+//GOD1PRF:164446 where $x$ and $y$ are real.
 Admitted.
 
 //GOD1:164909 pure_imaginary : "#1 is pure imaginary" | $\operatorname{Re}(#1)=0$
@@ -36016,6 +36227,10 @@ Definition pure_imaginary : set -> prop :=
 
 Theorem god1_complex_real_iff_imaginary_part_zero :
   forall z :e complex, z :e real <-> CSNo_Im z = 0.
+let z.
+assume hz.
+apply iffI.
+//GOD1PRF:164988 On the other hand, $z$ is real (i.e., $z$ belongs to the subring $\mathbf{R}$ of $\mathbf{C}$ ) if and only if $\operatorname{Im}(z)=0$.
 Admitted.
 
 Theorem god1_complex_conjugate_norm_and_inverse :
@@ -36033,6 +36248,10 @@ Theorem god1_complex_conjugate_norm_and_inverse :
     recip_CSNo z = mul_CSNo
       (recip_SNo (abs_sqr_CSNo z))
       (conj_CSNo z)).
+apply andI.
+//GOD1PRF:166020 which show how to calculate the conjugate of a sum or product of elements of L .
+//GOD1PRF:166360 The formula (11) shows that
+//GOD1PRF:169619 the denominator cannot vanish unless $x=y=0$, i.e., unless $z=0$ (in agreement with Theorem 2).
 Admitted.
 
 //GOD1:172486 complex_argument : "#2 is an argument of the nonzero complex number #1" | $#2\in\operatorname{Arg}(#1)$
@@ -36058,11 +36277,21 @@ Theorem god1_complex_modulus_basic_properties :
   /\ (forall z w :e complex,
     modulus_CSNo (mul_CSNo z w)
       = mul_SNo (modulus_CSNo z) (modulus_CSNo w)).
+apply andI.
+//GOD1PRF:171860 The modulus $|z|$ is always $\geqslant 0$, and $|z|=0$ if and only if $z=0$.
+//GOD1PRF:171937 Furthermore, the classical inequalities between the side-lengths of a triangle show that $|z+w| \leqslant|z|+|w|$ for any two complex numbers $z, w$; and, more generally,
+//GOD1PRF:172293 This result is usually referred to as the triangle inequality.
+//GOD1PRF:173539 Next, we shall deduce the formulae
+//GOD1PRF:173813 which give the modulus and argument of a product of complex numbers.
 Admitted.
 
 Theorem god1_complex_polar_representation :
   forall z :e complex,
     z <> 0 -> exists theta :e real, complex_argument z theta.
+let z.
+assume hz hnz.
+//GOD1PRF:172667 The figure above shows that the real and imaginary parts of $z$ are given in terms of the absolute value $r$ and the argument $\theta$ by the formula
+//GOD1PRF:172903 so that we have
 Admitted.
 
 Theorem god1_complex_argument_of_product :
@@ -36070,6 +36299,18 @@ Theorem god1_complex_argument_of_product :
     complex_argument z theta ->
     complex_argument w phi ->
     complex_argument (mul_CSNo z w) (add_SNo theta phi).
+let z.
+assume hz.
+let w.
+assume hw.
+let theta.
+assume htheta.
+let phi.
+assume hphi hzarg hwarg.
+//GOD1PRF:174156 Since $r_{1} r_{2}$ is positive, it is enough to show that
+//GOD1PRF:174400 But the rules for multiplying complex numbers show that the real part of the lefthand side is equal to
+//GOD1PRF:174627 and the imaginary part is equal to
+//GOD1PRF:174788 Hence (19) is proved.
 Admitted.
 
 Theorem god1_de_moivre :
@@ -36082,6 +36323,13 @@ Theorem god1_de_moivre :
     = add_CSNo
       (complex_cos (mul_SNo n theta))
       (mul_CSNo Complex_i (complex_sin (mul_SNo n theta))).
+let theta.
+assume htheta.
+let n.
+assume hn.
+//GOD1PRF:174812 This result extends immediately to a product of several factors, in the form
+//GOD1PRF:175086 In particular, taking all the $\theta_{p}$ to be equal to the same angle $\theta$, we have
+//GOD1PRF:175286 which is known as De Moivre's theorem.
 Admitted.
 
 (** § 10. Modules and vector spaces. **)
@@ -36146,6 +36394,13 @@ Theorem god1_module_zero_and_negation_scalar_laws :
     /\ (forall x :e M,
       module_negation M addM x
       = smul (ring_negation K addK (ring_one K mulK)) x).
+let K addK mulK M addM smul.
+assume hM.
+apply andI.
+//GOD1PRF:197396 Observe that the identities in axiom (M 2) imply the relations
+//GOD1PRF:197776 To prove the first of these relations, observe that $\lambda 0+\lambda x=\lambda(0+x)=\lambda x$ for all $x=\mathrm{M}$, hence $\lambda 0=\lambda x-\lambda x=0$ as required.
+//GOD1PRF:197950 The second relation follows from the fact that $0 x+1 x=(0+1) x=1 x$, whence $0 x=x-x=0$.
+//GOD1PRF:207123 (because $(-1) x+x=(-1) x+(+1) x=(-1+1) x=0 x=0$ ).\\
 Admitted.
 
 //GOD1:199690 module_power_addition : "componentwise addition on the module power #1^#4" | $(x_i)+(y_i)=(x_i+y_i)$
@@ -36166,6 +36421,9 @@ Theorem god1_module_direct_power_is_module :
       (M :^: I)
       (module_power_addition I addM)
       (module_power_left_scalar I smul).
+let K addK mulK M addM smul I.
+assume hM.
+//GOD1PRF:199641 That the axiom (M 1) is satisfied follows from § 7, section 2 (direct product of groups), and the identities in axiom (M 2) are easily verified by using the axioms for a ring.
 Admitted.
 
 Theorem god1_mapping_module_is_module :
@@ -36176,6 +36434,10 @@ Theorem god1_mapping_module_is_module :
       (M :^: X)
       (module_power_addition X addM)
       (module_power_left_scalar X smul).
+let K addK mulK M addM smul X.
+assume hM.
+//GOD1PRF:201924 Let E denote the set of all mappings $f: \mathrm{X} \rightarrow \mathrm{M}$; we shall make E into a left K -module.
+//GOD1PRF:202567 The reader should verify in detail that the axioms (M 1) and (M 2) are satisfied.\\
 Admitted.
 
 //GOD1:206210 submodule : "#7 is a submodule of the left #1-module #4" | $#7\leq_{#1}#4$
@@ -36206,6 +36468,14 @@ Theorem god1_submodule_test :
       N <> 0
       /\ forall scalar mu :e K, forall x y :e N,
         addM (smul scalar x) (smul mu y) :e N).
+let K addK mulK M addM smul N.
+assume hM hNM.
+apply iffI.
+//GOD1PRF:206544 To verify that a subset $\mathrm{M}^{\prime}$ of M is a submodule, it is enough to show that $\mathrm{M}^{\prime}$ is not empty (in practice, one shows that $0 \in \mathrm{M}^{\prime}$ ) and that
+//GOD1PRF:206879 Clearly this condition is necessary.
+//GOD1PRF:206916 Conversely, suppose that it is satisfied.
+//GOD1PRF:206958 Putting $\mu=0$ we get (ii) above; to get (i), put $\lambda=1$ and $\mu=-1$, and observe that, in any module M , we have
+//GOD1PRF:207123 (because $(-1) x+x=(-1) x+(+1) x=(-1+1) x=0 x=0$ ).\\
 Admitted.
 
 Theorem god1_submodule_induced_module :
@@ -36213,6 +36483,11 @@ Theorem god1_submodule_induced_module :
   forall M, forall addM smul:set -> set -> set, forall N,
     submodule K addK mulK M addM smul N ->
     left_module K addK mulK N addM smul.
+let K addK mulK M addM smul N.
+assume hN.
+//GOD1PRF:207286 Let $\mathrm{M}^{\prime}$ be a submodule of a module M .
+//GOD1PRF:207343 Condition (i) above already allows us to regard $\mathrm{M}^{\prime}$ as an additive group, and condition (ii) allows us to define a mapping $(\lambda, x) \rightarrow \lambda x$ of $\mathrm{K} \times \mathrm{M}^{\prime}$ into $\mathrm{M}^{\prime}$; the identities which feature in axiom (M 2) are then satisfied in $\mathrm{M}^{\prime}$ because they are satisfied in M .
+//GOD1PRF:207714 Hence every submodule $\mathrm{M}^{\prime}$ of M -can be regarded as a left K-module.
 Admitted.
 
 //GOD1:208638 module_family_intersection : "the intersection in #3 of the family #2 indexed by #1" | $\bigcap_{i\in #1}#2_i$
@@ -36237,6 +36512,12 @@ Theorem god1_s10_theorem1_intersection_and_directed_union_submodules :
         N i c= N k /\ N j c= N k)) ->
       submodule K addK mulK M addM smul
         (module_family_union I N)).
+let K addK mulK M addM smul I N.
+assume hM hN.
+apply andI.
+//GOD1PRF:209106 Then the intersection of the $\mathrm{M}_{i}$ is also a submodule of L .
+//GOD1PRF:209179 For the union of the $\mathrm{M}_{i}$ to be a submodule of L it is sufficient that, for each pair of indices $i, j \in \mathrm{I}$, there exist an index $k \in \mathrm{I}$ such that
+//GOD1PRF:209471 The proof is exactly the same as that of Theorem 1, § 7, and therefore we shall leave the details to the reader.
 Admitted.
 
 //GOD1:209821 opposite_ring_multiplication : "multiplication in the opposite ring of #1" | $x*y=yx$
@@ -36247,6 +36528,10 @@ Definition opposite_ring_multiplication :
 Theorem god1_opposite_ring_is_ring :
   forall K, forall add mul:set -> set -> set,
     ring K add mul -> ring K add (opposite_ring_multiplication mul).
+let K add mul.
+assume hK.
+//GOD1PRF:211000 It is easily seen that the set $K^{0}(=\mathrm{K}!)$, together with the two operations just defined, is a ring: for example, the formula
+//GOD1PRF:211167 reduces to the relation $z(x+y)=z x+z y$ in the ring K .\\
 Admitted.
 
 Theorem god1_right_modules_are_left_modules_over_opposite_ring :
@@ -36256,6 +36541,12 @@ Theorem god1_right_modules_are_left_modules_over_opposite_ring :
     left_module
       K addK (opposite_ring_multiplication mulK)
       M addM (fun scalar x => smulR x scalar).
+let K addK mulK M addM smulR.
+assume hM.
+//GOD1PRF:211674 Then the additive group M , together with the mapping just defined, is a left module over the opposite ring $\mathrm{K}^{0}$.
+//GOD1PRF:211800 For
+//GOD1PRF:212105 and finally
+//GOD1PRF:212137 which proves our assertion.\\
 Admitted.
 
 (** § 11. Linear relations in a module. **)
@@ -36320,6 +36611,19 @@ Theorem god1_s11_theorem1_linear_combinations_form_generated_submodule :
       (forall i :e n, a i :e N) ->
       submodule_generated_by_family
         K addK mulK M addM smul n a c= N).
+let K addK mulK M addM smul n.
+assume hn.
+let a.
+assume hM ha.
+apply andI.
+//GOD1PRF:215970 First of all, the relation
+//GOD1PRF:216060 and similar relations for $a_{2}, \ldots, a_{n}$ show that $\mathrm{M}^{\prime}$ contains $a_{1}, \ldots, a_{n}$.
+//GOD1PRF:216174 On the other hand, every submodule of M which contains $a_{1}, \ldots, a_{n}$ also contains $\xi_{1} a_{1}, \ldots, \xi_{n} a_{n}$, for all $\xi_{1}, \ldots, \xi_{n} \in \mathrm{~K}$, and hence also contains $\xi_{1} a_{1}+\cdots+\xi_{n} a_{n}$.
+//GOD1PRF:216420 Hence every submodule of M which contains $a_{1}, \ldots, a_{n}$ contains the set $\mathrm{M}^{\prime}$.
+//GOD1PRF:216526 The proof will therefore be complete if we show that $\mathrm{M}^{\prime}$ is in fact a submodule of M.
+//GOD1PRF:216725 be any two elements of $\mathrm{M}^{\prime}$.
+//GOD1PRF:216771 Then a trivial calculation shows that
+//GOD1PRF:216961 it follows that $\lambda x+\mu y \in \mathbf{M}^{\prime}$ for all scalars $\lambda, \mu \in \mathbf{K}$, and therefore $\mathbf{M}^{\prime}$ is a submodule of M .\\
 Admitted.
 
 //GOD1:217701 generating_family : "the family #8 indexed by #7 generates the module #4" | $\operatorname{span}(#8)=#4$
@@ -36384,6 +36688,13 @@ Theorem god1_s11_theorem2_unique_coordinates_iff_independent :
             K addK mulK M addM smul n a x eta -> eta = coeff)
       <-> linearly_independent_family
         K addK mulK M addM smul n a).
+let K addK mulK M addM smul n.
+assume hn.
+let a x.
+assume hM hx.
+apply iffI.
+//GOD1PRF:222338 It is enough to remark that, if ( $\lambda_{1}, \ldots, \lambda_{n}$ ) is a linear relation between $a_{1}, \ldots, a_{n}$, then $\lambda_{1} a_{1}+\cdots+\lambda_{n} a_{n}=0$ and therefore
+//GOD1PRF:222658 Clearly this property characterizes linear relations between the given vectors $a_{1}, \ldots, a_{n}$.\\
 Admitted.
 
 //GOD1:225809 module_basis : "the family #8 indexed by #7 is a basis of the module #4" | $#8\text{ is a basis of }#4$
@@ -36453,6 +36764,19 @@ Theorem god1_basis_unique_coordinates_and_coordinate_linearity :
       basis_coordinate_function K addK mulK M addM smul I a i (smul scalar x)
       = mulK scalar
         (basis_coordinate_function K addK mulK M addM smul I a i x)).
+let K addK mulK M addM smul I a.
+assume hBasis.
+apply andI.
+//GOD1PRF:226162 Let $a_{1}, \ldots, a_{n}$ be elements of a left K -module M .
+//GOD1PRF:226225 To say that they generate M means that for every $x \in M$ the relation
+//GOD1PRF:226342 is satisfied by at least one $n$-triple $\left(\zeta_{1}, \ldots, \zeta_{n}\right) \in \mathbf{K}^{n}$.
+//GOD1PRF:226446 On the other hand, to say that the $a_{i}$ are linearly independent means that for every $x \in \mathrm{M}$ the above relation is satisfied by at most one element of $\mathrm{K}^{n}$.
+//GOD1PRF:227069 }Consequently, the vectors $a_{1}, \ldots, a_{n}$ form a basis of $M$ if and only if, for each $x \in \mathrm{M}$ there exists a unique $n$-triple $\left(\xi_{1}, \ldots, \xi_{n}\right) \in \mathrm{K}^{n}$ such that
+//GOD1PRF:228168 The coordinate functions $f_{i}$ also satisfy the identities
+//GOD1PRF:228309 for if we add together
+//GOD1PRF:228457 we obtain
+//GOD1PRF:228561 so that the coordinates of $x+y$ are $f_{i}(x)+f_{i}(y)$.
+//GOD1PRF:228619 The other identity is proved similarly.\\
 Admitted.
 
 //GOD1:229696 canonical_module_basis_vector : "the #4-th canonical basis vector of #1^#3" | $e_{#4}$
@@ -36473,6 +36797,10 @@ Theorem god1_canonical_basis_of_finite_module_power :
       (module_power_left_scalar n mulK)
       n
       (canonical_module_basis_vector K addK mulK n).
+let K addK mulK n.
+assume hn hK.
+//GOD1PRF:228855 Example 12. The left K -module $\mathrm{K}^{n}$ is finitely generated and free, and Example 1 shows that the vectors $e_{1}, \ldots, e_{n}$ form a basis, called the canonical basis of $\mathrm{K}^{n}$.
+//GOD1PRF:229201 shows that the coordinates of $x$ with respect to the canonical basis of $\mathrm{K}^{n}$ are the scalars $\xi_{1}, \ldots, \xi_{n}$.
 Admitted.
 
 Theorem god1_s11_theorem3_finite_dimensional_vector_space_has_basis :
@@ -36481,6 +36809,10 @@ Theorem god1_s11_theorem3_finite_dimensional_vector_space_has_basis :
     finite_dimensional_vector_space K addK mulK M addM smul ->
     exists I, finite I /\ exists a:set -> set,
       module_basis K addK mulK M addM smul I a.
+let K addK mulK M addM smul.
+assume hFinite.
+//GOD1PRF:231053 Since the present chapter contains only results which are valid over an arbitrary ground ring, we shall not prove Theorem 3 at this stage.
+//GOD1PRF:231192 The reader will find a proof in § 19, section 1, which requires no more background than the contents of the present chapter.
 Admitted.
 
 (** § 12. Linear mappings and matrices. **)
