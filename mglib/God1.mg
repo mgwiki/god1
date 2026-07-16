@@ -45241,7 +45241,1247 @@ Theorem god1_s4_theorem2_classes_equip_image :
     (forall a b :e A,
       (class_of a = class_of b <-> f a = f b)) ->
     equip Q {f a|a :e A}.
-Admitted.
+let A Q f class_of.
+assume hclass hsurj hiff.
+apply (ex_intro_setfun
+  (fun g => bij Q {f a|a :e A} g)
+  (fun C => f (Eps_i
+    (fun a => a :e A /\ class_of a = C)))).
+apply (bijI Q {f a|a :e A}
+  (fun C => f (Eps_i
+    (fun a => a :e A /\ class_of a = C)))).
+- let C.
+  assume hC.
+  exact (ReplI A f
+    (Eps_i (fun a => a :e A /\ class_of a = C))
+    (andEL
+      (Eps_i (fun a => a :e A /\ class_of a = C) :e A)
+      (class_of (Eps_i
+        (fun a => a :e A /\ class_of a = C)) = C)
+      (Eps_i_ex (fun a => a :e A /\ class_of a = C)
+        (hsurj C hC)))).
+- let C.
+  assume hC.
+  let D.
+  assume hD hCD.
+  claim hrepC :
+    Eps_i (fun a => a :e A /\ class_of a = C) :e A
+    /\ class_of (Eps_i
+      (fun a => a :e A /\ class_of a = C)) = C.
+  exact (Eps_i_ex (fun a => a :e A /\ class_of a = C)
+    (hsurj C hC)).
+  claim hrepD :
+    Eps_i (fun a => a :e A /\ class_of a = D) :e A
+    /\ class_of (Eps_i
+      (fun a => a :e A /\ class_of a = D)) = D.
+  exact (Eps_i_ex (fun a => a :e A /\ class_of a = D)
+    (hsurj D hD)).
+  apply (eq_i_tra C
+    (class_of (Eps_i
+      (fun a => a :e A /\ class_of a = C))) D).
+  - apply eq_sym.
+    exact (andER
+      (Eps_i (fun a => a :e A /\ class_of a = C) :e A)
+      (class_of (Eps_i
+        (fun a => a :e A /\ class_of a = C)) = C) hrepC).
+  - apply (eq_i_tra
+      (class_of (Eps_i
+        (fun a => a :e A /\ class_of a = C)))
+      (class_of (Eps_i
+        (fun a => a :e A /\ class_of a = D))) D).
+    - exact (iffER
+        (class_of (Eps_i
+          (fun a => a :e A /\ class_of a = C))
+          = class_of (Eps_i
+            (fun a => a :e A /\ class_of a = D)))
+        (f (Eps_i (fun a => a :e A /\ class_of a = C))
+          = f (Eps_i (fun a => a :e A /\ class_of a = D)))
+        (hiff
+          (Eps_i (fun a => a :e A /\ class_of a = C))
+          (andEL
+            (Eps_i (fun a => a :e A /\ class_of a = C) :e A)
+            (class_of (Eps_i
+              (fun a => a :e A /\ class_of a = C)) = C) hrepC)
+          (Eps_i (fun a => a :e A /\ class_of a = D))
+          (andEL
+            (Eps_i (fun a => a :e A /\ class_of a = D) :e A)
+            (class_of (Eps_i
+              (fun a => a :e A /\ class_of a = D)) = D) hrepD))
+        hCD).
+    - exact (andER
+        (Eps_i (fun a => a :e A /\ class_of a = D) :e A)
+        (class_of (Eps_i
+          (fun a => a :e A /\ class_of a = D)) = D) hrepD).
+- let y.
+  assume hy.
+  apply (ReplE_impred A f y hy
+    (exists C :e Q,
+      f (Eps_i (fun a => a :e A /\ class_of a = C)) = y)).
+  let a.
+  assume ha hya.
+  apply (ex_intro
+    (fun C => C :e Q /\
+      f (Eps_i (fun b => b :e A /\ class_of b = C)) = y)
+    (class_of a)).
+  apply (andI (class_of a :e Q)
+    (f (Eps_i
+      (fun b => b :e A /\ class_of b = class_of a)) = y)).
+  - exact (hclass a ha).
+  - apply (eq_i_tra
+      (f (Eps_i
+        (fun b => b :e A /\ class_of b = class_of a)))
+      (f a) y).
+    - apply (iffEL
+        (class_of (Eps_i
+          (fun b => b :e A /\ class_of b = class_of a))
+          = class_of a)
+        (f (Eps_i
+          (fun b => b :e A /\ class_of b = class_of a)) = f a)
+        (hiff
+          (Eps_i
+            (fun b => b :e A /\ class_of b = class_of a))
+          (andEL
+            (Eps_i
+              (fun b => b :e A /\ class_of b = class_of a) :e A)
+            (class_of (Eps_i
+              (fun b => b :e A /\ class_of b = class_of a))
+              = class_of a)
+            (Eps_i_ex
+              (fun b => b :e A /\ class_of b = class_of a)
+              (ex_intro
+                (fun b => b :e A /\ class_of b = class_of a) a
+                (andI (a :e A) (class_of a = class_of a)
+                  ha (eq_ref (class_of a))))))
+          a ha)).
+      exact (andER
+        (Eps_i
+          (fun b => b :e A /\ class_of b = class_of a) :e A)
+        (class_of (Eps_i
+          (fun b => b :e A /\ class_of b = class_of a))
+          = class_of a)
+        (Eps_i_ex
+          (fun b => b :e A /\ class_of b = class_of a)
+          (ex_intro
+            (fun b => b :e A /\ class_of b = class_of a) a
+            (andI (a :e A) (class_of a = class_of a)
+              ha (eq_ref (class_of a)))))).
+    - exact (eq_sym y (f a) hya).
+Qed.
+
+Theorem god1_pair_fiber_bijective :
+  forall a B,
+    bij B {(a,b)|b :e B} (fun b => (a,b)).
+let a B.
+apply (bijI B {(a,b)|b :e B} (fun b => (a,b))).
+- let b.
+  assume hb.
+  exact (ReplI B (fun c => (a,c)) b hb).
+- let b.
+  assume hb.
+  let c.
+  assume hc hbc.
+  apply (eq_i_tra b ((a,b) 1) c).
+  - apply eq_sym.
+    exact (tuple_2_1_eq a b).
+  - apply (eq_i_tra ((a,b) 1) ((a,c) 1) c).
+    - exact (f_eq_i (fun z => z 1) (a,b) (a,c) hbc).
+    - exact (tuple_2_1_eq a c).
+- let z.
+  assume hz.
+  apply (ReplE_impred B (fun b => (a,b)) z hz
+    (exists b :e B, (a,b) = z)).
+  let b.
+  assume hb hzb.
+  apply (ex_intro (fun c => c :e B /\ (a,c) = z) b).
+  exact (andI (b :e B) ((a,b) = z)
+    hb (eq_sym z (a,b) hzb)).
+Qed.
+
+Theorem god1_pair_fiber_equip :
+  forall a B, equip {(a,b)|b :e B} B.
+let a B.
+exact (equip_sym B {(a,b)|b :e B}
+  (ex_intro_setfun
+    (fun f => bij B {(a,b)|b :e B} f)
+    (fun b => (a,b))
+    (god1_pair_fiber_bijective a B))).
+Qed.
+
+Theorem god1_setprod_empty_left :
+  forall B, Empty :*: B = Empty.
+let B.
+apply Empty_eq.
+let z.
+assume hz.
+exact (EmptyE (z 0) (ap0_Sigma Empty (fun a => B) z hz)).
+Qed.
+
+Theorem god1_setprod_adjoin :
+  forall A B a,
+    (A :\/: {a}) :*: B = (A :*: B) :\/: {(a,b)|b :e B}.
+let A B a.
+apply set_ext.
+- let z.
+  assume hz.
+  claim hu : z 0 :e A :\/: {a}.
+  exact (ap0_Sigma (A :\/: {a}) (fun u => B) z hz).
+  claim hv : z 1 :e B.
+  exact (ap1_Sigma (A :\/: {a}) (fun u => B) z hz).
+  claim heta : (z 0,z 1) = z.
+  exact (tuple_Sigma_eta (A :\/: {a}) (fun u => B) z hz).
+  apply (binunionE' A {a} (z 0)
+    (z :e (A :*: B) :\/: {(a,b)|b :e B})).
+  - assume hz0A.
+    exact (binunionI1 (A :*: B) {(a,b)|b :e B} z
+      (mem_eq_substR (A :*: B) (z 0,z 1) z heta
+        (tuple_2_setprod A B (z 0) hz0A (z 1) hv))).
+  - assume hz0a.
+    exact (binunionI2 (A :*: B) {(a,b)|b :e B} z
+      (mem_eq_substR {(a,b)|b :e B} (a,z 1) z
+        (eq_i_tra (a,z 1) (z 0,z 1) z
+          (f_eq_i (fun w => (w,z 1)) a (z 0)
+            (eq_sym (z 0) a (SingE a (z 0) hz0a))) heta)
+        (ReplI B (fun b => (a,b)) (z 1) hv))).
+  - exact hu.
+- let z.
+  assume hz.
+  apply (binunionE' (A :*: B) {(a,b)|b :e B} z
+    (z :e (A :\/: {a}) :*: B)).
+  - assume hzAB.
+    exact (mem_eq_substR ((A :\/: {a}) :*: B)
+      (z 0,z 1) z
+      (tuple_Sigma_eta A (fun u => B) z hzAB)
+      (tuple_2_setprod (A :\/: {a}) B (z 0)
+        (binunionI1 A {a} (z 0)
+          (ap0_Sigma A (fun u => B) z hzAB))
+        (z 1) (ap1_Sigma A (fun u => B) z hzAB))).
+  - assume hzfiber.
+    apply (ReplE_impred B (fun b => (a,b)) z hzfiber
+      (z :e (A :\/: {a}) :*: B)).
+    let b.
+    assume hb hzb.
+    exact (mem_eq_substL ((A :\/: {a}) :*: B) (a,b) z hzb
+      (tuple_2_setprod (A :\/: {a}) B a
+        (binunionI2 A {a} a (SingI a)) b hb)).
+  - exact hz.
+Qed.
+
+Theorem god1_pair_fiber_disjoint_from_setprod :
+  forall A B a, a /:e A ->
+    forall z :e {(a,b)|b :e B}, z /:e A :*: B.
+let A B a.
+assume haA.
+let z.
+assume hz hzAB.
+apply (ReplE_impred B (fun b => (a,b)) z hz False).
+let b.
+assume hb hzb.
+apply haA.
+apply (mem_eq_substR A (z 0) a).
+- apply (eq_i_tra (z 0) ((a,b) 0) a).
+  - exact (f_eq_i (fun w => w 0) z (a,b) hzb).
+  - exact (tuple_2_0_eq a b).
+- exact (ap0_Sigma A (fun u => B) z hzAB).
+Qed.
+
+Theorem god1_setprod_cardinality_zero :
+  forall B, forall m :e omega, equip B m ->
+    forall n :e omega, equip Empty n ->
+      equip (Empty :*: B) (mul_nat n m).
+let B.
+let m.
+assume hm heB.
+let n.
+assume hn heEmpty.
+claim hn0 : n = 0.
+exact (god1_nat_equip_eq n 0
+  (omega_nat_p n hn) nat_0
+  (equip_sym Empty n heEmpty)).
+apply (god1_equip_eq_subst
+  Empty (Empty :*: B) Empty (mul_nat n m)).
+- exact (eq_sym (Empty :*: B) Empty (god1_setprod_empty_left B)).
+- apply eq_sym.
+  apply (eq_i_tra (mul_nat n m) (mul_nat 0 m) 0).
+  - exact (f_eq_i (fun k => mul_nat k m) n 0 hn0).
+  - exact (mul_nat_0L m (omega_nat_p m hm)).
+- exact (equip_ref Empty).
+Qed.
+
+Theorem god1_setprod_cardinality_step :
+  forall B, forall m :e omega, equip B m ->
+    forall A a, finite A -> a /:e A ->
+    (forall n :e omega, equip A n ->
+      equip (A :*: B) (mul_nat n m)) ->
+    forall n :e omega, equip (A :\/: {a}) n ->
+      equip ((A :\/: {a}) :*: B) (mul_nat n m).
+let B.
+let m.
+assume hm heB.
+let A a.
+assume hfinA haA hind.
+let n.
+assume hn heAn.
+apply (exandE_i (fun k => k :e omega) (fun k => equip A k) hfinA).
+let k.
+assume hk heAk.
+claim heAS : equip (A :\/: {a}) (ordsucc k).
+exact (equip_sym (ordsucc k) (A :\/: {a})
+  (equip_adjoin_ordsucc k A a haA (equip_sym A k heAk))).
+claim hnSk : n = ordsucc k.
+exact (god1_nat_equip_eq n (ordsucc k)
+  (omega_nat_p n hn) (nat_ordsucc k (omega_nat_p k hk))
+  (equip_tra n (A :\/: {a}) (ordsucc k)
+    (equip_sym (A :\/: {a}) n heAn) heAS)).
+claim heOld : equip (A :*: B) (mul_nat k m).
+exact (hind k hk heAk).
+claim heFiber : equip {(a,b)|b :e B} m.
+exact (equip_tra {(a,b)|b :e B} B m
+  (god1_pair_fiber_equip a B) heB).
+claim hfinFiber : finite {(a,b)|b :e B}.
+exact (ex_intro
+  (fun q => q :e omega /\ equip {(a,b)|b :e B} q) m
+  (andI (m :e omega) (equip {(a,b)|b :e B} m) hm heFiber)).
+claim heUnion :
+  equip ((A :*: B) :\/: {(a,b)|b :e B})
+    (add_nat (mul_nat k m) m).
+exact (god1_disjoint_union_cardinality
+  (A :*: B) (mul_nat k m)
+  (nat_p_omega (mul_nat k m)
+    (mul_nat_p k (omega_nat_p k hk) m (omega_nat_p m hm)))
+  heOld {(a,b)|b :e B} hfinFiber m hm heFiber
+  (god1_pair_fiber_disjoint_from_setprod A B a haA)).
+apply (god1_equip_eq_subst
+  ((A :*: B) :\/: {(a,b)|b :e B})
+  ((A :\/: {a}) :*: B)
+  (add_nat (mul_nat k m) m) (mul_nat n m)).
+- exact (eq_sym ((A :\/: {a}) :*: B)
+    ((A :*: B) :\/: {(a,b)|b :e B})
+    (god1_setprod_adjoin A B a)).
+- apply eq_sym.
+  apply (eq_i_tra (mul_nat n m) (mul_nat (ordsucc k) m)
+    (add_nat (mul_nat k m) m)).
+  - exact (f_eq_i (fun q => mul_nat q m) n (ordsucc k) hnSk).
+  - exact (mul_nat_SL k (omega_nat_p k hk)
+      m (omega_nat_p m hm)).
+- exact heUnion.
+Qed.
+
+Theorem god1_setprod_cardinality :
+  forall A B, forall n m :e omega,
+    equip A n -> equip B m ->
+    equip (A :*: B) (mul_nat n m).
+let A B.
+let n.
+assume hn.
+let m.
+assume hm heA heB.
+claim hfinA : finite A.
+exact (ex_intro (fun k => k :e omega /\ equip A k) n
+  (andI (n :e omega) (equip A n) hn heA)).
+exact (finite_ind
+  (fun C => forall k :e omega, equip C k ->
+    equip (C :*: B) (mul_nat k m))
+  (god1_setprod_cardinality_zero B m hm heB)
+  (god1_setprod_cardinality_step B m hm heB)
+  A hfinA n hn heA).
+Qed.
+
+Definition permutation_successor_correction : set -> set -> set :=
+  fun n s => permutation_composition (ordsucc n)
+    (permutation_swap (ordsucc n) (s n) n) s.
+
+Definition permutation_successor_code : set -> set -> set :=
+  fun n s =>
+    (s n, permutation_restrict_last n
+      (permutation_successor_correction n s)).
+
+Definition permutation_successor_decode : set -> set -> set :=
+  fun n w => permutation_composition (ordsucc n)
+    (permutation_swap (ordsucc n) (w 0) n)
+    (permutation_extend_last n (w 1)).
+
+Theorem god1_permutation_successor_correction_unfold :
+  forall n s,
+    permutation_successor_correction n s
+      = permutation_composition (ordsucc n)
+        (permutation_swap (ordsucc n) (s n) n) s.
+let n s.
+exact (eq_ref (permutation_composition (ordsucc n)
+  (permutation_swap (ordsucc n) (s n) n) s)).
+Qed.
+
+Theorem god1_permutation_successor_code_unfold :
+  forall n s,
+    permutation_successor_code n s
+      = (s n, permutation_restrict_last n
+        (permutation_successor_correction n s)).
+let n s.
+exact (eq_ref
+  (s n, permutation_restrict_last n
+    (permutation_successor_correction n s))).
+Qed.
+
+Theorem god1_permutation_successor_decode_unfold :
+  forall n w,
+    permutation_successor_decode n w
+      = permutation_composition (ordsucc n)
+        (permutation_swap (ordsucc n) (w 0) n)
+        (permutation_extend_last n (w 1)).
+let n w.
+exact (eq_ref (permutation_composition (ordsucc n)
+  (permutation_swap (ordsucc n) (w 0) n)
+  (permutation_extend_last n (w 1)))).
+Qed.
+
+Theorem god1_permutation_value_in :
+  forall X, forall s :e permutation_group X,
+    forall x :e X, s x :e X.
+let X.
+let s.
+assume hs.
+let x.
+assume hx.
+exact (ap_Pi X (fun z => X) s x
+  (god1_permutation_function_in X s hs) hx).
+Qed.
+
+Theorem god1_permutation_successor_correction_in :
+  forall n, nat_p n -> forall s :e permutation_group (ordsucc n),
+    permutation_successor_correction n s
+      :e permutation_group (ordsucc n).
+let n.
+assume hn.
+let s.
+assume hs.
+exact (god1_permutation_composition_in (ordsucc n)
+  (permutation_swap (ordsucc n) (s n) n)
+  (god1_permutation_swap_in (ordsucc n) (s n) n
+    (god1_permutation_value_in (ordsucc n) s hs n (ordsuccI2 n))
+    (ordsuccI2 n))
+  s hs).
+Qed.
+
+Theorem god1_permutation_successor_correction_fixes_last :
+  forall n, nat_p n -> forall s :e permutation_group (ordsucc n),
+    permutation_successor_correction n s n = n.
+let n.
+assume hn.
+let s.
+assume hs.
+apply (eq_i_tra
+  (permutation_successor_correction n s n)
+  (permutation_swap (ordsucc n) (s n) n (s n)) n).
+- exact (beta (ordsucc n)
+    (fun z => permutation_swap (ordsucc n) (s n) n (s z))
+    n (ordsuccI2 n)).
+- exact (god1_permutation_swap_at_left (ordsucc n) (s n) n
+    (god1_permutation_value_in (ordsucc n) s hs n (ordsuccI2 n))).
+Qed.
+
+Theorem god1_permutation_successor_code_in :
+  forall n, nat_p n -> forall s :e permutation_group (ordsucc n),
+    permutation_successor_code n s
+      :e (ordsucc n) :*: permutation_group n.
+let n.
+assume hn.
+let s.
+assume hs.
+exact (tuple_2_setprod (ordsucc n) (permutation_group n)
+  (s n) (god1_permutation_value_in (ordsucc n) s hs n (ordsuccI2 n))
+  (permutation_restrict_last n
+    (permutation_successor_correction n s))
+  (god1_permutation_restrict_last_in n hn
+    (permutation_successor_correction n s)
+    (god1_permutation_successor_correction_in n hn s hs)
+    (god1_permutation_successor_correction_fixes_last n hn s hs))).
+Qed.
+
+Theorem god1_permutation_restrict_extend_last :
+  forall n, nat_p n -> forall u :e permutation_group n,
+    permutation_restrict_last n (permutation_extend_last n u) = u.
+let n.
+assume hn.
+let u.
+assume hu.
+apply (Pi_ext n (fun k => n)
+  (permutation_restrict_last n (permutation_extend_last n u))
+  (god1_permutation_function_in n
+    (permutation_restrict_last n (permutation_extend_last n u))
+    (god1_permutation_restrict_last_in n hn
+      (permutation_extend_last n u)
+      (god1_permutation_extend_last_in n hn u hu)
+      (god1_permutation_extend_last_at_last n hn u)))
+  u (god1_permutation_function_in n u hu)).
+let k.
+assume hk.
+apply (eq_i_tra
+  (permutation_restrict_last n (permutation_extend_last n u) k)
+  (permutation_extend_last n u k) (u k)).
+- exact (god1_permutation_restrict_last_prefix n
+    (permutation_extend_last n u) k hk).
+- exact (god1_permutation_extend_last_prefix n u k hk).
+Qed.
+
+Theorem god1_permutation_successor_decode_in :
+  forall n, nat_p n ->
+    forall w :e (ordsucc n) :*: permutation_group n,
+      permutation_successor_decode n w
+        :e permutation_group (ordsucc n).
+let n.
+assume hn.
+let w.
+assume hw.
+claim hwdata : w 0 :e ordsucc n /\ w 1 :e permutation_group n.
+exact (setprod_elim_0_1 (ordsucc n) (permutation_group n) w hw).
+exact (god1_permutation_composition_in (ordsucc n)
+  (permutation_swap (ordsucc n) (w 0) n)
+  (god1_permutation_swap_in (ordsucc n) (w 0) n
+    (andEL (w 0 :e ordsucc n) (w 1 :e permutation_group n) hwdata)
+    (ordsuccI2 n))
+  (permutation_extend_last n (w 1))
+  (god1_permutation_extend_last_in n hn (w 1)
+    (andER (w 0 :e ordsucc n) (w 1 :e permutation_group n) hwdata))).
+Qed.
+
+Theorem god1_permutation_successor_decode_at_last :
+  forall n, nat_p n ->
+    forall w :e (ordsucc n) :*: permutation_group n,
+      permutation_successor_decode n w n = w 0.
+let n.
+assume hn.
+let w.
+assume hw.
+claim hwdata : w 0 :e ordsucc n /\ w 1 :e permutation_group n.
+exact (setprod_elim_0_1 (ordsucc n) (permutation_group n) w hw).
+apply (eq_i_tra
+  (permutation_successor_decode n w n)
+  (permutation_swap (ordsucc n) (w 0) n
+    (permutation_extend_last n (w 1) n))
+  (w 0)).
+- exact (beta (ordsucc n)
+    (fun z => permutation_swap (ordsucc n) (w 0) n
+      (permutation_extend_last n (w 1) z))
+    n (ordsuccI2 n)).
+- apply (eq_i_tra
+    (permutation_swap (ordsucc n) (w 0) n
+      (permutation_extend_last n (w 1) n))
+    (permutation_swap (ordsucc n) (w 0) n n) (w 0)).
+  - f_equal.
+    exact (god1_permutation_extend_last_at_last n hn (w 1)).
+  - exact (god1_permutation_swap_at_right (ordsucc n) (w 0) n
+      (andEL (w 0 :e ordsucc n) (w 1 :e permutation_group n) hwdata)
+      (ordsuccI2 n)).
+Qed.
+
+Theorem god1_permutation_successor_code_first :
+  forall n s, permutation_successor_code n s 0 = s n.
+let n s.
+exact (tuple_2_0_eq (s n)
+  (permutation_restrict_last n
+    (permutation_successor_correction n s))).
+Qed.
+
+Theorem god1_permutation_successor_code_second :
+  forall n s,
+    permutation_successor_code n s 1
+      = permutation_restrict_last n
+        (permutation_successor_correction n s).
+let n s.
+exact (tuple_2_1_eq (s n)
+  (permutation_restrict_last n
+    (permutation_successor_correction n s))).
+Qed.
+
+Theorem god1_permutation_successor_correction_decode :
+  forall n, nat_p n ->
+    forall w :e (ordsucc n) :*: permutation_group n,
+      permutation_successor_correction n
+        (permutation_successor_decode n w)
+      = permutation_extend_last n (w 1).
+let n.
+assume hn.
+let w.
+assume hw.
+claim hwdata : w 0 :e ordsucc n /\ w 1 :e permutation_group n.
+exact (setprod_elim_0_1 (ordsucc n) (permutation_group n) w hw).
+claim hswap :
+  permutation_swap (ordsucc n) (w 0) n
+    :e permutation_group (ordsucc n).
+exact (god1_permutation_swap_in (ordsucc n) (w 0) n
+  (andEL (w 0 :e ordsucc n) (w 1 :e permutation_group n) hwdata)
+  (ordsuccI2 n)).
+claim hext :
+  permutation_extend_last n (w 1) :e permutation_group (ordsucc n).
+exact (god1_permutation_extend_last_in n hn (w 1)
+  (andER (w 0 :e ordsucc n) (w 1 :e permutation_group n) hwdata)).
+apply (eq_i_tra
+  (permutation_successor_correction n
+    (permutation_successor_decode n w))
+  (permutation_composition (ordsucc n)
+    (permutation_swap (ordsucc n) (w 0) n)
+    (permutation_composition (ordsucc n)
+      (permutation_swap (ordsucc n) (w 0) n)
+      (permutation_extend_last n (w 1))))
+  (permutation_extend_last n (w 1))).
+- apply (eq_i_tra
+    (permutation_successor_correction n
+      (permutation_successor_decode n w))
+    (permutation_composition (ordsucc n)
+      (permutation_swap (ordsucc n)
+        (permutation_successor_decode n w n) n)
+      (permutation_successor_decode n w))
+    (permutation_composition (ordsucc n)
+      (permutation_swap (ordsucc n) (w 0) n)
+      (permutation_composition (ordsucc n)
+        (permutation_swap (ordsucc n) (w 0) n)
+        (permutation_extend_last n (w 1))))).
+  - exact (god1_permutation_successor_correction_unfold n
+      (permutation_successor_decode n w)).
+  - f_equal.
+    - f_equal.
+      exact (god1_permutation_successor_decode_at_last n hn w hw).
+    - exact (god1_permutation_successor_decode_unfold n w).
+- apply (eq_i_tra
+    (permutation_composition (ordsucc n)
+      (permutation_swap (ordsucc n) (w 0) n)
+      (permutation_composition (ordsucc n)
+        (permutation_swap (ordsucc n) (w 0) n)
+        (permutation_extend_last n (w 1))))
+    (permutation_composition (ordsucc n)
+      (permutation_composition (ordsucc n)
+        (permutation_swap (ordsucc n) (w 0) n)
+        (permutation_swap (ordsucc n) (w 0) n))
+      (permutation_extend_last n (w 1)))
+    (permutation_extend_last n (w 1))).
+  - exact (god1_group_associative
+      (permutation_group (ordsucc n))
+      (permutation_composition (ordsucc n))
+      (god1_permutations_form_group (ordsucc n))
+      (permutation_swap (ordsucc n) (w 0) n) hswap
+      (permutation_swap (ordsucc n) (w 0) n) hswap
+      (permutation_extend_last n (w 1)) hext).
+  - apply (eq_i_tra
+      (permutation_composition (ordsucc n)
+        (permutation_composition (ordsucc n)
+          (permutation_swap (ordsucc n) (w 0) n)
+          (permutation_swap (ordsucc n) (w 0) n))
+        (permutation_extend_last n (w 1)))
+      (permutation_composition (ordsucc n)
+        (permutation_identity (ordsucc n))
+        (permutation_extend_last n (w 1)))
+      (permutation_extend_last n (w 1))).
+    - f_equal.
+      exact (god1_permutation_swap_square_identity
+        (ordsucc n) (w 0) n
+        (andEL (w 0 :e ordsucc n) (w 1 :e permutation_group n) hwdata)
+        (ordsuccI2 n)).
+    - exact (god1_permutation_left_identity (ordsucc n)
+        (permutation_extend_last n (w 1)) hext).
+Qed.
+
+Theorem god1_permutation_successor_code_decode :
+  forall n, nat_p n ->
+    forall w :e (ordsucc n) :*: permutation_group n,
+      permutation_successor_code n
+        (permutation_successor_decode n w) = w.
+let n.
+assume hn.
+let w.
+assume hw.
+apply (eq_i_tra
+  (permutation_successor_code n
+    (permutation_successor_decode n w))
+  (w 0,w 1) w).
+- apply (eq_i_tra
+    (permutation_successor_code n
+      (permutation_successor_decode n w))
+    (permutation_successor_decode n w n,
+      permutation_restrict_last n
+        (permutation_successor_correction n
+          (permutation_successor_decode n w)))
+    (w 0,w 1)).
+  - exact (god1_permutation_successor_code_unfold n
+      (permutation_successor_decode n w)).
+  - apply (eq_i_tra
+      (permutation_successor_decode n w n,
+        permutation_restrict_last n
+          (permutation_successor_correction n
+            (permutation_successor_decode n w)))
+      (w 0,
+        permutation_restrict_last n
+          (permutation_successor_correction n
+            (permutation_successor_decode n w)))
+      (w 0,w 1)).
+    - exact (f_eq_i
+        (fun z => (z,
+          permutation_restrict_last n
+            (permutation_successor_correction n
+              (permutation_successor_decode n w))))
+        (permutation_successor_decode n w n) (w 0)
+        (god1_permutation_successor_decode_at_last n hn w hw)).
+    - apply (f_eq_i (fun z => (w 0,z))
+        (permutation_restrict_last n
+          (permutation_successor_correction n
+            (permutation_successor_decode n w)))
+        (w 1)).
+      apply (eq_i_tra
+        (permutation_restrict_last n
+          (permutation_successor_correction n
+            (permutation_successor_decode n w)))
+        (permutation_restrict_last n
+          (permutation_extend_last n (w 1)))
+        (w 1)).
+      - f_equal.
+        exact (god1_permutation_successor_correction_decode n hn w hw).
+      - exact (god1_permutation_restrict_extend_last n hn (w 1)
+          (andER (w 0 :e ordsucc n) (w 1 :e permutation_group n)
+            (setprod_elim_0_1
+              (ordsucc n) (permutation_group n) w hw))).
+- exact (tuple_Sigma_eta (ordsucc n)
+    (fun k => permutation_group n) w hw).
+Qed.
+
+Theorem god1_permutation_swap_correction_reconstructs :
+  forall n, nat_p n -> forall s :e permutation_group (ordsucc n),
+    permutation_composition (ordsucc n)
+      (permutation_swap (ordsucc n) (s n) n)
+      (permutation_successor_correction n s) = s.
+let n.
+assume hn.
+let s.
+assume hs.
+claim hswap :
+  permutation_swap (ordsucc n) (s n) n
+    :e permutation_group (ordsucc n).
+exact (god1_permutation_swap_in (ordsucc n) (s n) n
+  (god1_permutation_value_in (ordsucc n) s hs n (ordsuccI2 n))
+  (ordsuccI2 n)).
+apply (eq_i_tra
+  (permutation_composition (ordsucc n)
+    (permutation_swap (ordsucc n) (s n) n)
+    (permutation_successor_correction n s))
+  (permutation_composition (ordsucc n)
+    (permutation_swap (ordsucc n) (s n) n)
+    (permutation_composition (ordsucc n)
+      (permutation_swap (ordsucc n) (s n) n) s)) s).
+- f_equal.
+  exact (god1_permutation_successor_correction_unfold n s).
+- apply (eq_i_tra
+    (permutation_composition (ordsucc n)
+      (permutation_swap (ordsucc n) (s n) n)
+      (permutation_composition (ordsucc n)
+        (permutation_swap (ordsucc n) (s n) n) s))
+    (permutation_composition (ordsucc n)
+      (permutation_composition (ordsucc n)
+        (permutation_swap (ordsucc n) (s n) n)
+        (permutation_swap (ordsucc n) (s n) n)) s) s).
+  - exact (god1_group_associative
+      (permutation_group (ordsucc n))
+      (permutation_composition (ordsucc n))
+      (god1_permutations_form_group (ordsucc n))
+      (permutation_swap (ordsucc n) (s n) n) hswap
+      (permutation_swap (ordsucc n) (s n) n) hswap s hs).
+  - apply (eq_i_tra
+      (permutation_composition (ordsucc n)
+        (permutation_composition (ordsucc n)
+          (permutation_swap (ordsucc n) (s n) n)
+          (permutation_swap (ordsucc n) (s n) n)) s)
+      (permutation_composition (ordsucc n)
+        (permutation_identity (ordsucc n)) s) s).
+    - f_equal.
+      exact (god1_permutation_swap_square_identity
+        (ordsucc n) (s n) n
+        (god1_permutation_value_in (ordsucc n) s hs n (ordsuccI2 n))
+        (ordsuccI2 n)).
+    - exact (god1_permutation_left_identity (ordsucc n) s hs).
+Qed.
+
+Theorem god1_permutation_successor_decode_code :
+  forall n, nat_p n -> forall s :e permutation_group (ordsucc n),
+    permutation_successor_decode n
+      (permutation_successor_code n s) = s.
+let n.
+assume hn.
+let s.
+assume hs.
+apply (eq_i_tra
+  (permutation_successor_decode n (permutation_successor_code n s))
+  (permutation_composition (ordsucc n)
+    (permutation_swap (ordsucc n) (s n) n)
+    (permutation_successor_correction n s)) s).
+- apply (eq_i_tra
+    (permutation_successor_decode n (permutation_successor_code n s))
+    (permutation_composition (ordsucc n)
+      (permutation_swap (ordsucc n)
+        (permutation_successor_code n s 0) n)
+      (permutation_extend_last n
+        (permutation_successor_code n s 1)))
+    (permutation_composition (ordsucc n)
+      (permutation_swap (ordsucc n) (s n) n)
+      (permutation_successor_correction n s))).
+  - exact (god1_permutation_successor_decode_unfold n
+      (permutation_successor_code n s)).
+  - apply (eq_i_tra
+      (permutation_composition (ordsucc n)
+        (permutation_swap (ordsucc n)
+          (permutation_successor_code n s 0) n)
+        (permutation_extend_last n
+          (permutation_successor_code n s 1)))
+      (permutation_composition (ordsucc n)
+        (permutation_swap (ordsucc n) (s n) n)
+        (permutation_extend_last n
+          (permutation_successor_code n s 1)))
+      (permutation_composition (ordsucc n)
+        (permutation_swap (ordsucc n) (s n) n)
+        (permutation_successor_correction n s))).
+    - exact (f_eq_i
+        (fun z => permutation_composition (ordsucc n)
+          (permutation_swap (ordsucc n) z n)
+          (permutation_extend_last n
+            (permutation_successor_code n s 1)))
+        (permutation_successor_code n s 0) (s n)
+        (god1_permutation_successor_code_first n s)).
+    - apply (f_eq_i
+        (fun z => permutation_composition (ordsucc n)
+          (permutation_swap (ordsucc n) (s n) n) z)
+        (permutation_extend_last n
+          (permutation_successor_code n s 1))
+        (permutation_successor_correction n s)).
+      apply (eq_i_tra
+        (permutation_extend_last n
+          (permutation_successor_code n s 1))
+        (permutation_extend_last n
+          (permutation_restrict_last n
+            (permutation_successor_correction n s)))
+        (permutation_successor_correction n s)).
+      - exact (f_eq_i (fun z => permutation_extend_last n z)
+          (permutation_successor_code n s 1)
+          (permutation_restrict_last n
+            (permutation_successor_correction n s))
+          (god1_permutation_successor_code_second n s)).
+      - exact (god1_permutation_extend_restrict_last n hn
+          (permutation_successor_correction n s)
+          (god1_permutation_successor_correction_in n hn s hs)
+          (god1_permutation_successor_correction_fixes_last n hn s hs)).
+- exact (god1_permutation_swap_correction_reconstructs n hn s hs).
+Qed.
+
+Theorem god1_permutation_successor_bijective :
+  forall n, nat_p n ->
+    bij (permutation_group (ordsucc n))
+      ((ordsucc n) :*: permutation_group n)
+      (fun s => permutation_successor_code n s).
+let n.
+assume hn.
+apply (bijI (permutation_group (ordsucc n))
+  ((ordsucc n) :*: permutation_group n)
+  (fun s => permutation_successor_code n s)).
+- let s.
+  assume hs.
+  exact (god1_permutation_successor_code_in n hn s hs).
+- let s.
+  assume hs.
+  let t.
+  assume ht hcode.
+  apply (eq_i_tra s
+    (permutation_successor_decode n (permutation_successor_code n s)) t).
+  - apply eq_sym.
+    exact (god1_permutation_successor_decode_code n hn s hs).
+  - apply (eq_i_tra
+      (permutation_successor_decode n (permutation_successor_code n s))
+      (permutation_successor_decode n (permutation_successor_code n t)) t).
+    - exact (f_eq_i (fun w => permutation_successor_decode n w)
+        (permutation_successor_code n s)
+        (permutation_successor_code n t) hcode).
+    - exact (god1_permutation_successor_decode_code n hn t ht).
+- let w.
+  assume hw.
+  apply (ex_intro
+    (fun s => s :e permutation_group (ordsucc n)
+      /\ permutation_successor_code n s = w)
+    (permutation_successor_decode n w)).
+  exact (andI
+    (permutation_successor_decode n w :e permutation_group (ordsucc n))
+    (permutation_successor_code n
+      (permutation_successor_decode n w) = w)
+    (god1_permutation_successor_decode_in n hn w hw)
+    (god1_permutation_successor_code_decode n hn w hw)).
+Qed.
+
+Theorem god1_permutation_group_zero_equip_one :
+  equip (permutation_group 0) 1.
+apply (ex_intro_setfun
+  (fun f => bij (permutation_group 0) 1 f)
+  (fun s => 0)).
+apply (bijI (permutation_group 0) 1 (fun s => 0)).
+- let s.
+  assume hs.
+  exact In_0_1.
+- let s.
+  assume hs.
+  let t.
+  assume ht hst.
+  apply (eq_i_tra s (permutation_identity 0) t).
+  - exact (god1_permutation_empty_eq_identity s hs).
+  - apply eq_sym.
+    exact (god1_permutation_empty_eq_identity t ht).
+- let w.
+  assume hw.
+  apply (cases_1 w hw
+    (fun z => exists s :e permutation_group 0, (fun q:set => 0) s = z)).
+  apply (ex_intro
+    (fun s => s :e permutation_group 0 /\ (fun q:set => 0) s = 0)
+    (permutation_identity 0)).
+  exact (andI
+    (permutation_identity 0 :e permutation_group 0)
+    ((fun q:set => 0) (permutation_identity 0) = 0)
+    (god1_permutation_identity_in 0) (eq_ref 0)).
+Qed.
+
+Theorem god1_permutation_group_zero_order :
+  equip (permutation_group 0) (factorial 0).
+apply (god1_equip_codomain_eq_subst
+  (permutation_group 0) 1 (factorial 0)).
+- apply eq_sym.
+  exact factorial_0_eq_1.
+- exact god1_permutation_group_zero_equip_one.
+Qed.
+
+Theorem god1_permutation_successor_factorial_eq :
+  forall n, nat_p n ->
+    mul_nat (ordsucc n) (factorial n) = factorial (ordsucc n).
+let n.
+assume hn.
+claim hnomega : n :e omega.
+exact (nat_p_omega n hn).
+claim hsnomega : ordsucc n :e omega.
+exact (nat_p_omega (ordsucc n) (nat_ordsucc n hn)).
+claim hfactnat : nat_p (factorial n).
+exact (factorial_nat n hnomega).
+claim hfactomega : factorial n :e omega.
+exact (nat_p_omega (factorial n) hfactnat).
+apply (eq_i_tra
+  (mul_nat (ordsucc n) (factorial n))
+  ((ordsucc n) * (factorial n))
+  (factorial (ordsucc n))).
+  - exact (mul_nat_mul_SNo (ordsucc n) hsnomega
+      (factorial n) hfactomega).
+  - apply (eq_i_tra
+      ((ordsucc n) * (factorial n))
+      ((factorial n) * (ordsucc n))
+      (factorial (ordsucc n))).
+  - exact (mul_SNo_com (ordsucc n) (factorial n)
+      (omega_SNo (ordsucc n) hsnomega)
+      (factorial_SNo n hnomega)).
+  - apply eq_sym.
+    exact (factorial_ordsucc_eq_imp n hnomega).
+Qed.
+
+Theorem god1_permutation_group_ordinal_order_step :
+  forall n, nat_p n ->
+    equip (permutation_group n) (factorial n) ->
+    equip (permutation_group (ordsucc n)) (factorial (ordsucc n)).
+let n.
+assume hn hind.
+claim hdecomp :
+  equip (permutation_group (ordsucc n))
+    ((ordsucc n) :*: permutation_group n).
+exact (ex_intro_setfun
+  (fun f => bij (permutation_group (ordsucc n))
+    ((ordsucc n) :*: permutation_group n) f)
+  (fun s => permutation_successor_code n s)
+  (god1_permutation_successor_bijective n hn)).
+claim hproduct :
+  equip ((ordsucc n) :*: permutation_group n)
+    (mul_nat (ordsucc n) (factorial n)).
+exact (god1_setprod_cardinality
+  (ordsucc n) (permutation_group n)
+  (ordsucc n) (nat_p_omega (ordsucc n) (nat_ordsucc n hn))
+  (factorial n)
+  (nat_p_omega (factorial n)
+    (factorial_nat n (nat_p_omega n hn)))
+  (equip_ref (ordsucc n)) hind).
+apply (equip_tra
+  (permutation_group (ordsucc n))
+  ((ordsucc n) :*: permutation_group n)
+  (factorial (ordsucc n)) hdecomp).
+apply (god1_equip_codomain_eq_subst
+  ((ordsucc n) :*: permutation_group n)
+  (mul_nat (ordsucc n) (factorial n))
+  (factorial (ordsucc n))
+  (god1_permutation_successor_factorial_eq n hn) hproduct).
+Qed.
+
+Theorem god1_permutation_group_ordinal_order :
+  forall n, nat_p n ->
+    equip (permutation_group n) (factorial n).
+let n.
+assume hn.
+exact (nat_ind
+  (fun k => equip (permutation_group k) (factorial k))
+  god1_permutation_group_zero_order
+  god1_permutation_group_ordinal_order_step n hn).
+Qed.
+
+Definition permutation_relabel :
+  set -> set -> (set -> set) -> set -> set :=
+  fun X Y f s => fun y :e Y => f (s (inv X f y)).
+
+Definition permutation_unrelabel :
+  set -> set -> (set -> set) -> set -> set :=
+  fun X Y f u => fun x :e X => inv X f (u (f x)).
+
+Theorem god1_permutation_relabel_at :
+  forall X Y, forall f:set -> set, forall s,
+    forall y :e Y,
+      permutation_relabel X Y f s y = f (s (inv X f y)).
+let X Y f s.
+let y.
+assume hy.
+exact (beta Y (fun z => f (s (inv X f z))) y hy).
+Qed.
+
+Theorem god1_permutation_unrelabel_at :
+  forall X Y, forall f:set -> set, forall u,
+    forall x :e X,
+      permutation_unrelabel X Y f u x = inv X f (u (f x)).
+let X Y f u.
+let x.
+assume hx.
+exact (beta X (fun z => inv X f (u (f z))) x hx).
+Qed.
+
+Theorem god1_permutation_relabel_raw_bijective :
+  forall X Y, forall f:set -> set, bij X Y f ->
+    forall s :e permutation_group X,
+      bij Y Y (fun y => f (s (inv X f y))).
+let X Y f.
+assume hf.
+let s.
+assume hs.
+exact (bij_comp Y X Y
+  (inv X f) (fun x => f (s x))
+  (bij_inv X Y f hf)
+  (bij_comp X X Y (fun x => s x) f
+    (god1_permutation_bijective X s hs) hf)).
+Qed.
+
+Theorem god1_permutation_relabel_in :
+  forall X Y, forall f:set -> set, bij X Y f ->
+    forall s :e permutation_group X,
+      permutation_relabel X Y f s :e permutation_group Y.
+let X Y f.
+assume hf.
+let s.
+assume hs.
+claim hraw : bij Y Y (fun y => f (s (inv X f y))).
+exact (god1_permutation_relabel_raw_bijective X Y f hf s hs).
+apply (god1_permutation_group_intro Y (permutation_relabel X Y f s)).
+- exact (lam_Pi Y (fun y => Y)
+    (fun y => f (s (inv X f y)))
+    (god1_bijection_maps_into Y Y
+      (fun y => f (s (inv X f y))) hraw)).
+- exact (god1_bounded_bijection Y
+    (fun y => f (s (inv X f y))) hraw).
+Qed.
+
+Theorem god1_permutation_unrelabel_raw_bijective :
+  forall X Y, forall f:set -> set, bij X Y f ->
+    forall u :e permutation_group Y,
+      bij X X (fun x => inv X f (u (f x))).
+let X Y f.
+assume hf.
+let u.
+assume hu.
+exact (bij_comp X Y X f
+  (fun y => inv X f (u y)) hf
+  (bij_comp Y Y X (fun y => u y) (inv X f)
+    (god1_permutation_bijective Y u hu)
+    (bij_inv X Y f hf))).
+Qed.
+
+Theorem god1_permutation_unrelabel_in :
+  forall X Y, forall f:set -> set, bij X Y f ->
+    forall u :e permutation_group Y,
+      permutation_unrelabel X Y f u :e permutation_group X.
+let X Y f.
+assume hf.
+let u.
+assume hu.
+claim hraw : bij X X (fun x => inv X f (u (f x))).
+exact (god1_permutation_unrelabel_raw_bijective X Y f hf u hu).
+apply (god1_permutation_group_intro X (permutation_unrelabel X Y f u)).
+- exact (lam_Pi X (fun x => X)
+    (fun x => inv X f (u (f x)))
+    (god1_bijection_maps_into X X
+      (fun x => inv X f (u (f x))) hraw)).
+- exact (god1_bounded_bijection X
+    (fun x => inv X f (u (f x))) hraw).
+Qed.
+
+Theorem god1_permutation_relabel_unrelabel :
+  forall X Y, forall f:set -> set, bij X Y f ->
+    forall u :e permutation_group Y,
+      permutation_relabel X Y f
+        (permutation_unrelabel X Y f u) = u.
+let X Y f.
+assume hf.
+let u.
+assume hu.
+apply (Pi_ext Y (fun y => Y)
+  (permutation_relabel X Y f
+    (permutation_unrelabel X Y f u))
+  (god1_permutation_function_in Y
+    (permutation_relabel X Y f
+      (permutation_unrelabel X Y f u))
+    (god1_permutation_relabel_in X Y f hf
+      (permutation_unrelabel X Y f u)
+      (god1_permutation_unrelabel_in X Y f hf u hu)))
+  u (god1_permutation_function_in Y u hu)).
+let y.
+assume hy.
+claim hinvy : inv X f y :e X.
+exact (god1_bijection_maps_into Y X (inv X f)
+  (bij_inv X Y f hf) y hy).
+claim hfy : f (inv X f y) = y.
+exact (andER
+  (inv X f y :e X) (f (inv X f y) = y)
+  (surj_rinv X Y f
+    (god1_bijection_surjective X Y f hf) y hy)).
+claim huy : u y :e Y.
+exact (god1_permutation_value_in Y u hu y hy).
+apply (eq_i_tra
+  (permutation_relabel X Y f
+    (permutation_unrelabel X Y f u) y)
+  (f (permutation_unrelabel X Y f u (inv X f y)))
+  (u y)).
+- exact (god1_permutation_relabel_at X Y f
+    (permutation_unrelabel X Y f u) y hy).
+- apply (eq_i_tra
+    (f (permutation_unrelabel X Y f u (inv X f y)))
+    (f (inv X f (u (f (inv X f y)))))
+    (u y)).
+  - exact (f_eq_i (fun z => f z)
+      (permutation_unrelabel X Y f u (inv X f y))
+      (inv X f (u (f (inv X f y))))
+      (god1_permutation_unrelabel_at X Y f u
+        (inv X f y) hinvy)).
+  - apply (eq_i_tra
+      (f (inv X f (u (f (inv X f y)))))
+      (f (inv X f (u y))) (u y)).
+    - exact (f_eq_i (fun z => f (inv X f (u z)))
+        (f (inv X f y)) y hfy).
+    - exact (andER
+        (inv X f (u y) :e X) (f (inv X f (u y)) = u y)
+        (surj_rinv X Y f
+          (god1_bijection_surjective X Y f hf) (u y) huy)).
+Qed.
+
+Theorem god1_permutation_unrelabel_relabel :
+  forall X Y, forall f:set -> set, bij X Y f ->
+    forall s :e permutation_group X,
+      permutation_unrelabel X Y f
+        (permutation_relabel X Y f s) = s.
+let X Y f.
+assume hf.
+let s.
+assume hs.
+apply (Pi_ext X (fun x => X)
+  (permutation_unrelabel X Y f
+    (permutation_relabel X Y f s))
+  (god1_permutation_function_in X
+    (permutation_unrelabel X Y f
+      (permutation_relabel X Y f s))
+    (god1_permutation_unrelabel_in X Y f hf
+      (permutation_relabel X Y f s)
+      (god1_permutation_relabel_in X Y f hf s hs)))
+  s (god1_permutation_function_in X s hs)).
+let x.
+assume hx.
+claim hfx : f x :e Y.
+exact (god1_bijection_maps_into X Y f hf x hx).
+claim hlinvx : inv X f (f x) = x.
+exact (inj_linv X f
+  (god1_bijection_injective X Y f hf) x hx).
+claim hsx : s x :e X.
+exact (god1_permutation_value_in X s hs x hx).
+apply (eq_i_tra
+  (permutation_unrelabel X Y f
+    (permutation_relabel X Y f s) x)
+  (inv X f (permutation_relabel X Y f s (f x)))
+  (s x)).
+- exact (god1_permutation_unrelabel_at X Y f
+    (permutation_relabel X Y f s) x hx).
+- apply (eq_i_tra
+    (inv X f (permutation_relabel X Y f s (f x)))
+    (inv X f (f (s (inv X f (f x))))) (s x)).
+  - exact (f_eq_i (fun z => inv X f z)
+      (permutation_relabel X Y f s (f x))
+      (f (s (inv X f (f x))))
+      (god1_permutation_relabel_at X Y f s (f x) hfx)).
+  - apply (eq_i_tra
+      (inv X f (f (s (inv X f (f x)))))
+      (inv X f (f (s x))) (s x)).
+    - exact (f_eq_i (fun z => inv X f (f (s z)))
+        (inv X f (f x)) x hlinvx).
+    - exact (inj_linv X f
+        (god1_bijection_injective X Y f hf) (s x) hsx).
+Qed.
+
+Theorem god1_permutation_relabel_bijective :
+  forall X Y, forall f:set -> set, bij X Y f ->
+    bij (permutation_group X) (permutation_group Y)
+      (fun s => permutation_relabel X Y f s).
+let X Y f.
+assume hf.
+apply (bijI (permutation_group X) (permutation_group Y)
+  (fun s => permutation_relabel X Y f s)).
+- exact (god1_permutation_relabel_in X Y f hf).
+- let s.
+  assume hs.
+  let t.
+  assume ht hst.
+  apply (eq_i_tra s
+    (permutation_unrelabel X Y f
+      (permutation_relabel X Y f s)) t).
+  - apply eq_sym.
+    exact (god1_permutation_unrelabel_relabel X Y f hf s hs).
+  - apply (eq_i_tra
+      (permutation_unrelabel X Y f
+        (permutation_relabel X Y f s))
+      (permutation_unrelabel X Y f
+        (permutation_relabel X Y f t)) t).
+    - exact (f_eq_i (fun u => permutation_unrelabel X Y f u)
+        (permutation_relabel X Y f s)
+        (permutation_relabel X Y f t) hst).
+    - exact (god1_permutation_unrelabel_relabel X Y f hf t ht).
+- let u.
+  assume hu.
+  apply (ex_intro
+    (fun s => s :e permutation_group X
+      /\ permutation_relabel X Y f s = u)
+    (permutation_unrelabel X Y f u)).
+  exact (andI
+    (permutation_unrelabel X Y f u :e permutation_group X)
+    (permutation_relabel X Y f
+      (permutation_unrelabel X Y f u) = u)
+    (god1_permutation_unrelabel_in X Y f hf u hu)
+    (god1_permutation_relabel_unrelabel X Y f hf u hu)).
+Qed.
+
+Theorem god1_permutation_groups_equip_of_equip :
+  forall X Y, equip X Y ->
+    equip (permutation_group X) (permutation_group Y).
+let X Y.
+assume hequip.
+apply hequip.
+let f.
+assume hf.
+exact (ex_intro_setfun
+  (fun F => bij (permutation_group X) (permutation_group Y) F)
+  (fun s => permutation_relabel X Y f s)
+  (god1_permutation_relabel_bijective X Y f hf)).
+Qed.
 
 Theorem god1_s7_permutation_group_order :
   forall X, forall n :e omega,
@@ -45250,175 +46490,30 @@ let X n.
 assume hn hequip.
 //GOD1PRF:58547 The theorem is clearly true when $n=1$, and we shall prove it by induction on $n$; in other words, we shall show that if it is true for the integer $n-1$, then it is true for the integer $n$.
 claim h_s7_perm_order_induction :
-  (equip (permutation_group 1) (factorial 1))
-  /\ (equip (permutation_group (Union n)) (factorial (Union n)) ->
-    equip (permutation_group n) (factorial n)).
-admit.
+  equip (permutation_group n) (factorial n).
+exact (god1_permutation_group_ordinal_order n (omega_nat_p n hn)).
 //GOD1PRF:58740 To do this, fix an element $a$ in X , and let
 claim h_s7_perm_order_choose_a :
-  exists a :e X, a :e X.
-admit.
+  equip (permutation_group X) (permutation_group n).
+exact (god1_permutation_groups_equip_of_equip X n hequip).
 //GOD1PRF:58822 be the set obtained by removing the element $a$ from X ; the set Y has $n-1$ elements, and therefore (by the inductive hypothesis) the theorem applies to Y .
-claim h_s7_perm_order_removed_set :
-  forall a :e X,
-    equip (X :\: {a}) (Union n)
-    /\ (equip (permutation_group (X :\: {a}))
-      (factorial (Union n)) ->
-      equip (permutation_group (X :\: {a}))
-        (factorial (Union n))).
-admit.
 //GOD1PRF:58981 On the other hand the group $\mathrm{S}(\mathrm{Y})$ may be considered as a subgroup of $\mathrm{S}(\mathrm{X})$, for each permutation $s$ of the set Y we may associate the permutation $\bar{s}$ of X given by
-claim h_s7_perm_order_extension_subgroup :
-  forall a :e X,
-    subgroup
-      (permutation_group X) (permutation_composition X)
-      {s :e permutation_group X|s a = a}.
-admit.
 //GOD1PRF:59298 In this way $\mathbf{S}(\mathbf{Y})$ is identified with the subgroup of $\mathbf{S}(\mathbf{X})$ consisting of those permutations of X which have a as a fixed point.
-claim h_s7_perm_order_fixed_subgroup_size :
-  forall a :e X,
-    equip
-      {s :e permutation_group X|s a = a}
-      (factorial (Union n)).
-admit.
 //GOD1PRF:59465 By the inductive hypothesis, the group $\mathfrak{S}(\mathrm{Y})$ has $(n-1)$ ! elements; hence to show that $\mathfrak{S}(\mathrm{X})$ has $n!$ elements it is enough (by Theorem 4) to show that the index of $S(Y)$ in $S(X)$ is equal to $n$.
-claim h_s7_perm_order_group_for_theorem4 :
-  group (permutation_group X) (permutation_composition X).
-apply (god1_permutations_form_group X).
-claim h_s7_perm_order_subgroup_for_theorem4 :
-  subgroup
-    (permutation_group X) (permutation_composition X)
-    {s :e permutation_group X|
-      s (Eps_i (fun a => a :e X)) = Eps_i (fun a => a :e X)}.
-admit.
-claim h_s7_perm_order_finite_for_theorem4 :
-  finite (permutation_group X).
-admit.
-claim h_s7_perm_order_theorem4_call :
-  forall N Q R :e omega,
-    equip (permutation_group X) N ->
-    equip
-      (left_coset_quotient
-        (permutation_group X) (permutation_composition X)
-        {s :e permutation_group X|
-          s (Eps_i (fun a => a :e X)) = Eps_i (fun a => a :e X)}) Q ->
-    equip
-      {s :e permutation_group X|
-        s (Eps_i (fun a => a :e X)) = Eps_i (fun a => a :e X)} R ->
-    N = mul_nat Q R.
-apply (god1_s7_theorem4_lagrange_cardinality_formula
-  (permutation_group X) (permutation_composition X)
-  {s :e permutation_group X|
-    s (Eps_i (fun a => a :e X)) = Eps_i (fun a => a :e X)}
-  h_s7_perm_order_group_for_theorem4
-  h_s7_perm_order_subgroup_for_theorem4
-  h_s7_perm_order_finite_for_theorem4).
-claim h_s7_perm_order_reduce_to_index :
-  equip
-    (left_coset_quotient
-      (permutation_group X) (permutation_composition X)
-      {s :e permutation_group X|
-        s (Eps_i (fun a => a :e X)) = Eps_i (fun a => a :e X)}) n ->
-  equip (permutation_group X) (factorial n).
-admit.
 //GOD1PRF:59708 Let $f: \mathrm{S}(\mathrm{X}) \rightarrow \mathrm{X}$ be the mapping defined by
-claim h_s7_perm_order_evaluation_map :
-  forall s :e permutation_group X,
-    s (Eps_i (fun a => a :e X)) :e X.
-admit.
 //GOD1PRF:59864 If $s, t$ are permutations of X , the relation $f(s)=f(t)$ therefore means that
-claim h_s7_perm_order_equal_evaluations :
-  forall s t :e permutation_group X,
-    s (Eps_i (fun a => a :e X)) =
-      t (Eps_i (fun a => a :e X)) ->
-    s (Eps_i (fun a => a :e X)) =
-      t (Eps_i (fun a => a :e X)).
-admit.
 //GOD1PRF:59993 which in turn means that
-claim h_s7_perm_order_difference_fixes_a :
-  forall s t :e permutation_group X,
-    (s (Eps_i (fun a => a :e X)) =
-      t (Eps_i (fun a => a :e X)) <->
-      permutation_composition X
-        (group_inverse
-          (permutation_group X) (permutation_composition X) s) t
-        (Eps_i (fun a => a :e X))
-      = Eps_i (fun a => a :e X)).
-admit.
 //GOD1PRF:60065 i.e., that $s$ and $t$ belong to the same left coset of $\mathfrak{S}(\mathrm{Y})$ in $\mathfrak{S}(\mathrm{X})$.
-claim h_s7_perm_order_same_coset_iff_same_value :
-  forall s t :e permutation_group X,
-    (left_coset
-      (permutation_group X) (permutation_composition X)
-      {u :e permutation_group X|
-        u (Eps_i (fun a => a :e X)) = Eps_i (fun a => a :e X)} s
-    = left_coset
-      (permutation_group X) (permutation_composition X)
-      {u :e permutation_group X|
-        u (Eps_i (fun a => a :e X)) = Eps_i (fun a => a :e X)} t
-    <-> s (Eps_i (fun a => a :e X)) =
-      t (Eps_i (fun a => a :e X))).
-admit.
 //GOD1PRF:60179 By Theorem 2 of §4 it follows therefore that the number of left cosets of $\mathrm{S}(\mathrm{Y})$ in $\mathrm{S}(\mathrm{X})$ is equal to the number of elements in the image of $\mathrm{S}(\mathrm{X})$ under $f$, i.e., to the number of elements $x \in \mathrm{X}$ for which there exists a permutation $s$ of X such that $x=s(a)$.
-claim h_s7_perm_order_class_map_closed :
-  forall s :e permutation_group X,
-    left_coset
-      (permutation_group X) (permutation_composition X)
-      {u :e permutation_group X|
-        u (Eps_i (fun a => a :e X)) = Eps_i (fun a => a :e X)} s
-    :e left_coset_quotient
-      (permutation_group X) (permutation_composition X)
-      {u :e permutation_group X|
-        u (Eps_i (fun a => a :e X)) = Eps_i (fun a => a :e X)}.
-admit.
-claim h_s7_perm_order_class_map_surjective :
-  forall C :e left_coset_quotient
-      (permutation_group X) (permutation_composition X)
-      {u :e permutation_group X|
-        u (Eps_i (fun a => a :e X)) = Eps_i (fun a => a :e X)},
-    exists s :e permutation_group X,
-      left_coset
-        (permutation_group X) (permutation_composition X)
-        {u :e permutation_group X|
-          u (Eps_i (fun a => a :e X)) = Eps_i (fun a => a :e X)} s = C.
-admit.
-claim h_s7_perm_order_s4_theorem2_call :
-  equip
-    (left_coset_quotient
-      (permutation_group X) (permutation_composition X)
-      {u :e permutation_group X|
-        u (Eps_i (fun a => a :e X)) = Eps_i (fun a => a :e X)})
-    {s (Eps_i (fun a => a :e X))|s :e permutation_group X}.
-apply (god1_s4_theorem2_classes_equip_image
-  (permutation_group X)
-  (left_coset_quotient
-    (permutation_group X) (permutation_composition X)
-    {u :e permutation_group X|
-      u (Eps_i (fun a => a :e X)) = Eps_i (fun a => a :e X)})
-  (fun s => s (Eps_i (fun a => a :e X)))
-  (fun s => left_coset
-    (permutation_group X) (permutation_composition X)
-    {u :e permutation_group X|
-      u (Eps_i (fun a => a :e X)) = Eps_i (fun a => a :e X)} s)
-  h_s7_perm_order_class_map_closed
-  h_s7_perm_order_class_map_surjective
-  h_s7_perm_order_same_coset_iff_same_value).
 //GOD1PRF:60511 But it is clear that every $x \in \mathrm{X}$ is of the form $x=s(a)$ for a suitably chosen permutation $s$; hence the number of left cosets (i.e., the index of $\mathfrak{S}(\mathrm{Y})$ in $\mathfrak{S}(\mathrm{X}))$ is equal to $n$.
-claim h_s7_perm_order_orbit_is_all_X :
-  {s (Eps_i (fun a => a :e X))|s :e permutation_group X} = X.
-admit.
-claim h_s7_perm_order_index_is_n :
-  equip
-    (left_coset_quotient
-      (permutation_group X) (permutation_composition X)
-      {u :e permutation_group X|
-        u (Eps_i (fun a => a :e X)) = Eps_i (fun a => a :e X)}) n.
-admit.
 //GOD1PRF:60749 Q.E.D.
 claim h_s7_perm_order_book_conclusion :
   equip (permutation_group X) (factorial n).
-admit.
-Admitted.
+exact (equip_tra
+  (permutation_group X) (permutation_group n) (factorial n)
+  h_s7_perm_order_choose_a h_s7_perm_order_induction).
+exact h_s7_perm_order_book_conclusion.
+Qed.
 
 //GOD1:60785 group_homomorphism : "#7 is a homomorphism from the group #1 to the group #3" | $#7:#1\to #3$
 Definition group_homomorphism :
