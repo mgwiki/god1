@@ -67641,23 +67641,208 @@ Theorem god1_ring_homomorphism_injective_iff_trivial_kernel :
       = {ring_zero K addK}).
 let K addK mulK L addL mulL f.
 assume hf.
-apply iffI.
 //GOD1PRF:124627 The homomorphism $f$ is injective if and only if $\operatorname{Ker}(f)=\{0\}$.
 claim h_s8_ring_hom_underlying_group_hom :
   group_homomorphism K addK L addL f.
-admit.
+exact (god1_ring_homomorphism_additive_group_homomorphism
+  K addK mulK L addL mulL f hf).
 claim h_s8_ring_hom_s7_theorem8_call :
   inj K L f <->
     group_homomorphism_kernel K addK L addL f
       = {group_identity K addK}.
-apply (god1_s7_theorem8_injective_iff_trivial_kernel
+exact (god1_s7_theorem8_injective_iff_trivial_kernel
   K addK L addL f h_s8_ring_hom_underlying_group_hom).
 claim h_s8_ring_hom_kernel_characterization :
   inj K L f <->
     ring_homomorphism_kernel K addK mulK L addL mulL f
       = {ring_zero K addK}.
-admit.
-Admitted.
+exact h_s8_ring_hom_s7_theorem8_call.
+exact h_s8_ring_hom_kernel_characterization.
+Qed.
+
+Theorem god1_ring_zero_multiplication_right :
+  forall K, forall add mul:set -> set -> set,
+    ring K add mul -> forall x :e K,
+      mul x (ring_zero K add) = ring_zero K add.
+let K add mul.
+assume hK.
+let x.
+assume hx.
+claim hA : group K add.
+exact (god1_ring_additive_group K add mul hK).
+claim hzero : ring_zero K add :e K.
+exact (god1_group_identity_in K add hA).
+claim hz : mul x (ring_zero K add) :e K.
+exact (god1_ring_multiplicative_law K add mul hK
+  x hx (ring_zero K add) hzero).
+claim hzerozero :
+  add (ring_zero K add) (ring_zero K add) = ring_zero K add.
+exact (andEL
+  (add (ring_zero K add) (ring_zero K add) = ring_zero K add)
+  (add (ring_zero K add) (ring_zero K add) = ring_zero K add)
+  ((andER
+    (ring_zero K add :e K)
+    (forall u :e K,
+      add u (ring_zero K add) = u
+      /\ add (ring_zero K add) u = u)
+    (god1_group_identity_specification K add hA))
+    (ring_zero K add) hzero)).
+claim hzz :
+  mul x (ring_zero K add)
+  = add (mul x (ring_zero K add)) (mul x (ring_zero K add)).
+exact (eq_i_tra
+  (mul x (ring_zero K add))
+  (mul x (add (ring_zero K add) (ring_zero K add)))
+  (add (mul x (ring_zero K add)) (mul x (ring_zero K add)))
+  (eq_sym
+    (mul x (add (ring_zero K add) (ring_zero K add)))
+    (mul x (ring_zero K add))
+    (f_eq_i (fun u => mul x u)
+      (add (ring_zero K add) (ring_zero K add))
+      (ring_zero K add) hzerozero))
+  (andEL
+    (mul x (add (ring_zero K add) (ring_zero K add))
+      = add (mul x (ring_zero K add)) (mul x (ring_zero K add)))
+    (mul (add x (ring_zero K add)) (ring_zero K add)
+      = add (mul x (ring_zero K add))
+        (mul (ring_zero K add) (ring_zero K add)))
+    (god1_ring_distributive_laws K add mul hK
+      x hx (ring_zero K add) hzero (ring_zero K add) hzero))).
+apply eq_sym.
+exact (god1_group_left_cancel K add hA
+  (mul x (ring_zero K add)) hz
+  (ring_zero K add) hzero
+  (mul x (ring_zero K add)) hz
+  (eq_i_tra
+    (add (mul x (ring_zero K add)) (ring_zero K add))
+    (mul x (ring_zero K add))
+    (add (mul x (ring_zero K add)) (mul x (ring_zero K add)))
+    (andEL
+      (add (mul x (ring_zero K add)) (ring_zero K add)
+        = mul x (ring_zero K add))
+      (add (ring_zero K add) (mul x (ring_zero K add))
+        = mul x (ring_zero K add))
+      ((andER
+        (ring_zero K add :e K)
+        (forall u :e K,
+          add u (ring_zero K add) = u
+          /\ add (ring_zero K add) u = u)
+        (god1_group_identity_specification K add hA))
+        (mul x (ring_zero K add)) hz))
+    hzz)).
+Qed.
+
+Theorem god1_ring_homomorphism_kernel_elim :
+  forall K, forall addK mulK:set -> set -> set,
+  forall L, forall addL mulL:set -> set -> set,
+  forall f:set -> set, forall x,
+    x :e ring_homomorphism_kernel K addK mulK L addL mulL f ->
+    x :e K /\ f x = ring_zero L addL.
+let K addK mulK L addL mulL f x.
+assume hx.
+exact (andI (x :e K) (f x = ring_zero L addL)
+  (SepE1 K (fun z => f z = ring_zero L addL) x hx)
+  (SepE2 K (fun z => f z = ring_zero L addL) x hx)).
+Qed.
+
+Theorem god1_ring_homomorphism_kernel_intro :
+  forall K, forall addK mulK:set -> set -> set,
+  forall L, forall addL mulL:set -> set -> set,
+  forall f:set -> set, forall x,
+    x :e K -> f x = ring_zero L addL ->
+    x :e ring_homomorphism_kernel K addK mulK L addL mulL f.
+let K addK mulK L addL mulL f x.
+assume hx heq.
+exact (SepI K (fun z => f z = ring_zero L addL) x hx heq).
+Qed.
+
+Theorem god1_ring_homomorphism_kernel_additive_subgroup :
+  forall K, forall addK mulK:set -> set -> set,
+  forall L, forall addL mulL:set -> set -> set,
+  forall f:set -> set,
+    ring_homomorphism K addK mulK L addL mulL f ->
+    subgroup K addK
+      (ring_homomorphism_kernel K addK mulK L addL mulL f).
+let K addK mulK L addL mulL f.
+assume hf.
+exact (god1_group_homomorphism_kernel_subgroup K addK L addL f
+  (god1_ring_homomorphism_additive_group_homomorphism
+    K addK mulK L addL mulL f hf)).
+Qed.
+
+Theorem god1_ring_homomorphism_kernel_absorbs :
+  forall K, forall addK mulK:set -> set -> set,
+  forall L, forall addL mulL:set -> set -> set,
+  forall f:set -> set,
+    ring_homomorphism K addK mulK L addL mulL f ->
+    forall a :e K,
+    forall x :e ring_homomorphism_kernel K addK mulK L addL mulL f,
+      mulK a x :e ring_homomorphism_kernel K addK mulK L addL mulL f
+      /\ mulK x a :e ring_homomorphism_kernel K addK mulK L addL mulL f.
+let K addK mulK L addL mulL f.
+assume hf.
+let a.
+assume ha.
+let x.
+assume hx.
+claim hrings : ring K addK mulK /\ ring L addL mulL.
+exact (god1_ring_homomorphism_rings K addK mulK L addL mulL f hf).
+claim hK : ring K addK mulK.
+exact (andEL (ring K addK mulK) (ring L addL mulL) hrings).
+claim hL : ring L addL mulL.
+exact (andER (ring K addK mulK) (ring L addL mulL) hrings).
+claim hxdata : x :e K /\ f x = ring_zero L addL.
+exact (god1_ring_homomorphism_kernel_elim
+  K addK mulK L addL mulL f x hx).
+claim hxK : x :e K.
+exact (andEL (x :e K) (f x = ring_zero L addL) hxdata).
+claim hfa : f a :e L.
+exact (god1_ring_homomorphism_maps_into
+  K addK mulK L addL mulL f hf a ha).
+claim hfx : f x = ring_zero L addL.
+exact (andER (x :e K) (f x = ring_zero L addL) hxdata).
+claim hops :
+  f (addK a x) = addL (f a) (f x)
+  /\ f (mulK a x) = mulL (f a) (f x).
+exact (god1_ring_homomorphism_operations
+  K addK mulK L addL mulL f hf a ha x hxK).
+claim hopsrev :
+  f (addK x a) = addL (f x) (f a)
+  /\ f (mulK x a) = mulL (f x) (f a).
+exact (god1_ring_homomorphism_operations
+  K addK mulK L addL mulL f hf x hxK a ha).
+apply andI.
+- apply (god1_ring_homomorphism_kernel_intro
+    K addK mulK L addL mulL f (mulK a x)).
+  - exact (god1_ring_multiplicative_law K addK mulK hK a ha x hxK).
+  - exact (eq_i_tra
+      (f (mulK a x)) (mulL (f a) (f x)) (ring_zero L addL)
+      (andER
+        (f (addK a x) = addL (f a) (f x))
+        (f (mulK a x) = mulL (f a) (f x)) hops)
+      (eq_i_tra
+        (mulL (f a) (f x))
+        (mulL (f a) (ring_zero L addL)) (ring_zero L addL)
+        (f_eq_i (fun z => mulL (f a) z)
+          (f x) (ring_zero L addL) hfx)
+        (god1_ring_zero_multiplication_right L addL mulL hL
+          (f a) hfa))).
+- apply (god1_ring_homomorphism_kernel_intro
+    K addK mulK L addL mulL f (mulK x a)).
+  - exact (god1_ring_multiplicative_law K addK mulK hK x hxK a ha).
+  - exact (eq_i_tra
+      (f (mulK x a)) (mulL (f x) (f a)) (ring_zero L addL)
+      (andER
+        (f (addK x a) = addL (f x) (f a))
+        (f (mulK x a) = mulL (f x) (f a)) hopsrev)
+      (eq_i_tra
+        (mulL (f x) (f a))
+        (mulL (ring_zero L addL) (f a)) (ring_zero L addL)
+        (f_eq_i (fun z => mulL z (f a))
+          (f x) (ring_zero L addL) hfx)
+        (god1_ring_zero_multiplication_left L addL mulL hL
+          (f a) hfa))).
+Qed.
 
 //GOD1:125150 left_ideal : "#4 is a left ideal of the ring #1" | $#4\triangleleft_l #1$
 Definition left_ideal :
@@ -67691,6 +67876,27 @@ Theorem god1_ring_homomorphism_kernel_is_two_sided_ideal :
       (ring_homomorphism_kernel K addK mulK L addL mulL f).
 let K addK mulK L addL mulL f.
 assume hf.
+claim hrings : ring K addK mulK /\ ring L addL mulL.
+exact (god1_ring_homomorphism_rings
+  K addK mulK L addL mulL f hf).
+claim hK : ring K addK mulK.
+exact (andEL (ring K addK mulK) (ring L addL mulL) hrings).
+claim hsub :
+  subgroup K addK
+    (ring_homomorphism_kernel K addK mulK L addL mulL f).
+exact (god1_ring_homomorphism_kernel_additive_subgroup
+  K addK mulK L addL mulL f hf).
+claim hsubset :
+  ring_homomorphism_kernel K addK mulK L addL mulL f c= K.
+exact (god1_subgroup_subset K addK
+  (ring_homomorphism_kernel K addK mulK L addL mulL f) hsub).
+claim habsorb :
+  forall a :e K,
+  forall x :e ring_homomorphism_kernel K addK mulK L addL mulL f,
+    mulK a x :e ring_homomorphism_kernel K addK mulK L addL mulL f
+    /\ mulK x a :e ring_homomorphism_kernel K addK mulK L addL mulL f.
+exact (god1_ring_homomorphism_kernel_absorbs
+  K addK mulK L addL mulL f hf).
 //GOD1PRF:124708 The relations
 claim h_s8_ring_kernel_relations :
   forall x y :e ring_homomorphism_kernel K addK mulK L addL mulL f,
@@ -67699,20 +67905,91 @@ claim h_s8_ring_kernel_relations :
   /\ forall a :e K,
     mulK a x :e ring_homomorphism_kernel K addK mulK L addL mulL f
     /\ mulK x a :e ring_homomorphism_kernel K addK mulK L addL mulL f.
-admit.
+exact (fun x hx y hy => andI
+  (addK x (ring_negation K addK y)
+    :e ring_homomorphism_kernel K addK mulK L addL mulL f)
+  (forall a :e K,
+    mulK a x :e ring_homomorphism_kernel K addK mulK L addL mulL f
+    /\ mulK x a :e ring_homomorphism_kernel K addK mulK L addL mulL f)
+  (god1_subgroup_difference_closed K addK
+    (ring_homomorphism_kernel K addK mulK L addL mulL f)
+    hsub x hx y hy)
+  (fun a ha => habsorb a ha x hx)).
+claim hleft :
+  left_ideal K addK mulK
+    (ring_homomorphism_kernel K addK mulK L addL mulL f).
+exact (andI
+  (((ring K addK mulK
+      /\ ring_homomorphism_kernel K addK mulK L addL mulL f c= K)
+    /\ subgroup K addK
+      (ring_homomorphism_kernel K addK mulK L addL mulL f)))
+  (forall a :e K,
+    forall x :e ring_homomorphism_kernel K addK mulK L addL mulL f,
+      mulK a x
+        :e ring_homomorphism_kernel K addK mulK L addL mulL f)
+  (andI
+    (ring K addK mulK
+      /\ ring_homomorphism_kernel K addK mulK L addL mulL f c= K)
+    (subgroup K addK
+      (ring_homomorphism_kernel K addK mulK L addL mulL f))
+    (andI
+      (ring K addK mulK)
+      (ring_homomorphism_kernel K addK mulK L addL mulL f c= K)
+      hK hsubset)
+    hsub)
+  (fun a ha x hx => andEL
+    (mulK a x
+      :e ring_homomorphism_kernel K addK mulK L addL mulL f)
+    (mulK x a
+      :e ring_homomorphism_kernel K addK mulK L addL mulL f)
+    (habsorb a ha x hx))).
+claim hright :
+  right_ideal K addK mulK
+    (ring_homomorphism_kernel K addK mulK L addL mulL f).
+exact (andI
+  (((ring K addK mulK
+      /\ ring_homomorphism_kernel K addK mulK L addL mulL f c= K)
+    /\ subgroup K addK
+      (ring_homomorphism_kernel K addK mulK L addL mulL f)))
+  (forall a :e K,
+    forall x :e ring_homomorphism_kernel K addK mulK L addL mulL f,
+      mulK x a
+        :e ring_homomorphism_kernel K addK mulK L addL mulL f)
+  (andI
+    (ring K addK mulK
+      /\ ring_homomorphism_kernel K addK mulK L addL mulL f c= K)
+    (subgroup K addK
+      (ring_homomorphism_kernel K addK mulK L addL mulL f))
+    (andI
+      (ring K addK mulK)
+      (ring_homomorphism_kernel K addK mulK L addL mulL f c= K)
+      hK hsubset)
+    hsub)
+  (fun a ha x hx => andER
+    (mulK a x
+      :e ring_homomorphism_kernel K addK mulK L addL mulL f)
+    (mulK x a
+      :e ring_homomorphism_kernel K addK mulK L addL mulL f)
+    (habsorb a ha x hx))).
 //GOD1PRF:124779 show that the kernel I of a homomorphism $f: \mathrm{K} \rightarrow \mathrm{L}$ satisfies the following two conditions :
 claim h_s8_ring_kernel_left_and_right :
   left_ideal K addK mulK
     (ring_homomorphism_kernel K addK mulK L addL mulL f)
   /\ right_ideal K addK mulK
     (ring_homomorphism_kernel K addK mulK L addL mulL f).
-admit.
+exact (andI
+  (left_ideal K addK mulK
+    (ring_homomorphism_kernel K addK mulK L addL mulL f))
+  (right_ideal K addK mulK
+    (ring_homomorphism_kernel K addK mulK L addL mulL f))
+  hleft hright).
 //GOD1PRF:125047 A subset $I$ of a ring $K$ is called a two-sided ideal if it satisfies these conditions (i) and (ii).
 claim h_s8_ring_kernel_two_sided :
   two_sided_ideal K addK mulK
     (ring_homomorphism_kernel K addK mulK L addL mulL f).
-admit.
-Admitted.
+exact h_s8_ring_kernel_left_and_right.
+exact h_s8_ring_kernel_two_sided.
+Qed.
 
 Theorem god1_two_sided_ideal_iff_left_and_right :
   forall K, forall add mul:set -> set -> set, forall I,
