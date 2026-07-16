@@ -59075,7 +59075,7 @@ apply set_ext.
 Qed.
 
 Theorem god1_binomial_pascal_interior :
-  forall n :e omega, forall r :e n, 0 :e r ->
+  forall n :e omega, forall r :e omega, 0 :e r ->
     add_nat
       (binomial_coefficient n r)
       (binomial_coefficient n (Union r))
@@ -59085,7 +59085,7 @@ assume hn.
 let r.
 assume hr hpos.
 claim hromega : r :e omega.
-exact (omega_TransSet n hn r hr).
+exact hr.
 claim hrsucc : r = ordsucc (Union r).
 exact (god1_positive_natural_successor_union r hromega hpos).
 claim hUnionomega : Union r :e omega.
@@ -59243,6 +59243,2660 @@ exact (god1_nat_equip_eq
     hbigEquip)).
 Qed.
 
+Theorem god1_bijection_adjoin_maps_into_finite_set :
+  forall n :e omega, forall A :e Power n, forall y :e n,
+    forall f:set -> set,
+      bij (ordsucc n) (A :\/: {y}) f ->
+      forall i :e ordsucc n, f i :e n.
+let n.
+assume hn.
+let A.
+assume hA.
+let y.
+assume hyn.
+let f.
+assume hf.
+let i.
+assume hi.
+claim hfiUnion : f i :e A :\/: {y}.
+exact (god1_bijection_maps_into
+  (ordsucc n) (A :\/: {y}) f hf i hi).
+apply (binunionE' A {y} (f i) (f i :e n)).
+- assume hfiA.
+  exact ((PowerE n A hA) (f i) hfiA).
+- assume hfiy.
+  exact (mem_eq_substL n y (f i)
+    (SingE y (f i) hfiy) hyn).
+- exact hfiUnion.
+Qed.
+
+Theorem god1_finite_subset_missing_point_contradiction :
+  forall n :e omega, forall A :e Power n, forall y :e n,
+    y /:e A -> equip A n -> False.
+let n.
+assume hn.
+let A.
+assume hA.
+let y.
+assume hyn hyA hequip.
+claim hAdjoinEquip : equip (ordsucc n) (A :\/: {y}).
+exact (equip_adjoin_ordsucc n A y hyA
+  (equip_sym A n hequip)).
+apply hAdjoinEquip.
+let f.
+assume hf.
+claim hmaps : forall i :e ordsucc n, f i :e n.
+exact (god1_bijection_adjoin_maps_into_finite_set
+  n hn A hA y hyn f hf).
+claim hinjective :
+  forall i j :e ordsucc n, f i = f j -> i = j.
+exact (god1_bijection_injective
+  (ordsucc n) (A :\/: {y}) f hf).
+exact ((PigeonHole_nat n (omega_nat_p n hn) f hmaps)
+  hinjective).
+Qed.
+
+Theorem god1_finite_subset_equip_self :
+  forall n :e omega, forall A :e Power n,
+    equip A n -> A = n.
+let n.
+assume hn.
+let A.
+assume hA hequip.
+apply set_ext.
+- exact (PowerE n A hA).
+- let y.
+  assume hyn.
+  apply dneg.
+  assume hyA.
+  exact (god1_finite_subset_missing_point_contradiction
+    n hn A hA y hyn hyA hequip).
+Qed.
+
+Theorem god1_finite_cardinality_eq_one_of_equip_singleton :
+  forall X, equip X 1 -> finite_cardinality X = 1.
+let X.
+assume hXone.
+claim hfin : finite X.
+exact (ex_intro
+  (fun n => n :e omega /\ equip X n) 1
+  (andI (1 :e omega) (equip X 1)
+    (nat_p_omega 1 nat_1) hXone)).
+claim hspec :
+  finite_cardinality X :e omega
+  /\ equip X (finite_cardinality X).
+exact (god1_finite_cardinality_specification X hfin).
+claim hcardEquip :
+  equip (finite_cardinality X) 1.
+exact (equip_tra
+  (finite_cardinality X) X 1
+  (equip_sym X (finite_cardinality X)
+    (andER
+      (finite_cardinality X :e omega)
+      (equip X (finite_cardinality X)) hspec))
+  hXone).
+exact (god1_nat_equip_eq
+  (finite_cardinality X) 1
+  (omega_nat_p (finite_cardinality X)
+    (andEL
+      (finite_cardinality X :e omega)
+      (equip X (finite_cardinality X)) hspec))
+  nat_1 hcardEquip).
+Qed.
+
+Theorem god1_binomial_zero_family_singleton :
+  forall n :e omega,
+    {A :e Power n|equip A 0} = {0}.
+let n.
+assume hn.
+apply set_ext.
+- let A.
+  assume hA.
+  claim hAequip : equip A 0.
+  exact (SepE2 (Power n) (fun B => equip B 0) A hA).
+  exact (mem_eq_substL {0} 0 A
+    (equip_0_Empty A hAequip) (SingI 0)).
+- let A.
+  assume hA.
+  claim hA0 : A = 0.
+  exact (SingE 0 A hA).
+  exact (mem_eq_substL
+    {B :e Power n|equip B 0} 0 A hA0
+    (SepI (Power n) (fun B => equip B 0) 0
+      (PowerI n 0 (fun z hz =>
+        FalseE (EmptyE z hz) (z :e n)))
+      (equip_ref 0))).
+Qed.
+
+Theorem god1_binomial_diagonal_family_singleton :
+  forall n :e omega,
+    {A :e Power n|equip A n} = {n}.
+let n.
+assume hn.
+apply set_ext.
+- let A.
+  assume hA.
+  claim hApower : A :e Power n.
+  exact (SepE1 (Power n) (fun B => equip B n) A hA).
+  claim hAequip : equip A n.
+  exact (SepE2 (Power n) (fun B => equip B n) A hA).
+  exact (mem_eq_substL {n} n A
+    (god1_finite_subset_equip_self n hn A hApower hAequip)
+    (SingI n)).
+- let A.
+  assume hA.
+  claim hAn : A = n.
+  exact (SingE n A hA).
+  exact (mem_eq_substL
+    {B :e Power n|equip B n} n A hAn
+    (SepI (Power n) (fun B => equip B n) n
+      (PowerI n n (fun z hz => hz))
+      (equip_ref n))).
+Qed.
+
+Theorem god1_binomial_coefficient_zero :
+  forall n :e omega, binomial_coefficient n 0 = 1.
+let n.
+assume hn.
+claim hfamily :
+  {A :e Power n|equip A 0} = {0}.
+exact (god1_binomial_zero_family_singleton n hn).
+claim hfamilyOne : equip {A :e Power n|equip A 0} 1.
+exact (god1_equip_domain_eq_subst
+  {0} {A :e Power n|equip A 0} 1
+  (eq_sym {A :e Power n|equip A 0} {0} hfamily)
+  (equip_Sing_1 0)).
+exact (god1_finite_cardinality_eq_one_of_equip_singleton
+  {A :e Power n|equip A 0} hfamilyOne).
+Qed.
+
+Theorem god1_binomial_coefficient_diagonal :
+  forall n :e omega, binomial_coefficient n n = 1.
+let n.
+assume hn.
+claim hfamily :
+  {A :e Power n|equip A n} = {n}.
+exact (god1_binomial_diagonal_family_singleton n hn).
+claim hfamilyOne : equip {A :e Power n|equip A n} 1.
+exact (god1_equip_domain_eq_subst
+  {n} {A :e Power n|equip A n} 1
+  (eq_sym {A :e Power n|equip A n} {n} hfamily)
+  (equip_Sing_1 n)).
+exact (god1_finite_cardinality_eq_one_of_equip_singleton
+  {A :e Power n|equip A n} hfamilyOne).
+Qed.
+
+Theorem god1_ring_additive_commutative :
+  forall K, forall add mul:set -> set -> set,
+    ring K add mul -> commutative_on K add.
+let K add mul.
+assume hK.
+exact (andER
+  (group K add) (commutative_on K add)
+  (god1_ring_additive_abelian_group K add mul hK)).
+Qed.
+
+Theorem god1_ring_finite_sum_zero_natural :
+  forall K, forall add:set -> set -> set, forall f:set -> set,
+    ring_finite_sum K add 0 f = group_identity K add.
+let K add f.
+exact (eq_i_tra
+  (ring_finite_sum K add 0 f)
+  (group_word_product K add f 0)
+  (group_identity K add)
+  (god1_ring_finite_sum_natural K add 0
+    (nat_p_omega 0 nat_0) f)
+  (god1_group_word_product_zero K add f)).
+Qed.
+
+Theorem god1_ring_finite_sum_in_natural :
+  forall K, forall add mul:set -> set -> set,
+    ring K add mul -> forall n :e omega, forall f:set -> set,
+      (forall i :e n, f i :e K) ->
+      ring_finite_sum K add n f :e K.
+let K add mul.
+assume hK.
+let n.
+assume hn.
+let f.
+assume hf.
+exact (mem_eq_substL K
+  (group_word_product K add f n)
+  (ring_finite_sum K add n f)
+  (god1_ring_finite_sum_natural K add n hn f)
+  (god1_group_word_product_in K add f n
+    (god1_ring_additive_group K add mul hK)
+    (omega_nat_p n hn) hf)).
+Qed.
+
+Theorem god1_ring_finite_sum_congr_natural :
+  forall K, forall add:set -> set -> set,
+  forall n :e omega, forall f g:set -> set,
+    (forall i :e n, f i = g i) ->
+    ring_finite_sum K add n f = ring_finite_sum K add n g.
+let K add.
+let n.
+assume hn.
+let f g.
+assume hfg.
+exact (eq_i_tra
+  (ring_finite_sum K add n f)
+  (group_word_product K add f n)
+  (ring_finite_sum K add n g)
+  (god1_ring_finite_sum_natural K add n hn f)
+  (eq_i_tra
+    (group_word_product K add f n)
+    (group_word_product K add g n)
+    (ring_finite_sum K add n g)
+    (god1_group_word_product_congr K add f g n
+      (omega_nat_p n hn) hfg)
+    (eq_sym
+      (ring_finite_sum K add n g)
+      (group_word_product K add g n)
+      (god1_ring_finite_sum_natural K add n hn g)))).
+Qed.
+
+Theorem god1_group_associative_reverse :
+  forall K, forall add:set -> set -> set,
+    group K add -> forall a b c :e K,
+      add (add a b) c = add a (add b c).
+let K add.
+assume hK.
+let a.
+assume ha.
+let b.
+assume hb.
+let c.
+assume hc.
+apply eq_sym.
+exact (god1_group_associative K add hK a ha b hb c hc).
+Qed.
+
+Theorem god1_abelian_four_term_interchange :
+  forall K, forall add:set -> set -> set,
+    abelian_group K add -> forall a b c d :e K,
+      add (add a b) (add c d) = add (add a c) (add b d).
+let K add.
+assume hK.
+let a.
+assume ha.
+let b.
+assume hb.
+let c.
+assume hc.
+let d.
+assume hd.
+claim hgroup : group K add.
+exact (andEL (group K add) (commutative_on K add) hK).
+claim hcomm : commutative_on K add.
+exact (andER (group K add) (commutative_on K add) hK).
+exact (eq_i_tra
+  (add (add a b) (add c d))
+  (add a (add b (add c d)))
+  (add (add a c) (add b d))
+  (god1_group_associative_reverse K add hgroup
+    a ha b hb (add c d)
+    (god1_group_law_of_composition K add hgroup c hc d hd))
+  (eq_i_tra
+    (add a (add b (add c d)))
+    (add a (add (add b c) d))
+    (add (add a c) (add b d))
+    (f_eq_i (fun z:set => add a z)
+      (add b (add c d)) (add (add b c) d)
+      (god1_group_associative K add hgroup b hb c hc d hd))
+    (eq_i_tra
+      (add a (add (add b c) d))
+      (add a (add (add c b) d))
+      (add (add a c) (add b d))
+      (f_eq_i (fun z:set => add a (add z d))
+        (add b c) (add c b) (hcomm b hb c hc))
+      (eq_i_tra
+        (add a (add (add c b) d))
+        (add a (add c (add b d)))
+        (add (add a c) (add b d))
+        (f_eq_i (fun z:set => add a z)
+          (add (add c b) d) (add c (add b d))
+          (god1_group_associative_reverse K add hgroup
+            c hc b hb d hd))
+        (god1_group_associative K add hgroup
+          a ha c hc (add b d)
+          (god1_group_law_of_composition K add hgroup b hb d hd)))))).
+Qed.
+
+Theorem god1_ring_finite_sum_head_tail_zero :
+  forall K, forall add mul:set -> set -> set,
+    ring K add mul -> forall f:set -> set,
+      (forall i :e ordsucc 0, f i :e K) ->
+      ring_finite_sum K add (ordsucc 0) f
+      = add (f 0)
+        (ring_finite_sum K add 0 (fun i => f (ordsucc i))).
+let K add mul.
+assume hK.
+let f.
+assume hf.
+claim hzero : group_identity K add :e K.
+exact (god1_group_identity_in K add
+  (god1_ring_additive_group K add mul hK)).
+claim hfzero : f 0 :e K.
+exact (hf 0 (ordsuccI2 0)).
+claim hneutral : neutral_element K add (group_identity K add).
+exact (god1_group_identity_specification K add
+  (god1_ring_additive_group K add mul hK)).
+exact (eq_i_tra
+  (ring_finite_sum K add (ordsucc 0) f)
+  (add (ring_finite_sum K add 0 f) (f 0))
+  (add (f 0)
+    (ring_finite_sum K add 0 (fun i => f (ordsucc i))))
+  (god1_ring_finite_sum_natural_successor K add 0
+    (nat_p_omega 0 nat_0) f)
+  (eq_i_tra
+    (add (ring_finite_sum K add 0 f) (f 0))
+    (f 0)
+    (add (f 0)
+      (ring_finite_sum K add 0 (fun i => f (ordsucc i))))
+    (eq_i_tra
+      (add (ring_finite_sum K add 0 f) (f 0))
+      (add (group_identity K add) (f 0))
+      (f 0)
+      (f_eq_i (fun z:set => add z (f 0))
+        (ring_finite_sum K add 0 f) (group_identity K add)
+        (god1_ring_finite_sum_zero_natural K add f))
+      (andER
+        (add (f 0) (group_identity K add) = f 0)
+        (add (group_identity K add) (f 0) = f 0)
+        ((andER
+          (group_identity K add :e K)
+          (forall z :e K,
+            add z (group_identity K add) = z
+            /\ add (group_identity K add) z = z)
+          hneutral) (f 0) hfzero)))
+    (eq_sym
+      (add (f 0)
+        (ring_finite_sum K add 0 (fun i => f (ordsucc i))))
+      (f 0)
+      (eq_i_tra
+        (add (f 0)
+          (ring_finite_sum K add 0 (fun i => f (ordsucc i))))
+        (add (f 0) (group_identity K add))
+        (f 0)
+        (f_eq_i (fun z:set => add (f 0) z)
+          (ring_finite_sum K add 0 (fun i => f (ordsucc i)))
+          (group_identity K add)
+          (god1_ring_finite_sum_zero_natural K add
+            (fun i => f (ordsucc i))))
+        (andEL
+          (add (f 0) (group_identity K add) = f 0)
+          (add (group_identity K add) (f 0) = f 0)
+          ((andER
+            (group_identity K add :e K)
+            (forall z :e K,
+              add z (group_identity K add) = z
+              /\ add (group_identity K add) z = z)
+            hneutral) (f 0) hfzero)))))).
+Qed.
+
+Theorem god1_ring_finite_sum_head_tail_step :
+  forall K, forall add mul:set -> set -> set,
+    ring K add mul -> forall f:set -> set, forall n,
+    nat_p n ->
+    ((forall i :e ordsucc n, f i :e K) ->
+      ring_finite_sum K add (ordsucc n) f
+      = add (f 0)
+        (ring_finite_sum K add n (fun i => f (ordsucc i)))) ->
+    (forall i :e ordsucc (ordsucc n), f i :e K) ->
+      ring_finite_sum K add (ordsucc (ordsucc n)) f
+      = add (f 0)
+        (ring_finite_sum K add (ordsucc n)
+          (fun i => f (ordsucc i))).
+let K add mul.
+assume hK.
+let f.
+let n.
+assume hn hind hf.
+claim hprefix : forall i :e ordsucc n, f i :e K.
+let i.
+assume hi.
+exact (hf i (ordsuccI1 (ordsucc n) i hi)).
+claim htailin :
+  ring_finite_sum K add n (fun i => f (ordsucc i)) :e K.
+apply (god1_ring_finite_sum_in_natural K add mul hK n
+  (nat_p_omega n hn)).
+let i.
+assume hi.
+exact (hf (ordsucc i)
+  (ordsuccI1 (ordsucc n) (ordsucc i)
+    (nat_ordsucc_in_ordsucc n hn i hi))).
+claim hfzero : f 0 :e K.
+exact (hf 0
+  (ordsuccI1 (ordsucc n) 0
+    (nat_0_in_ordsucc n hn))).
+claim hflast : f (ordsucc n) :e K.
+exact (hf (ordsucc n) (ordsuccI2 (ordsucc n))).
+claim hgroup : group K add.
+exact (god1_ring_additive_group K add mul hK).
+exact (eq_i_tra
+  (ring_finite_sum K add (ordsucc (ordsucc n)) f)
+  (add (ring_finite_sum K add (ordsucc n) f) (f (ordsucc n)))
+  (add (f 0)
+    (ring_finite_sum K add (ordsucc n)
+      (fun i => f (ordsucc i))))
+  (god1_ring_finite_sum_natural_successor K add
+    (ordsucc n) (nat_p_omega (ordsucc n) (nat_ordsucc n hn)) f)
+  (eq_i_tra
+    (add (ring_finite_sum K add (ordsucc n) f) (f (ordsucc n)))
+    (add
+      (add (f 0)
+        (ring_finite_sum K add n (fun i => f (ordsucc i))))
+      (f (ordsucc n)))
+    (add (f 0)
+      (ring_finite_sum K add (ordsucc n)
+        (fun i => f (ordsucc i))))
+    (f_eq_i (fun z:set => add z (f (ordsucc n)))
+      (ring_finite_sum K add (ordsucc n) f)
+      (add (f 0)
+        (ring_finite_sum K add n (fun i => f (ordsucc i))))
+      (hind hprefix))
+    (eq_i_tra
+      (add
+        (add (f 0)
+          (ring_finite_sum K add n (fun i => f (ordsucc i))))
+        (f (ordsucc n)))
+      (add (f 0)
+        (add
+          (ring_finite_sum K add n (fun i => f (ordsucc i)))
+          (f (ordsucc n))))
+      (add (f 0)
+        (ring_finite_sum K add (ordsucc n)
+          (fun i => f (ordsucc i))))
+      (god1_group_associative_reverse K add hgroup
+        (f 0) hfzero
+        (ring_finite_sum K add n (fun i => f (ordsucc i))) htailin
+        (f (ordsucc n)) hflast)
+      (f_eq_i (fun z:set => add (f 0) z)
+        (add
+          (ring_finite_sum K add n (fun i => f (ordsucc i)))
+          (f (ordsucc n)))
+        (ring_finite_sum K add (ordsucc n)
+          (fun i => f (ordsucc i)))
+        (eq_sym
+          (ring_finite_sum K add (ordsucc n)
+            (fun i => f (ordsucc i)))
+          (add
+            (ring_finite_sum K add n (fun i => f (ordsucc i)))
+            (f (ordsucc n)))
+          (god1_ring_finite_sum_natural_successor K add n
+            (nat_p_omega n hn)
+            (fun i => f (ordsucc i)))))))).
+Qed.
+
+Theorem god1_ring_finite_sum_head_tail :
+  forall K, forall add mul:set -> set -> set,
+    ring K add mul -> forall f:set -> set, forall n :e omega,
+    (forall i :e ordsucc n, f i :e K) ->
+      ring_finite_sum K add (ordsucc n) f
+      = add (f 0)
+        (ring_finite_sum K add n (fun i => f (ordsucc i))).
+let K add mul.
+assume hK.
+let f.
+let n.
+assume hn hf.
+exact (nat_ind
+  (fun m =>
+    (forall i :e ordsucc m, f i :e K) ->
+      ring_finite_sum K add (ordsucc m) f
+      = add (f 0)
+        (ring_finite_sum K add m (fun i => f (ordsucc i))))
+  (god1_ring_finite_sum_head_tail_zero K add mul hK f)
+  (god1_ring_finite_sum_head_tail_step K add mul hK f)
+  n (omega_nat_p n hn) hf).
+Qed.
+
+Theorem god1_ring_finite_sum_pointwise_add_zero :
+  forall K, forall add mul:set -> set -> set,
+    ring K add mul -> forall f g:set -> set,
+    (forall i :e 0, f i :e K) ->
+    (forall i :e 0, g i :e K) ->
+      ring_finite_sum K add 0 (fun i => add (f i) (g i))
+      = add (ring_finite_sum K add 0 f)
+        (ring_finite_sum K add 0 g).
+let K add mul.
+assume hK.
+let f g.
+assume hf hg.
+claim hgroup : group K add.
+exact (god1_ring_additive_group K add mul hK).
+claim hzero : group_identity K add :e K.
+exact (god1_group_identity_in K add hgroup).
+claim hzerozero :
+  add (group_identity K add) (group_identity K add)
+  = group_identity K add.
+exact (andEL
+  (add (group_identity K add) (group_identity K add)
+    = group_identity K add)
+  (add (group_identity K add) (group_identity K add)
+    = group_identity K add)
+  ((andER
+    (group_identity K add :e K)
+    (forall z :e K,
+      add z (group_identity K add) = z
+      /\ add (group_identity K add) z = z)
+    (god1_group_identity_specification K add hgroup))
+    (group_identity K add) hzero)).
+apply (eq_i_tra
+  (ring_finite_sum K add 0 (fun i => add (f i) (g i)))
+  (group_identity K add)
+  (add (ring_finite_sum K add 0 f)
+    (ring_finite_sum K add 0 g))).
+- exact (god1_ring_finite_sum_zero_natural K add
+    (fun i => add (f i) (g i))).
+- apply eq_sym.
+  apply (eq_i_tra
+    (add (ring_finite_sum K add 0 f)
+      (ring_finite_sum K add 0 g))
+    (add (group_identity K add) (group_identity K add))
+    (group_identity K add)).
+  - f_equal.
+    - exact (god1_ring_finite_sum_zero_natural K add f).
+    - exact (god1_ring_finite_sum_zero_natural K add g).
+  - exact hzerozero.
+Qed.
+
+Theorem god1_ring_finite_sum_pointwise_add_step :
+  forall K, forall add mul:set -> set -> set,
+    ring K add mul -> forall f g:set -> set, forall n,
+    nat_p n ->
+    ((forall i :e n, f i :e K) ->
+      (forall i :e n, g i :e K) ->
+      ring_finite_sum K add n (fun i => add (f i) (g i))
+      = add (ring_finite_sum K add n f)
+        (ring_finite_sum K add n g)) ->
+    (forall i :e ordsucc n, f i :e K) ->
+    (forall i :e ordsucc n, g i :e K) ->
+      ring_finite_sum K add (ordsucc n)
+        (fun i => add (f i) (g i))
+      = add (ring_finite_sum K add (ordsucc n) f)
+        (ring_finite_sum K add (ordsucc n) g).
+let K add mul.
+assume hK.
+let f g n.
+assume hn hind hf hg.
+claim hfprefix : forall i :e n, f i :e K.
+let i.
+assume hi.
+exact (hf i (ordsuccI1 n i hi)).
+claim hgprefix : forall i :e n, g i :e K.
+let i.
+assume hi.
+exact (hg i (ordsuccI1 n i hi)).
+claim hsf : ring_finite_sum K add n f :e K.
+exact (god1_ring_finite_sum_in_natural K add mul hK n
+  (nat_p_omega n hn) f hfprefix).
+claim hsg : ring_finite_sum K add n g :e K.
+exact (god1_ring_finite_sum_in_natural K add mul hK n
+  (nat_p_omega n hn) g hgprefix).
+claim hfn : f n :e K.
+exact (hf n (ordsuccI2 n)).
+claim hgn : g n :e K.
+exact (hg n (ordsuccI2 n)).
+apply (eq_i_tra
+  (ring_finite_sum K add (ordsucc n)
+    (fun i => add (f i) (g i)))
+  (add
+    (ring_finite_sum K add n (fun i => add (f i) (g i)))
+    (add (f n) (g n)))
+  (add (ring_finite_sum K add (ordsucc n) f)
+    (ring_finite_sum K add (ordsucc n) g))).
+- exact (god1_ring_finite_sum_natural_successor K add n
+    (nat_p_omega n hn) (fun i => add (f i) (g i))).
+- apply (eq_i_tra
+    (add
+      (ring_finite_sum K add n (fun i => add (f i) (g i)))
+      (add (f n) (g n)))
+    (add
+      (add (ring_finite_sum K add n f)
+        (ring_finite_sum K add n g))
+      (add (f n) (g n)))
+    (add (ring_finite_sum K add (ordsucc n) f)
+      (ring_finite_sum K add (ordsucc n) g))).
+  - f_equal.
+    exact (hind hfprefix hgprefix).
+  - apply (eq_i_tra
+      (add
+        (add (ring_finite_sum K add n f)
+          (ring_finite_sum K add n g))
+        (add (f n) (g n)))
+      (add
+        (add (ring_finite_sum K add n f) (f n))
+        (add (ring_finite_sum K add n g) (g n)))
+      (add (ring_finite_sum K add (ordsucc n) f)
+        (ring_finite_sum K add (ordsucc n) g))).
+    - exact (god1_abelian_four_term_interchange K add
+        (god1_ring_additive_abelian_group K add mul hK)
+        (ring_finite_sum K add n f) hsf
+        (ring_finite_sum K add n g) hsg
+        (f n) hfn (g n) hgn).
+    - f_equal.
+      - apply eq_sym.
+        exact (god1_ring_finite_sum_natural_successor K add n
+          (nat_p_omega n hn) f).
+      - apply eq_sym.
+        exact (god1_ring_finite_sum_natural_successor K add n
+          (nat_p_omega n hn) g).
+Qed.
+
+Theorem god1_ring_finite_sum_pointwise_add :
+  forall K, forall add mul:set -> set -> set,
+    ring K add mul -> forall n :e omega, forall f g:set -> set,
+    (forall i :e n, f i :e K) ->
+    (forall i :e n, g i :e K) ->
+      ring_finite_sum K add n (fun i => add (f i) (g i))
+      = add (ring_finite_sum K add n f)
+        (ring_finite_sum K add n g).
+let K add mul.
+assume hK.
+let n.
+assume hn.
+let f g.
+assume hf hg.
+exact (nat_ind
+  (fun m =>
+    (forall i :e m, f i :e K) ->
+    (forall i :e m, g i :e K) ->
+      ring_finite_sum K add m (fun i => add (f i) (g i))
+      = add (ring_finite_sum K add m f)
+        (ring_finite_sum K add m g))
+  (god1_ring_finite_sum_pointwise_add_zero K add mul hK f g)
+  (god1_ring_finite_sum_pointwise_add_step K add mul hK f g)
+  n (omega_nat_p n hn) hf hg).
+Qed.
+
+Theorem god1_ring_nat_multiple_one :
+  forall K, forall add mul:set -> set -> set,
+    ring K add mul -> forall z :e K,
+      ring_nat_multiple K add 1 z = z.
+let K add mul.
+assume hK.
+let z.
+assume hz.
+claim hgroup : group K add.
+exact (god1_ring_additive_group K add mul hK).
+exact (eq_i_tra
+  (ring_nat_multiple K add 1 z)
+  (add (ring_nat_multiple K add 0 z) z) z
+  (god1_group_nat_power_successor K add z 0 nat_0)
+  (eq_i_tra
+    (add (ring_nat_multiple K add 0 z) z)
+    (add (group_identity K add) z) z
+    (f_eq_i (fun q:set => add q z)
+      (ring_nat_multiple K add 0 z) (group_identity K add)
+      (god1_group_nat_power_zero K add z))
+    (andER
+      (add z (group_identity K add) = z)
+      (add (group_identity K add) z = z)
+      ((andER
+        (group_identity K add :e K)
+        (forall q :e K,
+          add q (group_identity K add) = q
+          /\ add (group_identity K add) q = q)
+        (god1_group_identity_specification K add hgroup)) z hz)))).
+Qed.
+
+Theorem god1_ring_nat_multiple_add_coefficients :
+  forall K, forall add mul:set -> set -> set,
+    ring K add mul -> forall z :e K, forall a b :e omega,
+      add
+        (ring_nat_multiple K add a z)
+        (ring_nat_multiple K add b z)
+      = ring_nat_multiple K add (add_nat a b) z.
+let K add mul.
+assume hK.
+let z.
+assume hz.
+let a.
+assume ha.
+let b.
+assume hb.
+exact (god1_group_nat_power_add K add z
+  (god1_ring_additive_group K add mul hK) hz a b
+  (omega_nat_p a ha) (omega_nat_p b hb)).
+Qed.
+
+Theorem god1_ring_nat_multiple_right_mul_zero :
+  forall K, forall add mul:set -> set -> set,
+    ring K add mul -> forall z w :e K,
+      mul (ring_nat_multiple K add 0 z) w
+      = ring_nat_multiple K add 0 (mul z w).
+let K add mul.
+assume hK.
+let z.
+assume hz.
+let w.
+assume hw.
+claim hzw : mul z w :e K.
+exact (god1_ring_multiplicative_law K add mul hK z hz w hw).
+exact (eq_i_tra
+  (mul (ring_nat_multiple K add 0 z) w)
+  (ring_zero K add)
+  (ring_nat_multiple K add 0 (mul z w))
+  (eq_i_tra
+    (mul (ring_nat_multiple K add 0 z) w)
+    (mul (ring_zero K add) w)
+    (ring_zero K add)
+    (f_eq_i (fun q:set => mul q w)
+      (ring_nat_multiple K add 0 z) (ring_zero K add)
+      (god1_group_nat_power_zero K add z))
+    (god1_ring_zero_multiplication_left K add mul hK w hw))
+  (eq_sym
+    (ring_nat_multiple K add 0 (mul z w))
+    (ring_zero K add)
+    (god1_group_nat_power_zero K add (mul z w)))).
+Qed.
+
+Theorem god1_ring_nat_multiple_right_mul_step :
+  forall K, forall add mul:set -> set -> set,
+    ring K add mul -> forall z w :e K, forall n,
+    nat_p n ->
+      mul (ring_nat_multiple K add n z) w
+      = ring_nat_multiple K add n (mul z w) ->
+      mul (ring_nat_multiple K add (ordsucc n) z) w
+      = ring_nat_multiple K add (ordsucc n) (mul z w).
+let K add mul.
+assume hK.
+let z.
+assume hz.
+let w.
+assume hw.
+let n.
+assume hn hind.
+claim hmultn : ring_nat_multiple K add n z :e K.
+exact (god1_ring_nat_multiple_in K add mul hK n
+  (nat_p_omega n hn) z hz).
+claim hzw : mul z w :e K.
+exact (god1_ring_multiplicative_law K add mul hK z hz w hw).
+apply (eq_i_tra
+  (mul (ring_nat_multiple K add (ordsucc n) z) w)
+  (mul (add (ring_nat_multiple K add n z) z) w)
+  (ring_nat_multiple K add (ordsucc n) (mul z w))).
+- f_equal.
+  exact (god1_group_nat_power_successor K add z n hn).
+- apply (eq_i_tra
+    (mul (add (ring_nat_multiple K add n z) z) w)
+    (add
+      (mul (ring_nat_multiple K add n z) w)
+      (mul z w))
+    (ring_nat_multiple K add (ordsucc n) (mul z w))).
+  - exact (andER
+      (mul (ring_nat_multiple K add n z) (add z w)
+        = add
+          (mul (ring_nat_multiple K add n z) z)
+          (mul (ring_nat_multiple K add n z) w))
+      (mul (add (ring_nat_multiple K add n z) z) w
+        = add
+          (mul (ring_nat_multiple K add n z) w)
+          (mul z w))
+      (god1_ring_distributive_laws K add mul hK
+        (ring_nat_multiple K add n z) hmultn z hz w hw)).
+  - apply (eq_i_tra
+      (add
+        (mul (ring_nat_multiple K add n z) w)
+        (mul z w))
+      (add (ring_nat_multiple K add n (mul z w)) (mul z w))
+      (ring_nat_multiple K add (ordsucc n) (mul z w))).
+    - f_equal.
+      exact hind.
+    - apply eq_sym.
+      exact (god1_group_nat_power_successor K add (mul z w) n hn).
+Qed.
+
+Theorem god1_ring_nat_multiple_right_mul :
+  forall K, forall add mul:set -> set -> set,
+    ring K add mul -> forall z w :e K, forall n :e omega,
+      mul (ring_nat_multiple K add n z) w
+      = ring_nat_multiple K add n (mul z w).
+let K add mul.
+assume hK.
+let z.
+assume hz.
+let w.
+assume hw.
+let n.
+assume hn.
+exact (nat_ind
+  (fun m =>
+    mul (ring_nat_multiple K add m z) w
+    = ring_nat_multiple K add m (mul z w))
+  (god1_ring_nat_multiple_right_mul_zero K add mul hK z hz w hw)
+  (god1_ring_nat_multiple_right_mul_step K add mul hK z hz w hw)
+  n (omega_nat_p n hn)).
+Qed.
+
+Theorem god1_ring_finite_sum_right_mul_zero :
+  forall K, forall add mul:set -> set -> set,
+    ring K add mul -> forall f:set -> set, forall z :e K,
+    (forall i :e 0, f i :e K) ->
+      mul (ring_finite_sum K add 0 f) z
+      = ring_finite_sum K add 0 (fun i => mul (f i) z).
+let K add mul.
+assume hK.
+let f.
+let z.
+assume hz hf.
+exact (eq_i_tra
+  (mul (ring_finite_sum K add 0 f) z)
+  (ring_zero K add)
+  (ring_finite_sum K add 0 (fun i => mul (f i) z))
+  (eq_i_tra
+    (mul (ring_finite_sum K add 0 f) z)
+    (mul (ring_zero K add) z)
+    (ring_zero K add)
+    (f_eq_i (fun q:set => mul q z)
+      (ring_finite_sum K add 0 f) (ring_zero K add)
+      (god1_ring_finite_sum_zero_natural K add f))
+    (god1_ring_zero_multiplication_left K add mul hK z hz))
+  (eq_sym
+    (ring_finite_sum K add 0 (fun i => mul (f i) z))
+    (ring_zero K add)
+    (god1_ring_finite_sum_zero_natural K add
+      (fun i => mul (f i) z)))).
+Qed.
+
+Theorem god1_ring_finite_sum_right_mul_step :
+  forall K, forall add mul:set -> set -> set,
+    ring K add mul -> forall f:set -> set, forall z :e K, forall n,
+    nat_p n ->
+    ((forall i :e n, f i :e K) ->
+      mul (ring_finite_sum K add n f) z
+      = ring_finite_sum K add n (fun i => mul (f i) z)) ->
+    (forall i :e ordsucc n, f i :e K) ->
+      mul (ring_finite_sum K add (ordsucc n) f) z
+      = ring_finite_sum K add (ordsucc n) (fun i => mul (f i) z).
+let K add mul.
+assume hK.
+let f.
+let z.
+assume hz.
+let n.
+assume hn hind hf.
+claim hprefix : forall i :e n, f i :e K.
+let i.
+assume hi.
+exact (hf i (ordsuccI1 n i hi)).
+claim hsum : ring_finite_sum K add n f :e K.
+exact (god1_ring_finite_sum_in_natural K add mul hK n
+  (nat_p_omega n hn) f hprefix).
+claim hfn : f n :e K.
+exact (hf n (ordsuccI2 n)).
+apply (eq_i_tra
+  (mul (ring_finite_sum K add (ordsucc n) f) z)
+  (mul (add (ring_finite_sum K add n f) (f n)) z)
+  (ring_finite_sum K add (ordsucc n) (fun i => mul (f i) z))).
+- f_equal.
+  exact (god1_ring_finite_sum_natural_successor K add n
+    (nat_p_omega n hn) f).
+- apply (eq_i_tra
+    (mul (add (ring_finite_sum K add n f) (f n)) z)
+    (add
+      (mul (ring_finite_sum K add n f) z)
+      (mul (f n) z))
+    (ring_finite_sum K add (ordsucc n) (fun i => mul (f i) z))).
+  - exact (andER
+      (mul (ring_finite_sum K add n f) (add (f n) z)
+        = add
+          (mul (ring_finite_sum K add n f) (f n))
+          (mul (ring_finite_sum K add n f) z))
+      (mul (add (ring_finite_sum K add n f) (f n)) z
+        = add
+          (mul (ring_finite_sum K add n f) z)
+          (mul (f n) z))
+      (god1_ring_distributive_laws K add mul hK
+        (ring_finite_sum K add n f) hsum (f n) hfn z hz)).
+  - apply (eq_i_tra
+      (add
+        (mul (ring_finite_sum K add n f) z)
+        (mul (f n) z))
+      (add
+        (ring_finite_sum K add n (fun i => mul (f i) z))
+        (mul (f n) z))
+      (ring_finite_sum K add (ordsucc n) (fun i => mul (f i) z))).
+    - f_equal.
+      exact (hind hprefix).
+    - apply eq_sym.
+      exact (god1_ring_finite_sum_natural_successor K add n
+        (nat_p_omega n hn) (fun i => mul (f i) z)).
+Qed.
+
+Theorem god1_ring_finite_sum_right_mul :
+  forall K, forall add mul:set -> set -> set,
+    ring K add mul -> forall n :e omega, forall f:set -> set,
+    (forall i :e n, f i :e K) -> forall z :e K,
+      mul (ring_finite_sum K add n f) z
+      = ring_finite_sum K add n (fun i => mul (f i) z).
+let K add mul.
+assume hK.
+let n.
+assume hn.
+let f.
+assume hf.
+let z.
+assume hz.
+exact (nat_ind
+  (fun m =>
+    (forall i :e m, f i :e K) ->
+      mul (ring_finite_sum K add m f) z
+      = ring_finite_sum K add m (fun i => mul (f i) z))
+  (god1_ring_finite_sum_right_mul_zero K add mul hK f z hz)
+  (god1_ring_finite_sum_right_mul_step K add mul hK f z hz)
+  n (omega_nat_p n hn) hf).
+Qed.
+
+Theorem god1_nat_sub_witness_zero :
+  forall n :e omega, nat_sub_witness 0 n = n.
+let n.
+assume hn.
+claim hrewrite : n = add_nat n 0.
+apply eq_sym.
+exact (add_nat_0R n).
+exact (eq_i_tra
+  (nat_sub_witness 0 n)
+  (nat_sub_witness 0 (add_nat n 0)) n
+  (f_eq_i (fun q:set => nat_sub_witness 0 q)
+    n (add_nat n 0) hrewrite)
+  (nat_sub_witness_eq_of_add 0 n nat_0 (omega_nat_p n hn))).
+Qed.
+
+Theorem god1_nat_sub_witness_successor_top :
+  forall n :e omega, forall p :e ordsucc n,
+    nat_sub_witness p (ordsucc n)
+    = ordsucc (nat_sub_witness p n).
+let n.
+assume hn.
+let p.
+assume hp.
+claim hnatn : nat_p n.
+exact (omega_nat_p n hn).
+claim hpomega : p :e omega.
+exact (omega_TransSet (ordsucc n) (omega_ordsucc n hn) p hp).
+claim hnatp : nat_p p.
+exact (omega_nat_p p hpomega).
+claim hpsub : p c= n.
+exact (nat_ordsucc_trans n hnatn p hp).
+claim hspec :
+  nat_p (nat_sub_witness p n)
+  /\ n = add_nat (nat_sub_witness p n) p.
+exact (nat_sub_witness_spec p hnatp n hnatn hpsub).
+claim hnatq : nat_p (nat_sub_witness p n).
+exact (andEL
+  (nat_p (nat_sub_witness p n))
+  (n = add_nat (nat_sub_witness p n) p) hspec).
+claim hsum :
+  ordsucc n
+  = add_nat (ordsucc (nat_sub_witness p n)) p.
+exact (eq_i_tra
+  (ordsucc n)
+  (ordsucc (add_nat (nat_sub_witness p n) p))
+  (add_nat (ordsucc (nat_sub_witness p n)) p)
+  (f_eq_i ordsucc n (add_nat (nat_sub_witness p n) p)
+    (andER
+      (nat_p (nat_sub_witness p n))
+      (n = add_nat (nat_sub_witness p n) p) hspec))
+  (eq_sym
+    (add_nat (ordsucc (nat_sub_witness p n)) p)
+    (ordsucc (add_nat (nat_sub_witness p n) p))
+    (add_nat_SL (nat_sub_witness p n) hnatq p hnatp))).
+exact (eq_i_tra
+  (nat_sub_witness p (ordsucc n))
+  (nat_sub_witness p
+    (add_nat (ordsucc (nat_sub_witness p n)) p))
+  (ordsucc (nat_sub_witness p n))
+  (f_eq_i (fun q:set => nat_sub_witness p q)
+    (ordsucc n)
+    (add_nat (ordsucc (nat_sub_witness p n)) p) hsum)
+  (nat_sub_witness_eq_of_add p
+    (ordsucc (nat_sub_witness p n)) hnatp
+    (nat_ordsucc (nat_sub_witness p n) hnatq))).
+Qed.
+
+Theorem god1_nat_sub_witness_shift_both_successor :
+  forall n :e omega, forall p :e ordsucc n,
+    nat_sub_witness (ordsucc p) (ordsucc n)
+    = nat_sub_witness p n.
+let n.
+assume hn.
+let p.
+assume hp.
+claim hnatn : nat_p n.
+exact (omega_nat_p n hn).
+claim hpomega : p :e omega.
+exact (omega_TransSet (ordsucc n) (omega_ordsucc n hn) p hp).
+claim hnatp : nat_p p.
+exact (omega_nat_p p hpomega).
+claim hpsub : p c= n.
+exact (nat_ordsucc_trans n hnatn p hp).
+claim hspec :
+  nat_p (nat_sub_witness p n)
+  /\ n = add_nat (nat_sub_witness p n) p.
+exact (nat_sub_witness_spec p hnatp n hnatn hpsub).
+claim hnatq : nat_p (nat_sub_witness p n).
+exact (andEL
+  (nat_p (nat_sub_witness p n))
+  (n = add_nat (nat_sub_witness p n) p) hspec).
+claim hsum :
+  ordsucc n
+  = add_nat (nat_sub_witness p n) (ordsucc p).
+exact (eq_i_tra
+  (ordsucc n)
+  (ordsucc (add_nat (nat_sub_witness p n) p))
+  (add_nat (nat_sub_witness p n) (ordsucc p))
+  (f_eq_i ordsucc n (add_nat (nat_sub_witness p n) p)
+    (andER
+      (nat_p (nat_sub_witness p n))
+      (n = add_nat (nat_sub_witness p n) p) hspec))
+  (eq_sym
+    (add_nat (nat_sub_witness p n) (ordsucc p))
+    (ordsucc (add_nat (nat_sub_witness p n) p))
+    (add_nat_SR (nat_sub_witness p n) p hnatp))).
+exact (eq_i_tra
+  (nat_sub_witness (ordsucc p) (ordsucc n))
+  (nat_sub_witness (ordsucc p)
+    (add_nat (nat_sub_witness p n) (ordsucc p)))
+  (nat_sub_witness p n)
+  (f_eq_i (fun q:set => nat_sub_witness (ordsucc p) q)
+    (ordsucc n)
+    (add_nat (nat_sub_witness p n) (ordsucc p)) hsum)
+  (nat_sub_witness_eq_of_add (ordsucc p)
+    (nat_sub_witness p n) (nat_ordsucc p hnatp) hnatq)).
+Qed.
+
+Theorem god1_ring_multiplicative_associative_reverse :
+  forall K, forall add mul:set -> set -> set,
+    ring K add mul -> forall a b c :e K,
+      mul (mul a b) c = mul a (mul b c).
+let K add mul.
+assume hK.
+let a.
+assume ha.
+let b.
+assume hb.
+let c.
+assume hc.
+apply eq_sym.
+exact (god1_ring_multiplicative_associative K add mul hK
+  a ha b hb c hc).
+Qed.
+
+Theorem god1_ring_nat_power_successor_reverse :
+  forall K, forall add mul:set -> set -> set, forall x n,
+    nat_p n ->
+      mul (ring_nat_power K add mul x n) x
+      = ring_nat_power K add mul x (ordsucc n).
+let K add mul x n.
+assume hn.
+apply eq_sym.
+exact (god1_ring_nat_power_successor K add mul x n hn).
+Qed.
+
+Theorem god1_ring_power_commutes_with_element_zero :
+  forall K, forall add mul:set -> set -> set,
+    ring K add mul -> forall x y :e K,
+      mul x y = mul y x ->
+      mul (ring_nat_power K add mul y 0) x
+      = mul x (ring_nat_power K add mul y 0).
+let K add mul.
+assume hK.
+let x.
+assume hx.
+let y.
+assume hy hcomm.
+claim hone : ring_one K mul :e K.
+exact (andEL
+  (ring_one K mul :e K)
+  (forall z :e K,
+    mul z (ring_one K mul) = z
+    /\ mul (ring_one K mul) z = z)
+  (god1_ring_multiplicative_identity_specification K add mul hK)).
+claim hneutral : neutral_element K mul (ring_one K mul).
+exact (god1_ring_multiplicative_identity_specification K add mul hK).
+exact (eq_i_tra
+  (mul (ring_nat_power K add mul y 0) x)
+  x (mul x (ring_nat_power K add mul y 0))
+  (eq_i_tra
+    (mul (ring_nat_power K add mul y 0) x)
+    (mul (ring_one K mul) x) x
+    (f_eq_i (fun z:set => mul z x)
+      (ring_nat_power K add mul y 0) (ring_one K mul)
+      (god1_ring_nat_power_zero K add mul y))
+    (andER
+      (mul x (ring_one K mul) = x)
+      (mul (ring_one K mul) x = x)
+      ((andER
+        (ring_one K mul :e K)
+        (forall z :e K,
+          mul z (ring_one K mul) = z
+          /\ mul (ring_one K mul) z = z)
+        hneutral) x hx)))
+  (eq_sym
+    (mul x (ring_nat_power K add mul y 0)) x
+    (eq_i_tra
+      (mul x (ring_nat_power K add mul y 0))
+      (mul x (ring_one K mul)) x
+      (f_eq_i (fun z:set => mul x z)
+        (ring_nat_power K add mul y 0) (ring_one K mul)
+        (god1_ring_nat_power_zero K add mul y))
+      (andEL
+        (mul x (ring_one K mul) = x)
+        (mul (ring_one K mul) x = x)
+        ((andER
+          (ring_one K mul :e K)
+          (forall z :e K,
+            mul z (ring_one K mul) = z
+            /\ mul (ring_one K mul) z = z)
+          hneutral) x hx))))).
+Qed.
+
+Theorem god1_ring_power_commutes_with_element_step :
+  forall K, forall add mul:set -> set -> set,
+    ring K add mul -> forall x y :e K,
+      mul x y = mul y x -> forall n,
+      nat_p n ->
+      mul (ring_nat_power K add mul y n) x
+        = mul x (ring_nat_power K add mul y n) ->
+      mul (ring_nat_power K add mul y (ordsucc n)) x
+        = mul x (ring_nat_power K add mul y (ordsucc n)).
+let K add mul.
+assume hK.
+let x.
+assume hx.
+let y.
+assume hy hcomm.
+let n.
+assume hn hind.
+claim hpower : ring_nat_power K add mul y n :e K.
+exact (god1_ring_nat_power_in K add mul hK y hy n
+  (nat_p_omega n hn)).
+claim hyx : mul y x = mul x y.
+apply eq_sym.
+exact hcomm.
+apply (eq_i_tra
+  (mul (ring_nat_power K add mul y (ordsucc n)) x)
+  (mul (mul (ring_nat_power K add mul y n) y) x)
+  (mul x (ring_nat_power K add mul y (ordsucc n)))).
+- f_equal.
+  exact (god1_ring_nat_power_successor K add mul y n hn).
+- apply (eq_i_tra
+    (mul (mul (ring_nat_power K add mul y n) y) x)
+    (mul (ring_nat_power K add mul y n) (mul y x))
+    (mul x (ring_nat_power K add mul y (ordsucc n)))).
+  - exact (god1_ring_multiplicative_associative_reverse K add mul hK
+      (ring_nat_power K add mul y n) hpower y hy x hx).
+  - apply (eq_i_tra
+      (mul (ring_nat_power K add mul y n) (mul y x))
+      (mul (ring_nat_power K add mul y n) (mul x y))
+      (mul x (ring_nat_power K add mul y (ordsucc n)))).
+    - f_equal.
+      exact hyx.
+    - apply (eq_i_tra
+        (mul (ring_nat_power K add mul y n) (mul x y))
+        (mul (mul (ring_nat_power K add mul y n) x) y)
+        (mul x (ring_nat_power K add mul y (ordsucc n)))).
+      - exact (god1_ring_multiplicative_associative K add mul hK
+          (ring_nat_power K add mul y n) hpower x hx y hy).
+      - apply (eq_i_tra
+          (mul (mul (ring_nat_power K add mul y n) x) y)
+          (mul (mul x (ring_nat_power K add mul y n)) y)
+          (mul x (ring_nat_power K add mul y (ordsucc n)))).
+        - f_equal.
+          exact hind.
+        - apply (eq_i_tra
+            (mul (mul x (ring_nat_power K add mul y n)) y)
+            (mul x (mul (ring_nat_power K add mul y n) y))
+            (mul x (ring_nat_power K add mul y (ordsucc n)))).
+          - exact (god1_ring_multiplicative_associative_reverse
+              K add mul hK x hx
+              (ring_nat_power K add mul y n) hpower y hy).
+          - f_equal.
+            exact (god1_ring_nat_power_successor_reverse
+              K add mul y n hn).
+Qed.
+
+Theorem god1_ring_power_commutes_with_element :
+  forall K, forall add mul:set -> set -> set,
+    ring K add mul -> forall x y :e K,
+      mul x y = mul y x -> forall n :e omega,
+      mul (ring_nat_power K add mul y n) x
+      = mul x (ring_nat_power K add mul y n).
+let K add mul.
+assume hK.
+let x.
+assume hx.
+let y.
+assume hy hcomm.
+let n.
+assume hn.
+exact (nat_ind
+  (fun m =>
+    mul (ring_nat_power K add mul y m) x
+    = mul x (ring_nat_power K add mul y m))
+  (god1_ring_power_commutes_with_element_zero
+    K add mul hK x hx y hy hcomm)
+  (god1_ring_power_commutes_with_element_step
+    K add mul hK x hx y hy hcomm)
+  n (omega_nat_p n hn)).
+Qed.
+
+Theorem god1_ring_monomial_right_x :
+  forall K, forall add mul:set -> set -> set,
+    ring K add mul -> forall x y :e K,
+      mul x y = mul y x -> forall q p :e omega,
+      mul
+        (mul
+          (ring_nat_power K add mul x q)
+          (ring_nat_power K add mul y p)) x
+      = mul
+          (ring_nat_power K add mul x (ordsucc q))
+          (ring_nat_power K add mul y p).
+let K add mul.
+assume hK.
+let x.
+assume hx.
+let y.
+assume hy hcomm.
+let q.
+assume hq.
+let p.
+assume hp.
+claim hxq : ring_nat_power K add mul x q :e K.
+exact (god1_ring_nat_power_in K add mul hK x hx q hq).
+claim hyp : ring_nat_power K add mul y p :e K.
+exact (god1_ring_nat_power_in K add mul hK y hy p hp).
+apply (eq_i_tra
+  (mul
+    (mul (ring_nat_power K add mul x q)
+      (ring_nat_power K add mul y p)) x)
+  (mul (ring_nat_power K add mul x q)
+    (mul (ring_nat_power K add mul y p) x))
+  (mul (ring_nat_power K add mul x (ordsucc q))
+    (ring_nat_power K add mul y p))).
+- exact (god1_ring_multiplicative_associative_reverse K add mul hK
+    (ring_nat_power K add mul x q) hxq
+    (ring_nat_power K add mul y p) hyp x hx).
+- apply (eq_i_tra
+    (mul (ring_nat_power K add mul x q)
+      (mul (ring_nat_power K add mul y p) x))
+    (mul (ring_nat_power K add mul x q)
+      (mul x (ring_nat_power K add mul y p)))
+    (mul (ring_nat_power K add mul x (ordsucc q))
+      (ring_nat_power K add mul y p))).
+  - f_equal.
+    exact (god1_ring_power_commutes_with_element
+      K add mul hK x hx y hy hcomm p hp).
+  - apply (eq_i_tra
+      (mul (ring_nat_power K add mul x q)
+        (mul x (ring_nat_power K add mul y p)))
+      (mul
+        (mul (ring_nat_power K add mul x q) x)
+        (ring_nat_power K add mul y p))
+      (mul (ring_nat_power K add mul x (ordsucc q))
+        (ring_nat_power K add mul y p))).
+    - exact (god1_ring_multiplicative_associative K add mul hK
+        (ring_nat_power K add mul x q) hxq x hx
+        (ring_nat_power K add mul y p) hyp).
+    - f_equal.
+      exact (god1_ring_nat_power_successor_reverse
+        K add mul x q (omega_nat_p q hq)).
+Qed.
+
+Theorem god1_ring_monomial_right_y :
+  forall K, forall add mul:set -> set -> set,
+    ring K add mul -> forall x y :e K, forall q p :e omega,
+      mul
+        (mul
+          (ring_nat_power K add mul x q)
+          (ring_nat_power K add mul y p)) y
+      = mul
+          (ring_nat_power K add mul x q)
+          (ring_nat_power K add mul y (ordsucc p)).
+let K add mul.
+assume hK.
+let x.
+assume hx.
+let y.
+assume hy.
+let q.
+assume hq.
+let p.
+assume hp.
+claim hxq : ring_nat_power K add mul x q :e K.
+exact (god1_ring_nat_power_in K add mul hK x hx q hq).
+claim hyp : ring_nat_power K add mul y p :e K.
+exact (god1_ring_nat_power_in K add mul hK y hy p hp).
+exact (eq_i_tra
+  (mul
+    (mul (ring_nat_power K add mul x q)
+      (ring_nat_power K add mul y p)) y)
+  (mul (ring_nat_power K add mul x q)
+    (mul (ring_nat_power K add mul y p) y))
+  (mul (ring_nat_power K add mul x q)
+    (ring_nat_power K add mul y (ordsucc p)))
+  (god1_ring_multiplicative_associative_reverse K add mul hK
+    (ring_nat_power K add mul x q) hxq
+    (ring_nat_power K add mul y p) hyp y hy)
+  (f_eq_i (fun z:set => mul (ring_nat_power K add mul x q) z)
+    (mul (ring_nat_power K add mul y p) y)
+    (ring_nat_power K add mul y (ordsucc p))
+    (god1_ring_nat_power_successor_reverse
+      K add mul y p (omega_nat_p p hp)))).
+Qed.
+
+Theorem god1_ring_finite_sum_adjacent_pairing_left :
+  forall K, forall add mul:set -> set -> set,
+    ring K add mul -> forall n :e omega,
+    forall f g u:set -> set,
+    (forall i :e ordsucc n, f i :e K) ->
+    (forall i :e ordsucc n, g i :e K) ->
+    add
+      (ring_finite_sum K add n (fun i => f (ordsucc i)))
+      (ring_finite_sum K add n g)
+      = ring_finite_sum K add n (fun i => u (ordsucc i)) ->
+    add
+      (ring_finite_sum K add (ordsucc n) f)
+      (ring_finite_sum K add (ordsucc n) g)
+    = add (f 0)
+        (add
+          (ring_finite_sum K add n (fun i => u (ordsucc i)))
+          (g n)).
+let K add mul.
+assume hK.
+let n.
+assume hn.
+let f g u.
+assume hf hg hpair.
+claim hnatn : nat_p n.
+exact (omega_nat_p n hn).
+claim hftail : forall i :e n, f (ordsucc i) :e K.
+let i.
+assume hi.
+exact (hf (ordsucc i)
+  (nat_ordsucc_in_ordsucc n hnatn i hi)).
+claim hgprefix : forall i :e n, g i :e K.
+let i.
+assume hi.
+exact (hg i (ordsuccI1 n i hi)).
+claim hsf :
+  ring_finite_sum K add n (fun i => f (ordsucc i)) :e K.
+exact (god1_ring_finite_sum_in_natural K add mul hK n hn
+  (fun i => f (ordsucc i)) hftail).
+claim hsg : ring_finite_sum K add n g :e K.
+exact (god1_ring_finite_sum_in_natural K add mul hK n hn g hgprefix).
+claim hfzero : f 0 :e K.
+exact (hf 0 (nat_0_in_ordsucc n hnatn)).
+claim hgn : g n :e K.
+exact (hg n (ordsuccI2 n)).
+apply (eq_i_tra
+  (add
+    (ring_finite_sum K add (ordsucc n) f)
+    (ring_finite_sum K add (ordsucc n) g))
+  (add
+    (add (f 0)
+      (ring_finite_sum K add n (fun i => f (ordsucc i))))
+    (add (ring_finite_sum K add n g) (g n)))
+  (add (f 0)
+    (add
+      (ring_finite_sum K add n (fun i => u (ordsucc i)))
+      (g n)))).
+- f_equal.
+  - exact (god1_ring_finite_sum_head_tail K add mul hK f n hn hf).
+  - exact (god1_ring_finite_sum_natural_successor K add n hn g).
+- apply (eq_i_tra
+    (add
+      (add (f 0)
+        (ring_finite_sum K add n (fun i => f (ordsucc i))))
+      (add (ring_finite_sum K add n g) (g n)))
+    (add (f 0)
+      (add
+        (ring_finite_sum K add n (fun i => f (ordsucc i)))
+        (add (ring_finite_sum K add n g) (g n))))
+    (add (f 0)
+      (add
+        (ring_finite_sum K add n (fun i => u (ordsucc i)))
+        (g n)))).
+  - exact (god1_group_associative_reverse K add
+      (god1_ring_additive_group K add mul hK)
+      (f 0) hfzero
+      (ring_finite_sum K add n (fun i => f (ordsucc i))) hsf
+      (add (ring_finite_sum K add n g) (g n))
+      (god1_group_law_of_composition K add
+        (god1_ring_additive_group K add mul hK)
+        (ring_finite_sum K add n g) hsg (g n) hgn)).
+  - apply (eq_i_tra
+      (add (f 0)
+        (add
+          (ring_finite_sum K add n (fun i => f (ordsucc i)))
+          (add (ring_finite_sum K add n g) (g n))))
+      (add (f 0)
+        (add
+          (add
+            (ring_finite_sum K add n (fun i => f (ordsucc i)))
+            (ring_finite_sum K add n g))
+          (g n)))
+      (add (f 0)
+        (add
+          (ring_finite_sum K add n (fun i => u (ordsucc i)))
+          (g n)))).
+    - f_equal.
+      exact (god1_group_associative K add
+        (god1_ring_additive_group K add mul hK)
+        (ring_finite_sum K add n (fun i => f (ordsucc i))) hsf
+        (ring_finite_sum K add n g) hsg (g n) hgn).
+    - f_equal.
+      f_equal.
+      exact hpair.
+Qed.
+
+Theorem god1_ring_finite_sum_adjacent_pairing_right :
+  forall K, forall add mul:set -> set -> set,
+    ring K add mul -> forall n :e omega,
+    forall f g u:set -> set,
+    (forall i :e ordsucc (ordsucc n), u i :e K) ->
+    u 0 = f 0 -> u (ordsucc n) = g n ->
+    ring_finite_sum K add (ordsucc (ordsucc n)) u
+    = add (f 0)
+        (add
+          (ring_finite_sum K add n (fun i => u (ordsucc i)))
+          (g n)).
+let K add mul.
+assume hK.
+let n.
+assume hn.
+let f g u.
+assume hu hu0 hulast.
+apply (eq_i_tra
+  (ring_finite_sum K add (ordsucc (ordsucc n)) u)
+  (add (u 0)
+    (ring_finite_sum K add (ordsucc n)
+      (fun i => u (ordsucc i))))
+  (add (f 0)
+    (add
+      (ring_finite_sum K add n (fun i => u (ordsucc i)))
+      (g n)))).
+- exact (god1_ring_finite_sum_head_tail K add mul hK u
+    (ordsucc n) (omega_ordsucc n hn) hu).
+- apply (eq_i_tra
+    (add (u 0)
+      (ring_finite_sum K add (ordsucc n)
+        (fun i => u (ordsucc i))))
+    (add (f 0)
+      (ring_finite_sum K add (ordsucc n)
+        (fun i => u (ordsucc i))))
+    (add (f 0)
+      (add
+        (ring_finite_sum K add n (fun i => u (ordsucc i)))
+        (g n)))).
+  - f_equal.
+    exact hu0.
+  - f_equal.
+    apply (eq_i_tra
+      (ring_finite_sum K add (ordsucc n)
+        (fun i => u (ordsucc i)))
+      (add
+        (ring_finite_sum K add n (fun i => u (ordsucc i)))
+        (u (ordsucc n)))
+      (add
+        (ring_finite_sum K add n (fun i => u (ordsucc i)))
+        (g n))).
+    - exact (god1_ring_finite_sum_natural_successor K add n hn
+        (fun i => u (ordsucc i))).
+    - f_equal.
+      exact hulast.
+Qed.
+
+Theorem god1_ring_finite_sum_adjacent_pairing :
+  forall K, forall add mul:set -> set -> set,
+    ring K add mul -> forall n :e omega,
+    forall f g u:set -> set,
+    (forall i :e ordsucc n, f i :e K) ->
+    (forall i :e ordsucc n, g i :e K) ->
+    (forall i :e ordsucc (ordsucc n), u i :e K) ->
+    u 0 = f 0 ->
+    (forall i :e n, u (ordsucc i) = add (f (ordsucc i)) (g i)) ->
+    u (ordsucc n) = g n ->
+      add
+        (ring_finite_sum K add (ordsucc n) f)
+        (ring_finite_sum K add (ordsucc n) g)
+      = ring_finite_sum K add (ordsucc (ordsucc n)) u.
+let K add mul.
+assume hK.
+let n.
+assume hn.
+let f g u.
+assume hf hg hu hu0 hmid hulast.
+claim hnatn : nat_p n.
+exact (omega_nat_p n hn).
+claim hftail : forall i :e n, f (ordsucc i) :e K.
+let i.
+assume hi.
+exact (hf (ordsucc i)
+  (nat_ordsucc_in_ordsucc n hnatn i hi)).
+claim hgprefix : forall i :e n, g i :e K.
+let i.
+assume hi.
+exact (hg i (ordsuccI1 n i hi)).
+claim hushift :
+  forall i :e ordsucc n, u (ordsucc i) :e K.
+let i.
+assume hi.
+exact (hu (ordsucc i)
+  (nat_ordsucc_in_ordsucc (ordsucc n)
+    (nat_ordsucc n hnatn) i hi)).
+claim hsf :
+  ring_finite_sum K add n (fun i => f (ordsucc i)) :e K.
+exact (god1_ring_finite_sum_in_natural K add mul hK n hn
+  (fun i => f (ordsucc i)) hftail).
+claim hsg : ring_finite_sum K add n g :e K.
+exact (god1_ring_finite_sum_in_natural K add mul hK n hn g hgprefix).
+claim hpair :
+  add
+    (ring_finite_sum K add n (fun i => f (ordsucc i)))
+    (ring_finite_sum K add n g)
+  = ring_finite_sum K add n (fun i => u (ordsucc i)).
+exact (eq_i_tra
+  (add
+    (ring_finite_sum K add n (fun i => f (ordsucc i)))
+    (ring_finite_sum K add n g))
+  (ring_finite_sum K add n
+    (fun i => add (f (ordsucc i)) (g i)))
+  (ring_finite_sum K add n (fun i => u (ordsucc i)))
+  (eq_sym
+    (ring_finite_sum K add n
+      (fun i => add (f (ordsucc i)) (g i)))
+    (add
+      (ring_finite_sum K add n (fun i => f (ordsucc i)))
+      (ring_finite_sum K add n g))
+    (god1_ring_finite_sum_pointwise_add K add mul hK n hn
+      (fun i => f (ordsucc i)) g hftail hgprefix))
+  (god1_ring_finite_sum_congr_natural K add n hn
+    (fun i => add (f (ordsucc i)) (g i))
+    (fun i => u (ordsucc i))
+    (fun i hi => eq_sym
+      (u (ordsucc i)) (add (f (ordsucc i)) (g i))
+      (hmid i hi)))).
+claim hleft :
+  add
+    (ring_finite_sum K add (ordsucc n) f)
+    (ring_finite_sum K add (ordsucc n) g)
+  = add (f 0)
+      (add
+        (ring_finite_sum K add n (fun i => u (ordsucc i)))
+        (g n)).
+exact (god1_ring_finite_sum_adjacent_pairing_left
+  K add mul hK n hn f g u hf hg hpair).
+claim hright :
+  ring_finite_sum K add (ordsucc (ordsucc n)) u
+  = add (f 0)
+      (add
+        (ring_finite_sum K add n (fun i => u (ordsucc i)))
+        (g n)).
+exact (god1_ring_finite_sum_adjacent_pairing_right
+  K add mul hK n hn f g u hu hu0 hulast).
+exact (eq_i_tra
+  (add
+    (ring_finite_sum K add (ordsucc n) f)
+    (ring_finite_sum K add (ordsucc n) g))
+  (add (f 0)
+    (add
+      (ring_finite_sum K add n (fun i => u (ordsucc i)))
+      (g n)))
+  (ring_finite_sum K add (ordsucc (ordsucc n)) u)
+  hleft
+  (eq_sym
+    (ring_finite_sum K add (ordsucc (ordsucc n)) u)
+    (add (f 0)
+      (add
+        (ring_finite_sum K add n (fun i => u (ordsucc i)))
+        (g n))) hright)).
+Qed.
+
+Definition god1_ring_binomial_term :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> set -> set -> set -> set :=
+  fun K add mul x y n p =>
+    ring_nat_multiple K add (binomial_coefficient n p)
+      (mul
+        (ring_nat_power K add mul x (nat_sub_witness p n))
+        (ring_nat_power K add mul y p)).
+
+Definition god1_ring_binomial_first_step :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> set -> set -> set -> set :=
+  fun K add mul x y n p =>
+    ring_nat_multiple K add (binomial_coefficient n p)
+      (mul
+        (ring_nat_power K add mul x
+          (nat_sub_witness p (ordsucc n)))
+        (ring_nat_power K add mul y p)).
+
+Definition god1_ring_binomial_second_step :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> set -> set -> set -> set :=
+  fun K add mul x y n p =>
+    ring_nat_multiple K add (binomial_coefficient n p)
+      (mul
+        (ring_nat_power K add mul x
+          (nat_sub_witness (ordsucc p) (ordsucc n)))
+        (ring_nat_power K add mul y (ordsucc p))).
+
+Theorem god1_nat_sub_witness_bounded_natural :
+  forall n :e omega, forall p :e ordsucc n,
+    nat_sub_witness p n :e omega.
+let n.
+assume hn.
+let p.
+assume hp.
+claim hpomega : p :e omega.
+exact (omega_TransSet (ordsucc n) (omega_ordsucc n hn) p hp).
+exact (nat_p_omega (nat_sub_witness p n)
+  (andEL
+    (nat_p (nat_sub_witness p n))
+    (n = add_nat (nat_sub_witness p n) p)
+    (nat_sub_witness_spec p (omega_nat_p p hpomega)
+      n (omega_nat_p n hn)
+      (nat_ordsucc_trans n (omega_nat_p n hn) p hp)))).
+Qed.
+
+Theorem god1_ring_binomial_term_in :
+  forall K, forall add mul:set -> set -> set,
+    ring K add mul -> forall x y :e K,
+    forall n :e omega, forall p :e ordsucc n,
+      god1_ring_binomial_term K add mul x y n p :e K.
+let K add mul.
+assume hK.
+let x.
+assume hx.
+let y.
+assume hy.
+let n.
+assume hn.
+let p.
+assume hp.
+claim hpomega : p :e omega.
+exact (omega_TransSet (ordsucc n) (omega_ordsucc n hn) p hp).
+claim hsubomega : nat_sub_witness p n :e omega.
+exact (god1_nat_sub_witness_bounded_natural n hn p hp).
+claim hmonomial :
+  mul
+    (ring_nat_power K add mul x (nat_sub_witness p n))
+    (ring_nat_power K add mul y p) :e K.
+exact (god1_ring_multiplicative_law K add mul hK
+  (ring_nat_power K add mul x (nat_sub_witness p n))
+    (god1_ring_nat_power_in K add mul hK x hx
+      (nat_sub_witness p n) hsubomega)
+  (ring_nat_power K add mul y p)
+    (god1_ring_nat_power_in K add mul hK y hy p hpomega)).
+exact (god1_ring_nat_multiple_in K add mul hK
+  (binomial_coefficient n p)
+  (god1_binomial_coefficient_natural n hn p hpomega)
+  (mul
+    (ring_nat_power K add mul x (nat_sub_witness p n))
+    (ring_nat_power K add mul y p)) hmonomial).
+Qed.
+
+Theorem god1_ring_binomial_first_step_in :
+  forall K, forall add mul:set -> set -> set,
+    ring K add mul -> forall x y :e K,
+    forall n :e omega, forall p :e ordsucc n,
+      god1_ring_binomial_first_step K add mul x y n p :e K.
+let K add mul.
+assume hK.
+let x.
+assume hx.
+let y.
+assume hy.
+let n.
+assume hn.
+let p.
+assume hp.
+claim hpomega : p :e omega.
+exact (omega_TransSet (ordsucc n) (omega_ordsucc n hn) p hp).
+claim hpsuccbig : p :e ordsucc (ordsucc n).
+exact (ordsuccI1 (ordsucc n) p hp).
+claim hsubomega : nat_sub_witness p (ordsucc n) :e omega.
+exact (god1_nat_sub_witness_bounded_natural
+  (ordsucc n) (omega_ordsucc n hn) p hpsuccbig).
+claim hmonomial :
+  mul
+    (ring_nat_power K add mul x
+      (nat_sub_witness p (ordsucc n)))
+    (ring_nat_power K add mul y p) :e K.
+exact (god1_ring_multiplicative_law K add mul hK
+  (ring_nat_power K add mul x
+    (nat_sub_witness p (ordsucc n)))
+    (god1_ring_nat_power_in K add mul hK x hx
+      (nat_sub_witness p (ordsucc n)) hsubomega)
+  (ring_nat_power K add mul y p)
+    (god1_ring_nat_power_in K add mul hK y hy p hpomega)).
+exact (god1_ring_nat_multiple_in K add mul hK
+  (binomial_coefficient n p)
+  (god1_binomial_coefficient_natural n hn p hpomega)
+  (mul
+    (ring_nat_power K add mul x
+      (nat_sub_witness p (ordsucc n)))
+    (ring_nat_power K add mul y p)) hmonomial).
+Qed.
+
+Theorem god1_ring_binomial_second_step_in :
+  forall K, forall add mul:set -> set -> set,
+    ring K add mul -> forall x y :e K,
+    forall n :e omega, forall p :e ordsucc n,
+      god1_ring_binomial_second_step K add mul x y n p :e K.
+let K add mul.
+assume hK.
+let x.
+assume hx.
+let y.
+assume hy.
+let n.
+assume hn.
+let p.
+assume hp.
+claim hpomega : p :e omega.
+exact (omega_TransSet (ordsucc n) (omega_ordsucc n hn) p hp).
+claim hsuccpbig : ordsucc p :e ordsucc (ordsucc n).
+exact (nat_ordsucc_in_ordsucc (ordsucc n)
+  (nat_ordsucc n (omega_nat_p n hn)) p hp).
+claim hsubomega :
+  nat_sub_witness (ordsucc p) (ordsucc n) :e omega.
+exact (god1_nat_sub_witness_bounded_natural
+  (ordsucc n) (omega_ordsucc n hn) (ordsucc p) hsuccpbig).
+claim hmonomial :
+  mul
+    (ring_nat_power K add mul x
+      (nat_sub_witness (ordsucc p) (ordsucc n)))
+    (ring_nat_power K add mul y (ordsucc p)) :e K.
+exact (god1_ring_multiplicative_law K add mul hK
+  (ring_nat_power K add mul x
+    (nat_sub_witness (ordsucc p) (ordsucc n)))
+    (god1_ring_nat_power_in K add mul hK x hx
+      (nat_sub_witness (ordsucc p) (ordsucc n)) hsubomega)
+  (ring_nat_power K add mul y (ordsucc p))
+    (god1_ring_nat_power_in K add mul hK y hy (ordsucc p)
+      (omega_ordsucc p hpomega))).
+exact (god1_ring_nat_multiple_in K add mul hK
+  (binomial_coefficient n p)
+  (god1_binomial_coefficient_natural n hn p hpomega)
+  (mul
+    (ring_nat_power K add mul x
+      (nat_sub_witness (ordsucc p) (ordsucc n)))
+    (ring_nat_power K add mul y (ordsucc p))) hmonomial).
+Qed.
+
+Theorem god1_ring_binomial_term_right_x :
+  forall K, forall add mul:set -> set -> set,
+    ring K add mul -> forall x y :e K,
+    mul x y = mul y x -> forall n :e omega,
+    forall p :e ordsucc n,
+      mul (god1_ring_binomial_term K add mul x y n p) x
+      = god1_ring_binomial_first_step K add mul x y n p.
+let K add mul.
+assume hK.
+let x.
+assume hx.
+let y.
+assume hy hcomm.
+let n.
+assume hn.
+let p.
+assume hp.
+claim hpomega : p :e omega.
+exact (omega_TransSet (ordsucc n) (omega_ordsucc n hn) p hp).
+claim hsubomega : nat_sub_witness p n :e omega.
+exact (god1_nat_sub_witness_bounded_natural n hn p hp).
+claim hmonomial :
+  mul
+    (ring_nat_power K add mul x (nat_sub_witness p n))
+    (ring_nat_power K add mul y p) :e K.
+exact (god1_ring_multiplicative_law K add mul hK
+  (ring_nat_power K add mul x (nat_sub_witness p n))
+    (god1_ring_nat_power_in K add mul hK x hx
+      (nat_sub_witness p n) hsubomega)
+  (ring_nat_power K add mul y p)
+    (god1_ring_nat_power_in K add mul hK y hy p hpomega)).
+claim hcoeff : binomial_coefficient n p :e omega.
+exact (god1_binomial_coefficient_natural n hn p hpomega).
+apply (eq_i_tra
+  (mul (god1_ring_binomial_term K add mul x y n p) x)
+  (ring_nat_multiple K add (binomial_coefficient n p)
+    (mul
+      (mul
+        (ring_nat_power K add mul x (nat_sub_witness p n))
+        (ring_nat_power K add mul y p)) x))
+  (god1_ring_binomial_first_step K add mul x y n p)).
+- exact (god1_ring_nat_multiple_right_mul K add mul hK
+    (mul
+      (ring_nat_power K add mul x (nat_sub_witness p n))
+      (ring_nat_power K add mul y p)) hmonomial x hx
+    (binomial_coefficient n p) hcoeff).
+- apply (eq_i_tra
+    (ring_nat_multiple K add (binomial_coefficient n p)
+      (mul
+        (mul
+          (ring_nat_power K add mul x (nat_sub_witness p n))
+          (ring_nat_power K add mul y p)) x))
+    (ring_nat_multiple K add (binomial_coefficient n p)
+      (mul
+        (ring_nat_power K add mul x
+          (ordsucc (nat_sub_witness p n)))
+        (ring_nat_power K add mul y p)))
+    (god1_ring_binomial_first_step K add mul x y n p)).
+  - f_equal.
+    exact (god1_ring_monomial_right_x K add mul hK x hx y hy hcomm
+      (nat_sub_witness p n) hsubomega p hpomega).
+  - exact (f_eq_i
+      (fun q:set =>
+        ring_nat_multiple K add (binomial_coefficient n p)
+          (mul (ring_nat_power K add mul x q)
+            (ring_nat_power K add mul y p)))
+      (ordsucc (nat_sub_witness p n))
+      (nat_sub_witness p (ordsucc n))
+      (eq_sym
+        (nat_sub_witness p (ordsucc n))
+        (ordsucc (nat_sub_witness p n))
+        (god1_nat_sub_witness_successor_top n hn p hp))).
+Qed.
+
+Theorem god1_ring_binomial_term_right_y :
+  forall K, forall add mul:set -> set -> set,
+    ring K add mul -> forall x y :e K,
+    forall n :e omega, forall p :e ordsucc n,
+      mul (god1_ring_binomial_term K add mul x y n p) y
+      = god1_ring_binomial_second_step K add mul x y n p.
+let K add mul.
+assume hK.
+let x.
+assume hx.
+let y.
+assume hy.
+let n.
+assume hn.
+let p.
+assume hp.
+claim hpomega : p :e omega.
+exact (omega_TransSet (ordsucc n) (omega_ordsucc n hn) p hp).
+claim hsubomega : nat_sub_witness p n :e omega.
+exact (god1_nat_sub_witness_bounded_natural n hn p hp).
+claim hmonomial :
+  mul
+    (ring_nat_power K add mul x (nat_sub_witness p n))
+    (ring_nat_power K add mul y p) :e K.
+exact (god1_ring_multiplicative_law K add mul hK
+  (ring_nat_power K add mul x (nat_sub_witness p n))
+    (god1_ring_nat_power_in K add mul hK x hx
+      (nat_sub_witness p n) hsubomega)
+  (ring_nat_power K add mul y p)
+    (god1_ring_nat_power_in K add mul hK y hy p hpomega)).
+claim hcoeff : binomial_coefficient n p :e omega.
+exact (god1_binomial_coefficient_natural n hn p hpomega).
+apply (eq_i_tra
+  (mul (god1_ring_binomial_term K add mul x y n p) y)
+  (ring_nat_multiple K add (binomial_coefficient n p)
+    (mul
+      (mul
+        (ring_nat_power K add mul x (nat_sub_witness p n))
+        (ring_nat_power K add mul y p)) y))
+  (god1_ring_binomial_second_step K add mul x y n p)).
+- exact (god1_ring_nat_multiple_right_mul K add mul hK
+    (mul
+      (ring_nat_power K add mul x (nat_sub_witness p n))
+      (ring_nat_power K add mul y p)) hmonomial y hy
+    (binomial_coefficient n p) hcoeff).
+- apply (eq_i_tra
+    (ring_nat_multiple K add (binomial_coefficient n p)
+      (mul
+        (mul
+          (ring_nat_power K add mul x (nat_sub_witness p n))
+          (ring_nat_power K add mul y p)) y))
+    (ring_nat_multiple K add (binomial_coefficient n p)
+      (mul
+        (ring_nat_power K add mul x (nat_sub_witness p n))
+        (ring_nat_power K add mul y (ordsucc p))))
+    (god1_ring_binomial_second_step K add mul x y n p)).
+  - f_equal.
+    exact (god1_ring_monomial_right_y K add mul hK x hx y hy
+      (nat_sub_witness p n) hsubomega p hpomega).
+  - exact (f_eq_i
+      (fun q:set =>
+        ring_nat_multiple K add (binomial_coefficient n p)
+          (mul (ring_nat_power K add mul x q)
+            (ring_nat_power K add mul y (ordsucc p))))
+      (nat_sub_witness p n)
+      (nat_sub_witness (ordsucc p) (ordsucc n))
+      (eq_sym
+        (nat_sub_witness (ordsucc p) (ordsucc n))
+        (nat_sub_witness p n)
+        (god1_nat_sub_witness_shift_both_successor n hn p hp))).
+Qed.
+
+Theorem god1_binomial_pascal_successor_index :
+  forall n :e omega, forall i :e n,
+    add_nat
+      (binomial_coefficient n (ordsucc i))
+      (binomial_coefficient n i)
+    = binomial_coefficient (ordsucc n) (ordsucc i).
+let n.
+assume hn.
+let i.
+assume hi.
+claim hiomega : i :e omega.
+exact (omega_TransSet n hn i hi).
+claim hpos : 0 :e ordsucc i.
+exact (nat_0_in_ordsucc i (omega_nat_p i hiomega)).
+claim hunion : Union (ordsucc i) = i.
+exact (Union_ordsucc_eq i (omega_nat_p i hiomega)).
+exact (eq_i_tra
+  (add_nat
+    (binomial_coefficient n (ordsucc i))
+    (binomial_coefficient n i))
+  (add_nat
+    (binomial_coefficient n (ordsucc i))
+    (binomial_coefficient n (Union (ordsucc i))))
+  (binomial_coefficient (ordsucc n) (ordsucc i))
+  (f_eq_i
+    (fun q:set => add_nat
+      (binomial_coefficient n (ordsucc i))
+      (binomial_coefficient n q))
+    i (Union (ordsucc i))
+    (eq_sym (Union (ordsucc i)) i hunion))
+  (god1_binomial_pascal_interior n hn (ordsucc i)
+    (omega_ordsucc i hiomega) hpos)).
+Qed.
+
+Theorem god1_ring_binomial_pairing_zero :
+  forall K, forall add mul:set -> set -> set,
+    forall x y n,
+    n :e omega ->
+    god1_ring_binomial_term K add mul x y (ordsucc n) 0
+    = god1_ring_binomial_first_step K add mul x y n 0.
+let K add mul x y n.
+assume hn.
+exact (f_eq_i
+  (fun c:set =>
+    ring_nat_multiple K add c
+      (mul
+        (ring_nat_power K add mul x
+          (nat_sub_witness 0 (ordsucc n)))
+        (ring_nat_power K add mul y 0)))
+  (binomial_coefficient (ordsucc n) 0)
+  (binomial_coefficient n 0)
+  (eq_i_tra
+    (binomial_coefficient (ordsucc n) 0) 1
+    (binomial_coefficient n 0)
+    (god1_binomial_coefficient_zero
+      (ordsucc n) (omega_ordsucc n hn))
+    (eq_sym
+      (binomial_coefficient n 0) 1
+      (god1_binomial_coefficient_zero n hn)))).
+Qed.
+
+Theorem god1_ring_binomial_pairing_last :
+  forall K, forall add mul:set -> set -> set,
+    forall x y n,
+    n :e omega ->
+    god1_ring_binomial_term K add mul x y
+      (ordsucc n) (ordsucc n)
+    = god1_ring_binomial_second_step K add mul x y n n.
+let K add mul x y n.
+assume hn.
+exact (f_eq_i
+  (fun c:set =>
+    ring_nat_multiple K add c
+      (mul
+        (ring_nat_power K add mul x
+          (nat_sub_witness (ordsucc n) (ordsucc n)))
+        (ring_nat_power K add mul y (ordsucc n))))
+  (binomial_coefficient (ordsucc n) (ordsucc n))
+  (binomial_coefficient n n)
+  (eq_i_tra
+    (binomial_coefficient (ordsucc n) (ordsucc n)) 1
+    (binomial_coefficient n n)
+    (god1_binomial_coefficient_diagonal
+      (ordsucc n) (omega_ordsucc n hn))
+    (eq_sym
+      (binomial_coefficient n n) 1
+      (god1_binomial_coefficient_diagonal n hn)))).
+Qed.
+
+Theorem god1_ring_binomial_pairing_middle :
+  forall K, forall add mul:set -> set -> set,
+    ring K add mul -> forall x y :e K,
+    forall n :e omega, forall i :e n,
+    god1_ring_binomial_term K add mul x y
+      (ordsucc n) (ordsucc i)
+    = add
+        (god1_ring_binomial_first_step K add mul x y n (ordsucc i))
+        (god1_ring_binomial_second_step K add mul x y n i).
+let K add mul.
+assume hK.
+let x.
+assume hx.
+let y.
+assume hy.
+let n.
+assume hn.
+let i.
+assume hi.
+claim hiomega : i :e omega.
+exact (omega_TransSet n hn i hi).
+claim hsuccibig : ordsucc i :e ordsucc (ordsucc n).
+exact (nat_ordsucc_in_ordsucc (ordsucc n)
+  (nat_ordsucc n (omega_nat_p n hn)) i
+  (ordsuccI1 n i hi)).
+claim hsubomega :
+  nat_sub_witness (ordsucc i) (ordsucc n) :e omega.
+exact (god1_nat_sub_witness_bounded_natural
+  (ordsucc n) (omega_ordsucc n hn) (ordsucc i) hsuccibig).
+claim hmonomial :
+  mul
+    (ring_nat_power K add mul x
+      (nat_sub_witness (ordsucc i) (ordsucc n)))
+    (ring_nat_power K add mul y (ordsucc i)) :e K.
+exact (god1_ring_multiplicative_law K add mul hK
+  (ring_nat_power K add mul x
+    (nat_sub_witness (ordsucc i) (ordsucc n)))
+    (god1_ring_nat_power_in K add mul hK x hx
+      (nat_sub_witness (ordsucc i) (ordsucc n)) hsubomega)
+  (ring_nat_power K add mul y (ordsucc i))
+    (god1_ring_nat_power_in K add mul hK y hy (ordsucc i)
+      (omega_ordsucc i hiomega))).
+claim hcoeffsucc : binomial_coefficient n (ordsucc i) :e omega.
+exact (god1_binomial_coefficient_natural n hn (ordsucc i)
+  (omega_ordsucc i hiomega)).
+claim hcoeffi : binomial_coefficient n i :e omega.
+exact (god1_binomial_coefficient_natural n hn i hiomega).
+claim hpascal :
+  add_nat
+    (binomial_coefficient n (ordsucc i))
+    (binomial_coefficient n i)
+  = binomial_coefficient (ordsucc n) (ordsucc i).
+exact (god1_binomial_pascal_successor_index n hn i hi).
+apply (eq_i_tra
+  (god1_ring_binomial_term K add mul x y
+    (ordsucc n) (ordsucc i))
+  (ring_nat_multiple K add
+    (add_nat
+      (binomial_coefficient n (ordsucc i))
+      (binomial_coefficient n i))
+    (mul
+      (ring_nat_power K add mul x
+        (nat_sub_witness (ordsucc i) (ordsucc n)))
+      (ring_nat_power K add mul y (ordsucc i))))
+  (add
+    (god1_ring_binomial_first_step K add mul x y n (ordsucc i))
+    (god1_ring_binomial_second_step K add mul x y n i))).
+- exact (f_eq_i
+    (fun c:set =>
+      ring_nat_multiple K add c
+        (mul
+          (ring_nat_power K add mul x
+            (nat_sub_witness (ordsucc i) (ordsucc n)))
+          (ring_nat_power K add mul y (ordsucc i))))
+    (binomial_coefficient (ordsucc n) (ordsucc i))
+    (add_nat
+      (binomial_coefficient n (ordsucc i))
+      (binomial_coefficient n i))
+    (eq_sym
+      (add_nat
+        (binomial_coefficient n (ordsucc i))
+        (binomial_coefficient n i))
+      (binomial_coefficient (ordsucc n) (ordsucc i)) hpascal)).
+- apply eq_sym.
+  exact (god1_ring_nat_multiple_add_coefficients K add mul hK
+    (mul
+      (ring_nat_power K add mul x
+        (nat_sub_witness (ordsucc i) (ordsucc n)))
+      (ring_nat_power K add mul y (ordsucc i))) hmonomial
+    (binomial_coefficient n (ordsucc i)) hcoeffsucc
+    (binomial_coefficient n i) hcoeffi).
+Qed.
+
+Theorem god1_ring_binomial_step_pairing :
+  forall K, forall add mul:set -> set -> set,
+    ring K add mul -> forall x y :e K, forall n :e omega,
+    add
+      (ring_finite_sum K add (ordsucc n)
+        (fun p => god1_ring_binomial_first_step
+          K add mul x y n p))
+      (ring_finite_sum K add (ordsucc n)
+        (fun p => god1_ring_binomial_second_step
+          K add mul x y n p))
+    = ring_finite_sum K add (ordsucc (ordsucc n))
+        (fun p => god1_ring_binomial_term
+          K add mul x y (ordsucc n) p).
+let K add mul.
+assume hK.
+let x.
+assume hx.
+let y.
+assume hy.
+let n.
+assume hn.
+exact (god1_ring_finite_sum_adjacent_pairing K add mul hK n hn
+  (fun p => god1_ring_binomial_first_step K add mul x y n p)
+  (fun p => god1_ring_binomial_second_step K add mul x y n p)
+  (fun p => god1_ring_binomial_term K add mul x y (ordsucc n) p)
+  (fun p hp => god1_ring_binomial_first_step_in
+    K add mul hK x hx y hy n hn p hp)
+  (fun p hp => god1_ring_binomial_second_step_in
+    K add mul hK x hx y hy n hn p hp)
+  (fun p hp => god1_ring_binomial_term_in
+    K add mul hK x hx y hy
+    (ordsucc n) (omega_ordsucc n hn) p hp)
+  (god1_ring_binomial_pairing_zero K add mul x y n hn)
+  (fun i hi => god1_ring_binomial_pairing_middle
+    K add mul hK x hx y hy n hn i hi)
+  (god1_ring_binomial_pairing_last K add mul x y n hn)).
+Qed.
+
+Theorem god1_ring_binomial_induction_expansion :
+  forall K, forall add mul:set -> set -> set,
+    ring K add mul -> forall x y :e K,
+    mul x y = mul y x -> forall n :e omega,
+    ring_nat_power K add mul (add x y) n
+      = ring_finite_sum K add (ordsucc n)
+        (fun p => god1_ring_binomial_term K add mul x y n p) ->
+    ring_nat_power K add mul (add x y) (ordsucc n)
+      = add
+        (ring_finite_sum K add (ordsucc n)
+          (fun p => god1_ring_binomial_first_step
+            K add mul x y n p))
+        (ring_finite_sum K add (ordsucc n)
+          (fun p => god1_ring_binomial_second_step
+            K add mul x y n p)).
+let K add mul.
+assume hK.
+let x.
+assume hx.
+let y.
+assume hy hcomm.
+let n.
+assume hn hind.
+claim hterm :
+  forall p :e ordsucc n,
+    god1_ring_binomial_term K add mul x y n p :e K.
+exact (god1_ring_binomial_term_in K add mul hK x hx y hy n hn).
+claim hsum :
+  ring_finite_sum K add (ordsucc n)
+    (fun p => god1_ring_binomial_term K add mul x y n p) :e K.
+exact (god1_ring_finite_sum_in_natural K add mul hK
+  (ordsucc n) (omega_ordsucc n hn)
+  (fun p => god1_ring_binomial_term K add mul x y n p) hterm).
+apply (eq_i_tra
+  (ring_nat_power K add mul (add x y) (ordsucc n))
+  (mul (ring_nat_power K add mul (add x y) n) (add x y))
+  (add
+    (ring_finite_sum K add (ordsucc n)
+      (fun p => god1_ring_binomial_first_step K add mul x y n p))
+    (ring_finite_sum K add (ordsucc n)
+      (fun p => god1_ring_binomial_second_step K add mul x y n p)))).
+- exact (god1_ring_nat_power_successor K add mul
+    (add x y) n (omega_nat_p n hn)).
+- apply (eq_i_tra
+    (mul (ring_nat_power K add mul (add x y) n) (add x y))
+    (mul
+      (ring_finite_sum K add (ordsucc n)
+        (fun p => god1_ring_binomial_term K add mul x y n p))
+      (add x y))
+    (add
+      (ring_finite_sum K add (ordsucc n)
+        (fun p => god1_ring_binomial_first_step K add mul x y n p))
+      (ring_finite_sum K add (ordsucc n)
+        (fun p => god1_ring_binomial_second_step K add mul x y n p)))).
+  - f_equal.
+    exact hind.
+  - apply (eq_i_tra
+      (mul
+        (ring_finite_sum K add (ordsucc n)
+          (fun p => god1_ring_binomial_term K add mul x y n p))
+        (add x y))
+      (add
+        (mul
+          (ring_finite_sum K add (ordsucc n)
+            (fun p => god1_ring_binomial_term K add mul x y n p)) x)
+        (mul
+          (ring_finite_sum K add (ordsucc n)
+            (fun p => god1_ring_binomial_term K add mul x y n p)) y))
+      (add
+        (ring_finite_sum K add (ordsucc n)
+          (fun p => god1_ring_binomial_first_step K add mul x y n p))
+        (ring_finite_sum K add (ordsucc n)
+          (fun p => god1_ring_binomial_second_step K add mul x y n p)))).
+    - exact (andEL
+        (mul
+          (ring_finite_sum K add (ordsucc n)
+            (fun p => god1_ring_binomial_term K add mul x y n p))
+          (add x y)
+          = add
+            (mul
+              (ring_finite_sum K add (ordsucc n)
+                (fun p => god1_ring_binomial_term K add mul x y n p)) x)
+            (mul
+              (ring_finite_sum K add (ordsucc n)
+                (fun p => god1_ring_binomial_term K add mul x y n p)) y))
+        (mul
+          (add
+            (ring_finite_sum K add (ordsucc n)
+              (fun p => god1_ring_binomial_term K add mul x y n p)) x) y
+          = add
+            (mul
+              (ring_finite_sum K add (ordsucc n)
+                (fun p => god1_ring_binomial_term K add mul x y n p)) y)
+            (mul x y))
+        (god1_ring_distributive_laws K add mul hK
+          (ring_finite_sum K add (ordsucc n)
+            (fun p => god1_ring_binomial_term K add mul x y n p)) hsum
+          x hx y hy)).
+    - apply (eq_i_tra
+        (add
+          (mul
+            (ring_finite_sum K add (ordsucc n)
+              (fun p => god1_ring_binomial_term K add mul x y n p)) x)
+          (mul
+            (ring_finite_sum K add (ordsucc n)
+              (fun p => god1_ring_binomial_term K add mul x y n p)) y))
+        (add
+          (ring_finite_sum K add (ordsucc n)
+            (fun p => mul
+              (god1_ring_binomial_term K add mul x y n p) x))
+          (ring_finite_sum K add (ordsucc n)
+            (fun p => mul
+              (god1_ring_binomial_term K add mul x y n p) y)))
+        (add
+          (ring_finite_sum K add (ordsucc n)
+            (fun p => god1_ring_binomial_first_step K add mul x y n p))
+          (ring_finite_sum K add (ordsucc n)
+            (fun p => god1_ring_binomial_second_step K add mul x y n p)))).
+      - f_equal.
+        - exact (god1_ring_finite_sum_right_mul K add mul hK
+            (ordsucc n) (omega_ordsucc n hn)
+            (fun p => god1_ring_binomial_term K add mul x y n p)
+            hterm x hx).
+        - exact (god1_ring_finite_sum_right_mul K add mul hK
+            (ordsucc n) (omega_ordsucc n hn)
+            (fun p => god1_ring_binomial_term K add mul x y n p)
+            hterm y hy).
+      - f_equal.
+        - exact (god1_ring_finite_sum_congr_natural K add
+            (ordsucc n) (omega_ordsucc n hn)
+            (fun p => mul
+              (god1_ring_binomial_term K add mul x y n p) x)
+            (fun p => god1_ring_binomial_first_step K add mul x y n p)
+            (fun p hp => god1_ring_binomial_term_right_x
+              K add mul hK x hx y hy hcomm n hn p hp)).
+        - exact (god1_ring_finite_sum_congr_natural K add
+            (ordsucc n) (omega_ordsucc n hn)
+            (fun p => mul
+              (god1_ring_binomial_term K add mul x y n p) y)
+            (fun p => god1_ring_binomial_second_step K add mul x y n p)
+            (fun p hp => god1_ring_binomial_term_right_y
+              K add mul hK x hx y hy n hn p hp)).
+Qed.
+
+Theorem god1_ring_binomial_induction_step :
+  forall K, forall add mul:set -> set -> set,
+    ring K add mul -> forall x y :e K,
+    mul x y = mul y x -> forall n :e omega,
+    ring_nat_power K add mul (add x y) n
+      = ring_finite_sum K add (ordsucc n)
+        (fun p => god1_ring_binomial_term K add mul x y n p) ->
+    ring_nat_power K add mul (add x y) (ordsucc n)
+      = ring_finite_sum K add (ordsucc (ordsucc n))
+        (fun p => god1_ring_binomial_term K add mul x y (ordsucc n) p).
+let K add mul.
+assume hK.
+let x.
+assume hx.
+let y.
+assume hy hcomm.
+let n.
+assume hn hind.
+exact (eq_i_tra
+  (ring_nat_power K add mul (add x y) (ordsucc n))
+  (add
+    (ring_finite_sum K add (ordsucc n)
+      (fun p => god1_ring_binomial_first_step K add mul x y n p))
+    (ring_finite_sum K add (ordsucc n)
+      (fun p => god1_ring_binomial_second_step K add mul x y n p)))
+  (ring_finite_sum K add (ordsucc (ordsucc n))
+    (fun p => god1_ring_binomial_term K add mul x y (ordsucc n) p))
+  (god1_ring_binomial_induction_expansion
+    K add mul hK x hx y hy hcomm n hn hind)
+  (god1_ring_binomial_step_pairing K add mul hK x hx y hy n hn)).
+Qed.
+
+Theorem god1_ring_nat_power_one :
+  forall K, forall add mul:set -> set -> set,
+    ring K add mul -> forall z :e K,
+      ring_nat_power K add mul z 1 = z.
+let K add mul.
+assume hK.
+let z.
+assume hz.
+exact (eq_i_tra
+  (ring_nat_power K add mul z 1)
+  (mul (ring_nat_power K add mul z 0) z) z
+  (god1_ring_nat_power_successor K add mul z 0 nat_0)
+  (eq_i_tra
+    (mul (ring_nat_power K add mul z 0) z)
+    (mul (ring_one K mul) z) z
+    (f_eq_i (fun q:set => mul q z)
+      (ring_nat_power K add mul z 0) (ring_one K mul)
+      (god1_ring_nat_power_zero K add mul z))
+    (andER
+      (mul z (ring_one K mul) = z)
+      (mul (ring_one K mul) z = z)
+      ((andER
+        (ring_one K mul :e K)
+        (forall q :e K,
+          mul q (ring_one K mul) = q
+          /\ mul (ring_one K mul) q = q)
+        (god1_ring_multiplicative_identity_specification K add mul hK))
+        z hz)))).
+Qed.
+
+Theorem god1_ring_binomial_zero_monomial :
+  forall K, forall add mul:set -> set -> set,
+    ring K add mul -> forall x y :e K,
+    mul
+      (ring_nat_power K add mul x (nat_sub_witness 0 0))
+      (ring_nat_power K add mul y 0)
+    = ring_one K mul.
+let K add mul.
+assume hK.
+let x.
+assume hx.
+let y.
+assume hy.
+apply (eq_i_tra
+  (mul
+    (ring_nat_power K add mul x (nat_sub_witness 0 0))
+    (ring_nat_power K add mul y 0))
+  (mul (ring_one K mul) (ring_one K mul))
+  (ring_one K mul)).
+- f_equal.
+  - exact (eq_i_tra
+      (ring_nat_power K add mul x (nat_sub_witness 0 0))
+      (ring_nat_power K add mul x 0) (ring_one K mul)
+      (f_eq_i (fun q:set => ring_nat_power K add mul x q)
+        (nat_sub_witness 0 0) 0
+        (nat_sub_witness_self_eq_0 0 nat_0))
+      (god1_ring_nat_power_zero K add mul x)).
+  - exact (god1_ring_nat_power_zero K add mul y).
+- exact (andEL
+    (mul (ring_one K mul) (ring_one K mul) = ring_one K mul)
+    (mul (ring_one K mul) (ring_one K mul) = ring_one K mul)
+    ((andER
+      (ring_one K mul :e K)
+      (forall q :e K,
+        mul q (ring_one K mul) = q
+        /\ mul (ring_one K mul) q = q)
+      (god1_ring_multiplicative_identity_specification K add mul hK))
+      (ring_one K mul)
+      (andEL
+        (ring_one K mul :e K)
+        (forall q :e K,
+          mul q (ring_one K mul) = q
+          /\ mul (ring_one K mul) q = q)
+        (god1_ring_multiplicative_identity_specification K add mul hK)))).
+Qed.
+
+Theorem god1_ring_binomial_term_zero_zero :
+  forall K, forall add mul:set -> set -> set,
+    ring K add mul -> forall x y :e K,
+      god1_ring_binomial_term K add mul x y 0 0
+      = ring_one K mul.
+let K add mul.
+assume hK.
+let x.
+assume hx.
+let y.
+assume hy.
+claim hxzero : ring_nat_power K add mul x 0 :e K.
+exact (god1_ring_nat_power_in K add mul hK x hx 0
+  (nat_p_omega 0 nat_0)).
+claim hyzero : ring_nat_power K add mul y 0 :e K.
+exact (god1_ring_nat_power_in K add mul hK y hy 0
+  (nat_p_omega 0 nat_0)).
+claim hmonomialin :
+  mul
+    (ring_nat_power K add mul x (nat_sub_witness 0 0))
+    (ring_nat_power K add mul y 0) :e K.
+exact (god1_ring_multiplicative_law K add mul hK
+  (ring_nat_power K add mul x (nat_sub_witness 0 0))
+    (mem_eq_substL K
+      (ring_nat_power K add mul x 0)
+      (ring_nat_power K add mul x (nat_sub_witness 0 0))
+      (f_eq_i (fun q:set => ring_nat_power K add mul x q)
+        (nat_sub_witness 0 0) 0
+        (nat_sub_witness_self_eq_0 0 nat_0)) hxzero)
+  (ring_nat_power K add mul y 0) hyzero).
+claim hmonomial :
+  mul
+    (ring_nat_power K add mul x (nat_sub_witness 0 0))
+    (ring_nat_power K add mul y 0)
+  = ring_one K mul.
+exact (god1_ring_binomial_zero_monomial K add mul hK x hx y hy).
+apply (eq_i_tra
+  (god1_ring_binomial_term K add mul x y 0 0)
+  (ring_nat_multiple K add 1
+    (mul
+      (ring_nat_power K add mul x (nat_sub_witness 0 0))
+      (ring_nat_power K add mul y 0)))
+  (ring_one K mul)).
+- exact (f_eq_i
+    (fun c:set => ring_nat_multiple K add c
+      (mul
+        (ring_nat_power K add mul x (nat_sub_witness 0 0))
+        (ring_nat_power K add mul y 0)))
+    (binomial_coefficient 0 0) 1
+    (god1_binomial_coefficient_zero 0 (nat_p_omega 0 nat_0))).
+- exact (eq_i_tra
+    (ring_nat_multiple K add 1
+      (mul
+        (ring_nat_power K add mul x (nat_sub_witness 0 0))
+        (ring_nat_power K add mul y 0)))
+    (mul
+      (ring_nat_power K add mul x (nat_sub_witness 0 0))
+      (ring_nat_power K add mul y 0))
+    (ring_one K mul)
+    (god1_ring_nat_multiple_one K add mul hK
+      (mul
+        (ring_nat_power K add mul x (nat_sub_witness 0 0))
+        (ring_nat_power K add mul y 0)) hmonomialin)
+    hmonomial).
+Qed.
+
+Theorem god1_ring_binomial_sum_zero :
+  forall K, forall add mul:set -> set -> set,
+    ring K add mul -> forall x y :e K,
+    ring_finite_sum K add (ordsucc 0)
+      (fun p => god1_ring_binomial_term K add mul x y 0 p)
+    = ring_one K mul.
+let K add mul.
+assume hK.
+let x.
+assume hx.
+let y.
+assume hy.
+claim htermzero :
+  god1_ring_binomial_term K add mul x y 0 0 = ring_one K mul.
+exact (god1_ring_binomial_term_zero_zero K add mul hK x hx y hy).
+claim htermzeroIn :
+  god1_ring_binomial_term K add mul x y 0 0 :e K.
+exact (god1_ring_binomial_term_in K add mul hK x hx y hy
+  0 (nat_p_omega 0 nat_0) 0 (ordsuccI2 0)).
+apply (eq_i_tra
+  (ring_finite_sum K add (ordsucc 0)
+    (fun p => god1_ring_binomial_term K add mul x y 0 p))
+  (add
+    (ring_finite_sum K add 0
+      (fun p => god1_ring_binomial_term K add mul x y 0 p))
+    (god1_ring_binomial_term K add mul x y 0 0))
+  (ring_one K mul)).
+- exact (god1_ring_finite_sum_natural_successor K add 0
+    (nat_p_omega 0 nat_0)
+    (fun p => god1_ring_binomial_term K add mul x y 0 p)).
+- apply (eq_i_tra
+    (add
+      (ring_finite_sum K add 0
+        (fun p => god1_ring_binomial_term K add mul x y 0 p))
+      (god1_ring_binomial_term K add mul x y 0 0))
+    (add (ring_zero K add)
+      (god1_ring_binomial_term K add mul x y 0 0))
+    (ring_one K mul)).
+  - f_equal.
+    exact (god1_ring_finite_sum_zero_natural K add
+      (fun p => god1_ring_binomial_term K add mul x y 0 p)).
+  - apply (eq_i_tra
+      (add (ring_zero K add)
+        (god1_ring_binomial_term K add mul x y 0 0))
+      (god1_ring_binomial_term K add mul x y 0 0)
+      (ring_one K mul)).
+    - exact (andER
+        (add
+          (god1_ring_binomial_term K add mul x y 0 0)
+          (ring_zero K add)
+          = god1_ring_binomial_term K add mul x y 0 0)
+        (add
+          (ring_zero K add)
+          (god1_ring_binomial_term K add mul x y 0 0)
+          = god1_ring_binomial_term K add mul x y 0 0)
+        ((andER
+          (ring_zero K add :e K)
+          (forall q :e K,
+            add q (ring_zero K add) = q
+            /\ add (ring_zero K add) q = q)
+          (god1_group_identity_specification K add
+            (god1_ring_additive_group K add mul hK)))
+          (god1_ring_binomial_term K add mul x y 0 0) htermzeroIn)).
+    - exact htermzero.
+Qed.
+
+Theorem god1_ring_binomial_base_zero :
+  forall K, forall add mul:set -> set -> set,
+    ring K add mul -> forall x y :e K,
+    ring_nat_power K add mul (add x y) 0
+    = ring_finite_sum K add (ordsucc 0)
+      (fun p => god1_ring_binomial_term K add mul x y 0 p).
+let K add mul.
+assume hK.
+let x.
+assume hx.
+let y.
+assume hy.
+claim hsum :
+  ring_finite_sum K add (ordsucc 0)
+    (fun p => god1_ring_binomial_term K add mul x y 0 p)
+  = ring_one K mul.
+exact (god1_ring_binomial_sum_zero K add mul hK x hx y hy).
+exact (eq_i_tra
+  (ring_nat_power K add mul (add x y) 0)
+  (ring_one K mul)
+  (ring_finite_sum K add (ordsucc 0)
+    (fun p => god1_ring_binomial_term K add mul x y 0 p))
+  (god1_ring_nat_power_zero K add mul (add x y))
+  (eq_sym
+    (ring_finite_sum K add (ordsucc 0)
+      (fun p => god1_ring_binomial_term K add mul x y 0 p))
+    (ring_one K mul) hsum)).
+Qed.
+
+Theorem god1_ring_binomial_induction_step_nat :
+  forall K, forall add mul:set -> set -> set,
+    ring K add mul -> forall x y :e K,
+    mul x y = mul y x -> forall n,
+    nat_p n ->
+    ring_nat_power K add mul (add x y) n
+      = ring_finite_sum K add (ordsucc n)
+        (fun p => god1_ring_binomial_term K add mul x y n p) ->
+    ring_nat_power K add mul (add x y) (ordsucc n)
+      = ring_finite_sum K add (ordsucc (ordsucc n))
+        (fun p => god1_ring_binomial_term K add mul x y (ordsucc n) p).
+let K add mul.
+assume hK.
+let x.
+assume hx.
+let y.
+assume hy hcomm.
+let n.
+assume hn hind.
+exact (god1_ring_binomial_induction_step K add mul hK
+  x hx y hy hcomm n (nat_p_omega n hn) hind).
+Qed.
+
+Theorem god1_ring_binomial_theorem_core :
+  forall K, forall add mul:set -> set -> set,
+    ring K add mul -> forall x y :e K,
+    mul x y = mul y x -> forall n :e omega,
+    ring_nat_power K add mul (add x y) n
+    = ring_finite_sum K add (ordsucc n)
+      (fun p => god1_ring_binomial_term K add mul x y n p).
+let K add mul.
+assume hK.
+let x.
+assume hx.
+let y.
+assume hy hcomm.
+let n.
+assume hn.
+exact (nat_ind
+  (fun m =>
+    ring_nat_power K add mul (add x y) m
+    = ring_finite_sum K add (ordsucc m)
+      (fun p => god1_ring_binomial_term K add mul x y m p))
+  (god1_ring_binomial_base_zero K add mul hK x hx y hy)
+  (god1_ring_binomial_induction_step_nat
+    K add mul hK x hx y hy hcomm)
+  n (omega_nat_p n hn)).
+Qed.
+
+Theorem god1_union_zero : Union 0 = 0.
+apply set_ext.
+- let z.
+  assume hz.
+  apply (UnionE_impred 0 z hz (z :e 0)).
+  let A.
+  assume hzA hA.
+  exact (FalseE (EmptyE A hA) (z :e 0)).
+- let z.
+  assume hz.
+  exact (FalseE (EmptyE z hz) (z :e Union 0)).
+Qed.
+
+Theorem god1_union_natural_in_omega :
+  forall r :e omega, Union r :e omega.
+let r.
+assume hr.
+apply (orE
+  (r = 0)
+  (exists s, nat_p s /\ r = ordsucc s)
+  (nat_inv r (omega_nat_p r hr))
+  (Union r :e omega)).
+- assume hrzero.
+  exact (mem_eq_substL omega 0 (Union r)
+    (eq_i_tra (Union r) (Union 0) 0
+      (f_eq_i Union r 0 hrzero) god1_union_zero)
+    (nat_p_omega 0 nat_0)).
+- assume hsucc.
+  apply (exandE_i
+    (fun s => nat_p s)
+    (fun s => r = ordsucc s) hsucc).
+  let s.
+  assume hs hrs.
+  exact (mem_eq_substL omega s (Union r)
+    (eq_i_tra (Union r) (Union (ordsucc s)) s
+      (f_eq_i Union r (ordsucc s) hrs)
+      (Union_ordsucc_eq s hs))
+    (nat_p_omega s hs)).
+Qed.
+
 Theorem god1_s8_theorem3_binomial_theorem :
   forall K, forall add mul:set -> set -> set,
     ring K add mul ->
@@ -59265,6 +61919,9 @@ let y.
 assume hy hcomm.
 let n.
 assume hn hpos.
+claim hxy : add x y :e K.
+exact (god1_group_law_of_composition K add
+  (god1_ring_additive_group K add mul hK) x hx y hy).
 //GOD1PRF:117878 The formula to be proved is trivial for $n=1$, and it is therefore enough to show that the formula
 claim h_s8_t3_base_and_induction_plan :
   ring_nat_power K add mul (add x y) 1 = add x y
@@ -59273,7 +61930,16 @@ claim h_s8_t3_base_and_induction_plan :
       = ring_nat_power K add mul (add x y) m ->
     ring_nat_power K add mul (add x y) (ordsucc m)
       = ring_nat_power K add mul (add x y) (ordsucc m)).
-admit.
+exact (andI
+  (ring_nat_power K add mul (add x y) 1 = add x y)
+  (forall m :e omega,
+    ring_nat_power K add mul (add x y) m
+      = ring_nat_power K add mul (add x y) m ->
+    ring_nat_power K add mul (add x y) (ordsucc m)
+      = ring_nat_power K add mul (add x y) (ordsucc m))
+  (god1_ring_nat_power_one K add mul hK (add x y) hxy)
+  (fun m hm heq =>
+    eq_ref (ring_nat_power K add mul (add x y) (ordsucc m)))).
 //GOD1PRF:118044 implies the corresponding formula for the exponent $n$.
 claim h_s8_t3_induction_step_goal :
   ring_nat_power K add mul (add x y) (ordsucc n)
@@ -59283,48 +61949,93 @@ claim h_s8_t3_induction_step_goal :
         (mul
           (ring_nat_power K add mul x (nat_sub_witness p (ordsucc n)))
           (ring_nat_power K add mul y p))).
-admit.
+exact (god1_ring_binomial_theorem_core K add mul hK
+  x hx y hy hcomm (ordsucc n) (omega_ordsucc n hn)).
 //GOD1PRF:118100 If we multiply each side of this formula by $x+y$, we obtain
 claim h_s8_t3_multiply_induction_hypothesis :
   ring_nat_power K add mul (add x y) (ordsucc n)
     = mul (ring_nat_power K add mul (add x y) n) (add x y).
-admit.
+exact (god1_ring_nat_power_successor K add mul
+  (add x y) n (omega_nat_p n hn)).
 //GOD1PRF:118275 If $r$ is an integer such that $0<r<n$, there are two terms on the right-hand side which contain the monomial
 claim h_s8_t3_two_middle_terms :
   forall r :e n,
     0 :e r ->
     binomial_coefficient n r :e omega
     /\ binomial_coefficient n (Union r) :e omega.
-admit.
+exact (fun r hr hpositive =>
+  andI
+    (binomial_coefficient n r :e omega)
+    (binomial_coefficient n (Union r) :e omega)
+    (god1_binomial_coefficient_natural n hn r
+      (omega_TransSet n hn r hr))
+    (god1_binomial_coefficient_natural n hn (Union r)
+      (god1_union_natural_in_omega r
+        (omega_TransSet n hn r hr)))).
 //GOD1PRF:118409 the first corresponds to $p=r$ in the first sum, which introduces a factor equal to
 claim h_s8_t3_first_middle_coefficient :
   forall r :e n,
     ring_nat_multiple K add (binomial_coefficient n r)
       (ring_one K mul) :e K.
-admit.
+exact (fun r hr =>
+  god1_ring_nat_multiple_in K add mul hK
+    (binomial_coefficient n r)
+    (god1_binomial_coefficient_natural n hn r
+      (omega_TransSet n hn r hr))
+    (ring_one K mul)
+    (andEL
+      (ring_one K mul :e K)
+      (forall z :e K,
+        mul z (ring_one K mul) = z
+        /\ mul (ring_one K mul) z = z)
+      (god1_ring_multiplicative_identity_specification K add mul hK))).
 //GOD1PRF:118517 and the second corresponds to $p=r-1$ in the second sum, which introduces a factor equal to
 claim h_s8_t3_second_middle_coefficient :
   forall r :e n,
     ring_nat_multiple K add (binomial_coefficient n (Union r))
       (ring_one K mul) :e K.
-admit.
+exact (fun r hr =>
+  god1_ring_nat_multiple_in K add mul hK
+    (binomial_coefficient n (Union r))
+    (god1_binomial_coefficient_natural n hn (Union r)
+      (god1_union_natural_in_omega r
+        (omega_TransSet n hn r hr)))
+    (ring_one K mul)
+    (andEL
+      (ring_one K mul :e K)
+      (forall z :e K,
+        mul z (ring_one K mul) = z
+        /\ mul (ring_one K mul) z = z)
+      (god1_ring_multiplicative_identity_specification K add mul hK))).
 //GOD1PRF:118634 Hence the proof will be complete if we verify that
 claim h_s8_t3_pascal_identity_goal :
   forall r :e n,
+    0 :e r ->
     add_nat
       (binomial_coefficient n r)
       (binomial_coefficient n (Union r))
     = binomial_coefficient (ordsucc n) r.
-admit.
+exact (fun r hr hpositive =>
+  god1_binomial_pascal_interior n hn r
+    (omega_TransSet n hn r hr) hpositive).
 //GOD1PRF:118740 Now the right-hand side is equal to
 claim h_s8_t3_pascal_identity_conclusion :
   forall r :e n,
+    0 :e r ->
     binomial_coefficient (ordsucc n) r
     = add_nat
       (binomial_coefficient n r)
       (binomial_coefficient n (Union r)).
-admit.
-Admitted.
+exact (fun r hr hpositive =>
+  eq_sym
+    (add_nat
+      (binomial_coefficient n r)
+      (binomial_coefficient n (Union r)))
+    (binomial_coefficient (ordsucc n) r)
+    (h_s8_t3_pascal_identity_goal r hr hpositive)).
+exact (god1_ring_binomial_theorem_core K add mul hK
+  x hx y hy hcomm n hn).
+Qed.
 
 Theorem god1_product_of_sums_expansion :
   forall K, forall add mul:set -> set -> set,
