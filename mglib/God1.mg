@@ -52273,6 +52273,323 @@ Definition action_orbit :
   set -> (set -> set -> set) -> set -> set :=
   fun G mul X act x => {act s x|s :e G}.
 
+Theorem god1_group_action_group :
+  forall G, forall mul:set -> set -> set,
+  forall X, forall act:set -> set -> set,
+    group_action G mul X act -> group G mul.
+let G mul X act.
+assume hact.
+exact (andEL
+  (group G mul)
+  (forall s :e G, forall x :e X, act s x :e X)
+  (andEL
+    (group G mul
+      /\ forall s :e G, forall x :e X, act s x :e X)
+    (forall s t :e G, forall x :e X,
+      act s (act t x) = act (mul s t) x)
+    (andEL
+      ((group G mul
+        /\ forall s :e G, forall x :e X, act s x :e X)
+        /\ forall s t :e G, forall x :e X,
+          act s (act t x) = act (mul s t) x)
+      (forall x :e X, act (group_identity G mul) x = x)
+      hact))).
+Qed.
+
+Theorem god1_group_action_closed :
+  forall G, forall mul:set -> set -> set,
+  forall X, forall act:set -> set -> set,
+    group_action G mul X act ->
+    forall s :e G, forall x :e X, act s x :e X.
+let G mul X act.
+assume hact.
+exact (andER
+  (group G mul)
+  (forall s :e G, forall x :e X, act s x :e X)
+  (andEL
+    (group G mul
+      /\ forall s :e G, forall x :e X, act s x :e X)
+    (forall s t :e G, forall x :e X,
+      act s (act t x) = act (mul s t) x)
+    (andEL
+      ((group G mul
+        /\ forall s :e G, forall x :e X, act s x :e X)
+        /\ forall s t :e G, forall x :e X,
+          act s (act t x) = act (mul s t) x)
+      (forall x :e X, act (group_identity G mul) x = x)
+      hact))).
+Qed.
+
+Theorem god1_group_action_composition :
+  forall G, forall mul:set -> set -> set,
+  forall X, forall act:set -> set -> set,
+    group_action G mul X act ->
+    forall s t :e G, forall x :e X,
+      act s (act t x) = act (mul s t) x.
+let G mul X act.
+assume hact.
+exact (andER
+  (group G mul
+    /\ forall s :e G, forall x :e X, act s x :e X)
+  (forall s t :e G, forall x :e X,
+    act s (act t x) = act (mul s t) x)
+  (andEL
+    ((group G mul
+      /\ forall s :e G, forall x :e X, act s x :e X)
+      /\ forall s t :e G, forall x :e X,
+        act s (act t x) = act (mul s t) x)
+    (forall x :e X, act (group_identity G mul) x = x)
+    hact)).
+Qed.
+
+Theorem god1_group_action_identity :
+  forall G, forall mul:set -> set -> set,
+  forall X, forall act:set -> set -> set,
+    group_action G mul X act ->
+    forall x :e X, act (group_identity G mul) x = x.
+let G mul X act.
+assume hact.
+exact (andER
+  ((group G mul
+    /\ forall s :e G, forall x :e X, act s x :e X)
+    /\ forall s t :e G, forall x :e X,
+      act s (act t x) = act (mul s t) x)
+  (forall x :e X, act (group_identity G mul) x = x)
+  hact).
+Qed.
+
+Theorem god1_group_action_inverse_left :
+  forall G, forall mul:set -> set -> set,
+  forall X, forall act:set -> set -> set,
+    group_action G mul X act -> forall s :e G, forall x :e X,
+      act (group_inverse G mul s) (act s x) = x.
+let G mul X act.
+assume hact.
+let s.
+assume hs.
+let x.
+assume hx.
+claim hG : group G mul.
+exact (god1_group_action_group G mul X act hact).
+apply (eq_i_tra
+  (act (group_inverse G mul s) (act s x))
+  (act (mul (group_inverse G mul s) s) x) x).
+- exact (god1_group_action_composition G mul X act hact
+    (group_inverse G mul s)
+    (god1_group_inverse_in G mul hG s hs) s hs x hx).
+- apply (eq_i_tra
+    (act (mul (group_inverse G mul s) s) x)
+    (act (group_identity G mul) x) x).
+  - exact (f_eq_i (fun u => act u x)
+      (mul (group_inverse G mul s) s)
+      (group_identity G mul)
+      (andER
+        (group_inverse G mul s :e G)
+        (mul (group_inverse G mul s) s = group_identity G mul)
+        (andEL
+          (group_inverse G mul s :e G
+            /\ mul (group_inverse G mul s) s = group_identity G mul)
+          (mul s (group_inverse G mul s) = group_identity G mul)
+          (god1_group_inverse_specification G mul hG s hs)))).
+  - exact (god1_group_action_identity G mul X act hact x hx).
+Qed.
+
+Theorem god1_group_action_inverse_right :
+  forall G, forall mul:set -> set -> set,
+  forall X, forall act:set -> set -> set,
+    group_action G mul X act -> forall s :e G, forall x :e X,
+      act s (act (group_inverse G mul s) x) = x.
+let G mul X act.
+assume hact.
+let s.
+assume hs.
+let x.
+assume hx.
+claim hG : group G mul.
+exact (god1_group_action_group G mul X act hact).
+apply (eq_i_tra
+  (act s (act (group_inverse G mul s) x))
+  (act (mul s (group_inverse G mul s)) x) x).
+- exact (god1_group_action_composition G mul X act hact
+    s hs (group_inverse G mul s)
+    (god1_group_inverse_in G mul hG s hs) x hx).
+- apply (eq_i_tra
+    (act (mul s (group_inverse G mul s)) x)
+    (act (group_identity G mul) x) x).
+  - exact (f_eq_i (fun u => act u x)
+      (mul s (group_inverse G mul s))
+      (group_identity G mul)
+      (andER
+        (group_inverse G mul s :e G
+          /\ mul (group_inverse G mul s) s = group_identity G mul)
+        (mul s (group_inverse G mul s) = group_identity G mul)
+        (god1_group_inverse_specification G mul hG s hs))).
+  - exact (god1_group_action_identity G mul X act hact x hx).
+Qed.
+
+Theorem god1_group_action_map_bijective :
+  forall G, forall mul:set -> set -> set,
+  forall X, forall act:set -> set -> set,
+    group_action G mul X act -> forall s :e G,
+      bij X X (fun x => act s x).
+let G mul X act.
+assume hact.
+let s.
+assume hs.
+claim hG : group G mul.
+exact (god1_group_action_group G mul X act hact).
+apply (bijI X X (fun x => act s x)).
+- exact (god1_group_action_closed G mul X act hact s hs).
+- let x.
+  assume hx.
+  let y.
+  assume hy hxy.
+  apply (eq_i_tra x
+    (act (group_inverse G mul s) (act s x)) y).
+  - apply eq_sym.
+    exact (god1_group_action_inverse_left
+      G mul X act hact s hs x hx).
+  - apply (eq_i_tra
+      (act (group_inverse G mul s) (act s x))
+      (act (group_inverse G mul s) (act s y)) y).
+    - exact (f_eq_i (fun z => act (group_inverse G mul s) z)
+        (act s x) (act s y) hxy).
+    - exact (god1_group_action_inverse_left
+        G mul X act hact s hs y hy).
+- let y.
+  assume hy.
+  apply (ex_intro
+    (fun x => x :e X /\ act s x = y)
+    (act (group_inverse G mul s) y)).
+  exact (andI
+    (act (group_inverse G mul s) y :e X)
+    (act s (act (group_inverse G mul s) y) = y)
+    (god1_group_action_closed G mul X act hact
+      (group_inverse G mul s)
+      (god1_group_inverse_in G mul hG s hs) y hy)
+    (god1_group_action_inverse_right
+      G mul X act hact s hs y hy)).
+Qed.
+
+Theorem god1_group_action_map_in_permutation_group :
+  forall G, forall mul:set -> set -> set,
+  forall X, forall act:set -> set -> set,
+    group_action G mul X act -> forall s :e G,
+      (fun x :e X => act s x) :e permutation_group X.
+let G mul X act.
+assume hact.
+let s.
+assume hs.
+apply (god1_permutation_group_intro X (fun x :e X => act s x)).
+- exact (lam_Pi X (fun x => X) (fun x => act s x)
+    (god1_group_action_closed G mul X act hact s hs)).
+- exact (god1_bounded_bijection X (fun x => act s x)
+    (god1_group_action_map_bijective G mul X act hact s hs)).
+Qed.
+
+Theorem god1_group_action_map_multiplies :
+  forall G, forall mul:set -> set -> set,
+  forall X, forall act:set -> set -> set,
+    group_action G mul X act -> forall s t :e G,
+      (fun x :e X => act (mul s t) x)
+      = permutation_composition X
+        (fun x :e X => act s x) (fun x :e X => act t x).
+let G mul X act.
+assume hact.
+let s.
+assume hs.
+let t.
+assume ht.
+claim hG : group G mul.
+exact (god1_group_action_group G mul X act hact).
+claim hst : mul s t :e G.
+exact ((god1_group_law_of_composition G mul hG) s hs t ht).
+claim hleft : (fun x :e X => act (mul s t) x) :e X :^: X.
+exact (god1_permutation_function_in X
+  (fun x :e X => act (mul s t) x)
+  (god1_group_action_map_in_permutation_group
+    G mul X act hact (mul s t) hst)).
+claim hright : permutation_composition X
+  (fun x :e X => act s x) (fun x :e X => act t x) :e X :^: X.
+exact (god1_permutation_function_in X
+  (permutation_composition X
+    (fun x :e X => act s x) (fun x :e X => act t x))
+  (god1_permutation_composition_in X
+    (fun x :e X => act s x)
+    (god1_group_action_map_in_permutation_group
+      G mul X act hact s hs)
+    (fun x :e X => act t x)
+    (god1_group_action_map_in_permutation_group
+      G mul X act hact t ht))).
+apply (Pi_ext X (fun x => X)
+  (fun x :e X => act (mul s t) x) hleft
+  (permutation_composition X
+    (fun x :e X => act s x) (fun x :e X => act t x)) hright).
+let x.
+assume hx.
+apply (eq_i_tra
+  ((fun y :e X => act (mul s t) y) x)
+  (act (mul s t) x)
+  (permutation_composition X
+    (fun y :e X => act s y) (fun y :e X => act t y) x)).
+- exact (beta X (fun y => act (mul s t) y) x hx).
+- apply eq_sym.
+  apply (eq_i_tra
+    (permutation_composition X
+      (fun y :e X => act s y) (fun y :e X => act t y) x)
+    ((fun y :e X => act s y) ((fun y :e X => act t y) x))
+    (act (mul s t) x)).
+  - exact (beta X
+      (fun y => (fun z :e X => act s z)
+        ((fun z :e X => act t z) y)) x hx).
+  - apply (eq_i_tra
+      ((fun y :e X => act s y) ((fun y :e X => act t y) x))
+      (act s (act t x)) (act (mul s t) x)).
+    - apply (eq_i_tra
+        ((fun y :e X => act s y) ((fun y :e X => act t y) x))
+        ((fun y :e X => act s y) (act t x))
+        (act s (act t x))).
+      - exact (f_eq_i (fun z => (fun y :e X => act s y) z)
+          ((fun y :e X => act t y) x) (act t x)
+          (beta X (fun y => act t y) x hx)).
+      - exact (beta X (fun y => act s y) (act t x)
+          (god1_group_action_closed G mul X act hact t ht x hx)).
+    - exact (god1_group_action_composition
+        G mul X act hact s hs t ht x hx).
+Qed.
+
+Theorem god1_group_action_homomorphism :
+  forall G, forall mul:set -> set -> set,
+  forall X, forall act:set -> set -> set,
+    group_action G mul X act ->
+    group_homomorphism
+      G mul (permutation_group X) (permutation_composition X)
+      (fun s => fun x :e X => act s x).
+let G mul X act.
+assume hact.
+exact (andI
+  ((group G mul
+      /\ group (permutation_group X) (permutation_composition X))
+    /\ forall s :e G,
+      (fun x :e X => act s x) :e permutation_group X)
+  (forall s t :e G,
+    (fun x :e X => act (mul s t) x)
+      = permutation_composition X
+        (fun x :e X => act s x) (fun x :e X => act t x))
+  (andI
+    (group G mul
+      /\ group (permutation_group X) (permutation_composition X))
+    (forall s :e G,
+      (fun x :e X => act s x) :e permutation_group X)
+    (andI
+      (group G mul)
+      (group (permutation_group X) (permutation_composition X))
+      (god1_group_action_group G mul X act hact)
+      (god1_permutations_form_group X))
+    (god1_group_action_map_in_permutation_group G mul X act hact))
+  (god1_group_action_map_multiplies G mul X act hact)).
+Qed.
+
 Theorem god1_action_maps_are_permutations_and_form_homomorphism :
   forall G, forall mul:set -> set -> set,
   forall X, forall act:set -> set -> set,
@@ -52287,22 +52604,19 @@ let G mul X act.
 assume hact.
 apply andI.
 //GOD1PRF:78818 If a group $G$ operates on a set $X$, then for every $s \in G$ the mapping
-claim h_s7_action_map_closed :
-  forall s :e G, forall x :e X, act s x :e X.
-admit.
+- claim h_s7_action_map_closed :
+    forall s :e G, forall x :e X, act s x :e X.
+  exact (god1_group_action_closed G mul X act hact).
 //GOD1PRF:78980 is bijective, because $s^{-1} \cdot(s \cdot x)=\left(s^{-1} s\right) \cdot x=e \cdot x=x$.
-claim h_s7_action_map_bijective :
-  forall s :e G,
-    bij X X (fun x => act s x).
-admit.
+  claim h_s7_action_map_bijective :
+    forall s :e G,
+      bij X X (fun x => act s x).
+  exact (god1_group_action_map_bijective G mul X act hact).
+  exact (god1_group_action_map_in_permutation_group
+    G mul X act hact).
 //GOD1PRF:79071 Hence the conditions at the beginning of this section are equivalent to the statement that the mapping $s \rightarrow \bar{s}$ is a homomorphism of the group G onto a group of transformations of the set X .
-claim h_s7_action_homomorphism :
-  group_homomorphism
-    G mul
-    (permutation_group X) (permutation_composition X)
-    (fun s => fun x :e X => act s x).
-admit.
-Admitted.
+- exact (god1_group_action_homomorphism G mul X act hact).
+Qed.
 
 Theorem god1_action_stabilizer_is_subgroup :
   forall G, forall mul:set -> set -> set,
@@ -52315,10 +52629,48 @@ assume hact.
 let x.
 assume hx.
 //GOD1PRF:79319 For each $x \in \mathrm{X}$, the elements $s \in \mathrm{G}$ such that $s . x=x$ clearly form a subgroup of G ; this subgroup is called the stabilizer of $x$ in G .
-claim h_s7_action_stabilizer_closure :
-  subgroup G mul (action_stabilizer G mul X act x).
-admit.
-Admitted.
+claim hG : group G mul.
+exact (god1_group_action_group G mul X act hact).
+apply (god1_subgroup_of_identity_product_inverse
+  G mul (action_stabilizer G mul X act x) hG).
+- let s.
+  assume hs.
+  exact (SepE1 G (fun t => act t x = x) s hs).
+- exact (SepI G (fun s => act s x = x)
+    (group_identity G mul)
+    (god1_group_identity_in G mul hG)
+    (god1_group_action_identity G mul X act hact x hx)).
+- let s.
+  assume hs.
+  let t.
+  assume ht.
+  exact (SepI G (fun u => act u x = x) (mul s t)
+    (god1_group_law_of_composition G mul hG
+      s (SepE1 G (fun u => act u x = x) s hs)
+      t (SepE1 G (fun u => act u x = x) t ht))
+    (eq_i_tra (act (mul s t) x) (act s (act t x)) x
+      (eq_sym (act s (act t x)) (act (mul s t) x)
+        (god1_group_action_composition G mul X act hact
+          s (SepE1 G (fun u => act u x = x) s hs)
+          t (SepE1 G (fun u => act u x = x) t ht) x hx))
+      (eq_i_tra (act s (act t x)) (act s x) x
+        (f_eq_i (fun z => act s z) (act t x) x
+          (SepE2 G (fun u => act u x = x) t ht))
+        (SepE2 G (fun u => act u x = x) s hs)))).
+- let s.
+  assume hs.
+  exact (SepI G (fun u => act u x = x) (group_inverse G mul s)
+    (god1_group_inverse_in G mul hG s
+      (SepE1 G (fun u => act u x = x) s hs))
+    (eq_i_tra (act (group_inverse G mul s) x)
+      (act (group_inverse G mul s) (act s x)) x
+      (f_eq_i (fun z => act (group_inverse G mul s) z)
+        x (act s x)
+        (eq_sym (act s x) x
+          (SepE2 G (fun u => act u x = x) s hs)))
+      (god1_group_action_inverse_left G mul X act hact
+        s (SepE1 G (fun u => act u x = x) s hs) x hx))).
+Qed.
 
 (** § 8. Rings and fields. **)
 
