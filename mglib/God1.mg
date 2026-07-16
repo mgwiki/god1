@@ -57204,6 +57204,1076 @@ Theorem god1_s8_finite_integral_domain_field_interface :
 exact god1_finite_integral_domain_field_core.
 Qed.
 
+Theorem god1_int_mod_modulus_nonzero :
+  forall p :e omega, 1 :e p -> p <> 0.
+let p.
+assume hp h1 hp0.
+exact (EmptyE 1 (mem_eq_set_subst p 0 1 hp0 h1)).
+Qed.
+
+Theorem god1_int_mod_quotient_eq_reduced_classes :
+  forall p :e omega, 1 :e p ->
+    int_mod_quotient p = {int_mod_class p r|r :e p}.
+let p.
+assume hp h1.
+claim hpnonzero : p :e omega :\: {0}.
+apply (setminusI omega {0} p hp).
+assume hpzero.
+exact ((god1_int_mod_modulus_nonzero p hp h1) (SingE 0 p hpzero)).
+apply set_ext.
+- let A.
+  assume hA.
+  apply (ReplE_impred int (fun x => int_mod_class p x) A hA
+    (A :e {int_mod_class p r|r :e p})).
+  let x.
+  assume hx hAx.
+  apply (exandE_i
+    (fun q => q :e int)
+    (fun q => exists r :e p,
+      x = add_SNo (mul_SNo q p) r)
+    (quotient_remainder_int p hpnonzero x hx)).
+  let q.
+  assume hq hrem.
+  apply (exandE_i
+    (fun r => r :e p)
+    (fun r => x = add_SNo (mul_SNo q p) r) hrem).
+  let r.
+  assume hr hxr.
+  claim hrint : r :e int.
+  exact (Subq_omega_int r (omega_TransSet p hp r hr)).
+  claim hcommqp : mul_SNo q p = mul_SNo p q.
+  exact (eq_sym (mul_SNo p q) (mul_SNo q p)
+    (mul_SNo_com p q (omega_SNo p hp) (int_SNo q hq))).
+  claim hcommadd :
+    add_SNo (mul_SNo q p) r = add_SNo r (mul_SNo q p).
+  exact (add_SNo_com (mul_SNo q p) r
+    (SNo_mul_SNo q p (int_SNo q hq) (omega_SNo p hp))
+    (int_SNo r hrint)).
+  claim haddtransport :
+    add_SNo r (mul_SNo q p) = add_SNo r (mul_SNo p q).
+  exact (f_eq_i (fun z:set => add_SNo r z)
+    (mul_SNo q p) (mul_SNo p q) hcommqp).
+  claim hsum :
+    add_SNo (mul_SNo q p) r = add_SNo r (mul_SNo p q).
+  exact (eq_i_tra
+    (add_SNo (mul_SNo q p) r)
+    (add_SNo r (mul_SNo q p))
+    (add_SNo r (mul_SNo p q)) hcommadd haddtransport).
+  claim hshift : x = add_SNo r (mul_SNo p q).
+  exact (eq_i_tra x
+    (add_SNo (mul_SNo q p) r)
+    (add_SNo r (mul_SNo p q)) hxr hsum).
+  claim hclass : int_mod_class p x = int_mod_class p r.
+  exact (god1_int_mod_class_eq_of_shift p hp
+    r hrint x hx q hq hshift).
+  exact (mem_eq_substL
+    {int_mod_class p z|z :e p}
+    (int_mod_class p r) A
+    (eq_i_tra A (int_mod_class p x) (int_mod_class p r) hAx hclass)
+    (ReplI p (fun z => int_mod_class p z) r hr)).
+- let A.
+  assume hA.
+  apply (ReplE_impred p (fun r => int_mod_class p r) A hA
+    (A :e int_mod_quotient p)).
+  let r.
+  assume hr hAr.
+  claim hrint : r :e int.
+  exact (Subq_omega_int r (omega_TransSet p hp r hr)).
+  exact (mem_eq_substL (int_mod_quotient p)
+    (int_mod_class p r) A hAr
+    (god1_int_mod_class_in_quotient p hp r hrint)).
+Qed.
+
+Theorem god1_int_mod_quotient_finite :
+  forall p :e omega, 1 :e p -> finite (int_mod_quotient p).
+let p.
+assume hp h1.
+claim himage : finite {int_mod_class p r|r :e p}.
+exact (Repl_finite (fun r => int_mod_class p r)
+  p (nat_finite p (omega_nat_p p hp))).
+apply (exandE_i
+  (fun n => n :e omega)
+  (fun n => equip {int_mod_class p r|r :e p} n) himage).
+let n.
+assume hn hequip.
+exact (ex_intro
+  (fun m => m :e omega /\ equip (int_mod_quotient p) m) n
+  (andI (n :e omega) (equip (int_mod_quotient p) n) hn
+    (god1_equip_domain_eq_subst
+      {int_mod_class p r|r :e p} (int_mod_quotient p) n
+      (eq_sym (int_mod_quotient p)
+        {int_mod_class p r|r :e p}
+        (god1_int_mod_quotient_eq_reduced_classes p hp h1))
+      hequip))).
+Qed.
+
+Theorem god1_int_mod_class_eq_zero_iff_multiple :
+  forall p :e omega, forall x :e int,
+    (int_mod_class p x = int_mod_class p 0
+    <-> exists k :e int, x = mul_SNo p k).
+let p.
+assume hp.
+let x.
+assume hx.
+claim h0int : 0 :e int.
+exact (Subq_omega_int 0 (nat_p_omega 0 nat_0)).
+apply iffI.
+- assume hclass.
+  apply (exandE_i
+    (fun k => k :e int)
+    (fun k => x = add_SNo 0 (mul_SNo p k))
+    (god1_int_mod_class_equal_gives_shift p hp
+      0 h0int x hx
+      (eq_sym (int_mod_class p x) (int_mod_class p 0) hclass))).
+  let k.
+  assume hk hxk.
+  witness k.
+  exact (andI (k :e int) (x = mul_SNo p k) hk
+    (eq_i_tra x (add_SNo 0 (mul_SNo p k)) (mul_SNo p k) hxk
+      (add_SNo_0L (mul_SNo p k)
+        (SNo_mul_SNo p k (omega_SNo p hp) (int_SNo k hk))))).
+- assume hmultiple.
+  apply (exandE_i
+    (fun k => k :e int)
+    (fun k => x = mul_SNo p k) hmultiple).
+  let k.
+  assume hk hxk.
+  exact (god1_int_mod_class_eq_of_shift p hp
+    0 h0int x hx k hk
+    (eq_i_tra x (mul_SNo p k)
+      (add_SNo 0 (mul_SNo p k)) hxk
+      (eq_sym (add_SNo 0 (mul_SNo p k)) (mul_SNo p k)
+        (add_SNo_0L (mul_SNo p k)
+          (SNo_mul_SNo p k (omega_SNo p hp) (int_SNo k hk)))))).
+Qed.
+
+Theorem god1_int_mod_ring_zero_eq_class_zero :
+  forall p :e omega,
+    ring_zero (int_mod_quotient p) (int_mod_addition p)
+      = int_mod_class p 0.
+let p.
+assume hp.
+claim hcommring : commutative_ring
+  (int_mod_quotient p) (int_mod_addition p) (int_mod_multiplication p).
+exact (god1_int_mod_commutative_ring_core p hp).
+claim hring : ring
+  (int_mod_quotient p) (int_mod_addition p) (int_mod_multiplication p).
+exact (andEL
+  (ring (int_mod_quotient p) (int_mod_addition p) (int_mod_multiplication p))
+  (commutative_on (int_mod_quotient p) (int_mod_multiplication p))
+  hcommring).
+exact (god1_s6_theorem1_neutral_element_unique
+  (int_mod_quotient p) (int_mod_addition p)
+  (god1_group_law_of_composition
+    (int_mod_quotient p) (int_mod_addition p)
+    (god1_ring_additive_group
+      (int_mod_quotient p) (int_mod_addition p)
+      (int_mod_multiplication p) hring))
+  (ring_zero (int_mod_quotient p) (int_mod_addition p))
+  (int_mod_class p 0)
+  (god1_group_identity_specification
+    (int_mod_quotient p) (int_mod_addition p)
+    (god1_ring_additive_group
+      (int_mod_quotient p) (int_mod_addition p)
+      (int_mod_multiplication p) hring))
+  (god1_int_mod_zero_neutral p hp)).
+Qed.
+
+Theorem god1_int_mod_ring_one_eq_class_one :
+  forall p :e omega,
+    ring_one (int_mod_quotient p) (int_mod_multiplication p)
+      = int_mod_class p 1.
+let p.
+assume hp.
+claim hcommring : commutative_ring
+  (int_mod_quotient p) (int_mod_addition p) (int_mod_multiplication p).
+exact (god1_int_mod_commutative_ring_core p hp).
+claim hring : ring
+  (int_mod_quotient p) (int_mod_addition p) (int_mod_multiplication p).
+exact (andEL
+  (ring (int_mod_quotient p) (int_mod_addition p) (int_mod_multiplication p))
+  (commutative_on (int_mod_quotient p) (int_mod_multiplication p))
+  hcommring).
+exact (god1_s6_theorem1_neutral_element_unique
+  (int_mod_quotient p) (int_mod_multiplication p)
+  (god1_ring_multiplicative_law
+    (int_mod_quotient p) (int_mod_addition p)
+    (int_mod_multiplication p) hring)
+  (ring_one (int_mod_quotient p) (int_mod_multiplication p))
+  (int_mod_class p 1)
+  (god1_ring_multiplicative_identity_specification
+    (int_mod_quotient p) (int_mod_addition p)
+    (int_mod_multiplication p) hring)
+  (god1_int_mod_one_neutral p hp)).
+Qed.
+
+Theorem god1_int_mod_modulus_not_divide_one :
+  forall p :e omega, 1 :e p -> ~divides_int p 1.
+let p.
+assume hp h1 hdiv.
+claim h0omega : 0 :e omega.
+exact (nat_p_omega 0 nat_0).
+claim hpint : p :e int.
+exact (Subq_omega_int p hp).
+claim hdivzeroint : divides_int p 0.
+exact (divides_int_0 p hpint).
+claim hdivzero : divides_nat p 0.
+exact (divides_int_divides_nat p hp 0 h0omega
+  hdivzeroint).
+claim hdivone : divides_nat p 1.
+exact (divides_int_divides_nat p hp 1
+  (nat_p_omega 1 nat_1) hdiv).
+exact ((nat_1In_not_divides_ordsucc p 0 h1 hdivzero) hdivone).
+Qed.
+
+Theorem god1_field_zero_product :
+  forall K, forall add mul:set -> set -> set,
+    field K add mul -> forall u v :e K,
+      mul u v = ring_zero K add ->
+      u = ring_zero K add \/ v = ring_zero K add.
+let K add mul.
+assume hK.
+claim hdivision : division_ring K add mul.
+exact (god1_field_division_ring K add mul hK).
+claim hring : ring K add mul.
+exact (god1_division_ring_ring K add mul hdivision).
+claim hcomm : commutative_on K mul.
+exact (god1_field_multiplication_commutative K add mul hK).
+let u.
+assume hu.
+let v.
+assume hv huv.
+apply (orE
+  (u = ring_zero K add)
+  (u <> ring_zero K add)
+  (xm (u = ring_zero K add))
+  (u = ring_zero K add \/ v = ring_zero K add)).
+- assume huzero.
+  exact (orIL (u = ring_zero K add)
+    (v = ring_zero K add) huzero).
+- assume hune.
+  claim hunit : ring_unit K add mul u.
+  exact (god1_division_ring_nonzero_is_unit K add mul hdivision u hu hune).
+  claim hreflection : reflection K mul (ring_one K mul) u
+    (ring_inverse K add mul u).
+  exact (god1_ring_inverse_specification K add mul u hunit).
+  claim hrK : ring_inverse K add mul u :e K.
+  exact (andEL
+    (ring_inverse K add mul u :e K)
+    (mul (ring_inverse K add mul u) u = ring_one K mul)
+    (andEL
+      (ring_inverse K add mul u :e K
+        /\ mul (ring_inverse K add mul u) u = ring_one K mul)
+      (mul u (ring_inverse K add mul u) = ring_one K mul)
+      hreflection)).
+  claim hru : mul (ring_inverse K add mul u) u = ring_one K mul.
+  exact (andER
+      (ring_inverse K add mul u :e K)
+      (mul (ring_inverse K add mul u) u = ring_one K mul)
+      (andEL
+        (ring_inverse K add mul u :e K
+          /\ mul (ring_inverse K add mul u) u = ring_one K mul)
+        (mul u (ring_inverse K add mul u) = ring_one K mul)
+        hreflection)).
+  claim honeutral : neutral_element K mul (ring_one K mul).
+  exact (god1_ring_multiplicative_identity_specification K add mul hring).
+  claim honev : mul (ring_one K mul) v = v.
+  exact (andER
+    (mul v (ring_one K mul) = v)
+    (mul (ring_one K mul) v = v)
+    ((andER
+      (ring_one K mul :e K)
+      (forall x :e K,
+        mul x (ring_one K mul) = x
+        /\ mul (ring_one K mul) x = x)
+      honeutral) v hv)).
+  claim hrightzero :
+    mul (ring_inverse K add mul u) (ring_zero K add)
+      = ring_zero K add.
+  exact (eq_i_tra
+    (mul (ring_inverse K add mul u) (ring_zero K add))
+    (mul (ring_zero K add) (ring_inverse K add mul u))
+    (ring_zero K add)
+    (hcomm (ring_inverse K add mul u) hrK
+      (ring_zero K add)
+      (god1_group_identity_in K add
+        (god1_ring_additive_group K add mul hring)))
+    (god1_ring_zero_multiplication_left K add mul hring
+      (ring_inverse K add mul u) hrK)).
+  claim hone_to_inverse_product :
+    mul (ring_one K mul) v
+      = mul (mul (ring_inverse K add mul u) u) v.
+  exact (f_eq_i (fun z:set => mul z v)
+    (ring_one K mul)
+    (mul (ring_inverse K add mul u) u)
+    (eq_sym
+      (mul (ring_inverse K add mul u) u)
+      (ring_one K mul) hru)).
+  claim hassocback :
+    mul (mul (ring_inverse K add mul u) u) v
+      = mul (ring_inverse K add mul u) (mul u v).
+  exact (eq_sym
+    (mul (ring_inverse K add mul u) (mul u v))
+    (mul (mul (ring_inverse K add mul u) u) v)
+    (god1_ring_multiplicative_associative K add mul hring
+      (ring_inverse K add mul u) hrK u hu v hv)).
+  claim hinverse_product_zero :
+    mul (ring_inverse K add mul u) (mul u v)
+      = ring_zero K add.
+  exact (eq_i_tra
+    (mul (ring_inverse K add mul u) (mul u v))
+    (mul (ring_inverse K add mul u) (ring_zero K add))
+    (ring_zero K add)
+    (f_eq_i (fun z:set => mul (ring_inverse K add mul u) z)
+      (mul u v) (ring_zero K add) huv)
+    hrightzero).
+  apply (orIR (u = ring_zero K add) (v = ring_zero K add)).
+  exact (eq_i_tra v
+    (mul (ring_one K mul) v)
+    (ring_zero K add)
+    (eq_sym (mul (ring_one K mul) v) v honev)
+    (eq_i_tra
+      (mul (ring_one K mul) v)
+      (mul (mul (ring_inverse K add mul u) u) v)
+      (ring_zero K add)
+      hone_to_inverse_product
+      (eq_i_tra
+        (mul (mul (ring_inverse K add mul u) u) v)
+        (mul (ring_inverse K add mul u) (mul u v))
+        (ring_zero K add)
+        hassocback hinverse_product_zero))).
+Qed.
+
+Theorem god1_field_is_integral_domain :
+  forall K, forall add mul:set -> set -> set,
+    field K add mul -> integral_domain K add mul.
+let K add mul.
+assume hK.
+claim hdivision : division_ring K add mul.
+exact (god1_field_division_ring K add mul hK).
+claim hring : ring K add mul.
+exact (god1_division_ring_ring K add mul hdivision).
+claim hcomm : commutative_on K mul.
+exact (god1_field_multiplication_commutative K add mul hK).
+claim hcommring : commutative_ring K add mul.
+exact (andI (ring K add mul) (commutative_on K mul) hring hcomm).
+exact (andI
+  (commutative_ring K add mul
+    /\ ring_one K mul <> ring_zero K add)
+  (forall u v :e K,
+    mul u v = ring_zero K add ->
+    u = ring_zero K add \/ v = ring_zero K add)
+  (andI
+    (commutative_ring K add mul)
+    (ring_one K mul <> ring_zero K add)
+    hcommring
+    (god1_division_ring_one_ne_zero K add mul hdivision))
+  (god1_field_zero_product K add mul hK)).
+Qed.
+
+Theorem god1_int_multiple_witness_implies_divides :
+  forall p x :e int,
+    (exists k :e int, x = mul_SNo p k) -> divides_int p x.
+let p.
+assume hp.
+let x.
+assume hx hmultiple.
+apply (exandE_i
+  (fun k => k :e int)
+  (fun k => x = mul_SNo p k) hmultiple).
+let k.
+assume hk hxk.
+apply (andI
+  (p :e int /\ x :e int)
+  (exists a :e int, mul_SNo p a = x)).
+- exact (andI (p :e int) (x :e int) hp hx).
+- exact (ex_intro
+    (fun a => a :e int /\ mul_SNo p a = x) k
+    (andI (k :e int) (mul_SNo p k = x) hk
+      (eq_sym x (mul_SNo p k) hxk))).
+Qed.
+
+Theorem god1_divides_implies_int_multiple_witness :
+  forall p x :e int,
+    divides_int p x -> exists k :e int, x = mul_SNo p k.
+let p.
+assume hp.
+let x.
+assume hx hdiv.
+claim hdivdata :
+  (p :e int /\ x :e int)
+  /\ exists k :e int, mul_SNo p k = x.
+exact hdiv.
+claim hex : exists k :e int, mul_SNo p k = x.
+exact (andER
+  (p :e int /\ x :e int)
+  (exists k :e int, mul_SNo p k = x)
+  hdivdata).
+apply (exandE_i
+  (fun k => k :e int)
+  (fun k => mul_SNo p k = x) hex).
+let k.
+assume hk hkx.
+witness k.
+exact (andI (k :e int) (x = mul_SNo p k) hk
+  (eq_sym (mul_SNo p k) x hkx)).
+Qed.
+
+Theorem god1_int_multiple_witness_iff_divides :
+  forall p x :e int,
+    ((exists k :e int, x = mul_SNo p k) <-> divides_int p x).
+let p.
+assume hp.
+let x.
+assume hx.
+exact (iffI
+  (exists k :e int, x = mul_SNo p k)
+  (divides_int p x)
+  (god1_int_multiple_witness_implies_divides p hp x hx)
+  (god1_divides_implies_int_multiple_witness p hp x hx)).
+Qed.
+
+Theorem god1_prime_iff_integer_product_divisibility :
+  forall p :e omega, 1 :e p ->
+    (prime_nat p <->
+      forall x y :e int,
+        (exists k :e int, mul_SNo x y = mul_SNo p k) ->
+        (exists k :e int, x = mul_SNo p k)
+        \/ (exists k :e int, y = mul_SNo p k)).
+let p.
+assume hp h1.
+apply iffI.
+- assume hprime.
+  let x.
+  assume hx.
+  let y.
+  assume hy hmultiple.
+  claim hxydiv : divides_int p (mul_SNo x y).
+  exact (iffEL
+    (exists k :e int, mul_SNo x y = mul_SNo p k)
+    (divides_int p (mul_SNo x y))
+    (god1_int_multiple_witness_iff_divides
+      p (Subq_omega_int p hp)
+      (mul_SNo x y) (int_mul_SNo x hx y hy))
+    hmultiple).
+  apply (orE
+    (divides_int p x) (divides_int p y)
+    (Euclid_lemma p hprime x hx y hy hxydiv)
+    ((exists k :e int, x = mul_SNo p k)
+      \/ (exists k :e int, y = mul_SNo p k))).
+  - assume hpx.
+    exact (orIL
+      (exists k :e int, x = mul_SNo p k)
+      (exists k :e int, y = mul_SNo p k)
+      (iffER
+        (exists k :e int, x = mul_SNo p k)
+        (divides_int p x)
+        (god1_int_multiple_witness_iff_divides
+          p (Subq_omega_int p hp) x hx) hpx)).
+  - assume hpy.
+    exact (orIR
+      (exists k :e int, x = mul_SNo p k)
+      (exists k :e int, y = mul_SNo p k)
+      (iffER
+        (exists k :e int, y = mul_SNo p k)
+        (divides_int p y)
+        (god1_int_multiple_witness_iff_divides
+          p (Subq_omega_int p hp) y hy) hpy)).
+- assume hproperty.
+  apply (orE
+    (prime_nat p) (composite_nat p)
+    (prime_nat_or_composite_nat p hp h1)
+    (prime_nat p)).
+  - exact (fun hprime => hprime).
+  - assume hcomposite.
+    claim hcompdata :
+      p :e omega
+      /\ exists k m :e omega,
+        1 :e k /\ 1 :e m /\ mul_nat k m = p.
+    exact hcomposite.
+    claim hfactors : exists k m :e omega,
+      1 :e k /\ 1 :e m /\ mul_nat k m = p.
+    exact (andER
+      (p :e omega)
+      (exists k m :e omega,
+        1 :e k /\ 1 :e m /\ mul_nat k m = p)
+      hcompdata).
+    apply (exandE_i
+      (fun k => k :e omega)
+      (fun k => exists m :e omega,
+        1 :e k /\ 1 :e m /\ mul_nat k m = p)
+      hfactors).
+    let k.
+    assume hk hkdata.
+    apply (exandE_i
+      (fun m => m :e omega)
+      (fun m => 1 :e k /\ 1 :e m /\ mul_nat k m = p)
+      hkdata).
+    let m.
+    assume hm hfactor.
+    claim hk1 : 1 :e k.
+    exact (andEL (1 :e k) (1 :e m)
+      (andEL
+        (1 :e k /\ 1 :e m)
+        (mul_nat k m = p) hfactor)).
+    claim hm1 : 1 :e m.
+    exact (andER (1 :e k) (1 :e m)
+      (andEL
+        (1 :e k /\ 1 :e m)
+        (mul_nat k m = p) hfactor)).
+    claim hkmnat : mul_nat k m = p.
+    exact (andER
+      (1 :e k /\ 1 :e m)
+      (mul_nat k m = p) hfactor).
+    claim hkm : mul_SNo k m = p.
+    exact (eq_i_tra (mul_SNo k m) (mul_nat k m) p
+      (eq_sym (mul_nat k m) (mul_SNo k m)
+        (mul_nat_mul_SNo k hk m hm))
+      hkmnat).
+    claim hkint : k :e int.
+    exact (Subq_omega_int k hk).
+    claim hmint : m :e int.
+    exact (Subq_omega_int m hm).
+    claim hproductmultiple : exists a :e int,
+      mul_SNo k m = mul_SNo p a.
+    witness 1.
+    exact (andI
+      (1 :e int)
+      (mul_SNo k m = mul_SNo p 1)
+      (Subq_omega_int 1 (nat_p_omega 1 nat_1))
+      (eq_i_tra (mul_SNo k m) p (mul_SNo p 1) hkm
+        (eq_sym (mul_SNo p 1) p
+          (mul_SNo_oneR p (omega_SNo p hp))))).
+    claim hdivfactor :
+      (exists a :e int, k = mul_SNo p a)
+      \/ (exists a :e int, m = mul_SNo p a).
+    exact (hproperty k hkint m hmint hproductmultiple).
+    apply (orE
+      (exists a :e int, k = mul_SNo p a)
+      (exists a :e int, m = mul_SNo p a)
+      hdivfactor (prime_nat p)).
+    - assume hpkmultiple.
+      claim hpdivk : divides_int p k.
+      exact (iffEL
+        (exists a :e int, k = mul_SNo p a)
+        (divides_int p k)
+        (god1_int_multiple_witness_iff_divides
+          p (Subq_omega_int p hp) k hkint) hpkmultiple).
+      claim hkdivp : divides_int k p.
+      apply (iffEL
+        (exists a :e int, p = mul_SNo k a)
+        (divides_int k p)
+        (god1_int_multiple_witness_iff_divides
+          k hkint p (Subq_omega_int p hp))).
+      witness m.
+      exact (andI (m :e int) (p = mul_SNo k m) hmint
+        (eq_sym (mul_SNo k m) p hkm)).
+      claim hkpositive : 0 < k.
+      exact (god1_natural_nonzero_is_positive k hk
+        (god1_int_mod_modulus_nonzero k hk hk1)).
+      claim hppositive : 0 < p.
+      exact (god1_natural_nonzero_is_positive p hp
+        (god1_int_mod_modulus_nonzero p hp h1)).
+      claim hpk : p = k.
+      exact (SNoLe_antisym p k
+        (omega_SNo p hp) (omega_SNo k hk)
+        (divides_int_pos_Le p k hpdivk hkpositive)
+        (divides_int_pos_Le k p hkdivp hppositive)).
+      claim hkmself : mul_SNo k m = k.
+      exact (eq_i_tra (mul_SNo k m) p k hkm hpk).
+      claim hkmone : mul_SNo k m = mul_SNo k 1.
+      exact (eq_i_tra (mul_SNo k m) k (mul_SNo k 1) hkmself
+        (eq_sym (mul_SNo k 1) k
+          (mul_SNo_oneR k (omega_SNo k hk)))).
+      claim hmone : m = 1.
+      exact (mul_SNo_nonzero_cancel k m 1
+        (omega_SNo k hk) (god1_int_mod_modulus_nonzero k hk hk1)
+        (omega_SNo m hm) (omega_SNo 1 (nat_p_omega 1 nat_1)) hkmone).
+      exact (FalseE
+        (In_irref 1 (mem_eq_set_subst m 1 1 hmone hm1))
+        (prime_nat p)).
+    - assume hpmultiple.
+      claim hpdivm : divides_int p m.
+      exact (iffEL
+        (exists a :e int, m = mul_SNo p a)
+        (divides_int p m)
+        (god1_int_multiple_witness_iff_divides
+          p (Subq_omega_int p hp) m hmint) hpmultiple).
+      claim hmdivp : divides_int m p.
+      apply (iffEL
+        (exists a :e int, p = mul_SNo m a)
+        (divides_int m p)
+        (god1_int_multiple_witness_iff_divides
+          m hmint p (Subq_omega_int p hp))).
+      witness k.
+      exact (andI (k :e int) (p = mul_SNo m k) hkint
+        (eq_i_tra p (mul_SNo k m) (mul_SNo m k)
+          (eq_sym (mul_SNo k m) p hkm)
+          (mul_SNo_com k m (omega_SNo k hk) (omega_SNo m hm)))).
+      claim hmpositive : 0 < m.
+      exact (god1_natural_nonzero_is_positive m hm
+        (god1_int_mod_modulus_nonzero m hm hm1)).
+      claim hppositive : 0 < p.
+      exact (god1_natural_nonzero_is_positive p hp
+        (god1_int_mod_modulus_nonzero p hp h1)).
+      claim hpm : p = m.
+      exact (SNoLe_antisym p m
+        (omega_SNo p hp) (omega_SNo m hm)
+        (divides_int_pos_Le p m hpdivm hmpositive)
+        (divides_int_pos_Le m p hmdivp hppositive)).
+      claim hmkself : mul_SNo m k = m.
+      exact (eq_i_tra (mul_SNo m k) (mul_SNo k m) m
+        (eq_sym (mul_SNo k m) (mul_SNo m k)
+          (mul_SNo_com k m (omega_SNo k hk) (omega_SNo m hm)))
+        (eq_i_tra (mul_SNo k m) p m hkm hpm)).
+      claim hmkone : mul_SNo m k = mul_SNo m 1.
+      exact (eq_i_tra (mul_SNo m k) m (mul_SNo m 1) hmkself
+        (eq_sym (mul_SNo m 1) m
+          (mul_SNo_oneR m (omega_SNo m hm)))).
+      claim hkone : k = 1.
+      exact (mul_SNo_nonzero_cancel m k 1
+        (omega_SNo m hm) (god1_int_mod_modulus_nonzero m hm hm1)
+        (omega_SNo k hk) (omega_SNo 1 (nat_p_omega 1 nat_1)) hmkone).
+      exact (FalseE
+        (In_irref 1 (mem_eq_set_subst k 1 1 hkone hk1))
+        (prime_nat p)).
+Qed.
+
+Theorem god1_int_mod_ring_one_ne_zero :
+  forall p :e omega, 1 :e p ->
+    ring_one (int_mod_quotient p) (int_mod_multiplication p)
+      <> ring_zero (int_mod_quotient p) (int_mod_addition p).
+let p.
+assume hp h1 honezero.
+claim hclassonezero :
+  int_mod_class p 1 = int_mod_class p 0.
+exact (eq_i_tra
+  (int_mod_class p 1)
+  (ring_one (int_mod_quotient p) (int_mod_multiplication p))
+  (int_mod_class p 0)
+  (eq_sym
+    (ring_one (int_mod_quotient p) (int_mod_multiplication p))
+    (int_mod_class p 1)
+    (god1_int_mod_ring_one_eq_class_one p hp))
+  (eq_i_tra
+    (ring_one (int_mod_quotient p) (int_mod_multiplication p))
+    (ring_zero (int_mod_quotient p) (int_mod_addition p))
+    (int_mod_class p 0) honezero
+    (god1_int_mod_ring_zero_eq_class_zero p hp))).
+claim hone_multiple : exists k :e int, 1 = mul_SNo p k.
+exact (iffEL
+  (int_mod_class p 1 = int_mod_class p 0)
+  (exists k :e int, 1 = mul_SNo p k)
+  (god1_int_mod_class_eq_zero_iff_multiple p hp
+    1 (Subq_omega_int 1 (nat_p_omega 1 nat_1)))
+  hclassonezero).
+claim hpdivone : divides_int p 1.
+exact (god1_int_multiple_witness_implies_divides
+  p (Subq_omega_int p hp)
+  1 (Subq_omega_int 1 (nat_p_omega 1 nat_1))
+  hone_multiple).
+exact ((god1_int_mod_modulus_not_divide_one p hp h1) hpdivone).
+Qed.
+
+Theorem god1_int_mod_domain_implies_product_divisibility :
+  forall p :e omega,
+    integral_domain
+      (int_mod_quotient p) (int_mod_addition p) (int_mod_multiplication p) ->
+    forall x y :e int,
+      (exists k :e int, mul_SNo x y = mul_SNo p k) ->
+      (exists k :e int, x = mul_SNo p k)
+      \/ (exists k :e int, y = mul_SNo p k).
+let p.
+assume hp hdomain.
+let x.
+assume hx.
+let y.
+assume hy hmultiple.
+claim hclassx : int_mod_class p x :e int_mod_quotient p.
+exact (god1_int_mod_class_in_quotient p hp x hx).
+claim hclassy : int_mod_class p y :e int_mod_quotient p.
+exact (god1_int_mod_class_in_quotient p hp y hy).
+claim hclassproductzero :
+  int_mod_class p (mul_SNo x y) = int_mod_class p 0.
+exact (iffER
+  (int_mod_class p (mul_SNo x y) = int_mod_class p 0)
+  (exists k :e int, mul_SNo x y = mul_SNo p k)
+  (god1_int_mod_class_eq_zero_iff_multiple p hp
+    (mul_SNo x y) (int_mul_SNo x hx y hy))
+  hmultiple).
+claim hproductzero :
+  int_mod_multiplication p
+    (int_mod_class p x) (int_mod_class p y)
+  = ring_zero (int_mod_quotient p) (int_mod_addition p).
+exact (eq_i_tra
+  (int_mod_multiplication p
+    (int_mod_class p x) (int_mod_class p y))
+  (int_mod_class p (mul_SNo x y))
+  (ring_zero (int_mod_quotient p) (int_mod_addition p))
+  (god1_int_mod_multiplication_on_classes p hp x hx y hy)
+  (eq_i_tra
+    (int_mod_class p (mul_SNo x y))
+    (int_mod_class p 0)
+    (ring_zero (int_mod_quotient p) (int_mod_addition p))
+    hclassproductzero
+    (eq_sym
+      (ring_zero (int_mod_quotient p) (int_mod_addition p))
+      (int_mod_class p 0)
+      (god1_int_mod_ring_zero_eq_class_zero p hp)))).
+apply (orE
+  (int_mod_class p x
+    = ring_zero (int_mod_quotient p) (int_mod_addition p))
+  (int_mod_class p y
+    = ring_zero (int_mod_quotient p) (int_mod_addition p))
+  (god1_integral_domain_zero_product
+    (int_mod_quotient p) (int_mod_addition p)
+    (int_mod_multiplication p) hdomain
+    (int_mod_class p x) hclassx
+    (int_mod_class p y) hclassy hproductzero)
+  ((exists k :e int, x = mul_SNo p k)
+    \/ (exists k :e int, y = mul_SNo p k))).
+- assume hclassxringzero.
+  apply (orIL
+    (exists k :e int, x = mul_SNo p k)
+    (exists k :e int, y = mul_SNo p k)).
+  apply (iffEL
+    (int_mod_class p x = int_mod_class p 0)
+    (exists k :e int, x = mul_SNo p k)
+    (god1_int_mod_class_eq_zero_iff_multiple p hp x hx)).
+  exact (eq_i_tra
+    (int_mod_class p x)
+    (ring_zero (int_mod_quotient p) (int_mod_addition p))
+    (int_mod_class p 0) hclassxringzero
+    (god1_int_mod_ring_zero_eq_class_zero p hp)).
+- assume hclassyringzero.
+  apply (orIR
+    (exists k :e int, x = mul_SNo p k)
+    (exists k :e int, y = mul_SNo p k)).
+  apply (iffEL
+    (int_mod_class p y = int_mod_class p 0)
+    (exists k :e int, y = mul_SNo p k)
+    (god1_int_mod_class_eq_zero_iff_multiple p hp y hy)).
+  exact (eq_i_tra
+    (int_mod_class p y)
+    (ring_zero (int_mod_quotient p) (int_mod_addition p))
+    (int_mod_class p 0) hclassyringzero
+    (god1_int_mod_ring_zero_eq_class_zero p hp)).
+Qed.
+
+Theorem god1_int_mod_product_divisibility_implies_zero_product :
+  forall p :e omega,
+    (forall x y :e int,
+      (exists k :e int, mul_SNo x y = mul_SNo p k) ->
+      (exists k :e int, x = mul_SNo p k)
+      \/ (exists k :e int, y = mul_SNo p k)) ->
+    forall A B :e int_mod_quotient p,
+      int_mod_multiplication p A B
+        = ring_zero (int_mod_quotient p) (int_mod_addition p) ->
+      A = ring_zero (int_mod_quotient p) (int_mod_addition p)
+      \/ B = ring_zero (int_mod_quotient p) (int_mod_addition p).
+let p.
+assume hp hproperty.
+let A.
+assume hA.
+let B.
+assume hB hproductzero.
+claim hArep : exists x :e int, A = int_mod_class p x.
+witness (int_mod_representative p A).
+exact (god1_int_mod_representative_data p hp A hA).
+apply (exandE_i
+  (fun x => x :e int)
+  (fun x => A = int_mod_class p x) hArep).
+let x.
+assume hx hAx.
+claim hBrep : exists y :e int, B = int_mod_class p y.
+witness (int_mod_representative p B).
+exact (god1_int_mod_representative_data p hp B hB).
+apply (exandE_i
+  (fun y => y :e int)
+  (fun y => B = int_mod_class p y) hBrep).
+let y.
+assume hy hBy.
+claim hcongr :
+  int_mod_multiplication p A B
+    = int_mod_multiplication p
+      (int_mod_class p x) (int_mod_class p y).
+exact (god1_binary_operation_congruence
+  (int_mod_multiplication p)
+  A (int_mod_class p x) B (int_mod_class p y) hAx hBy).
+claim hclassproductzero :
+  int_mod_class p (mul_SNo x y) = int_mod_class p 0.
+exact (eq_i_tra
+  (int_mod_class p (mul_SNo x y))
+  (int_mod_multiplication p
+    (int_mod_class p x) (int_mod_class p y))
+  (int_mod_class p 0)
+  (eq_sym
+    (int_mod_multiplication p
+      (int_mod_class p x) (int_mod_class p y))
+    (int_mod_class p (mul_SNo x y))
+    (god1_int_mod_multiplication_on_classes p hp x hx y hy))
+  (eq_i_tra
+    (int_mod_multiplication p
+      (int_mod_class p x) (int_mod_class p y))
+    (int_mod_multiplication p A B)
+    (int_mod_class p 0)
+    (eq_sym
+      (int_mod_multiplication p A B)
+      (int_mod_multiplication p
+        (int_mod_class p x) (int_mod_class p y))
+      hcongr)
+    (eq_i_tra
+      (int_mod_multiplication p A B)
+      (ring_zero (int_mod_quotient p) (int_mod_addition p))
+      (int_mod_class p 0) hproductzero
+      (god1_int_mod_ring_zero_eq_class_zero p hp)))).
+claim hmultipleproduct : exists k :e int,
+  mul_SNo x y = mul_SNo p k.
+exact (iffEL
+  (int_mod_class p (mul_SNo x y) = int_mod_class p 0)
+  (exists k :e int, mul_SNo x y = mul_SNo p k)
+  (god1_int_mod_class_eq_zero_iff_multiple p hp
+    (mul_SNo x y) (int_mul_SNo x hx y hy))
+  hclassproductzero).
+apply (orE
+  (exists k :e int, x = mul_SNo p k)
+  (exists k :e int, y = mul_SNo p k)
+  (hproperty x hx y hy hmultipleproduct)
+  (A = ring_zero (int_mod_quotient p) (int_mod_addition p)
+    \/ B = ring_zero (int_mod_quotient p) (int_mod_addition p))).
+- assume hxmultiple.
+  apply (orIL
+    (A = ring_zero (int_mod_quotient p) (int_mod_addition p))
+    (B = ring_zero (int_mod_quotient p) (int_mod_addition p))).
+  exact (eq_i_tra A
+    (int_mod_class p x)
+    (ring_zero (int_mod_quotient p) (int_mod_addition p))
+    hAx
+    (eq_i_tra
+      (int_mod_class p x) (int_mod_class p 0)
+      (ring_zero (int_mod_quotient p) (int_mod_addition p))
+      (iffER
+        (int_mod_class p x = int_mod_class p 0)
+        (exists k :e int, x = mul_SNo p k)
+        (god1_int_mod_class_eq_zero_iff_multiple p hp x hx)
+        hxmultiple)
+      (eq_sym
+        (ring_zero (int_mod_quotient p) (int_mod_addition p))
+        (int_mod_class p 0)
+        (god1_int_mod_ring_zero_eq_class_zero p hp)))).
+- assume hymultiple.
+  apply (orIR
+    (A = ring_zero (int_mod_quotient p) (int_mod_addition p))
+    (B = ring_zero (int_mod_quotient p) (int_mod_addition p))).
+  exact (eq_i_tra B
+    (int_mod_class p y)
+    (ring_zero (int_mod_quotient p) (int_mod_addition p))
+    hBy
+    (eq_i_tra
+      (int_mod_class p y) (int_mod_class p 0)
+      (ring_zero (int_mod_quotient p) (int_mod_addition p))
+      (iffER
+        (int_mod_class p y = int_mod_class p 0)
+        (exists k :e int, y = mul_SNo p k)
+        (god1_int_mod_class_eq_zero_iff_multiple p hp y hy)
+        hymultiple)
+      (eq_sym
+        (ring_zero (int_mod_quotient p) (int_mod_addition p))
+        (int_mod_class p 0)
+        (god1_int_mod_ring_zero_eq_class_zero p hp)))).
+Qed.
+
+Theorem god1_int_mod_product_divisibility_implies_domain :
+  forall p :e omega, 1 :e p ->
+    (forall x y :e int,
+      (exists k :e int, mul_SNo x y = mul_SNo p k) ->
+      (exists k :e int, x = mul_SNo p k)
+      \/ (exists k :e int, y = mul_SNo p k)) ->
+    integral_domain
+      (int_mod_quotient p) (int_mod_addition p) (int_mod_multiplication p).
+let p.
+assume hp h1 hproperty.
+exact (andI
+  (commutative_ring
+      (int_mod_quotient p) (int_mod_addition p)
+      (int_mod_multiplication p)
+    /\ ring_one (int_mod_quotient p) (int_mod_multiplication p)
+      <> ring_zero (int_mod_quotient p) (int_mod_addition p))
+  (forall A B :e int_mod_quotient p,
+    int_mod_multiplication p A B
+      = ring_zero (int_mod_quotient p) (int_mod_addition p) ->
+    A = ring_zero (int_mod_quotient p) (int_mod_addition p)
+    \/ B = ring_zero (int_mod_quotient p) (int_mod_addition p))
+  (andI
+    (commutative_ring
+      (int_mod_quotient p) (int_mod_addition p)
+      (int_mod_multiplication p))
+    (ring_one (int_mod_quotient p) (int_mod_multiplication p)
+      <> ring_zero (int_mod_quotient p) (int_mod_addition p))
+    (god1_int_mod_commutative_ring_core p hp)
+    (god1_int_mod_ring_one_ne_zero p hp h1))
+  (god1_int_mod_product_divisibility_implies_zero_product
+    p hp hproperty)).
+Qed.
+
+Theorem god1_int_mod_integral_domain_iff_product_divisibility :
+  forall p :e omega, 1 :e p ->
+    (integral_domain
+      (int_mod_quotient p) (int_mod_addition p) (int_mod_multiplication p)
+    <-> forall x y :e int,
+      (exists k :e int, mul_SNo x y = mul_SNo p k) ->
+      (exists k :e int, x = mul_SNo p k)
+      \/ (exists k :e int, y = mul_SNo p k)).
+let p.
+assume hp h1.
+exact (iffI
+  (integral_domain
+    (int_mod_quotient p) (int_mod_addition p) (int_mod_multiplication p))
+  (forall x y :e int,
+    (exists k :e int, mul_SNo x y = mul_SNo p k) ->
+    (exists k :e int, x = mul_SNo p k)
+    \/ (exists k :e int, y = mul_SNo p k))
+  (god1_int_mod_domain_implies_product_divisibility p hp)
+  (god1_int_mod_product_divisibility_implies_domain p hp h1)).
+Qed.
+
+Theorem god1_int_mod_class_product_nonzero_iff_not_multiple :
+  forall p :e omega, forall x y :e int,
+    (int_mod_class p (mul_SNo x y) <> int_mod_class p 0
+    <-> ~exists k :e int, mul_SNo x y = mul_SNo p k).
+let p.
+assume hp.
+let x.
+assume hx.
+let y.
+assume hy.
+apply iffI.
+- assume hclassne hmultiple.
+  exact (hclassne
+    (iffER
+      (int_mod_class p (mul_SNo x y) = int_mod_class p 0)
+      (exists k :e int, mul_SNo x y = mul_SNo p k)
+      (god1_int_mod_class_eq_zero_iff_multiple p hp
+        (mul_SNo x y) (int_mul_SNo x hx y hy))
+      hmultiple)).
+- assume hnotmultiple hclasseq.
+  exact (hnotmultiple
+    (iffEL
+      (int_mod_class p (mul_SNo x y) = int_mod_class p 0)
+      (exists k :e int, mul_SNo x y = mul_SNo p k)
+      (god1_int_mod_class_eq_zero_iff_multiple p hp
+        (mul_SNo x y) (int_mul_SNo x hx y hy))
+      hclasseq)).
+Qed.
+
+Theorem god1_int_mod_two_representatives :
+  forall p :e omega, forall A B :e int_mod_quotient p,
+    exists x y :e int,
+      A = int_mod_class p x /\ B = int_mod_class p y.
+let p.
+assume hp.
+let A.
+assume hA.
+let B.
+assume hB.
+witness (int_mod_representative p A).
+exact (andI
+  (int_mod_representative p A :e int)
+  (exists y :e int,
+    A = int_mod_class p (int_mod_representative p A)
+    /\ B = int_mod_class p y)
+  (andEL
+    (int_mod_representative p A :e int)
+    (A = int_mod_class p (int_mod_representative p A))
+    (god1_int_mod_representative_data p hp A hA))
+  (ex_intro
+    (fun y => y :e int
+      /\ (A = int_mod_class p (int_mod_representative p A)
+        /\ B = int_mod_class p y))
+    (int_mod_representative p B)
+    (andI
+      (int_mod_representative p B :e int)
+      (A = int_mod_class p (int_mod_representative p A)
+        /\ B = int_mod_class p (int_mod_representative p B))
+      (andEL
+        (int_mod_representative p B :e int)
+        (B = int_mod_class p (int_mod_representative p B))
+        (god1_int_mod_representative_data p hp B hB))
+      (andI
+        (A = int_mod_class p (int_mod_representative p A))
+        (B = int_mod_class p (int_mod_representative p B))
+        (andER
+          (int_mod_representative p A :e int)
+          (A = int_mod_class p (int_mod_representative p A))
+          (god1_int_mod_representative_data p hp A hA))
+        (andER
+          (int_mod_representative p B :e int)
+          (B = int_mod_class p (int_mod_representative p B))
+          (god1_int_mod_representative_data p hp B hB)))))).
+Qed.
+
+Theorem god1_int_mod_integral_domain_iff_prime :
+  forall p :e omega, 1 :e p ->
+    (integral_domain
+      (int_mod_quotient p) (int_mod_addition p) (int_mod_multiplication p)
+    <-> prime_nat p).
+let p.
+assume hp h1.
+claim hdomainproperty :
+  integral_domain
+    (int_mod_quotient p) (int_mod_addition p) (int_mod_multiplication p)
+  <-> forall x y :e int,
+    (exists k :e int, mul_SNo x y = mul_SNo p k) ->
+    (exists k :e int, x = mul_SNo p k)
+    \/ (exists k :e int, y = mul_SNo p k).
+exact (god1_int_mod_integral_domain_iff_product_divisibility p hp h1).
+claim hprimeproperty :
+  prime_nat p
+  <-> forall x y :e int,
+    (exists k :e int, mul_SNo x y = mul_SNo p k) ->
+    (exists k :e int, x = mul_SNo p k)
+    \/ (exists k :e int, y = mul_SNo p k).
+exact (god1_prime_iff_integer_product_divisibility p hp h1).
+exact (iffI
+  (integral_domain
+    (int_mod_quotient p) (int_mod_addition p) (int_mod_multiplication p))
+  (prime_nat p)
+  (fun hdomain =>
+    iffER
+      (prime_nat p)
+      (forall x y :e int,
+        (exists k :e int, mul_SNo x y = mul_SNo p k) ->
+        (exists k :e int, x = mul_SNo p k)
+        \/ (exists k :e int, y = mul_SNo p k))
+      hprimeproperty
+      (iffEL
+        (integral_domain
+          (int_mod_quotient p) (int_mod_addition p)
+          (int_mod_multiplication p))
+        (forall x y :e int,
+          (exists k :e int, mul_SNo x y = mul_SNo p k) ->
+          (exists k :e int, x = mul_SNo p k)
+          \/ (exists k :e int, y = mul_SNo p k))
+        hdomainproperty hdomain))
+  (fun hprime =>
+    iffER
+      (integral_domain
+        (int_mod_quotient p) (int_mod_addition p)
+        (int_mod_multiplication p))
+      (forall x y :e int,
+        (exists k :e int, mul_SNo x y = mul_SNo p k) ->
+        (exists k :e int, x = mul_SNo p k)
+        \/ (exists k :e int, y = mul_SNo p k))
+      hdomainproperty
+      (iffEL
+        (prime_nat p)
+        (forall x y :e int,
+          (exists k :e int, mul_SNo x y = mul_SNo p k) ->
+          (exists k :e int, x = mul_SNo p k)
+          \/ (exists k :e int, y = mul_SNo p k))
+        hprimeproperty hprime))).
+Qed.
+
 Theorem god1_s8_theorem1_integers_mod_p_domain_field_prime :
   forall p :e omega,
     1 :e p ->
@@ -57222,26 +58292,28 @@ Theorem god1_s8_theorem1_integers_mod_p_domain_field_prime :
     <-> prime_nat p).
 let p.
 assume hp h1.
-apply andI.
 //GOD1PRF:114921 Let $\xi, \eta$ be two non-zero elements of $\mathbf{Z} / p \mathbf{Z}$.
 claim h_s8_t1_two_nonzero_classes :
   forall xi eta :e int_mod_quotient p,
     xi <> ring_zero (int_mod_quotient p) (int_mod_addition p) ->
     eta <> ring_zero (int_mod_quotient p) (int_mod_addition p) ->
     xi :e int_mod_quotient p /\ eta :e int_mod_quotient p.
-admit.
+exact (fun xi hxi eta heta hxine hetane =>
+  andI
+    (xi :e int_mod_quotient p)
+    (eta :e int_mod_quotient p) hxi heta).
 //GOD1PRF:114994 Then $\xi=\theta(x), \eta=\theta(y)$ where
 claim h_s8_t1_nonzero_representatives :
   forall xi eta :e int_mod_quotient p,
     exists x y :e int,
       xi = int_mod_class p x /\ eta = int_mod_class p y.
-admit.
+exact (god1_int_mod_two_representatives p hp).
 //GOD1PRF:115104 to deduce that $\xi \eta=\theta(x y)$ is also non-zero we have to show that
 claim h_s8_t1_product_class_nonzero_criterion :
   forall x y :e int,
     int_mod_class p (mul_SNo x y) <> int_mod_class p 0 <->
     ~exists k :e int, mul_SNo x y = mul_SNo p k.
-admit.
+exact (god1_int_mod_class_product_nonzero_iff_not_multiple p hp).
 //GOD1PRF:115217 in other words, $\mathbf{Z} / p \mathbf{Z}$ is an integral domain if and only if the relation
 claim h_s8_t1_domain_divisibility_criterion :
   (integral_domain
@@ -57250,7 +58322,7 @@ claim h_s8_t1_domain_divisibility_criterion :
     (exists k :e int, mul_SNo x y = mul_SNo p k) ->
     (exists k :e int, x = mul_SNo p k)
     \/ (exists k :e int, y = mul_SNo p k)).
-admit.
+exact (god1_int_mod_integral_domain_iff_product_divisibility p hp h1).
 //GOD1PRF:115424 or, equivalently, if $p$ divides a product $x y$, then it divides either $x$ or $y$.
 claim h_s8_t1_prime_divides_product :
   prime_nat p <->
@@ -57258,32 +58330,79 @@ claim h_s8_t1_prime_divides_product :
       (exists k :e int, mul_SNo x y = mul_SNo p k) ->
       (exists k :e int, x = mul_SNo p k)
       \/ (exists k :e int, y = mul_SNo p k).
-admit.
+exact (god1_prime_iff_integer_product_divisibility p hp h1).
 //GOD1PRF:115509 This proves the equivalence of $a$ ) and $c$ ).
 claim h_s8_t1_domain_iff_prime :
   integral_domain
     (int_mod_quotient p) (int_mod_addition p) (int_mod_multiplication p)
   <-> prime_nat p.
-admit.
+exact (god1_int_mod_integral_domain_iff_prime p hp h1).
 //GOD1PRF:115558 Clearly $b$ ) implies $a$ ).
 claim h_s8_t1_field_implies_domain :
   field
     (int_mod_quotient p) (int_mod_addition p) (int_mod_multiplication p) ->
   integral_domain
     (int_mod_quotient p) (int_mod_addition p) (int_mod_multiplication p).
-admit.
+exact (god1_field_is_integral_domain
+  (int_mod_quotient p) (int_mod_addition p)
+  (int_mod_multiplication p)).
 //GOD1PRF:115587 To complete the proof it is therefore only necessary to show that $a$ ) implies $b$ ), and this is a consequence of the following more general result:
 claim h_s8_t1_finite_quotient : finite (int_mod_quotient p).
-admit.
+exact (god1_int_mod_quotient_finite p hp h1).
 claim h_s8_t1_more_general_result_call :
   integral_domain
     (int_mod_quotient p) (int_mod_addition p) (int_mod_multiplication p) ->
   field
     (int_mod_quotient p) (int_mod_addition p) (int_mod_multiplication p).
-apply (god1_s8_finite_integral_domain_field_interface
+exact (god1_s8_finite_integral_domain_field_interface
   (int_mod_quotient p) (int_mod_addition p) (int_mod_multiplication p)
   h_s8_t1_finite_quotient).
-Admitted.
+claim hdomainfield :
+  integral_domain
+    (int_mod_quotient p) (int_mod_addition p) (int_mod_multiplication p)
+  <-> field
+    (int_mod_quotient p) (int_mod_addition p) (int_mod_multiplication p).
+exact (iffI
+  (integral_domain
+    (int_mod_quotient p) (int_mod_addition p) (int_mod_multiplication p))
+  (field
+    (int_mod_quotient p) (int_mod_addition p) (int_mod_multiplication p))
+  h_s8_t1_more_general_result_call h_s8_t1_field_implies_domain).
+claim hfieldprime :
+  field
+    (int_mod_quotient p) (int_mod_addition p) (int_mod_multiplication p)
+  <-> prime_nat p.
+exact (iffI
+  (field
+    (int_mod_quotient p) (int_mod_addition p) (int_mod_multiplication p))
+  (prime_nat p)
+  (fun hfield =>
+    iffEL
+      (integral_domain
+        (int_mod_quotient p) (int_mod_addition p)
+        (int_mod_multiplication p))
+      (prime_nat p) h_s8_t1_domain_iff_prime
+      (h_s8_t1_field_implies_domain hfield))
+  (fun hprime =>
+    h_s8_t1_more_general_result_call
+      (iffER
+        (integral_domain
+          (int_mod_quotient p) (int_mod_addition p)
+          (int_mod_multiplication p))
+        (prime_nat p) h_s8_t1_domain_iff_prime hprime))).
+exact (andI
+  (integral_domain
+      (int_mod_quotient p) (int_mod_addition p)
+      (int_mod_multiplication p)
+    <-> field
+      (int_mod_quotient p) (int_mod_addition p)
+      (int_mod_multiplication p))
+  (field
+      (int_mod_quotient p) (int_mod_addition p)
+      (int_mod_multiplication p)
+    <-> prime_nat p)
+  hdomainfield hfieldprime).
+Qed.
 
 (** Formal interface for §5, Theorem 4 on self-maps of finite sets. **)
 Theorem god1_s5_theorem4_finite_injection_is_surjection :
