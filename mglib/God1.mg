@@ -36196,5 +36196,2145 @@ Theorem god1_s11_theorem3_finite_dimensional_vector_space_has_basis :
       module_basis K addK mulK M addM smul I a.
 Admitted.
 
+(** §§ 12–14. Linear mappings and matrices. **)
+
+//GOD1:249688 module_homomorphism : "#11 is a linear mapping from the left module #4 to the left module #7" | $#11:#4\to #7$
+Definition module_homomorphism :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  (set -> set) -> prop :=
+  fun K addK mulK L addL smulL M addM smulM f =>
+    left_module K addK mulK L addL smulL
+    /\ left_module K addK mulK M addM smulM
+    /\ (forall x :e L, f x :e M)
+    /\ forall x y :e L, forall scalar mu :e K,
+      f (addL (smulL scalar x) (smulL mu y))
+      = addM (smulM scalar (f x)) (smulM mu (f y)).
+
+//GOD1:249993 module_isomorphism : "#11 is an isomorphism from the module #4 onto the module #7" | $#11:#4\xrightarrow{\sim}#7$
+Definition module_isomorphism :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  (set -> set) -> prop :=
+  fun K addK mulK L addL smulL M addM smulM f =>
+    module_homomorphism K addK mulK L addL smulL M addM smulM f
+    /\ bij L M f.
+
+//GOD1:249993 isomorphic_modules : "the modules #4 and #7 are isomorphic" | $#4\cong #7$
+Definition isomorphic_modules :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set -> set) -> (set -> set -> set) -> prop :=
+  fun K addK mulK L addL smulL M addM smulM =>
+    exists f:set -> set,
+      module_isomorphism K addK mulK L addL smulL M addM smulM f.
+
+//GOD1:250163 module_endomorphism : "#7 is an endomorphism of the module #4" | $#7\in\operatorname{End}(#4)$
+Definition module_endomorphism :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  (set -> set) -> prop :=
+  fun K addK mulK M addM smul f =>
+    module_homomorphism K addK mulK M addM smul M addM smul f.
+
+//GOD1:250163 module_automorphism : "#7 is an automorphism of the module #4" | $#7\in\operatorname{Aut}(#4)$
+Definition module_automorphism :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  (set -> set) -> prop :=
+  fun K addK mulK M addM smul f =>
+    module_isomorphism K addK mulK M addM smul M addM smul f.
+
+Theorem god1_module_homomorphism_additive_and_homogeneous_iff_linear :
+  forall K, forall addK mulK:set -> set -> set,
+  forall L, forall addL smulL:set -> set -> set,
+  forall M, forall addM smulM:set -> set -> set,
+  forall f:set -> set,
+    left_module K addK mulK L addL smulL ->
+    left_module K addK mulK M addM smulM ->
+    (forall x :e L, f x :e M) ->
+    (module_homomorphism K addK mulK L addL smulL M addM smulM f
+    <-> (forall x y :e L, f (addL x y) = addM (f x) (f y))
+      /\ (forall scalar :e K, forall x :e L,
+        f (smulL scalar x) = smulM scalar (f x))).
+Admitted.
+
+Theorem god1_module_homomorphism_preserves_zero_and_linear_combinations :
+  forall K, forall addK mulK:set -> set -> set,
+  forall L, forall addL smulL:set -> set -> set,
+  forall M, forall addM smulM:set -> set -> set,
+  forall f:set -> set,
+    module_homomorphism K addK mulK L addL smulL M addM smulM f ->
+    f (module_zero L addL) = module_zero M addM
+    /\ forall I, forall a:set -> set, forall coeff:set -> set,
+      (forall i :e I, a i :e L /\ coeff i :e K) ->
+      almost_all_zero I (ring_zero K addK) coeff ->
+      f (module_finitely_supported_sum L addL I
+          (fun i => smulL (coeff i) (a i)))
+      = module_finitely_supported_sum M addM I
+          (fun i => smulM (coeff i) (f (a i))).
+Admitted.
+
+Theorem god1_s12_theorem1_composition_and_inverse_linear :
+  forall K, forall addK mulK:set -> set -> set,
+  forall L, forall addL smulL:set -> set -> set,
+  forall M, forall addM smulM:set -> set -> set,
+  forall N, forall addN smulN:set -> set -> set,
+  forall f g:set -> set,
+    module_homomorphism K addK mulK L addL smulL M addM smulM f ->
+    module_homomorphism K addK mulK M addM smulM N addN smulN g ->
+    module_homomorphism K addK mulK L addL smulL N addN smulN
+      (fun x => g (f x))
+    /\ (module_isomorphism K addK mulK L addL smulL M addM smulM f ->
+      module_isomorphism K addK mulK M addM smulM L addL smulL
+        (inv L f))
+    /\ (module_isomorphism K addK mulK L addL smulL M addM smulM f ->
+        module_isomorphism K addK mulK M addM smulM N addN smulN g ->
+        module_isomorphism K addK mulK L addL smulL N addN smulN
+          (fun x => g (f x))).
+Admitted.
+
+//GOD1:254452 module_homomorphism_kernel : "the kernel of the module homomorphism #11" | $\operatorname{Ker}(#11)$
+Definition module_homomorphism_kernel :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  (set -> set) -> set :=
+  fun K addK mulK L addL smulL M addM smulM f =>
+    {x :e L|f x = module_zero M addM}.
+
+//GOD1:254718 module_homomorphism_image : "the image of the module homomorphism #11" | $\operatorname{Im}(#11)$
+Definition module_homomorphism_image : set -> (set -> set) -> set :=
+  fun L f => {f x|x :e L}.
+
+Theorem god1_s12_theorem2_images_and_preimages_of_submodules :
+  forall K, forall addK mulK:set -> set -> set,
+  forall L, forall addL smulL:set -> set -> set,
+  forall M, forall addM smulM:set -> set -> set,
+  forall f:set -> set,
+    module_homomorphism K addK mulK L addL smulL M addM smulM f ->
+    (forall A,
+      submodule K addK mulK L addL smulL A ->
+      submodule K addK mulK M addM smulM
+        (group_image_of_subset A f))
+    /\ (forall B,
+      submodule K addK mulK M addM smulM B ->
+      submodule K addK mulK L addL smulL
+        (group_preimage_of_subset L B f)).
+Admitted.
+
+Theorem god1_module_homomorphism_kernel_image_and_injectivity :
+  forall K, forall addK mulK:set -> set -> set,
+  forall L, forall addL smulL:set -> set -> set,
+  forall M, forall addM smulM:set -> set -> set,
+  forall f:set -> set,
+    module_homomorphism K addK mulK L addL smulL M addM smulM f ->
+    submodule K addK mulK L addL smulL
+      (module_homomorphism_kernel K addK mulK L addL smulL M addM smulM f)
+    /\ submodule K addK mulK M addM smulM
+      (module_homomorphism_image L f)
+    /\ (inj L M f <->
+      module_homomorphism_kernel K addK mulK L addL smulL M addM smulM f
+      = {module_zero L addL}).
+Admitted.
+
+Theorem god1_s12_theorem3_linear_map_from_basis :
+  forall K, forall addK mulK:set -> set -> set,
+  forall L, forall addL smulL:set -> set -> set,
+  forall M, forall addM smulM:set -> set -> set,
+  forall I, forall a c:set -> set,
+    module_basis K addK mulK L addL smulL I a ->
+    left_module K addK mulK M addM smulM ->
+    (forall i :e I, c i :e M) ->
+    exists f:set -> set,
+      module_homomorphism K addK mulK L addL smulL M addM smulM f
+      /\ (forall i :e I, f (a i) = c i)
+      /\ (forall g:set -> set,
+        module_homomorphism K addK mulK L addL smulL M addM smulM g ->
+        (forall i :e I, g (a i) = c i) -> g = f)
+      /\ (inj L M f <->
+        linearly_independent_family K addK mulK M addM smulM I c)
+      /\ (surj L M f <->
+        generating_family K addK mulK M addM smulM I c).
+Admitted.
+
+Theorem god1_s12_corollary1_free_module_iff_isomorphic_to_power :
+  forall K, forall addK mulK:set -> set -> set,
+  forall M, forall addM smulM:set -> set -> set,
+    left_module K addK mulK M addM smulM ->
+    (finitely_generated_free_module K addK mulK M addM smulM
+    <-> exists n :e omega,
+      isomorphic_modules
+        K addK mulK
+        (K :^: n)
+        (module_power_addition n addK)
+        (module_power_left_scalar n mulK)
+        M addM smulM).
+Admitted.
+
+Theorem god1_s12_corollary2_finitely_generated_iff_quotient_of_power :
+  forall K, forall addK mulK:set -> set -> set,
+  forall M, forall addM smulM:set -> set -> set,
+    left_module K addK mulK M addM smulM ->
+    (finitely_generated_module K addK mulK M addM smulM
+    <-> exists n :e omega, exists f:set -> set,
+      module_homomorphism
+        K addK mulK
+        (K :^: n)
+        (module_power_addition n addK)
+        (module_power_left_scalar n mulK)
+        M addM smulM f
+      /\ surj (K :^: n) M f).
+Admitted.
+
+//GOD1:280927 module_homomorphism_space : "the set of linear maps from #4 to #7" | $\operatorname{Hom}_{#1}(#4,#7)$
+Definition module_homomorphism_space :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set -> set) -> (set -> set -> set) -> set :=
+  fun K addK mulK L addL smulL M addM smulM =>
+    {f :e M :^: L|
+      module_homomorphism K addK mulK L addL smulL M addM smulM
+        (fun x => f x)}.
+
+//GOD1:281276 module_homomorphism_addition : "pointwise addition of module homomorphisms" | $(f+g)(x)=f(x)+g(x)$
+Definition module_homomorphism_addition :
+  set -> (set -> set -> set) -> set -> set -> set :=
+  fun L addM f g => fun x :e L => addM (f x) (g x).
+
+//GOD1:282760 module_homomorphism_scalar : "pointwise scalar multiplication of a module homomorphism" | $(\lambda f)(x)=\lambda f(x)$
+Definition module_homomorphism_scalar :
+  set -> (set -> set -> set) -> set -> set -> set :=
+  fun L smul scalar f => fun x :e L => smul scalar (f x).
+
+Theorem god1_s13_theorem1_homomorphisms_form_additive_group :
+  forall K, forall addK mulK:set -> set -> set,
+  forall L, forall addL smulL:set -> set -> set,
+  forall M, forall addM smulM:set -> set -> set,
+    left_module K addK mulK L addL smulL ->
+    left_module K addK mulK M addM smulM ->
+    abelian_group
+      (module_homomorphism_space K addK mulK L addL smulL M addM smulM)
+      (module_homomorphism_addition L addM)
+    /\ (commutative_ring K addK mulK ->
+      left_module K addK mulK
+        (module_homomorphism_space K addK mulK L addL smulL M addM smulM)
+        (module_homomorphism_addition L addM)
+        (module_homomorphism_scalar L smulM)).
+Admitted.
+
+//GOD1:265022 matrix_space : "the set of #2-by-#3 matrices with coefficients in #1" | $\operatorname{Mat}_{#2\times #3}(#1)$
+Definition matrix_space : set -> set -> set -> set :=
+  fun K p q => K :^: (p :*: q).
+
+//GOD1:265022 matrix_entry : "the entry in row #3 and column #4 of the matrix #2" | $#2_{#3,#4}$
+Definition matrix_entry : set -> set -> set -> set :=
+  fun A i j => A (i,j).
+
+//GOD1:285224 matrix_addition : "the sum of #6 and #7 as #4-by-#5 matrices" | $#6+#7$
+Definition matrix_addition :
+  set -> (set -> set -> set) -> set -> set -> set -> set -> set :=
+  fun K add p q A B =>
+    fun u :e p :*: q => add (A u) (B u).
+
+//GOD1:286254 matrix_left_scalar : "left scalar multiplication of #6 by #5" | $#5#6$
+Definition matrix_left_scalar :
+  set -> (set -> set -> set) -> set -> set -> set -> set -> set :=
+  fun K mul p q scalar A =>
+    fun u :e p :*: q => mul scalar (A u).
+
+//GOD1:286254 matrix_right_scalar : "right scalar multiplication of #6 by #5" | $#6#5$
+Definition matrix_right_scalar :
+  set -> (set -> set -> set) -> set -> set -> set -> set -> set :=
+  fun K mul p q A scalar =>
+    fun u :e p :*: q => mul (A u) scalar.
+
+//GOD1:291835 matrix_multiplication : "the product of the #2-by-#3 matrix #7 and the #3-by-#4 matrix #8" | $#7#8$
+Definition matrix_multiplication :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> set -> set -> set -> set -> set :=
+  fun K add mul p q r A B =>
+    fun u :e p :*: r =>
+      ring_finite_sum K add q
+        (fun j => mul (matrix_entry A (u 0) j)
+                      (matrix_entry B j (u 1))).
+
+//GOD1:295385 unit_matrix : "the unit matrix of order #4 over the ring #1" | $1_{#4}$
+Definition unit_matrix :
+  set -> (set -> set -> set) -> (set -> set -> set) -> set -> set :=
+  fun K add mul n =>
+    fun u :e n :*: n =>
+      if u 0 = u 1 then ring_one K mul else ring_zero K add.
+
+//GOD1:275059 right_module_basis : "the family #8 is a basis of the right #1-module #4" | $#8\text{ is a right-module basis}$
+Definition right_module_basis :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set) -> prop :=
+  fun K addK mulK M addM smulR I a =>
+    module_basis
+      K addK (opposite_ring_multiplication mulK)
+      M addM (fun scalar x => smulR x scalar) I a.
+
+//GOD1:249688 right_module_homomorphism : "#11 is a homomorphism of right modules from #4 to #7" | $#11:#4\to #7$
+Definition right_module_homomorphism :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  (set -> set) -> prop :=
+  fun K addK mulK L addL smulL M addM smulM f =>
+    module_homomorphism
+      K addK (opposite_ring_multiplication mulK)
+      L addL (fun scalar x => smulL x scalar)
+      M addM (fun scalar x => smulM x scalar) f.
+
+//GOD1:265310 matrix_of_right_linear_map : "the matrix of #17 relative to the bases #13 and #14" | $[#17]_{#14\leftarrow #13}$
+Definition matrix_of_right_linear_map :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> set -> (set -> set) -> (set -> set) -> (set -> set) -> set :=
+  fun K addK mulK L addL smulL M addM smulM q p a b f =>
+    fun u :e p :*: q =>
+      basis_coordinates
+        K addK (opposite_ring_multiplication mulK)
+        M addM (fun scalar x => smulM x scalar)
+        p b (f (a (u 1))) (u 0).
+
+Theorem god1_matrices_classify_maps_between_finite_free_right_modules :
+  forall K, forall addK mulK:set -> set -> set,
+  forall L, forall addL smulL:set -> set -> set,
+  forall M, forall addM smulM:set -> set -> set,
+  forall q p :e omega, forall a b:set -> set,
+    right_module_basis K addK mulK L addL smulL q a ->
+    right_module_basis K addK mulK M addM smulM p b ->
+    bij
+      (module_homomorphism_space
+        K addK (opposite_ring_multiplication mulK)
+        L addL (fun scalar x => smulL x scalar)
+        M addM (fun scalar x => smulM x scalar))
+      (matrix_space K p q)
+      (fun F => matrix_of_right_linear_map
+        K addK mulK L addL smulL M addM smulM q p a b
+        (fun x => F x)).
+Admitted.
+
+Theorem god1_s13_theorem2_matrix_of_sum :
+  forall K, forall addK mulK:set -> set -> set,
+  forall L, forall addL smulL:set -> set -> set,
+  forall M, forall addM smulM:set -> set -> set,
+  forall q p :e omega, forall a b:set -> set, forall f g:set -> set,
+    right_module_basis K addK mulK L addL smulL q a ->
+    right_module_basis K addK mulK M addM smulM p b ->
+    right_module_homomorphism K addK mulK L addL smulL M addM smulM f ->
+    right_module_homomorphism K addK mulK L addL smulL M addM smulM g ->
+    matrix_of_right_linear_map
+      K addK mulK L addL smulL M addM smulM q p a b
+      (fun x => addM (f x) (g x))
+    = matrix_addition K addK p q
+      (matrix_of_right_linear_map
+        K addK mulK L addL smulL M addM smulM q p a b f)
+      (matrix_of_right_linear_map
+        K addK mulK L addL smulL M addM smulM q p a b g).
+Admitted.
+
+//GOD1:288589 module_endomorphism_ring : "the ring of endomorphisms of the module #4" | $\operatorname{End}_{#1}(#4)$
+Definition module_endomorphism_ring :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set -> set) -> (set -> set -> set) -> set :=
+  fun K addK mulK M addM smul =>
+    module_homomorphism_space K addK mulK M addM smul M addM smul.
+
+//GOD1:288589 module_endomorphism_composition : "composition of endomorphisms" | $#7\circ #8$
+Definition module_endomorphism_composition :
+  set -> set -> set -> set :=
+  fun M f g => fun x :e M => f (g x).
+
+Theorem god1_s14_theorem1_composition_distributes_over_map_addition :
+  forall K, forall addK mulK:set -> set -> set,
+  forall L, forall addL smulL:set -> set -> set,
+  forall M, forall addM smulM:set -> set -> set,
+  forall N, forall addN smulN:set -> set -> set,
+  forall f g h:set -> set,
+    module_homomorphism K addK mulK L addL smulL M addM smulM f ->
+    module_homomorphism K addK mulK L addL smulL M addM smulM g ->
+    module_homomorphism K addK mulK M addM smulM N addN smulN h ->
+    (forall x :e L,
+      h (addM (f x) (g x)) = addN (h (f x)) (h (g x)))
+    /\ (forall u v:set -> set,
+      module_homomorphism K addK mulK M addM smulM N addN smulN u ->
+      module_homomorphism K addK mulK M addM smulM N addN smulN v ->
+      forall x :e L,
+        addN (u (f x)) (v (f x))
+        = (fun y:set => addN (u y) (v y)) (f x)).
+Admitted.
+
+Theorem god1_s14_corollary_endomorphisms_form_ring :
+  forall K, forall addK mulK:set -> set -> set,
+  forall M, forall addM smul:set -> set -> set,
+    left_module K addK mulK M addM smul ->
+    ring
+      (module_endomorphism_ring K addK mulK M addM smul)
+      (module_homomorphism_addition M addM)
+      (module_endomorphism_composition M).
+Admitted.
+
+Theorem god1_s14_theorem2_matrix_of_composition_is_product :
+  forall K, forall addK mulK:set -> set -> set,
+  forall L, forall addL smulL:set -> set -> set,
+  forall M, forall addM smulM:set -> set -> set,
+  forall N, forall addN smulN:set -> set -> set,
+  forall r q p :e omega, forall a b c:set -> set,
+  forall f g:set -> set,
+    right_module_basis K addK mulK L addL smulL r a ->
+    right_module_basis K addK mulK M addM smulM q b ->
+    right_module_basis K addK mulK N addN smulN p c ->
+    right_module_homomorphism K addK mulK M addM smulM N addN smulN f ->
+    right_module_homomorphism K addK mulK L addL smulL M addM smulM g ->
+    matrix_of_right_linear_map
+      K addK mulK L addL smulL N addN smulN r p a c
+      (fun x => f (g x))
+    = matrix_multiplication K addK mulK p q r
+      (matrix_of_right_linear_map
+        K addK mulK M addM smulM N addN smulN q p b c f)
+      (matrix_of_right_linear_map
+        K addK mulK L addL smulL M addM smulM r q a b g).
+Admitted.
+
+Theorem god1_matrix_associative_distributive_and_units :
+  forall K, forall add mul:set -> set -> set, forall p q r s :e omega,
+    ring K add mul ->
+    (forall A :e matrix_space K p q,
+     forall B :e matrix_space K q r,
+     forall C :e matrix_space K r s,
+      matrix_multiplication K add mul p q s A
+        (matrix_multiplication K add mul q r s B C)
+      = matrix_multiplication K add mul p r s
+        (matrix_multiplication K add mul p q r A B) C)
+    /\ (forall A B :e matrix_space K p q,
+        forall C :e matrix_space K q r,
+      matrix_multiplication K add mul p q r
+        (matrix_addition K add p q A B) C
+      = matrix_addition K add p r
+        (matrix_multiplication K add mul p q r A C)
+        (matrix_multiplication K add mul p q r B C))
+    /\ (forall A :e matrix_space K p q,
+      matrix_multiplication K add mul p p q (unit_matrix K add mul p) A = A
+      /\ matrix_multiplication K add mul p q q A (unit_matrix K add mul q) = A).
+Admitted.
+
+//GOD1:299045 square_matrix_ring : "the ring of square matrices of order #4 over #1" | $M_{#4}(#1)$
+Definition square_matrix_ring : set -> set -> set :=
+  fun K n => matrix_space K n n.
+
+Theorem god1_square_matrices_form_ring :
+  forall K, forall add mul:set -> set -> set, forall n :e omega,
+    ring K add mul ->
+    ring
+      (square_matrix_ring K n)
+      (matrix_addition K add n n)
+      (matrix_multiplication K add mul n n n).
+Admitted.
+
+(** § 15. Invertible matrices and change of basis. **)
+
+//GOD1:315927 module_general_linear_group : "the general linear group of the module #4" | $\operatorname{GL}(#4)$
+Definition module_general_linear_group :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set -> set) -> (set -> set -> set) -> set :=
+  fun K addK mulK M addM smul =>
+    {f :e M :^: M|
+      module_automorphism K addK mulK M addM smul (fun x => f x)}.
+
+Theorem god1_module_automorphisms_form_general_linear_group :
+  forall K, forall addK mulK:set -> set -> set,
+  forall M, forall addM smul:set -> set -> set,
+    left_module K addK mulK M addM smul ->
+    group
+      (module_general_linear_group K addK mulK M addM smul)
+      (module_endomorphism_composition M)
+    /\ module_general_linear_group K addK mulK M addM smul
+      = ring_units
+        (module_endomorphism_ring K addK mulK M addM smul)
+        (module_homomorphism_addition M addM)
+        (module_endomorphism_composition M).
+Admitted.
+
+//GOD1:317017 invertible_matrix : "#6 is an invertible square matrix of order #4 over #1" | $#6\in\operatorname{GL}(#4,#1)$
+Definition invertible_matrix :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> set -> prop :=
+  fun K add mul n A =>
+    ring_unit
+      (square_matrix_ring K n)
+      (matrix_addition K add n n)
+      (matrix_multiplication K add mul n n n) A.
+
+//GOD1:317017 general_linear_group : "the general linear group of square matrices of order #4 over #1" | $\operatorname{GL}(#4,#1)$
+Definition general_linear_group :
+  set -> (set -> set -> set) -> (set -> set -> set) -> set -> set :=
+  fun K add mul n =>
+    {A :e square_matrix_ring K n|invertible_matrix K add mul n A}.
+
+//GOD1:317017 matrix_inverse : "the inverse of the invertible matrix #6" | $#6^{-1}$
+Definition matrix_inverse :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> set -> set :=
+  fun K add mul n A =>
+    ring_inverse
+      (square_matrix_ring K n)
+      (matrix_addition K add n n)
+      (matrix_multiplication K add mul n n n) A.
+
+Theorem god1_general_linear_group_is_group :
+  forall K, forall add mul:set -> set -> set, forall n :e omega,
+    ring K add mul ->
+    group
+      (general_linear_group K add mul n)
+      (matrix_multiplication K add mul n n n)
+    /\ forall A :e general_linear_group K add mul n,
+      matrix_multiplication K add mul n n n
+        (matrix_inverse K add mul n A) A
+      = unit_matrix K add mul n
+      /\ matrix_multiplication K add mul n n n A
+        (matrix_inverse K add mul n A)
+      = unit_matrix K add mul n.
+Admitted.
+
+Theorem god1_automorphism_iff_matrix_invertible :
+  forall K, forall addK mulK:set -> set -> set,
+  forall M, forall addM smulR:set -> set -> set,
+  forall n :e omega, forall a:set -> set, forall f:set -> set,
+    right_module_basis K addK mulK M addM smulR n a ->
+    right_module_homomorphism K addK mulK M addM smulR M addM smulR f ->
+    (module_automorphism
+      K addK (opposite_ring_multiplication mulK)
+      M addM (fun scalar x => smulR x scalar) f
+    <-> invertible_matrix K addK mulK n
+      (matrix_of_right_linear_map
+        K addK mulK M addM smulR M addM smulR n n a a f)).
+Admitted.
+
+//GOD1:321107 determinant_2 : "the determinant of the square matrix #4 of order two" | $\det(#4)$
+Definition determinant_2 :
+  set -> (set -> set -> set) -> (set -> set -> set) -> set -> set :=
+  fun K add mul A =>
+    add
+      (mul (matrix_entry A 0 0) (matrix_entry A 1 1))
+      (ring_negation K add
+        (mul (matrix_entry A 0 1) (matrix_entry A 1 0))).
+
+Theorem god1_determinant_2_multiplicative_and_detects_units :
+  forall K, forall add mul:set -> set -> set,
+    commutative_ring K add mul ->
+    (forall A B :e square_matrix_ring K 2,
+      determinant_2 K add mul
+        (matrix_multiplication K add mul 2 2 2 A B)
+      = mul (determinant_2 K add mul A) (determinant_2 K add mul B))
+    /\ (forall A :e square_matrix_ring K 2,
+      invertible_matrix K add mul 2 A
+      <-> ring_unit K add mul (determinant_2 K add mul A)).
+Admitted.
+
+//GOD1:326299 transition_matrix : "the transition matrix from the basis #9 to the basis #10" | $T_{#10\leftarrow #9}$
+Definition transition_matrix :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set) -> (set -> set) -> set :=
+  fun K addK mulK M addM smulR n a b =>
+    fun u :e n :*: n =>
+      basis_coordinates
+        K addK (opposite_ring_multiplication mulK)
+        M addM (fun scalar x => smulR x scalar)
+        n b (a (u 1)) (u 0).
+
+Theorem god1_transition_matrix_is_invertible_and_changes_coordinates :
+  forall K, forall addK mulK:set -> set -> set,
+  forall M, forall addM smulR:set -> set -> set,
+  forall n :e omega, forall a b:set -> set,
+    right_module_basis K addK mulK M addM smulR n a ->
+    right_module_basis K addK mulK M addM smulR n b ->
+    invertible_matrix K addK mulK n
+      (transition_matrix K addK mulK M addM smulR n a b)
+    /\ forall x :e M, forall i :e n,
+      basis_coordinates
+        K addK (opposite_ring_multiplication mulK)
+        M addM (fun scalar y => smulR y scalar) n b x i
+      = ring_finite_sum K addK n
+        (fun j => mulK
+          (matrix_entry
+            (transition_matrix K addK mulK M addM smulR n a b) i j)
+          (basis_coordinates
+            K addK (opposite_ring_multiplication mulK)
+            M addM (fun scalar y => smulR y scalar) n a x j)).
+Admitted.
+
+//GOD1:328624 right_basis_transform : "the family obtained from #9 using the coefficient matrix #10" | $b_j=\sum_i #9_i#10_{ij}$
+Definition right_basis_transform :
+  set -> (set -> set -> set) ->
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set) -> set -> set -> set :=
+  fun K addK M addM smulR n a B j =>
+    module_finitely_supported_sum M addM n
+      (fun i => smulR (a i) (matrix_entry B i j)).
+
+Theorem god1_s15_theorem1_basis_transform_iff_matrix_invertible :
+  forall K, forall addK mulK:set -> set -> set,
+  forall M, forall addM smulR:set -> set -> set,
+  forall n :e omega, forall a:set -> set,
+  forall B :e square_matrix_ring K n,
+    right_module_basis K addK mulK M addM smulR n a ->
+    (right_module_basis K addK mulK M addM smulR n
+      (fun j => right_basis_transform K addK M addM smulR n a B j)
+    <-> invertible_matrix K addK mulK n B).
+Admitted.
+
+Theorem god1_s15_theorem2_matrix_under_change_of_bases :
+  forall K, forall addK mulK:set -> set -> set,
+  forall L, forall addL smulL:set -> set -> set,
+  forall M, forall addM smulM:set -> set -> set,
+  forall q p :e omega,
+  forall a1 a2 b1 b2:set -> set, forall f:set -> set,
+    right_module_basis K addK mulK L addL smulL q a1 ->
+    right_module_basis K addK mulK L addL smulL q a2 ->
+    right_module_basis K addK mulK M addM smulM p b1 ->
+    right_module_basis K addK mulK M addM smulM p b2 ->
+    right_module_homomorphism K addK mulK L addL smulL M addM smulM f ->
+    matrix_of_right_linear_map
+      K addK mulK L addL smulL M addM smulM q p a1 b1 f
+    = matrix_multiplication K addK mulK p p q
+      (matrix_inverse K addK mulK p
+        (transition_matrix K addK mulK M addM smulM p b1 b2))
+      (matrix_multiplication K addK mulK p q q
+        (matrix_of_right_linear_map
+          K addK mulK L addL smulL M addM smulM q p a2 b2 f)
+        (transition_matrix K addK mulK L addL smulL q a1 a2)).
+Admitted.
+
+Theorem god1_s15_corollary_similar_matrices_of_endomorphism :
+  forall K, forall addK mulK:set -> set -> set,
+  forall M, forall addM smulR:set -> set -> set,
+  forall n :e omega, forall a1 a2:set -> set, forall f:set -> set,
+    right_module_basis K addK mulK M addM smulR n a1 ->
+    right_module_basis K addK mulK M addM smulR n a2 ->
+    right_module_homomorphism K addK mulK M addM smulR M addM smulR f ->
+    matrix_of_right_linear_map
+      K addK mulK M addM smulR M addM smulR n n a2 a2 f
+    = matrix_multiplication K addK mulK n n n
+      (transition_matrix K addK mulK M addM smulR n a1 a2)
+      (matrix_multiplication K addK mulK n n n
+        (matrix_of_right_linear_map
+          K addK mulK M addM smulR M addM smulR n n a1 a1 f)
+        (matrix_inverse K addK mulK n
+          (transition_matrix K addK mulK M addM smulR n a1 a2))).
+Admitted.
+
+//GOD1:336010 similar_matrices : "the square matrices #5 and #6 are similar over #1" | $#5\sim #6$
+Definition similar_matrices :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> set -> set -> prop :=
+  fun K add mul n A B =>
+    A :e square_matrix_ring K n
+    /\ B :e square_matrix_ring K n
+    /\ exists U :e general_linear_group K add mul n,
+      B = matrix_multiplication K add mul n n n U
+        (matrix_multiplication K add mul n n n A
+          (matrix_inverse K add mul n U)).
+
+(** § 16. The transpose of a linear mapping. **)
+
+//GOD1:351702 right_module_dual : "the dual of the right module #4" | $#4^*$
+Definition right_module_dual :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set -> set) -> (set -> set -> set) -> set :=
+  fun K addK mulK L addL smulR =>
+    module_homomorphism_space
+      K addK (opposite_ring_multiplication mulK)
+      L addL (fun scalar x => smulR x scalar)
+      K addK (fun scalar x => mulK x scalar).
+
+//GOD1:351702 right_module_dual_addition : "addition in the dual module #4^*" | $(f+g)(x)=f(x)+g(x)$
+Definition right_module_dual_addition :
+  set -> (set -> set -> set) -> set -> set -> set :=
+  fun L addK => module_homomorphism_addition L addK.
+
+//GOD1:351702 right_module_dual_left_scalar : "left scalar multiplication in the dual module #4^*" | $(\lambda f)(x)=\lambda f(x)$
+Definition right_module_dual_left_scalar :
+  set -> (set -> set -> set) -> set -> set -> set :=
+  fun L mulK => module_homomorphism_scalar L mulK.
+
+Theorem god1_right_module_dual_is_left_module :
+  forall K, forall addK mulK:set -> set -> set,
+  forall L, forall addL smulR:set -> set -> set,
+    right_module K addK mulK L addL smulR ->
+    left_module K addK mulK
+      (right_module_dual K addK mulK L addL smulR)
+      (right_module_dual_addition L addK)
+      (right_module_dual_left_scalar L mulK).
+Admitted.
+
+//GOD1:353884 right_module_dual_evaluation : "evaluation of a linear form on the basis #8" | $\theta(f)=(f(#8_i))_i$
+Definition right_module_dual_evaluation :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set) -> set -> set :=
+  fun K addK mulK L addL smulR n a f =>
+    fun i :e n => f (a i).
+
+//GOD1:357479 right_module_dual_basis_vector : "the #9-th vector of the dual basis to #8" | $#8_{#9}^*$
+Definition right_module_dual_basis_vector :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set) -> set -> set -> set :=
+  fun K addK mulK L addL smulR n a i x =>
+    basis_coordinate_function
+      K addK (opposite_ring_multiplication mulK)
+      L addL (fun scalar y => smulR y scalar) n a i x.
+
+Theorem god1_s16_theorem1_dual_of_finite_free_module :
+  forall K, forall addK mulK:set -> set -> set,
+  forall L, forall addL smulR:set -> set -> set,
+  forall n :e omega, forall a:set -> set,
+    right_module_basis K addK mulK L addL smulR n a ->
+    module_isomorphism K addK mulK
+      (right_module_dual K addK mulK L addL smulR)
+      (right_module_dual_addition L addK)
+      (right_module_dual_left_scalar L mulK)
+      (K :^: n)
+      (module_power_addition n addK)
+      (module_power_left_scalar n mulK)
+      (fun f => right_module_dual_evaluation
+        K addK mulK L addL smulR n a f)
+    /\ module_basis K addK mulK
+      (right_module_dual K addK mulK L addL smulR)
+      (right_module_dual_addition L addK)
+      (right_module_dual_left_scalar L mulK)
+      n
+      (fun i => right_module_dual_basis_vector
+        K addK mulK L addL smulR n a i)
+    /\ forall i j :e n,
+      right_module_dual_basis_vector
+        K addK mulK L addL smulR n a i (a j)
+      = if i = j then ring_one K mulK else ring_zero K addK.
+Admitted.
+
+//GOD1:357975 right_module_bidual : "the bidual of the right module #4" | $#4^{**}$
+Definition right_module_bidual :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set -> set) -> (set -> set -> set) -> set :=
+  fun K addK mulK L addL smulR =>
+    module_homomorphism_space K addK mulK
+      (right_module_dual K addK mulK L addL smulR)
+      (right_module_dual_addition L addK)
+      (right_module_dual_left_scalar L mulK)
+      K addK mulK.
+
+//GOD1:357975 right_module_bidual_addition : "addition in the bidual module #4^{**}" | $(u+v)(f)=u(f)+v(f)$
+Definition right_module_bidual_addition :
+  set -> (set -> set -> set) -> set -> set -> set :=
+  fun dualL addK => module_homomorphism_addition dualL addK.
+
+//GOD1:357975 right_module_bidual_right_scalar : "right scalar multiplication in the bidual module #4^{**}" | $(u\lambda)(f)=u(f)\lambda$
+Definition right_module_bidual_right_scalar :
+  set -> (set -> set -> set) -> set -> set -> set :=
+  fun dualL mulK u scalar =>
+    fun f :e dualL => mulK (u f) scalar.
+
+//GOD1:359024 canonical_bidual_mapping : "the canonical mapping from #4 into its bidual" | $j_{#4}:#4\to #4^{**}$
+Definition canonical_bidual_mapping :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set -> set) -> (set -> set -> set) -> set -> set :=
+  fun K addK mulK L addL smulR x =>
+    fun f :e right_module_dual K addK mulK L addL smulR => f x.
+
+Theorem god1_bidual_is_right_module_and_evaluation_is_linear :
+  forall K, forall addK mulK:set -> set -> set,
+  forall L, forall addL smulR:set -> set -> set,
+    right_module K addK mulK L addL smulR ->
+    right_module K addK mulK
+      (right_module_bidual K addK mulK L addL smulR)
+      (right_module_bidual_addition
+        (right_module_dual K addK mulK L addL smulR) addK)
+      (right_module_bidual_right_scalar
+        (right_module_dual K addK mulK L addL smulR) mulK)
+    /\ right_module_homomorphism K addK mulK
+      L addL smulR
+      (right_module_bidual K addK mulK L addL smulR)
+      (right_module_bidual_addition
+        (right_module_dual K addK mulK L addL smulR) addK)
+      (right_module_bidual_right_scalar
+        (right_module_dual K addK mulK L addL smulR) mulK)
+      (canonical_bidual_mapping K addK mulK L addL smulR).
+Admitted.
+
+Theorem god1_s16_theorem2_finite_free_module_isomorphic_to_bidual :
+  forall K, forall addK mulK:set -> set -> set,
+  forall L, forall addL smulR:set -> set -> set,
+  forall n :e omega, forall a:set -> set,
+    right_module_basis K addK mulK L addL smulR n a ->
+    module_isomorphism
+      K addK (opposite_ring_multiplication mulK)
+      L addL (fun scalar x => smulR x scalar)
+      (right_module_bidual K addK mulK L addL smulR)
+      (right_module_bidual_addition
+        (right_module_dual K addK mulK L addL smulR) addK)
+      (fun scalar u => right_module_bidual_right_scalar
+        (right_module_dual K addK mulK L addL smulR) mulK u scalar)
+      (canonical_bidual_mapping K addK mulK L addL smulR).
+Admitted.
+
+Theorem god1_s16_corollary1_every_bidual_form_is_evaluation :
+  forall K, forall addK mulK:set -> set -> set,
+  forall L, forall addL smulR:set -> set -> set,
+  forall n :e omega, forall a:set -> set,
+    right_module_basis K addK mulK L addL smulR n a ->
+    forall u :e right_module_bidual K addK mulK L addL smulR,
+      exists x :e L,
+        (forall f :e right_module_dual K addK mulK L addL smulR,
+          u f = f x)
+        /\ forall y :e L,
+          (forall f :e right_module_dual K addK mulK L addL smulR,
+            u f = f y) -> y = x.
+Admitted.
+
+Theorem god1_s16_corollary2_prescribed_values_on_dual_basis :
+  forall K, forall addK mulK:set -> set -> set,
+  forall L, forall addL smulR:set -> set -> set,
+  forall n :e omega, forall f:set -> set, forall beta :e K :^: n,
+    right_module K addK mulK L addL smulR ->
+    module_basis K addK mulK
+      (right_module_dual K addK mulK L addL smulR)
+      (right_module_dual_addition L addK)
+      (right_module_dual_left_scalar L mulK) n f ->
+    exists x :e L,
+      (forall i :e n, f i x = beta i)
+      /\ forall y :e L,
+        (forall i :e n, f i y = beta i) -> y = x.
+Admitted.
+
+//GOD1:362899 module_transpose : "the transpose of the right-module homomorphism #10" | ${}^t#10$
+Definition module_transpose :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  (set -> set) -> set :=
+  fun K addK mulK L addL smulL M addM smulM f =>
+    fun u :e right_module_dual K addK mulK M addM smulM =>
+      fun x :e L => u (f x).
+
+Theorem god1_module_transpose_is_left_linear :
+  forall K, forall addK mulK:set -> set -> set,
+  forall L, forall addL smulL:set -> set -> set,
+  forall M, forall addM smulM:set -> set -> set,
+  forall f:set -> set,
+    right_module_homomorphism K addK mulK L addL smulL M addM smulM f ->
+    module_homomorphism K addK mulK
+      (right_module_dual K addK mulK M addM smulM)
+      (right_module_dual_addition M addK)
+      (right_module_dual_left_scalar M mulK)
+      (right_module_dual K addK mulK L addL smulL)
+      (right_module_dual_addition L addK)
+      (right_module_dual_left_scalar L mulK)
+      (fun u => module_transpose
+        K addK mulK L addL smulL M addM smulM f u).
+Admitted.
+
+Theorem god1_s16_theorem3_transpose_addition_and_composition :
+  forall K, forall addK mulK:set -> set -> set,
+  forall L, forall addL smulL:set -> set -> set,
+  forall M, forall addM smulM:set -> set -> set,
+  forall N, forall addN smulN:set -> set -> set,
+  forall f g h:set -> set,
+    right_module_homomorphism K addK mulK L addL smulL M addM smulM f ->
+    right_module_homomorphism K addK mulK L addL smulL M addM smulM g ->
+    right_module_homomorphism K addK mulK M addM smulM N addN smulN h ->
+    module_transpose K addK mulK L addL smulL M addM smulM
+      (fun x => addM (f x) (g x))
+    = right_module_dual_addition M addK
+      (module_transpose K addK mulK L addL smulL M addM smulM f)
+      (module_transpose K addK mulK L addL smulL M addM smulM g)
+    /\ module_transpose K addK mulK L addL smulL N addN smulN
+      (fun x => h (f x))
+    = fun u :e right_module_dual K addK mulK N addN smulN =>
+        module_transpose K addK mulK L addL smulL M addM smulM f
+          (module_transpose K addK mulK M addM smulM N addN smulN h u).
+Admitted.
+
+Theorem god1_transpose_of_identity_and_automorphism :
+  forall K, forall addK mulK:set -> set -> set,
+  forall L, forall addL smulR:set -> set -> set,
+  forall f:set -> set,
+    right_module K addK mulK L addL smulR ->
+    module_transpose K addK mulK L addL smulR L addL smulR
+      (fun x => x)
+    = (fun u :e right_module_dual K addK mulK L addL smulR => u)
+    /\ (module_automorphism
+      K addK (opposite_ring_multiplication mulK)
+      L addL (fun scalar x => smulR x scalar) f ->
+      module_automorphism K addK mulK
+        (right_module_dual K addK mulK L addL smulR)
+        (right_module_dual_addition L addK)
+        (right_module_dual_left_scalar L mulK)
+        (fun u => module_transpose
+          K addK mulK L addL smulR L addL smulR f u)).
+Admitted.
+
+//GOD1:369038 matrix_transpose : "the transpose of the #2-by-#3 matrix #4" | ${}^t#4$
+Definition matrix_transpose : set -> set -> set -> set -> set :=
+  fun K p q A => fun u :e q :*: p => A (u 1,u 0).
+
+Theorem god1_matrix_of_transposed_map_is_transpose_matrix :
+  forall K, forall addK mulK:set -> set -> set,
+  forall L, forall addL smulL:set -> set -> set,
+  forall M, forall addM smulM:set -> set -> set,
+  forall q p :e omega, forall a b:set -> set, forall f:set -> set,
+    right_module_basis K addK mulK L addL smulL q a ->
+    right_module_basis K addK mulK M addM smulM p b ->
+    right_module_homomorphism K addK mulK L addL smulL M addM smulM f ->
+    matrix_of_right_linear_map
+      K addK (opposite_ring_multiplication mulK)
+      (right_module_dual K addK mulK M addM smulM)
+      (right_module_dual_addition M addK)
+      (fun u scalar => right_module_dual_left_scalar M mulK scalar u)
+      (right_module_dual K addK mulK L addL smulL)
+      (right_module_dual_addition L addK)
+      (fun u scalar => right_module_dual_left_scalar L mulK scalar u)
+      p q
+      (fun i => right_module_dual_basis_vector
+        K addK mulK M addM smulM p b i)
+      (fun j => right_module_dual_basis_vector
+        K addK mulK L addL smulL q a j)
+      (fun u => module_transpose
+        K addK mulK L addL smulL M addM smulM f u)
+    = matrix_transpose K p q
+      (matrix_of_right_linear_map
+        K addK mulK L addL smulL M addM smulM q p a b f).
+Admitted.
+
+Theorem god1_s16_theorem4_matrix_transpose_laws :
+  forall K, forall add mul:set -> set -> set,
+  forall p q r :e omega,
+    ring K add mul ->
+    (forall A B :e matrix_space K p q,
+      matrix_transpose K p q (matrix_addition K add p q A B)
+      = matrix_addition K add q p
+        (matrix_transpose K p q A) (matrix_transpose K p q B))
+    /\ (forall A :e matrix_space K p q,
+        forall B :e matrix_space K q r,
+      matrix_transpose K p r
+        (matrix_multiplication K add mul p q r A B)
+      = matrix_multiplication
+        K add (opposite_ring_multiplication mul) r q p
+        (matrix_transpose K q r B) (matrix_transpose K p q A))
+    /\ (forall A :e square_matrix_ring K p,
+      (invertible_matrix K add mul p A
+      <-> invertible_matrix K add (opposite_ring_multiplication mul) p
+        (matrix_transpose K p p A)))
+    /\ forall A :e matrix_space K p q,
+      matrix_transpose K q p (matrix_transpose K p q A) = A.
+Admitted.
+
+(** § 17. Sums of submodules. **)
+
+//GOD1:376647 submodule_sum : "the sum of the submodules #7 and #8 of #4" | $#7+#8$
+Definition submodule_sum :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> set -> set :=
+  fun K addK mulK L addL smul M N =>
+    {z :e L|exists x :e M, exists y :e N, z = addL x y}.
+
+Theorem god1_sum_of_two_submodules_is_least_containing_submodule :
+  forall K, forall addK mulK:set -> set -> set,
+  forall L, forall addL smul:set -> set -> set, forall M N,
+    submodule K addK mulK L addL smul M ->
+    submodule K addK mulK L addL smul N ->
+    submodule K addK mulK L addL smul
+      (submodule_sum K addK mulK L addL smul M N)
+    /\ M c= submodule_sum K addK mulK L addL smul M N
+    /\ N c= submodule_sum K addK mulK L addL smul M N
+    /\ forall P,
+      submodule K addK mulK L addL smul P ->
+      M c= P -> N c= P ->
+      submodule_sum K addK mulK L addL smul M N c= P.
+Admitted.
+
+//GOD1:380037 submodule_family_sum : "the sum of the finite family of submodules #8 indexed by #7" | $\sum_{i\in #7}#8_i$
+Definition submodule_family_sum :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set) -> set :=
+  fun K addK mulK L addL smul I M =>
+    {z :e L|exists x :e (Pi_ i :e I, M i),
+      z = module_finitely_supported_sum L addL I (fun i => x i)}.
+
+Theorem god1_finite_sum_of_submodules_is_least_containing_submodule :
+  forall K, forall addK mulK:set -> set -> set,
+  forall L, forall addL smul:set -> set -> set,
+  forall I, forall M:set -> set,
+    finite I ->
+    (forall i :e I, submodule K addK mulK L addL smul (M i)) ->
+    submodule K addK mulK L addL smul
+      (submodule_family_sum K addK mulK L addL smul I M)
+    /\ (forall i :e I,
+      M i c= submodule_family_sum K addK mulK L addL smul I M)
+    /\ forall P,
+      submodule K addK mulK L addL smul P ->
+      (forall i :e I, M i c= P) ->
+      submodule_family_sum K addK mulK L addL smul I M c= P.
+Admitted.
+
+//GOD1:381544 indexed_module_product : "the direct product of the family of modules #5 indexed by #4" | $\prod_{i\in #4}#5_i$
+Definition indexed_module_product : set -> (set -> set) -> set :=
+  fun I M => Pi_ i :e I, M i.
+
+//GOD1:381544 indexed_module_product_addition : "componentwise addition on the direct product of modules" | $(x+y)_i=x_i+y_i$
+Definition indexed_module_product_addition :
+  set -> (set -> set -> set -> set) -> set -> set -> set :=
+  fun I addM x y => fun i :e I => addM i (x i) (y i).
+
+//GOD1:381544 indexed_module_product_left_scalar : "componentwise left scalar multiplication on the direct product of modules" | $(\lambda x)_i=\lambda x_i$
+Definition indexed_module_product_left_scalar :
+  set -> (set -> set -> set -> set) -> set -> set -> set :=
+  fun I smul scalar x => fun i :e I => smul i scalar (x i).
+
+Theorem god1_indexed_direct_product_is_module :
+  forall K, forall addK mulK:set -> set -> set,
+  forall I, forall M:set -> set,
+  forall addM smul:set -> set -> set -> set,
+    (forall i :e I, left_module K addK mulK (M i) (addM i) (smul i)) ->
+    left_module K addK mulK
+      (indexed_module_product I M)
+      (indexed_module_product_addition I addM)
+      (indexed_module_product_left_scalar I smul).
+Admitted.
+
+//GOD1:381544 module_product_projection : "the #7-th canonical projection from a direct product of modules" | $\operatorname{pr}_{#7}$
+Definition module_product_projection : set -> set -> set :=
+  fun i x => x i.
+
+//GOD1:381544 module_product_injection : "the #8-th canonical injection into a direct product of modules" | $u_{#8}$
+Definition module_product_injection :
+  set -> (set -> set) -> (set -> set -> set -> set) ->
+  set -> set -> set :=
+  fun I M addM i x =>
+    fun j :e I => if j = i then x else module_zero (M j) (addM j).
+
+Theorem god1_product_projections_and_injections_are_linear :
+  forall K, forall addK mulK:set -> set -> set,
+  forall I, forall M:set -> set,
+  forall addM smul:set -> set -> set -> set,
+    (forall i :e I, left_module K addK mulK (M i) (addM i) (smul i)) ->
+    (forall i :e I,
+      module_homomorphism K addK mulK
+        (indexed_module_product I M)
+        (indexed_module_product_addition I addM)
+        (indexed_module_product_left_scalar I smul)
+        (M i) (addM i) (smul i)
+        (module_product_projection i))
+    /\ (forall i :e I,
+      module_homomorphism K addK mulK
+        (M i) (addM i) (smul i)
+        (indexed_module_product I M)
+        (indexed_module_product_addition I addM)
+        (indexed_module_product_left_scalar I smul)
+        (module_product_injection I M addM i)
+      /\ inj (M i) (indexed_module_product I M)
+        (module_product_injection I M addM i)).
+Admitted.
+
+//GOD1:383491 submodule_family_sum_map : "the canonical summation map from the product of #8 to #4" | $(x_i)\mapsto\sum_i x_i$
+Definition submodule_family_sum_map :
+  set -> (set -> set -> set) -> set -> set -> set :=
+  fun L addL I x => module_finitely_supported_sum L addL I (fun i => x i).
+
+//GOD1:383491 linearly_independent_submodules : "the finite family of submodules #8 indexed by #7 is linearly independent" | $#8_i\text{ are linearly independent}$
+Definition linearly_independent_submodules :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set) -> prop :=
+  fun K addK mulK L addL smul I M =>
+    finite I
+    /\ (forall i :e I, submodule K addK mulK L addL smul (M i))
+    /\ inj (indexed_module_product I M) L
+      (submodule_family_sum_map L addL I).
+
+//GOD1:384976 direct_sum_decomposition : "#4 is the direct sum of the submodules #8 indexed by #7" | $#4=\bigoplus_{i\in #7}#8_i$
+Definition direct_sum_decomposition :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set) -> prop :=
+  fun K addK mulK L addL smul I M =>
+    linearly_independent_submodules K addK mulK L addL smul I M
+    /\ submodule_family_sum K addK mulK L addL smul I M = L.
+
+Theorem god1_s17_theorem1_two_submodules_independent_iff_trivial_intersection :
+  forall K, forall addK mulK:set -> set -> set,
+  forall L, forall addL smul:set -> set -> set, forall M N,
+    submodule K addK mulK L addL smul M ->
+    submodule K addK mulK L addL smul N ->
+    (linearly_independent_submodules K addK mulK L addL smul 2
+      (fun i => if i = 0 then M else N)
+    <-> {x :e M|x :e N} = {module_zero L addL}).
+Admitted.
+
+//GOD1:386555 complementary_submodule : "#8 is a complementary submodule of #7 in #4" | $#4=#7\oplus #8$
+Definition complementary_submodule :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> set -> prop :=
+  fun K addK mulK L addL smul M N =>
+    submodule K addK mulK L addL smul M
+    /\ submodule K addK mulK L addL smul N
+    /\ direct_sum_decomposition K addK mulK L addL smul 2
+      (fun i => if i = 0 then M else N).
+
+//GOD1:386555 direct_summand : "#7 is a direct summand of the module #4" | $#7\mid #4$
+Definition direct_summand :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set -> set) -> (set -> set -> set) -> set -> prop :=
+  fun K addK mulK L addL smul M =>
+    exists N, complementary_submodule K addK mulK L addL smul M N.
+
+//GOD1:388530 direct_sum_projection : "the projection onto the #8-th summand in a direct sum decomposition" | $v_{#8}$
+Definition direct_sum_projection :
+  set -> (set -> set -> set) -> set -> (set -> set) -> set -> set -> set :=
+  fun L addL I M i x =>
+    Eps_i (fun y => y :e M i
+      /\ exists coeff :e indexed_module_product I M,
+        x = submodule_family_sum_map L addL I coeff
+        /\ y = coeff i).
+
+//GOD1:389166 module_projection : "#7 is a projection endomorphism of the module #4" | $#7^2=#7$
+Definition module_projection :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  (set -> set) -> prop :=
+  fun K addK mulK L addL smul v =>
+    module_endomorphism K addK mulK L addL smul v
+    /\ forall x :e L, v (v x) = v x.
+
+Theorem god1_direct_sum_projections_are_orthogonal_and_sum_to_identity :
+  forall K, forall addK mulK:set -> set -> set,
+  forall L, forall addL smul:set -> set -> set,
+  forall I, forall M:set -> set,
+    direct_sum_decomposition K addK mulK L addL smul I M ->
+    (forall i :e I,
+      module_projection K addK mulK L addL smul
+        (direct_sum_projection L addL I M i)
+      /\ module_homomorphism_image L
+        (direct_sum_projection L addL I M i) = M i)
+    /\ (forall i j :e I, forall x :e L,
+      direct_sum_projection L addL I M j
+        (direct_sum_projection L addL I M i x)
+      = if i = j then direct_sum_projection L addL I M i x
+        else module_zero L addL)
+    /\ forall x :e L,
+      module_finitely_supported_sum L addL I
+        (fun i => direct_sum_projection L addL I M i x) = x.
+Admitted.
+
+Theorem god1_s17_theorem2_orthogonal_projections_give_direct_sum :
+  forall K, forall addK mulK:set -> set -> set,
+  forall L, forall addL smul:set -> set -> set,
+  forall I, forall v:set -> set -> set,
+    finite I ->
+    (forall i :e I, module_endomorphism K addK mulK L addL smul (v i)) ->
+    (forall i j :e I, forall x :e L,
+      v j (v i x) = if i = j then v i x else module_zero L addL) ->
+    (forall x :e L,
+      module_finitely_supported_sum L addL I (fun i => v i x) = x) ->
+    direct_sum_decomposition K addK mulK L addL smul I
+      (fun i => module_homomorphism_image L (v i)).
+Admitted.
+
+Theorem god1_s17_corollary_direct_summand_characterizations :
+  forall K, forall addK mulK:set -> set -> set,
+  forall L, forall addL smul:set -> set -> set, forall M,
+    submodule K addK mulK L addL smul M ->
+    (direct_summand K addK mulK L addL smul M
+    <-> exists v:set -> set,
+      module_projection K addK mulK L addL smul v
+      /\ module_homomorphism_image L v = M)
+    /\ (direct_summand K addK mulK L addL smul M
+    <-> exists q:set -> set,
+      module_homomorphism K addK mulK
+        L addL smul M addL smul q
+      /\ forall x :e M, q x = x).
+Admitted.
+
+(** § 18. Finiteness theorems. **)
+
+Theorem god1_s18_theorem1_finite_kernel_and_image :
+  forall K, forall addK mulK:set -> set -> set,
+  forall L, forall addL smulL:set -> set -> set,
+  forall M, forall addM smulM:set -> set -> set,
+  forall f:set -> set,
+    module_homomorphism K addK mulK L addL smulL M addM smulM f ->
+    (finitely_generated_module K addK mulK
+      (module_homomorphism_kernel
+        K addK mulK L addL smulL M addM smulM f)
+      addL smulL ->
+      finitely_generated_module K addK mulK
+        (module_homomorphism_image L f) addM smulM ->
+      finitely_generated_module K addK mulK L addL smulL)
+    /\ (forall p q :e omega,
+      isomorphic_modules K addK mulK
+        (module_homomorphism_kernel
+          K addK mulK L addL smulL M addM smulM f)
+        addL smulL
+        (K :^: p) (module_power_addition p addK)
+        (module_power_left_scalar p mulK) ->
+      isomorphic_modules K addK mulK
+        (module_homomorphism_image L f) addM smulM
+        (K :^: q) (module_power_addition q addK)
+        (module_power_left_scalar q mulK) ->
+      isomorphic_modules K addK mulK
+        L addL smulL
+        (K :^: (p + q)) (module_power_addition (p + q) addK)
+        (module_power_left_scalar (p + q) mulK)).
+Admitted.
+
+//GOD1:405336 left_noetherian_ring : "#1 is a left Noetherian ring" | $#1\text{ is left Noetherian}$
+Definition left_noetherian_ring :
+  set -> (set -> set -> set) -> (set -> set -> set) -> prop :=
+  fun K add mul =>
+    ring K add mul
+    /\ forall I, left_ideal K add mul I ->
+      finitely_generated_module K add mul I add mul.
+
+//GOD1:405336 right_noetherian_ring : "#1 is a right Noetherian ring" | $#1\text{ is right Noetherian}$
+Definition right_noetherian_ring :
+  set -> (set -> set -> set) -> (set -> set -> set) -> prop :=
+  fun K add mul =>
+    ring K add mul
+    /\ forall I, right_ideal K add mul I ->
+      finitely_generated_module
+        K add (opposite_ring_multiplication mul)
+        I add (fun scalar x => mul x scalar).
+
+//GOD1:405336 noetherian_ring : "#1 is a commutative Noetherian ring" | $#1\text{ is Noetherian}$
+Definition noetherian_ring :
+  set -> (set -> set -> set) -> (set -> set -> set) -> prop :=
+  fun K add mul => commutative_ring K add mul /\ left_noetherian_ring K add mul.
+
+Theorem god1_s18_theorem2_noetherian_submodule_characterization :
+  forall K, forall addK mulK:set -> set -> set,
+    ring K addK mulK ->
+    (left_noetherian_ring K addK mulK
+    <-> forall M, forall addM smul:set -> set -> set,
+      finitely_generated_module K addK mulK M addM smul ->
+      forall N,
+        submodule K addK mulK M addM smul N ->
+        finitely_generated_module K addK mulK N addM smul).
+Admitted.
+
+//GOD1:408800 left_ideal_free_generator_property : "every nonzero left ideal of #1 is freely generated by one element" | $I\cong #1$
+Definition left_ideal_free_generator_property :
+  set -> (set -> set -> set) -> (set -> set -> set) -> prop :=
+  fun K add mul =>
+    ring K add mul
+    /\ forall I,
+      left_ideal K add mul I -> I <> {ring_zero K add} ->
+      exists a :e I, bij K I (fun x => mul x a).
+
+Theorem god1_s18_theorem3_submodules_of_finite_free_modules :
+  forall K, forall addK mulK:set -> set -> set,
+    ring K addK mulK ->
+    (left_ideal_free_generator_property K addK mulK
+    <-> forall n :e omega,
+      forall M, forall addM smul:set -> set -> set,
+      forall a:set -> set,
+        module_basis K addK mulK M addM smul n a ->
+        forall N,
+          submodule K addK mulK M addM smul N ->
+          exists p :e omega, p c= n
+          /\ exists b:set -> set,
+            module_basis K addK mulK N addM smul p b).
+Admitted.
+
+Theorem god1_s18_corollary_subgroups_of_integer_powers_are_free :
+  forall n :e omega, forall H,
+    subgroup
+      (int :^: n) (module_power_addition n add_SNo) H ->
+    exists p :e omega, p c= n
+    /\ isomorphic_groups H (module_power_addition n add_SNo)
+      (int :^: p) (module_power_addition p add_SNo).
+Admitted.
+
+//GOD1:413095 homogeneous_linear_system_solution : "#7 solves the homogeneous linear system with coefficient matrix #6" | $#6#7=0$
+Definition homogeneous_linear_system_solution :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> set -> set -> set -> prop :=
+  fun K add mul p n A x =>
+    A :e matrix_space K p n
+    /\ x :e K :^: n
+    /\ forall i :e p,
+      ring_finite_sum K add n
+        (fun j => mul (matrix_entry A i j) (x j))
+      = ring_zero K add.
+
+//GOD1:413095 homogeneous_linear_solution_space : "the solution module of the homogeneous system #6" | $\ker(#6)$
+Definition homogeneous_linear_solution_space :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> set -> set -> set :=
+  fun K add mul p n A =>
+    {x :e K :^: n|homogeneous_linear_system_solution K add mul p n A x}.
+
+Theorem god1_homogeneous_solution_modules_are_finite_over_finite_rings :
+  forall K, forall add mul:set -> set -> set,
+  forall p n :e omega, forall A :e matrix_space K p n,
+    (right_noetherian_ring K add mul ->
+      finitely_generated_module
+        K add (opposite_ring_multiplication mul)
+        (homogeneous_linear_solution_space K add mul p n A)
+        (module_power_addition n add)
+        (fun scalar x => module_power_left_scalar n
+          (opposite_ring_multiplication mul) scalar x))
+    /\ ((division_ring K add mul \/ principal_ideal_domain K add mul) ->
+      exists r :e omega, r c= n
+      /\ isomorphic_modules
+        K add (opposite_ring_multiplication mul)
+        (homogeneous_linear_solution_space K add mul p n A)
+        (module_power_addition n add)
+        (fun scalar x => module_power_left_scalar n
+          (opposite_ring_multiplication mul) scalar x)
+        (K :^: r) (module_power_addition r add)
+        (module_power_left_scalar r (opposite_ring_multiplication mul))).
+Admitted.
+
+//GOD1:416094 increasing_sequence_of_sets : "#2 is an increasing sequence of subsets of #1" | $#2_n\subseteq #2_{n+1}$
+Definition increasing_sequence_of_sets : set -> (set -> set) -> prop :=
+  fun X A =>
+    (forall n :e omega, A n c= X)
+    /\ forall n :e omega, A n c= A (ordsucc n).
+
+//GOD1:416278 stationary_sequence_of_sets : "#2 is a stationary sequence of subsets of #1" | $#2_n\text{ is stationary}$
+Definition stationary_sequence_of_sets : set -> (set -> set) -> prop :=
+  fun X A =>
+    (forall n :e omega, A n c= X)
+    /\ exists p :e omega, forall n :e omega,
+      p c= n -> A n = A p.
+
+//GOD1:416424 maximal_element_by_inclusion : "#3 is a maximal element of the family #2 of subsets of #1" | $#3\in\max(#2)$
+Definition maximal_element_by_inclusion : set -> set -> set -> prop :=
+  fun X F A =>
+    F c= power X /\ A :e F
+    /\ forall B :e F, A c= B -> B = A.
+
+Theorem god1_s18_theorem4_noetherian_chain_conditions :
+  forall K, forall add mul:set -> set -> set,
+    ring K add mul ->
+    (left_noetherian_ring K add mul
+    <-> (forall A:set -> set,
+      increasing_sequence_of_sets K A ->
+      (forall n :e omega, left_ideal K add mul (A n)) ->
+      stationary_sequence_of_sets K A)
+      /\ (forall F,
+        F <> 0 -> (forall I :e F, left_ideal K add mul I) ->
+        exists I, maximal_element_by_inclusion K F I)).
+Admitted.
+
+//GOD1:419218 maximal_left_ideal : "#4 is a maximal left ideal of #1" | $#4\triangleleft_{\max,l}#1$
+Definition maximal_left_ideal :
+  set -> (set -> set -> set) -> (set -> set -> set) -> set -> prop :=
+  fun K add mul I =>
+    left_ideal K add mul I /\ I <> K
+    /\ forall J, left_ideal K add mul J ->
+      I c= J -> J = I \/ J = K.
+
+(** § 19. Dimension. **)
+
+//GOD1:218330 right_vector_space : "#4 is a right vector space over the division ring #1" | $#4\text{ is a right }#1\text{-vector space}$
+Definition right_vector_space :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set -> set) -> (set -> set -> set) -> prop :=
+  fun K addK mulK M addM smulR =>
+    division_ring K addK mulK
+    /\ right_module K addK mulK M addM smulR.
+
+//GOD1:218330 finite_dimensional_right_vector_space : "#4 is a finite-dimensional right vector space over #1" | $\dim_{#1}(#4)<\infty$
+Definition finite_dimensional_right_vector_space :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set -> set) -> (set -> set -> set) -> prop :=
+  fun K addK mulK M addM smulR =>
+    right_vector_space K addK mulK M addM smulR
+    /\ exists I, finite I /\ exists a:set -> set,
+      generating_family
+        K addK (opposite_ring_multiplication mulK)
+        M addM (fun scalar x => smulR x scalar) I a.
+
+Theorem god1_s19_theorem1_finite_dimensional_space_has_basis :
+  forall K, forall addK mulK:set -> set -> set,
+  forall M, forall addM smulR:set -> set -> set,
+    finite_dimensional_right_vector_space K addK mulK M addM smulR ->
+    exists n :e omega, exists a:set -> set,
+      right_module_basis K addK mulK M addM smulR n a.
+Admitted.
+
+Theorem god1_s19_theorem2_extend_independent_subset_to_basis :
+  forall K, forall addK mulK:set -> set -> set,
+  forall M, forall addM smulR:set -> set -> set,
+  forall X A,
+    right_vector_space K addK mulK M addM smulR ->
+    finite X ->
+    generating_family
+      K addK (opposite_ring_multiplication mulK)
+      M addM (fun scalar x => smulR x scalar) X (fun x => x) ->
+    A c= X ->
+    linearly_independent_family
+      K addK (opposite_ring_multiplication mulK)
+      M addM (fun scalar x => smulR x scalar) A (fun x => x) ->
+    exists B,
+      A c= B /\ B c= X
+      /\ right_module_basis K addK mulK M addM smulR B (fun x => x).
+Admitted.
+
+Theorem god1_s19_corollary1_independent_family_extends_to_basis :
+  forall K, forall addK mulK:set -> set -> set,
+  forall M, forall addM smulR:set -> set -> set,
+  forall p :e omega, forall x:set -> set,
+    finite_dimensional_right_vector_space K addK mulK M addM smulR ->
+    ((exists B, p c= B /\ exists b:set -> set,
+        right_module_basis K addK mulK M addM smulR B b
+        /\ forall i :e p, b i = x i)
+    <-> linearly_independent_family
+      K addK (opposite_ring_multiplication mulK)
+      M addM (fun scalar y => smulR y scalar) p x).
+Admitted.
+
+Theorem god1_s19_corollary2_every_subspace_has_complement :
+  forall K, forall addK mulK:set -> set -> set,
+  forall M, forall addM smulR:set -> set -> set, forall N,
+    finite_dimensional_right_vector_space K addK mulK M addM smulR ->
+    submodule
+      K addK (opposite_ring_multiplication mulK)
+      M addM (fun scalar x => smulR x scalar) N ->
+    direct_summand
+      K addK (opposite_ring_multiplication mulK)
+      M addM (fun scalar x => smulR x scalar) N.
+Admitted.
+
+//GOD1:434854 right_subspace_annihilator : "the annihilator of #7 in the dual of #4" | $#7^0$
+Definition right_subspace_annihilator :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set -> set) -> (set -> set -> set) -> set -> set :=
+  fun K addK mulK L addL smulR M =>
+    {f :e right_module_dual K addK mulK L addL smulR|
+      forall x :e M, f x = ring_zero K addK}.
+
+Theorem god1_annihilator_is_vector_subspace :
+  forall K, forall addK mulK:set -> set -> set,
+  forall L, forall addL smulR:set -> set -> set, forall M,
+    right_vector_space K addK mulK L addL smulR ->
+    submodule
+      K addK (opposite_ring_multiplication mulK)
+      L addL (fun scalar x => smulR x scalar) M ->
+    vector_subspace K addK mulK
+      (right_module_dual K addK mulK L addL smulR)
+      (right_module_dual_addition L addK)
+      (right_module_dual_left_scalar L mulK)
+      (right_subspace_annihilator K addK mulK L addL smulR M).
+Admitted.
+
+Theorem god1_s19_theorem3_double_annihilator_membership :
+  forall K, forall addK mulK:set -> set -> set,
+  forall L, forall addL smulR:set -> set -> set, forall M,
+    finite_dimensional_right_vector_space K addK mulK L addL smulR ->
+    submodule
+      K addK (opposite_ring_multiplication mulK)
+      L addL (fun scalar x => smulR x scalar) M ->
+    forall x :e L,
+      (x :e M <->
+        forall f :e right_subspace_annihilator
+          K addK mulK L addL smulR M,
+          f x = ring_zero K addK).
+Admitted.
+
+Theorem god1_s19_theorem3_corollary1_subspace_defined_by_annihilator_generators :
+  forall K, forall addK mulK:set -> set -> set,
+  forall L, forall addL smulR:set -> set -> set,
+  forall M I, forall f:set -> set,
+    finite_dimensional_right_vector_space K addK mulK L addL smulR ->
+    submodule
+      K addK (opposite_ring_multiplication mulK)
+      L addL (fun scalar x => smulR x scalar) M ->
+    generating_family K addK mulK
+      (right_subspace_annihilator K addK mulK L addL smulR M)
+      (right_module_dual_addition L addK)
+      (right_module_dual_left_scalar L mulK) I f ->
+    forall x :e L,
+      (x :e M <-> forall i :e I, f i x = ring_zero K addK).
+Admitted.
+
+Theorem god1_s19_theorem3_corollary2_proper_subspace_has_nonzero_form :
+  forall K, forall addK mulK:set -> set -> set,
+  forall L, forall addL smulR:set -> set -> set, forall M,
+    finite_dimensional_right_vector_space K addK mulK L addL smulR ->
+    submodule
+      K addK (opposite_ring_multiplication mulK)
+      L addL (fun scalar x => smulR x scalar) M ->
+    (M <> L <-> exists f :e right_module_dual K addK mulK L addL smulR,
+      f <> (fun x :e L => ring_zero K addK)
+      /\ forall x :e M, f x = ring_zero K addK).
+Admitted.
+
+Theorem god1_s19_theorem4_independent_forms_iff_all_values_attained :
+  forall K, forall addK mulK:set -> set -> set,
+  forall M, forall addM smulR:set -> set -> set,
+  forall r :e omega, forall f:set -> set,
+    right_vector_space K addK mulK M addM smulR ->
+    (forall i :e r, f i :e right_module_dual K addK mulK M addM smulR) ->
+    (linearly_independent_family K addK mulK
+      (right_module_dual K addK mulK M addM smulR)
+      (right_module_dual_addition M addK)
+      (right_module_dual_left_scalar M mulK) r f
+    <-> forall beta :e K :^: r, exists x :e M,
+      forall i :e r, f i x = beta i).
+Admitted.
+
+//GOD1:442302 linear_system_consistency_conditions : "the consistency conditions for the dependent equations #8 with right sides #10" | $#10_j=\sum_k\rho_{jk}#10_k$
+Definition linear_system_consistency_conditions :
+  set -> (set -> set -> set) -> (set -> set -> set) -> set -> set ->
+  (set -> set -> set) -> set -> prop :=
+  fun K addK mulK n r rho beta =>
+    forall j :e n,
+      j /:e r ->
+      beta j = ring_finite_sum K addK r
+        (fun k => mulK (rho j k) (beta k)).
+
+Theorem god1_s19_theorem5_consistency_of_dependent_linear_equations :
+  forall K, forall addK mulK:set -> set -> set,
+  forall M, forall addM smulR:set -> set -> set,
+  forall n r :e omega, forall f:set -> set,
+  forall rho:set -> set -> set, forall beta :e K :^: n,
+    right_vector_space K addK mulK M addM smulR ->
+    r c= n ->
+    linearly_independent_family K addK mulK
+      (right_module_dual K addK mulK M addM smulR)
+      (right_module_dual_addition M addK)
+      (right_module_dual_left_scalar M mulK) r f ->
+    (forall j :e n, j /:e r ->
+      f j = module_finitely_supported_sum
+        (right_module_dual K addK mulK M addM smulR)
+        (right_module_dual_addition M addK) r
+        (fun k => right_module_dual_left_scalar M mulK (rho j k) (f k))) ->
+    ((exists x :e M, forall i :e n, f i x = beta i)
+    <-> forall j :e n, j /:e r ->
+      beta j = ring_finite_sum K addK r
+        (fun k => mulK (rho j k) (beta k)))
+    /\ ((forall j :e n, j /:e r ->
+        beta j = ring_finite_sum K addK r
+          (fun k => mulK (rho j k) (beta k))) ->
+      {x :e M|forall i :e n, f i x = beta i}
+      = {x :e M|forall i :e r, f i x = beta i}).
+Admitted.
+
+Theorem god1_s19_theorem6_all_bases_have_same_size :
+  forall K, forall addK mulK:set -> set -> set,
+  forall M, forall addM smulR:set -> set -> set,
+  forall p q :e omega, forall a b:set -> set,
+    right_vector_space K addK mulK M addM smulR ->
+    right_module_basis K addK mulK M addM smulR p a ->
+    right_module_basis K addK mulK M addM smulR q b ->
+    p = q.
+Admitted.
+
+Theorem god1_s19_theorem7_independent_family_no_larger_than_basis :
+  forall K, forall addK mulK:set -> set -> set,
+  forall M, forall addM smulR:set -> set -> set,
+  forall p q :e omega, forall a x:set -> set,
+    right_vector_space K addK mulK M addM smulR ->
+    right_module_basis K addK mulK M addM smulR p a ->
+    linearly_independent_family
+      K addK (opposite_ring_multiplication mulK)
+      M addM (fun scalar y => smulR y scalar) q x ->
+    q c= p.
+Admitted.
+
+Theorem god1_s19_theorem7_corollary_underdetermined_homogeneous_system :
+  forall K, forall add mul:set -> set -> set,
+  forall n p :e omega, forall A :e matrix_space K n p,
+    division_ring K add mul ->
+    n :e p ->
+    exists x :e K :^: p,
+      homogeneous_linear_system_solution K add mul n p A x
+      /\ x <> (fun j :e p => ring_zero K add).
+Admitted.
+
+//GOD1:448413 module_dimension : "the dimension of the finite-dimensional left module #4 over #1" | $\dim_{#1}(#4)$
+Definition module_dimension :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set -> set) -> (set -> set -> set) -> set :=
+  fun K addK mulK M addM smul =>
+    Eps_i (fun n => n :e omega /\ exists a:set -> set,
+      module_basis K addK mulK M addM smul n a).
+
+//GOD1:448413 right_vector_dimension : "the dimension of the right vector space #4 over #1" | $\dim_{#1}(#4)$
+Definition right_vector_dimension :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set -> set) -> (set -> set -> set) -> set :=
+  fun K addK mulK M addM smulR =>
+    module_dimension
+      K addK (opposite_ring_multiplication mulK)
+      M addM (fun scalar x => smulR x scalar).
+
+Theorem god1_dimension_is_size_of_every_basis :
+  forall K, forall addK mulK:set -> set -> set,
+  forall M, forall addM smulR:set -> set -> set,
+  forall n :e omega, forall a:set -> set,
+    right_vector_space K addK mulK M addM smulR ->
+    right_module_basis K addK mulK M addM smulR n a ->
+    right_vector_dimension K addK mulK M addM smulR = n.
+Admitted.
+
+Theorem god1_s19_theorem8_isomorphic_iff_same_dimension :
+  forall K, forall addK mulK:set -> set -> set,
+  forall L, forall addL smulL:set -> set -> set,
+  forall M, forall addM smulM:set -> set -> set,
+    finite_dimensional_right_vector_space K addK mulK L addL smulL ->
+    finite_dimensional_right_vector_space K addK mulK M addM smulM ->
+    (isomorphic_modules
+      K addK (opposite_ring_multiplication mulK)
+      L addL (fun scalar x => smulL x scalar)
+      M addM (fun scalar x => smulM x scalar)
+    <-> right_vector_dimension K addK mulK L addL smulL
+      = right_vector_dimension K addK mulK M addM smulM).
+Admitted.
+
+Theorem god1_dimension_of_power_product_and_dual :
+  forall K, forall addK mulK:set -> set -> set,
+  forall n :e omega,
+    division_ring K addK mulK ->
+    right_vector_dimension K addK mulK
+      (K :^: n) (module_power_addition n addK)
+      (fun x scalar => module_power_left_scalar n
+        (opposite_ring_multiplication mulK) scalar x) = n
+    /\ module_dimension K addK mulK
+      (right_module_dual K addK mulK
+        (K :^: n) (module_power_addition n addK)
+        (fun x scalar => module_power_left_scalar n
+          (opposite_ring_multiplication mulK) scalar x))
+      (right_module_dual_addition (K :^: n) addK)
+      (right_module_dual_left_scalar (K :^: n) mulK) = n.
+Admitted.
+
+Theorem god1_s19_theorem9_dimension_of_annihilator :
+  forall K, forall addK mulK:set -> set -> set,
+  forall L, forall addL smulR:set -> set -> set, forall M,
+    finite_dimensional_right_vector_space K addK mulK L addL smulR ->
+    submodule
+      K addK (opposite_ring_multiplication mulK)
+      L addL (fun scalar x => smulR x scalar) M ->
+    right_vector_dimension K addK mulK M addL smulR
+    + module_dimension K addK mulK
+      (right_subspace_annihilator K addK mulK L addL smulR M)
+      (right_module_dual_addition L addK)
+      (right_module_dual_left_scalar L mulK)
+    = right_vector_dimension K addK mulK L addL smulR.
+Admitted.
+
+Theorem god1_s19_theorem9_corollary_subspace_dimension_bound :
+  forall K, forall addK mulK:set -> set -> set,
+  forall L, forall addL smulR:set -> set -> set, forall M,
+    finite_dimensional_right_vector_space K addK mulK L addL smulR ->
+    submodule
+      K addK (opposite_ring_multiplication mulK)
+      L addL (fun scalar x => smulR x scalar) M ->
+    right_vector_dimension K addK mulK M addL smulR
+      c= right_vector_dimension K addK mulK L addL smulR
+    /\ (right_vector_dimension K addK mulK M addL smulR
+      = right_vector_dimension K addK mulK L addL smulR <-> M = L).
+Admitted.
+
+//GOD1:454081 independent_family_size_bound : "every finite independent family in #4 has at most #7 elements" | $|I|\leq #7$
+Definition independent_family_size_bound :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set -> set) -> (set -> set -> set) -> set -> prop :=
+  fun K addK mulK M addM smul n =>
+    forall I, finite I -> forall x:set -> set,
+      linearly_independent_family K addK mulK M addM smul I x ->
+      finite_cardinality I c= n.
+
+//GOD1:454081 generating_family_size_bound : "every finite generating family of #4 has at least #7 elements" | $#7\leq |I|$
+Definition generating_family_size_bound :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set -> set) -> (set -> set -> set) -> set -> prop :=
+  fun K addK mulK M addM smul n =>
+    forall I, finite I -> forall x:set -> set,
+      generating_family K addK mulK M addM smul I x ->
+      n c= finite_cardinality I.
+
+Theorem god1_s19_theorem10_basis_characterizations :
+  forall K, forall addK mulK:set -> set -> set,
+  forall M, forall addM smulR:set -> set -> set,
+  forall n :e omega, forall x:set -> set,
+    right_vector_space K addK mulK M addM smulR ->
+    let mul0 := opposite_ring_multiplication mulK in
+    let smul := fun scalar y => smulR y scalar in
+    (right_module_basis K addK mulK M addM smulR n x
+    <-> linearly_independent_family K addK mul0 M addM smul n x
+      /\ right_vector_dimension K addK mulK M addM smulR = n)
+    /\ (right_module_basis K addK mulK M addM smulR n x
+    <-> linearly_independent_family K addK mul0 M addM smul n x
+      /\ independent_family_size_bound K addK mul0 M addM smul n)
+    /\ (right_module_basis K addK mulK M addM smulR n x
+    <-> generating_family K addK mul0 M addM smul n x
+      /\ right_vector_dimension K addK mulK M addM smulR = n)
+    /\ (right_module_basis K addK mulK M addM smulR n x
+    <-> generating_family K addK mul0 M addM smul n x
+      /\ generating_family_size_bound K addK mul0 M addM smul n).
+Admitted.
+
+Theorem god1_s19_theorem11_dimension_extremal_characterizations :
+  forall K, forall addK mulK:set -> set -> set,
+  forall M, forall addM smulR:set -> set -> set, forall n :e omega,
+    right_vector_space K addK mulK M addM smulR ->
+    (right_vector_dimension K addK mulK M addM smulR = n
+    <-> (exists x:set -> set,
+      linearly_independent_family
+        K addK (opposite_ring_multiplication mulK)
+        M addM (fun scalar y => smulR y scalar) n x)
+      /\ independent_family_size_bound
+        K addK (opposite_ring_multiplication mulK)
+        M addM (fun scalar y => smulR y scalar) n)
+    /\ (right_vector_dimension K addK mulK M addM smulR = n
+    <-> (exists x:set -> set,
+      generating_family
+        K addK (opposite_ring_multiplication mulK)
+        M addM (fun scalar y => smulR y scalar) n x)
+      /\ generating_family_size_bound
+        K addK (opposite_ring_multiplication mulK)
+        M addM (fun scalar y => smulR y scalar) n).
+Admitted.
+
+Theorem god1_s19_theorem12_bounded_independence_iff_finite_dimension :
+  forall K, forall addK mulK:set -> set -> set,
+  forall M, forall addM smulR:set -> set -> set,
+    right_vector_space K addK mulK M addM smulR ->
+    (finite_dimensional_right_vector_space K addK mulK M addM smulR
+    <-> exists n :e omega,
+      independent_family_size_bound
+        K addK (opposite_ring_multiplication mulK)
+        M addM (fun scalar y => smulR y scalar) n)
+    /\ forall n :e omega,
+      independent_family_size_bound
+        K addK (opposite_ring_multiplication mulK)
+        M addM (fun scalar y => smulR y scalar) n ->
+      right_vector_dimension K addK mulK M addM smulR c= n.
+Admitted.
+
+Theorem god1_s19_theorem13_rank_nullity :
+  forall K, forall addK mulK:set -> set -> set,
+  forall L, forall addL smulL:set -> set -> set,
+  forall M, forall addM smulM:set -> set -> set,
+  forall f:set -> set,
+    finite_dimensional_right_vector_space K addK mulK L addL smulL ->
+    right_vector_space K addK mulK M addM smulM ->
+    right_module_homomorphism K addK mulK L addL smulL M addM smulM f ->
+    right_vector_dimension K addK mulK L addL smulL
+    = right_vector_dimension K addK mulK
+        (module_homomorphism_kernel
+          K addK (opposite_ring_multiplication mulK)
+          L addL (fun scalar x => smulL x scalar)
+          M addM (fun scalar x => smulM x scalar) f)
+        addL smulL
+      + right_vector_dimension K addK mulK
+        (module_homomorphism_image L f) addM smulM.
+Admitted.
+
+Theorem god1_s19_theorem13_corollary1_equal_dimension_map_conditions :
+  forall K, forall addK mulK:set -> set -> set,
+  forall L, forall addL smulL:set -> set -> set,
+  forall M, forall addM smulM:set -> set -> set,
+  forall f:set -> set,
+    finite_dimensional_right_vector_space K addK mulK L addL smulL ->
+    finite_dimensional_right_vector_space K addK mulK M addM smulM ->
+    right_vector_dimension K addK mulK L addL smulL
+      = right_vector_dimension K addK mulK M addM smulM ->
+    right_module_homomorphism K addK mulK L addL smulL M addM smulM f ->
+    (bij L M f <-> surj L M f)
+    /\ (surj L M f <-> inj L M f)
+    /\ (inj L M f <->
+      module_homomorphism_kernel
+        K addK (opposite_ring_multiplication mulK)
+        L addL (fun scalar x => smulL x scalar)
+        M addM (fun scalar x => smulM x scalar) f
+      = {module_zero L addL}).
+Admitted.
+
+Theorem god1_s19_theorem13_corollary2_dimension_of_sum :
+  forall K, forall addK mulK:set -> set -> set,
+  forall M, forall addM smulR:set -> set -> set, forall E F,
+    finite_dimensional_right_vector_space K addK mulK M addM smulR ->
+    submodule K addK (opposite_ring_multiplication mulK)
+      M addM (fun scalar x => smulR x scalar) E ->
+    submodule K addK (opposite_ring_multiplication mulK)
+      M addM (fun scalar x => smulR x scalar) F ->
+    right_vector_dimension K addK mulK
+      (submodule_sum
+        K addK (opposite_ring_multiplication mulK)
+        M addM (fun scalar x => smulR x scalar) E F) addM smulR
+    + right_vector_dimension K addK mulK {x :e E|x :e F} addM smulR
+    = right_vector_dimension K addK mulK E addM smulR
+      + right_vector_dimension K addK mulK F addM smulR.
+Admitted.
+
+//GOD1:460500 natural_indexed_sum : "the sum of the natural numbers #2 indexed below #1" | $\sum_{i<#1}#2_i$
+Definition natural_indexed_sum : set -> (set -> set) -> set :=
+  fun n f => nat_primrec 0 (fun i s => s + f i) n.
+
+Theorem god1_s19_theorem13_corollary3_dimension_of_finite_subspace_sum :
+  forall K, forall addK mulK:set -> set -> set,
+  forall E, forall addE smulR:set -> set -> set,
+  forall n :e omega, forall M:set -> set,
+    finite_dimensional_right_vector_space K addK mulK E addE smulR ->
+    (forall i :e n,
+      submodule K addK (opposite_ring_multiplication mulK)
+        E addE (fun scalar x => smulR x scalar) (M i)) ->
+    right_vector_dimension K addK mulK
+      (submodule_family_sum
+        K addK (opposite_ring_multiplication mulK)
+        E addE (fun scalar x => smulR x scalar) n M) addE smulR
+      c= natural_indexed_sum n
+        (fun i => right_vector_dimension K addK mulK (M i) addE smulR)
+    /\ (right_vector_dimension K addK mulK
+      (submodule_family_sum
+        K addK (opposite_ring_multiplication mulK)
+        E addE (fun scalar x => smulR x scalar) n M) addE smulR
+      = natural_indexed_sum n
+        (fun i => right_vector_dimension K addK mulK (M i) addE smulR)
+    <-> linearly_independent_submodules
+      K addK (opposite_ring_multiplication mulK)
+      E addE (fun scalar x => smulR x scalar) n M).
+Admitted.
+
+//GOD1:461869 linear_map_rank : "the rank of the right-linear map #10" | $\operatorname{rank}(#10)$
+Definition linear_map_rank :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  (set -> set) -> set :=
+  fun K addK mulK L addL smulL M addM smulM f =>
+    right_vector_dimension K addK mulK
+      (module_homomorphism_image L f) addM smulM.
+
+//GOD1:462130 module_family_rank : "the rank of the finite family #8 in the left vector space #4" | $\operatorname{rank}(#8)$
+Definition module_family_rank :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set) -> set :=
+  fun K addK mulK M addM smul I x =>
+    module_dimension K addK mulK
+      (submodule_generated_by_family K addK mulK M addM smul I x)
+      addM smul.
+
+//GOD1:462130 right_vector_family_rank : "the rank of the finite family #8 in the right vector space #4" | $\operatorname{rank}(#8)$
+Definition right_vector_family_rank :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> (set -> set) -> set :=
+  fun K addK mulK M addM smulR I x =>
+    module_family_rank K addK (opposite_ring_multiplication mulK)
+      M addM (fun scalar y => smulR y scalar) I x.
+
+//GOD1:464361 matrix_column : "the #6-th column of the #4-by-#5 matrix #7" | $#7_{*,#6}$
+Definition matrix_column : set -> set -> set -> set :=
+  fun n A j => fun i :e n => matrix_entry A i j.
+
+//GOD1:464361 matrix_rank : "the rank of the #4-by-#5 matrix #6" | $\operatorname{rank}(#6)$
+Definition matrix_rank :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> set -> set -> set :=
+  fun K add mul n p A =>
+    right_vector_family_rank K add mul
+      (K :^: n) (module_power_addition n add)
+      (fun x scalar => module_power_left_scalar n
+        (opposite_ring_multiplication mul) scalar x)
+      p (matrix_column n A).
+
+Theorem god1_s19_theorem14_rank_of_map_equals_rank_of_matrix :
+  forall K, forall addK mulK:set -> set -> set,
+  forall L, forall addL smulL:set -> set -> set,
+  forall M, forall addM smulM:set -> set -> set,
+  forall p n :e omega, forall a b:set -> set, forall f:set -> set,
+    right_vector_space K addK mulK L addL smulL ->
+    right_vector_space K addK mulK M addM smulM ->
+    right_module_basis K addK mulK L addL smulL p a ->
+    right_module_basis K addK mulK M addM smulM n b ->
+    right_module_homomorphism K addK mulK L addL smulL M addM smulM f ->
+    linear_map_rank K addK mulK L addL smulL M addM smulM f
+    = matrix_rank K addK mulK n p
+      (matrix_of_right_linear_map
+        K addK mulK L addL smulL M addM smulM p n a b f).
+Admitted.
+
+Theorem god1_s19_theorem15_rank_of_family_equals_coefficient_matrix_rank :
+  forall K, forall addK mulK:set -> set -> set,
+  forall M, forall addM smulR:set -> set -> set,
+  forall n p :e omega, forall b x:set -> set,
+  forall A :e matrix_space K n p,
+    right_vector_space K addK mulK M addM smulR ->
+    right_module_basis K addK mulK M addM smulR n b ->
+    (forall j :e p,
+      x j = module_finitely_supported_sum M addM n
+        (fun i => smulR (b i) (matrix_entry A i j))) ->
+    right_vector_family_rank K addK mulK M addM smulR p x
+    = matrix_rank K addK mulK n p A.
+Admitted.
+
+//GOD1:467202 matrix_submatrix : "the square submatrix of #7 selected by rows #5 and columns #6" | $#7[#5,#6]$
+Definition matrix_submatrix :
+  set -> set -> (set -> set) -> (set -> set) -> set -> set :=
+  fun r s rows cols A =>
+    fun u :e r :*: s => matrix_entry A (rows (u 0)) (cols (u 1)).
+
+//GOD1:467202 invertible_square_submatrix_of_order : "#6 contains an invertible square submatrix of order #7" | $#6\text{ has an invertible }#7\times #7\text{ submatrix}$
+Definition invertible_square_submatrix_of_order :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> set -> set -> set -> prop :=
+  fun K add mul n p A r =>
+    r :e omega /\ A :e matrix_space K n p
+    /\ exists rows :e n :^: r, exists cols :e p :^: r,
+      inj r n (fun i => rows i)
+      /\ inj r p (fun j => cols j)
+      /\ invertible_matrix K add mul r
+        (matrix_submatrix r r (fun i => rows i) (fun j => cols j) A).
+
+Theorem god1_s19_theorem16_rank_is_largest_invertible_submatrix_order :
+  forall K, forall add mul:set -> set -> set,
+  forall n p :e omega, forall A :e matrix_space K n p,
+    division_ring K add mul ->
+    invertible_square_submatrix_of_order
+      K add mul n p A (matrix_rank K add mul n p A)
+    /\ forall s :e omega,
+      invertible_square_submatrix_of_order K add mul n p A s ->
+      s c= matrix_rank K add mul n p A.
+Admitted.
+
+Theorem god1_s19_theorem16_corollary_rank_of_transpose :
+  forall K, forall add mul:set -> set -> set,
+  forall n p :e omega, forall A :e matrix_space K n p,
+    division_ring K add mul ->
+    matrix_rank K add mul n p A
+    = matrix_rank K add (opposite_ring_multiplication mul) p n
+      (matrix_transpose K n p A).
+Admitted.
+
+//GOD1:476223 linear_forms_common_kernel : "the subspace defined by the homogeneous equations #8" | $\bigcap_i\ker(#8_i)$
+Definition linear_forms_common_kernel :
+  set -> (set -> set -> set) -> set -> (set -> set) -> set :=
+  fun K addK L I f =>
+    {x :e L|forall i :e I, f i x = ring_zero K addK}.
+
+Theorem god1_s19_theorem17_dimension_from_linear_equations :
+  forall K, forall addK mulK:set -> set -> set,
+  forall L, forall addL smulR:set -> set -> set,
+  forall m n :e omega, forall f:set -> set,
+    right_vector_space K addK mulK L addL smulR ->
+    right_vector_dimension K addK mulK L addL smulR = n ->
+    (forall i :e m, f i :e right_module_dual K addK mulK L addL smulR) ->
+    right_vector_dimension K addK mulK
+      (linear_forms_common_kernel K addK L m f) addL smulR
+    + module_family_rank K addK mulK
+      (right_module_dual K addK mulK L addL smulR)
+      (right_module_dual_addition L addK)
+      (right_module_dual_left_scalar L mulK) m f
+    = n.
+Admitted.
+
+(** § 20. Linear equations. **)
+
+//GOD1:492044 matrix_vector_product : "the product of the #4-by-#5 matrix #6 with the column vector #7" | $#6#7$
+Definition matrix_vector_product :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> set -> set -> set -> set :=
+  fun K add mul n p A x =>
+    fun i :e n => ring_finite_sum K add p
+      (fun j => mul (matrix_entry A i j) (x j)).
+
+//GOD1:492044 linear_system : "the system of #4 linear equations in #5 unknowns with matrix #6 and constant vector #7" | $#6x=#7$
+Definition linear_system :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> set -> set -> set -> prop :=
+  fun K add mul n p A b =>
+    A :e matrix_space K n p /\ b :e K :^: n.
+
+//GOD1:492443 linear_system_solution : "#8 is a solution of the linear system with matrix #6 and constant vector #7" | $#6#8=#7$
+Definition linear_system_solution :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> set -> set -> set -> set -> prop :=
+  fun K add mul n p A b x =>
+    linear_system K add mul n p A b
+    /\ x :e K :^: p
+    /\ matrix_vector_product K add mul n p A x = b.
+
+//GOD1:492443 linear_system_solution_set : "the set of solutions of the linear system #6x=#7" | $\{x:#6x=#7\}$
+Definition linear_system_solution_set :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> set -> set -> set -> set :=
+  fun K add mul n p A b =>
+    {x :e K :^: p|linear_system_solution K add mul n p A b x}.
+
+//GOD1:492443 linear_system_unique_solution : "the linear system #6x=#7 has exactly one solution" | $\exists!x,#6x=#7$
+Definition linear_system_unique_solution :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> set -> set -> set -> prop :=
+  fun K add mul n p A b =>
+    exists x :e K :^: p,
+      linear_system_solution K add mul n p A b x
+      /\ forall y :e K :^: p,
+        linear_system_solution K add mul n p A b y -> y = x.
+
+//GOD1:492044 matrix_row_linear_form : "the #7-th row of #6 regarded as a linear form" | $f_{#7}(x)=\sum_j#6_{#7j}x_j$
+Definition matrix_row_linear_form :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> set -> set -> set -> set :=
+  fun K add mul p A i x =>
+    ring_finite_sum K add p
+      (fun j => mul (matrix_entry A i j) (x j)).
+
+//GOD1:494390 linear_system_rank : "the rank of the linear system with coefficient matrix #6" | $\operatorname{rank}(#6)$
+Definition linear_system_rank :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> set -> set -> set :=
+  fun K add mul n p A => matrix_rank K add mul n p A.
+
+Theorem god1_linear_system_rank_equals_row_form_rank_and_matrix_rank :
+  forall K, forall add mul:set -> set -> set,
+  forall n p :e omega, forall A :e matrix_space K n p,
+    division_ring K add mul ->
+    linear_system_rank K add mul n p A = matrix_rank K add mul n p A
+    /\ linear_system_rank K add mul n p A
+      = module_family_rank K add mul
+        (right_module_dual K add mul
+          (K :^: p) (module_power_addition p add)
+          (fun x scalar => module_power_left_scalar p
+            (opposite_ring_multiplication mul) scalar x))
+        (right_module_dual_addition (K :^: p) add)
+        (right_module_dual_left_scalar (K :^: p) mul)
+        n (matrix_row_linear_form K add mul p A).
+Admitted.
+
+//GOD1:496635 associated_homogeneous_solution_space : "the solution space of the homogeneous system associated with #6x=#7" | $\ker(#6)$
+Definition associated_homogeneous_solution_space :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> set -> set -> set :=
+  fun K add mul n p A =>
+    linear_system_solution_set K add mul n p A
+      (fun i :e n => ring_zero K add).
+
+Theorem god1_s20_associated_homogeneous_solution_dimension :
+  forall K, forall add mul:set -> set -> set,
+  forall n p :e omega, forall A :e matrix_space K n p,
+    division_ring K add mul ->
+    right_vector_dimension K add mul
+      (associated_homogeneous_solution_space K add mul n p A)
+      (module_power_addition p add)
+      (fun x scalar => module_power_left_scalar p
+        (opposite_ring_multiplication mul) scalar x)
+    + linear_system_rank K add mul n p A = p.
+Admitted.
+
+//GOD1:499438 cramer_linear_system : "the coefficient matrix #6 defines a Cramer system" | $#6\text{ is a Cramer system}$
+Definition cramer_linear_system :
+  set -> (set -> set -> set) -> (set -> set -> set) ->
+  set -> set -> set -> prop :=
+  fun K add mul n p A =>
+    A :e matrix_space K n p
+    /\ forall b :e K :^: n,
+      linear_system_unique_solution K add mul n p A b.
+
+Theorem god1_s20_theorem1_cramer_system_characterizations :
+  forall K, forall add mul:set -> set -> set,
+  forall n p :e omega, forall A :e matrix_space K n p,
+    division_ring K add mul ->
+    (cramer_linear_system K add mul n p A
+    <-> p = n
+      /\ associated_homogeneous_solution_space K add mul n p A
+        = {(fun j :e p => ring_zero K add)})
+    /\ (cramer_linear_system K add mul n p A
+    <-> p = n
+      /\ linearly_independent_family K add mul
+        (right_module_dual K add mul
+          (K :^: p) (module_power_addition p add)
+          (fun x scalar => module_power_left_scalar p
+            (opposite_ring_multiplication mul) scalar x))
+        (right_module_dual_addition (K :^: p) add)
+        (right_module_dual_left_scalar (K :^: p) mul)
+        n (matrix_row_linear_form K add mul p A)).
+Admitted.
+
+Theorem god1_s20_theorem2_square_cramer_equivalences_and_solution :
+  forall K, forall add mul:set -> set -> set,
+  forall n :e omega, forall A :e square_matrix_ring K n,
+    division_ring K add mul ->
+    (cramer_linear_system K add mul n n A
+    <-> forall b :e K :^: n,
+      exists x :e K :^: n,
+        linear_system_solution K add mul n n A b x)
+    /\ (cramer_linear_system K add mul n n A
+    <-> forall b :e K :^: n, forall x y :e K :^: n,
+      linear_system_solution K add mul n n A b x ->
+      linear_system_solution K add mul n n A b y -> x = y)
+    /\ (cramer_linear_system K add mul n n A
+    <-> exists b :e K :^: n,
+      linear_system_unique_solution K add mul n n A b)
+    /\ (cramer_linear_system K add mul n n A
+    <-> associated_homogeneous_solution_space K add mul n n A
+      = {(fun j :e n => ring_zero K add)})
+    /\ (cramer_linear_system K add mul n n A
+    <-> invertible_matrix K add mul n A)
+    /\ (invertible_matrix K add mul n A ->
+      forall b :e K :^: n,
+        linear_system_unique_solution K add mul n n A b
+        /\ linear_system_solution K add mul n n A b
+          (matrix_vector_product K add mul n n
+            (matrix_inverse K add mul n A) b)).
+Admitted.
+
+Theorem god1_s20_theorem3_independent_system_reduces_to_cramer_system :
+  forall K, forall add mul:set -> set -> set,
+  forall n p :e omega, forall A :e matrix_space K n p,
+    division_ring K add mul ->
+    linearly_independent_family K add mul
+      (right_module_dual K add mul
+        (K :^: p) (module_power_addition p add)
+        (fun x scalar => module_power_left_scalar p
+          (opposite_ring_multiplication mul) scalar x))
+      (right_module_dual_addition (K :^: p) add)
+      (right_module_dual_left_scalar (K :^: p) mul)
+      n (matrix_row_linear_form K add mul p A) ->
+    exists cols :e p :^: n,
+      inj n p (fun i => cols i)
+      /\ invertible_matrix K add mul n
+        (matrix_submatrix n n (fun i => i) (fun j => cols j) A)
+      /\ exists Lambda :e matrix_space K n p,
+        forall b :e K :^: n, forall eta :e K :^: p,
+          exists x :e K :^: p,
+            linear_system_solution K add mul n p A b x
+            /\ (forall k :e p,
+              k /:e {cols i|i :e n} -> x k = eta k)
+            /\ (forall i :e n,
+              x (cols i)
+              = add
+                (ring_finite_sum K add n
+                  (fun j => mul
+                    (matrix_entry
+                      (matrix_inverse K add mul n
+                        (matrix_submatrix n n
+                          (fun h => h) (fun h => cols h) A)) i j)
+                    (b j)))
+                (module_finitely_supported_sum K add
+                  {k :e p|k /:e {cols h|h :e n}}
+                  (fun k => mul (matrix_entry Lambda i k) (eta k))))
+            /\ forall y :e K :^: p,
+              linear_system_solution K add mul n p A b y ->
+              (forall k :e p,
+                k /:e {cols i|i :e n} -> y k = eta k) -> y = x.
+Admitted.
+
 
 End God1.
