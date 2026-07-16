@@ -77929,6 +77929,222 @@ exact (andI
   h_s9_modulus_product_conclusion).
 Qed.
 
+Theorem god1_nonzero_complex_polar_coordinate_angle :
+  forall z :e complex,
+    z <> 0 ->
+    exists theta :e real,
+      complex_cos theta :e real
+      /\ complex_sin theta :e real
+      /\ CSNo_Re z
+        = mul_SNo (modulus_CSNo z) (complex_cos theta)
+      /\ CSNo_Im z
+        = mul_SNo (modulus_CSNo z) (complex_sin theta).
+admit.
+Admitted.
+
+Theorem god1_polar_coordinate_data_gives_argument :
+  forall z :e complex,
+    z <> 0 ->
+    forall theta :e real,
+      complex_cos theta :e real ->
+      complex_sin theta :e real ->
+      CSNo_Re z
+        = mul_SNo (modulus_CSNo z) (complex_cos theta) ->
+      CSNo_Im z
+        = mul_SNo (modulus_CSNo z) (complex_sin theta) ->
+      complex_argument z theta.
+let z.
+assume hz hnz.
+let theta.
+assume htheta hcosReal hsinReal hReCoordinate hImCoordinate.
+claim hmodReal : modulus_CSNo z :e real.
+exact (modulus_CSNo_mem_R z hz).
+claim hmodC : modulus_CSNo z :e complex.
+exact (real_complex (modulus_CSNo z) hmodReal).
+claim hcosC : complex_cos theta :e complex.
+exact (real_complex (complex_cos theta) hcosReal).
+claim hsinC : complex_sin theta :e complex.
+exact (real_complex (complex_sin theta) hsinReal).
+claim hiSinC :
+  mul_CSNo Complex_i (complex_sin theta) :e complex.
+exact (complex_mul_CSNo Complex_i complex_i
+  (complex_sin theta) hsinC).
+claim hEulerC :
+  add_CSNo
+    (complex_cos theta)
+    (mul_CSNo Complex_i (complex_sin theta)) :e complex.
+exact (complex_add_CSNo
+  (complex_cos theta) hcosC
+  (mul_CSNo Complex_i (complex_sin theta)) hiSinC).
+claim hmodCosBridge :
+  mul_CSNo (modulus_CSNo z) (complex_cos theta)
+  = mul_SNo (modulus_CSNo z) (complex_cos theta).
+exact (mul_CSNo_mul_SNo
+  (modulus_CSNo z) (complex_cos theta)
+  (real_SNo (modulus_CSNo z) hmodReal)
+  (real_SNo (complex_cos theta) hcosReal)).
+claim hmodSinBridge :
+  mul_CSNo (modulus_CSNo z) (complex_sin theta)
+  = mul_SNo (modulus_CSNo z) (complex_sin theta).
+exact (mul_CSNo_mul_SNo
+  (modulus_CSNo z) (complex_sin theta)
+  (real_SNo (modulus_CSNo z) hmodReal)
+  (real_SNo (complex_sin theta) hsinReal)).
+claim hsecondProduct :
+  mul_CSNo (modulus_CSNo z)
+    (mul_CSNo Complex_i (complex_sin theta))
+  = mul_CSNo Complex_i
+    (mul_CSNo (modulus_CSNo z) (complex_sin theta)).
+exact (eq_i_tra
+  (mul_CSNo (modulus_CSNo z)
+    (mul_CSNo Complex_i (complex_sin theta)))
+  (mul_CSNo
+    (mul_CSNo (modulus_CSNo z) Complex_i)
+    (complex_sin theta))
+  (mul_CSNo Complex_i
+    (mul_CSNo (modulus_CSNo z) (complex_sin theta)))
+  (mul_CSNo_assoc
+    (modulus_CSNo z) Complex_i (complex_sin theta)
+    (complex_CSNo (modulus_CSNo z) hmodC)
+    (complex_CSNo Complex_i complex_i)
+    (complex_CSNo (complex_sin theta) hsinC))
+  (eq_i_tra
+    (mul_CSNo
+      (mul_CSNo (modulus_CSNo z) Complex_i)
+      (complex_sin theta))
+    (mul_CSNo
+      (mul_CSNo Complex_i (modulus_CSNo z))
+      (complex_sin theta))
+    (mul_CSNo Complex_i
+      (mul_CSNo (modulus_CSNo z) (complex_sin theta)))
+    (f_eq_i
+      (fun u => mul_CSNo u (complex_sin theta))
+      (mul_CSNo (modulus_CSNo z) Complex_i)
+      (mul_CSNo Complex_i (modulus_CSNo z))
+      (mul_CSNo_com
+        (modulus_CSNo z) Complex_i
+        (complex_CSNo (modulus_CSNo z) hmodC)
+        (complex_CSNo Complex_i complex_i)))
+    (eq_sym
+      (mul_CSNo Complex_i
+        (mul_CSNo (modulus_CSNo z) (complex_sin theta)))
+      (mul_CSNo
+        (mul_CSNo Complex_i (modulus_CSNo z))
+        (complex_sin theta))
+      (mul_CSNo_assoc
+        Complex_i (modulus_CSNo z) (complex_sin theta)
+        (complex_CSNo Complex_i complex_i)
+        (complex_CSNo (modulus_CSNo z) hmodC)
+        (complex_CSNo (complex_sin theta) hsinC))))).
+claim hpolarExpansion :
+  mul_CSNo (modulus_CSNo z)
+    (add_CSNo
+      (complex_cos theta)
+      (mul_CSNo Complex_i (complex_sin theta)))
+  = add_CSNo
+    (mul_CSNo (modulus_CSNo z) (complex_cos theta))
+    (mul_CSNo (modulus_CSNo z)
+      (mul_CSNo Complex_i (complex_sin theta))).
+exact (mul_CSNo_distrL
+  (modulus_CSNo z)
+  (complex_cos theta)
+  (mul_CSNo Complex_i (complex_sin theta))
+  (complex_CSNo (modulus_CSNo z) hmodC)
+  (complex_CSNo (complex_cos theta) hcosC)
+  (complex_CSNo
+    (mul_CSNo Complex_i (complex_sin theta)) hiSinC)).
+claim hpolarEqualsEta :
+  mul_CSNo (modulus_CSNo z)
+    (add_CSNo
+      (complex_cos theta)
+      (mul_CSNo Complex_i (complex_sin theta)))
+  = add_CSNo
+    (CSNo_Re z)
+    (mul_CSNo Complex_i (CSNo_Im z)).
+exact (eq_i_tra
+  (mul_CSNo (modulus_CSNo z)
+    (add_CSNo
+      (complex_cos theta)
+      (mul_CSNo Complex_i (complex_sin theta))))
+  (add_CSNo
+    (mul_CSNo (modulus_CSNo z) (complex_cos theta))
+    (mul_CSNo (modulus_CSNo z)
+      (mul_CSNo Complex_i (complex_sin theta))))
+  (add_CSNo
+    (CSNo_Re z)
+    (mul_CSNo Complex_i (CSNo_Im z)))
+  hpolarExpansion
+  (god1_binary_operation_congruence add_CSNo
+    (mul_CSNo (modulus_CSNo z) (complex_cos theta))
+    (CSNo_Re z)
+    (mul_CSNo (modulus_CSNo z)
+      (mul_CSNo Complex_i (complex_sin theta)))
+    (mul_CSNo Complex_i (CSNo_Im z))
+    (eq_i_tra
+      (mul_CSNo (modulus_CSNo z) (complex_cos theta))
+      (mul_SNo (modulus_CSNo z) (complex_cos theta))
+      (CSNo_Re z)
+      hmodCosBridge
+      (eq_sym
+        (CSNo_Re z)
+        (mul_SNo (modulus_CSNo z) (complex_cos theta))
+        hReCoordinate))
+    (eq_i_tra
+      (mul_CSNo (modulus_CSNo z)
+        (mul_CSNo Complex_i (complex_sin theta)))
+      (mul_CSNo Complex_i
+        (mul_CSNo (modulus_CSNo z) (complex_sin theta)))
+      (mul_CSNo Complex_i (CSNo_Im z))
+      hsecondProduct
+      (f_eq_i (mul_CSNo Complex_i)
+        (mul_CSNo (modulus_CSNo z) (complex_sin theta))
+        (CSNo_Im z)
+        (eq_i_tra
+          (mul_CSNo (modulus_CSNo z) (complex_sin theta))
+          (mul_SNo (modulus_CSNo z) (complex_sin theta))
+          (CSNo_Im z)
+          hmodSinBridge
+          (eq_sym
+            (CSNo_Im z)
+            (mul_SNo (modulus_CSNo z) (complex_sin theta))
+            hImCoordinate)))))).
+claim hrepresentation :
+  z = mul_CSNo (modulus_CSNo z)
+    (add_CSNo
+      (complex_cos theta)
+      (mul_CSNo Complex_i (complex_sin theta))).
+exact (eq_i_tra z
+  (add_CSNo
+    (CSNo_Re z)
+    (mul_CSNo Complex_i (CSNo_Im z)))
+  (mul_CSNo (modulus_CSNo z)
+    (add_CSNo
+      (complex_cos theta)
+      (mul_CSNo Complex_i (complex_sin theta))))
+  (complex_eta z hz)
+  (eq_sym
+    (mul_CSNo (modulus_CSNo z)
+      (add_CSNo
+        (complex_cos theta)
+        (mul_CSNo Complex_i (complex_sin theta))))
+    (add_CSNo
+      (CSNo_Re z)
+      (mul_CSNo Complex_i (CSNo_Im z)))
+    hpolarEqualsEta)).
+exact (andI
+  (((z :e complex /\ z <> 0) /\ theta :e real))
+  (z = mul_CSNo (modulus_CSNo z)
+    (add_CSNo
+      (complex_cos theta)
+      (mul_CSNo Complex_i (complex_sin theta))))
+  (andI
+    (z :e complex /\ z <> 0)
+    (theta :e real)
+    (andI (z :e complex) (z <> 0) hz hnz)
+    htheta)
+  hrepresentation).
+Qed.
+
 Theorem god1_complex_polar_representation :
   forall z :e complex,
     z <> 0 -> exists theta :e real, complex_argument z theta.
@@ -77939,12 +78155,382 @@ claim h_s9_polar_angle_exists :
   exists theta :e real,
     CSNo_Re z = mul_SNo (modulus_CSNo z) (complex_cos theta)
     /\ CSNo_Im z = mul_SNo (modulus_CSNo z) (complex_sin theta).
-admit.
+claim hpolarData :
+  exists theta :e real,
+    complex_cos theta :e real
+    /\ complex_sin theta :e real
+    /\ CSNo_Re z
+      = mul_SNo (modulus_CSNo z) (complex_cos theta)
+    /\ CSNo_Im z
+      = mul_SNo (modulus_CSNo z) (complex_sin theta).
+exact (god1_nonzero_complex_polar_coordinate_angle z hz hnz).
+exact (exandE_i
+  (fun theta => theta :e real)
+  (fun theta =>
+    complex_cos theta :e real
+    /\ complex_sin theta :e real
+    /\ CSNo_Re z
+      = mul_SNo (modulus_CSNo z) (complex_cos theta)
+    /\ CSNo_Im z
+      = mul_SNo (modulus_CSNo z) (complex_sin theta))
+  (god1_nonzero_complex_polar_coordinate_angle z hz hnz)
+  (exists theta :e real,
+    CSNo_Re z = mul_SNo (modulus_CSNo z) (complex_cos theta)
+    /\ CSNo_Im z = mul_SNo (modulus_CSNo z) (complex_sin theta))
+  (fun theta htheta hdata =>
+    ex_intro
+      (fun phi => phi :e real /\
+        (CSNo_Re z = mul_SNo (modulus_CSNo z) (complex_cos phi)
+        /\ CSNo_Im z = mul_SNo (modulus_CSNo z) (complex_sin phi)))
+      theta
+      (andI
+        (theta :e real)
+        (CSNo_Re z = mul_SNo (modulus_CSNo z) (complex_cos theta)
+          /\ CSNo_Im z = mul_SNo (modulus_CSNo z) (complex_sin theta))
+        htheta
+        (andI
+          (CSNo_Re z = mul_SNo (modulus_CSNo z) (complex_cos theta))
+          (CSNo_Im z = mul_SNo (modulus_CSNo z) (complex_sin theta))
+          (andER
+            (complex_cos theta :e real
+              /\ complex_sin theta :e real)
+            (CSNo_Re z
+              = mul_SNo (modulus_CSNo z) (complex_cos theta))
+            (andEL
+              ((complex_cos theta :e real
+                /\ complex_sin theta :e real)
+                /\ CSNo_Re z
+                  = mul_SNo (modulus_CSNo z) (complex_cos theta))
+              (CSNo_Im z
+                = mul_SNo (modulus_CSNo z) (complex_sin theta))
+              hdata))
+          (andER
+            ((complex_cos theta :e real
+              /\ complex_sin theta :e real)
+              /\ CSNo_Re z
+                = mul_SNo (modulus_CSNo z) (complex_cos theta))
+            (CSNo_Im z
+              = mul_SNo (modulus_CSNo z) (complex_sin theta))
+            hdata))))).
 //GOD1PRF:172903 so that we have
 claim h_s9_polar_representation_conclusion :
   exists theta :e real, complex_argument z theta.
+exact (exandE_i
+  (fun theta => theta :e real)
+  (fun theta =>
+    complex_cos theta :e real
+    /\ complex_sin theta :e real
+    /\ CSNo_Re z
+      = mul_SNo (modulus_CSNo z) (complex_cos theta)
+    /\ CSNo_Im z
+      = mul_SNo (modulus_CSNo z) (complex_sin theta))
+  (god1_nonzero_complex_polar_coordinate_angle z hz hnz)
+  (exists theta :e real, complex_argument z theta)
+  (fun theta htheta hdata =>
+    ex_intro
+      (fun phi => phi :e real /\ complex_argument z phi)
+      theta
+      (andI
+        (theta :e real)
+        (complex_argument z theta)
+        htheta
+        (god1_polar_coordinate_data_gives_argument
+          z hz hnz theta htheta
+          (andEL
+            (complex_cos theta :e real)
+            (complex_sin theta :e real)
+            (andEL
+              (complex_cos theta :e real
+                /\ complex_sin theta :e real)
+              (CSNo_Re z
+                = mul_SNo (modulus_CSNo z) (complex_cos theta))
+              (andEL
+                ((complex_cos theta :e real
+                  /\ complex_sin theta :e real)
+                  /\ CSNo_Re z
+                    = mul_SNo (modulus_CSNo z) (complex_cos theta))
+                (CSNo_Im z
+                  = mul_SNo (modulus_CSNo z) (complex_sin theta))
+                hdata)))
+          (andER
+            (complex_cos theta :e real)
+            (complex_sin theta :e real)
+            (andEL
+              (complex_cos theta :e real
+                /\ complex_sin theta :e real)
+              (CSNo_Re z
+                = mul_SNo (modulus_CSNo z) (complex_cos theta))
+              (andEL
+                ((complex_cos theta :e real
+                  /\ complex_sin theta :e real)
+                  /\ CSNo_Re z
+                    = mul_SNo (modulus_CSNo z) (complex_cos theta))
+                (CSNo_Im z
+                  = mul_SNo (modulus_CSNo z) (complex_sin theta))
+                hdata)))
+          (andER
+            (complex_cos theta :e real
+              /\ complex_sin theta :e real)
+            (CSNo_Re z
+              = mul_SNo (modulus_CSNo z) (complex_cos theta))
+            (andEL
+              ((complex_cos theta :e real
+                /\ complex_sin theta :e real)
+                /\ CSNo_Re z
+                  = mul_SNo (modulus_CSNo z) (complex_cos theta))
+              (CSNo_Im z
+                = mul_SNo (modulus_CSNo z) (complex_sin theta))
+              hdata))
+          (andER
+            ((complex_cos theta :e real
+              /\ complex_sin theta :e real)
+              /\ CSNo_Re z
+                = mul_SNo (modulus_CSNo z) (complex_cos theta))
+            (CSNo_Im z
+              = mul_SNo (modulus_CSNo z) (complex_sin theta))
+            hdata))))).
+exact h_s9_polar_representation_conclusion.
+Admitted.
+
+Theorem god1_real_angle_euler_laws :
+  (forall theta :e real,
+    complex_cos theta :e real
+    /\ complex_sin theta :e real)
+  /\ forall theta phi :e real,
+    mul_CSNo
+      (add_CSNo
+        (complex_cos theta)
+        (mul_CSNo Complex_i (complex_sin theta)))
+      (add_CSNo
+        (complex_cos phi)
+        (mul_CSNo Complex_i (complex_sin phi)))
+    = add_CSNo
+      (complex_cos (add_SNo theta phi))
+      (mul_CSNo Complex_i
+        (complex_sin (add_SNo theta phi))).
 admit.
 Admitted.
+
+Theorem god1_complex_argument_gives_coordinates :
+  forall z :e complex, forall theta :e real,
+    complex_argument z theta ->
+    complex_cos theta :e real ->
+    complex_sin theta :e real ->
+    CSNo_Re z
+      = mul_SNo (modulus_CSNo z) (complex_cos theta)
+    /\ CSNo_Im z
+      = mul_SNo (modulus_CSNo z) (complex_sin theta).
+let z.
+assume hz.
+let theta.
+assume htheta harg hcosReal hsinReal.
+claim hrepresentation :
+  z = mul_CSNo (modulus_CSNo z)
+    (add_CSNo
+      (complex_cos theta)
+      (mul_CSNo Complex_i (complex_sin theta))).
+exact (andER
+  (((z :e complex /\ z <> 0) /\ theta :e real))
+  (z = mul_CSNo (modulus_CSNo z)
+    (add_CSNo
+      (complex_cos theta)
+      (mul_CSNo Complex_i (complex_sin theta))))
+  harg).
+claim hmodReal : modulus_CSNo z :e real.
+exact (modulus_CSNo_mem_R z hz).
+claim hmodC : modulus_CSNo z :e complex.
+exact (real_complex (modulus_CSNo z) hmodReal).
+claim hcosC : complex_cos theta :e complex.
+exact (real_complex (complex_cos theta) hcosReal).
+claim hsinC : complex_sin theta :e complex.
+exact (real_complex (complex_sin theta) hsinReal).
+claim hiSinC :
+  mul_CSNo Complex_i (complex_sin theta) :e complex.
+exact (complex_mul_CSNo Complex_i complex_i
+  (complex_sin theta) hsinC).
+claim hmodCosBridge :
+  mul_CSNo (modulus_CSNo z) (complex_cos theta)
+  = mul_SNo (modulus_CSNo z) (complex_cos theta).
+exact (mul_CSNo_mul_SNo
+  (modulus_CSNo z) (complex_cos theta)
+  (real_SNo (modulus_CSNo z) hmodReal)
+  (real_SNo (complex_cos theta) hcosReal)).
+claim hmodSinBridge :
+  mul_CSNo (modulus_CSNo z) (complex_sin theta)
+  = mul_SNo (modulus_CSNo z) (complex_sin theta).
+exact (mul_CSNo_mul_SNo
+  (modulus_CSNo z) (complex_sin theta)
+  (real_SNo (modulus_CSNo z) hmodReal)
+  (real_SNo (complex_sin theta) hsinReal)).
+claim hsecondProduct :
+  mul_CSNo (modulus_CSNo z)
+    (mul_CSNo Complex_i (complex_sin theta))
+  = mul_CSNo Complex_i
+    (mul_CSNo (modulus_CSNo z) (complex_sin theta)).
+exact (eq_i_tra
+  (mul_CSNo (modulus_CSNo z)
+    (mul_CSNo Complex_i (complex_sin theta)))
+  (mul_CSNo
+    (mul_CSNo (modulus_CSNo z) Complex_i)
+    (complex_sin theta))
+  (mul_CSNo Complex_i
+    (mul_CSNo (modulus_CSNo z) (complex_sin theta)))
+  (mul_CSNo_assoc
+    (modulus_CSNo z) Complex_i (complex_sin theta)
+    (complex_CSNo (modulus_CSNo z) hmodC)
+    (complex_CSNo Complex_i complex_i)
+    (complex_CSNo (complex_sin theta) hsinC))
+  (eq_i_tra
+    (mul_CSNo
+      (mul_CSNo (modulus_CSNo z) Complex_i)
+      (complex_sin theta))
+    (mul_CSNo
+      (mul_CSNo Complex_i (modulus_CSNo z))
+      (complex_sin theta))
+    (mul_CSNo Complex_i
+      (mul_CSNo (modulus_CSNo z) (complex_sin theta)))
+    (f_eq_i
+      (fun u => mul_CSNo u (complex_sin theta))
+      (mul_CSNo (modulus_CSNo z) Complex_i)
+      (mul_CSNo Complex_i (modulus_CSNo z))
+      (mul_CSNo_com
+        (modulus_CSNo z) Complex_i
+        (complex_CSNo (modulus_CSNo z) hmodC)
+        (complex_CSNo Complex_i complex_i)))
+    (eq_sym
+      (mul_CSNo Complex_i
+        (mul_CSNo (modulus_CSNo z) (complex_sin theta)))
+      (mul_CSNo
+        (mul_CSNo Complex_i (modulus_CSNo z))
+        (complex_sin theta))
+      (mul_CSNo_assoc
+        Complex_i (modulus_CSNo z) (complex_sin theta)
+        (complex_CSNo Complex_i complex_i)
+        (complex_CSNo (modulus_CSNo z) hmodC)
+        (complex_CSNo (complex_sin theta) hsinC))))).
+claim hpolarExpansion :
+  mul_CSNo (modulus_CSNo z)
+    (add_CSNo
+      (complex_cos theta)
+      (mul_CSNo Complex_i (complex_sin theta)))
+  = add_CSNo
+    (mul_CSNo (modulus_CSNo z) (complex_cos theta))
+    (mul_CSNo (modulus_CSNo z)
+      (mul_CSNo Complex_i (complex_sin theta))).
+exact (mul_CSNo_distrL
+  (modulus_CSNo z)
+  (complex_cos theta)
+  (mul_CSNo Complex_i (complex_sin theta))
+  (complex_CSNo (modulus_CSNo z) hmodC)
+  (complex_CSNo (complex_cos theta) hcosC)
+  (complex_CSNo
+    (mul_CSNo Complex_i (complex_sin theta)) hiSinC)).
+claim himaginaryBridge :
+  mul_CSNo (modulus_CSNo z)
+    (mul_CSNo Complex_i (complex_sin theta))
+  = mul_CSNo Complex_i
+    (mul_SNo (modulus_CSNo z) (complex_sin theta)).
+exact (eq_i_tra
+  (mul_CSNo (modulus_CSNo z)
+    (mul_CSNo Complex_i (complex_sin theta)))
+  (mul_CSNo Complex_i
+    (mul_CSNo (modulus_CSNo z) (complex_sin theta)))
+  (mul_CSNo Complex_i
+    (mul_SNo (modulus_CSNo z) (complex_sin theta)))
+  hsecondProduct
+  (f_eq_i (mul_CSNo Complex_i)
+    (mul_CSNo (modulus_CSNo z) (complex_sin theta))
+    (mul_SNo (modulus_CSNo z) (complex_sin theta))
+    hmodSinBridge)).
+claim hcartesianRepresentation :
+  z = add_CSNo
+    (mul_SNo (modulus_CSNo z) (complex_cos theta))
+    (mul_CSNo Complex_i
+      (mul_SNo (modulus_CSNo z) (complex_sin theta))).
+exact (eq_i_tra z
+  (mul_CSNo (modulus_CSNo z)
+    (add_CSNo
+      (complex_cos theta)
+      (mul_CSNo Complex_i (complex_sin theta))))
+  (add_CSNo
+    (mul_SNo (modulus_CSNo z) (complex_cos theta))
+    (mul_CSNo Complex_i
+      (mul_SNo (modulus_CSNo z) (complex_sin theta))))
+  hrepresentation
+  (eq_i_tra
+    (mul_CSNo (modulus_CSNo z)
+      (add_CSNo
+        (complex_cos theta)
+        (mul_CSNo Complex_i (complex_sin theta))))
+    (add_CSNo
+      (mul_CSNo (modulus_CSNo z) (complex_cos theta))
+      (mul_CSNo (modulus_CSNo z)
+        (mul_CSNo Complex_i (complex_sin theta))))
+    (add_CSNo
+      (mul_SNo (modulus_CSNo z) (complex_cos theta))
+      (mul_CSNo Complex_i
+        (mul_SNo (modulus_CSNo z) (complex_sin theta))))
+    hpolarExpansion
+    (god1_binary_operation_congruence add_CSNo
+      (mul_CSNo (modulus_CSNo z) (complex_cos theta))
+      (mul_SNo (modulus_CSNo z) (complex_cos theta))
+      (mul_CSNo (modulus_CSNo z)
+        (mul_CSNo Complex_i (complex_sin theta)))
+      (mul_CSNo Complex_i
+        (mul_SNo (modulus_CSNo z) (complex_sin theta)))
+      hmodCosBridge himaginaryBridge))).
+claim hscaledCosReal :
+  mul_SNo (modulus_CSNo z) (complex_cos theta) :e real.
+exact (real_mul_SNo
+  (modulus_CSNo z) hmodReal
+  (complex_cos theta) hcosReal).
+claim hscaledSinReal :
+  mul_SNo (modulus_CSNo z) (complex_sin theta) :e real.
+exact (real_mul_SNo
+  (modulus_CSNo z) hmodReal
+  (complex_sin theta) hsinReal).
+claim hcartesianUnique :
+  forall eta :e complex, forall x y :e real,
+    eta = add_CSNo x (mul_CSNo Complex_i y) ->
+    x = CSNo_Re eta /\ y = CSNo_Im eta.
+exact (andER
+  (((Complex_i :e complex
+    /\ mul_CSNo Complex_i Complex_i = minus_CSNo 1)
+    /\ forall eta :e complex,
+      eta = add_CSNo
+        (CSNo_Re eta)
+        (mul_CSNo Complex_i (CSNo_Im eta))))
+  (forall eta :e complex, forall x y :e real,
+    eta = add_CSNo x (mul_CSNo Complex_i y) ->
+    x = CSNo_Re eta /\ y = CSNo_Im eta)
+  god1_complex_i_and_cartesian_representation).
+claim hcoordinatesForward :
+  mul_SNo (modulus_CSNo z) (complex_cos theta) = CSNo_Re z
+  /\ mul_SNo (modulus_CSNo z) (complex_sin theta) = CSNo_Im z.
+exact (hcartesianUnique z hz
+  (mul_SNo (modulus_CSNo z) (complex_cos theta)) hscaledCosReal
+  (mul_SNo (modulus_CSNo z) (complex_sin theta)) hscaledSinReal
+  hcartesianRepresentation).
+exact (andI
+  (CSNo_Re z
+    = mul_SNo (modulus_CSNo z) (complex_cos theta))
+  (CSNo_Im z
+    = mul_SNo (modulus_CSNo z) (complex_sin theta))
+  (eq_sym
+    (mul_SNo (modulus_CSNo z) (complex_cos theta))
+    (CSNo_Re z)
+    (andEL
+      (mul_SNo (modulus_CSNo z) (complex_cos theta) = CSNo_Re z)
+      (mul_SNo (modulus_CSNo z) (complex_sin theta) = CSNo_Im z)
+      hcoordinatesForward))
+  (eq_sym
+    (mul_SNo (modulus_CSNo z) (complex_sin theta))
+    (CSNo_Im z)
+    (andER
+      (mul_SNo (modulus_CSNo z) (complex_cos theta) = CSNo_Re z)
+      (mul_SNo (modulus_CSNo z) (complex_sin theta) = CSNo_Im z)
+      hcoordinatesForward))).
+Qed.
 
 Theorem god1_complex_argument_of_product :
   forall z w :e complex, forall theta phi :e real,
@@ -77960,26 +78546,728 @@ assume htheta.
 let phi.
 assume hphi hzarg hwarg.
 //GOD1PRF:174156 Since $r_{1} r_{2}$ is positive, it is enough to show that
+claim hargumentZBasic :
+  (z :e complex /\ z <> 0) /\ theta :e real.
+exact (andEL
+  (((z :e complex /\ z <> 0) /\ theta :e real))
+  (z = mul_CSNo (modulus_CSNo z)
+    (add_CSNo
+      (complex_cos theta)
+      (mul_CSNo Complex_i (complex_sin theta))))
+  hzarg).
+claim hargumentWBasic :
+  (w :e complex /\ w <> 0) /\ phi :e real.
+exact (andEL
+  (((w :e complex /\ w <> 0) /\ phi :e real))
+  (w = mul_CSNo (modulus_CSNo w)
+    (add_CSNo
+      (complex_cos phi)
+      (mul_CSNo Complex_i (complex_sin phi))))
+  hwarg).
+claim hznz : z <> 0.
+exact (andER (z :e complex) (z <> 0)
+  (andEL (z :e complex /\ z <> 0) (theta :e real)
+    hargumentZBasic)).
+claim hwnz : w <> 0.
+exact (andER (w :e complex) (w <> 0)
+  (andEL (w :e complex /\ w <> 0) (phi :e real)
+    hargumentWBasic)).
+claim hrepresentationZ :
+  z = mul_CSNo (modulus_CSNo z)
+    (add_CSNo
+      (complex_cos theta)
+      (mul_CSNo Complex_i (complex_sin theta))).
+exact (andER
+  (((z :e complex /\ z <> 0) /\ theta :e real))
+  (z = mul_CSNo (modulus_CSNo z)
+    (add_CSNo
+      (complex_cos theta)
+      (mul_CSNo Complex_i (complex_sin theta))))
+  hzarg).
+claim hrepresentationW :
+  w = mul_CSNo (modulus_CSNo w)
+    (add_CSNo
+      (complex_cos phi)
+      (mul_CSNo Complex_i (complex_sin phi))).
+exact (andER
+  (((w :e complex /\ w <> 0) /\ phi :e real))
+  (w = mul_CSNo (modulus_CSNo w)
+    (add_CSNo
+      (complex_cos phi)
+      (mul_CSNo Complex_i (complex_sin phi))))
+  hwarg).
+claim hrealAngleValues :
+  forall alpha :e real,
+    complex_cos alpha :e real
+    /\ complex_sin alpha :e real.
+exact (andEL
+  (forall alpha :e real,
+    complex_cos alpha :e real
+    /\ complex_sin alpha :e real)
+  (forall alpha beta :e real,
+    mul_CSNo
+      (add_CSNo
+        (complex_cos alpha)
+        (mul_CSNo Complex_i (complex_sin alpha)))
+      (add_CSNo
+        (complex_cos beta)
+        (mul_CSNo Complex_i (complex_sin beta)))
+    = add_CSNo
+      (complex_cos (add_SNo alpha beta))
+      (mul_CSNo Complex_i
+        (complex_sin (add_SNo alpha beta))))
+  god1_real_angle_euler_laws).
+claim hEulerProductLaw :
+  forall alpha beta :e real,
+    mul_CSNo
+      (add_CSNo
+        (complex_cos alpha)
+        (mul_CSNo Complex_i (complex_sin alpha)))
+      (add_CSNo
+        (complex_cos beta)
+        (mul_CSNo Complex_i (complex_sin beta)))
+    = add_CSNo
+      (complex_cos (add_SNo alpha beta))
+      (mul_CSNo Complex_i
+        (complex_sin (add_SNo alpha beta))).
+exact (andER
+  (forall alpha :e real,
+    complex_cos alpha :e real
+    /\ complex_sin alpha :e real)
+  (forall alpha beta :e real,
+    mul_CSNo
+      (add_CSNo
+        (complex_cos alpha)
+        (mul_CSNo Complex_i (complex_sin alpha)))
+      (add_CSNo
+        (complex_cos beta)
+        (mul_CSNo Complex_i (complex_sin beta)))
+    = add_CSNo
+      (complex_cos (add_SNo alpha beta))
+      (mul_CSNo Complex_i
+        (complex_sin (add_SNo alpha beta))))
+  god1_real_angle_euler_laws).
+claim hthetaValues :
+  complex_cos theta :e real /\ complex_sin theta :e real.
+exact (hrealAngleValues theta htheta).
+claim hphiValues :
+  complex_cos phi :e real /\ complex_sin phi :e real.
+exact (hrealAngleValues phi hphi).
+claim hsumReal : add_SNo theta phi :e real.
+exact (real_add_SNo theta htheta phi hphi).
+claim hsumValues :
+  complex_cos (add_SNo theta phi) :e real
+  /\ complex_sin (add_SNo theta phi) :e real.
+exact (hrealAngleValues (add_SNo theta phi) hsumReal).
+claim hcosThetaReal : complex_cos theta :e real.
+exact (andEL (complex_cos theta :e real)
+  (complex_sin theta :e real) hthetaValues).
+claim hsinThetaReal : complex_sin theta :e real.
+exact (andER (complex_cos theta :e real)
+  (complex_sin theta :e real) hthetaValues).
+claim hcosPhiReal : complex_cos phi :e real.
+exact (andEL (complex_cos phi :e real)
+  (complex_sin phi :e real) hphiValues).
+claim hsinPhiReal : complex_sin phi :e real.
+exact (andER (complex_cos phi :e real)
+  (complex_sin phi :e real) hphiValues).
+claim hcosSumReal : complex_cos (add_SNo theta phi) :e real.
+exact (andEL (complex_cos (add_SNo theta phi) :e real)
+  (complex_sin (add_SNo theta phi) :e real) hsumValues).
+claim hsinSumReal : complex_sin (add_SNo theta phi) :e real.
+exact (andER (complex_cos (add_SNo theta phi) :e real)
+  (complex_sin (add_SNo theta phi) :e real) hsumValues).
+claim hmodZReal : modulus_CSNo z :e real.
+exact (modulus_CSNo_mem_R z hz).
+claim hmodWReal : modulus_CSNo w :e real.
+exact (modulus_CSNo_mem_R w hw).
+claim hmodZC : modulus_CSNo z :e complex.
+exact (real_complex (modulus_CSNo z) hmodZReal).
+claim hmodWC : modulus_CSNo w :e complex.
+exact (real_complex (modulus_CSNo w) hmodWReal).
+claim hunitThetaC :
+  add_CSNo
+    (complex_cos theta)
+    (mul_CSNo Complex_i (complex_sin theta)) :e complex.
+exact (complex_add_CSNo
+  (complex_cos theta) (real_complex (complex_cos theta) hcosThetaReal)
+  (mul_CSNo Complex_i (complex_sin theta))
+  (complex_mul_CSNo Complex_i complex_i
+    (complex_sin theta) (real_complex (complex_sin theta) hsinThetaReal))).
+claim hunitPhiC :
+  add_CSNo
+    (complex_cos phi)
+    (mul_CSNo Complex_i (complex_sin phi)) :e complex.
+exact (complex_add_CSNo
+  (complex_cos phi) (real_complex (complex_cos phi) hcosPhiReal)
+  (mul_CSNo Complex_i (complex_sin phi))
+  (complex_mul_CSNo Complex_i complex_i
+    (complex_sin phi) (real_complex (complex_sin phi) hsinPhiReal))).
+claim hunitSumC :
+  add_CSNo
+    (complex_cos (add_SNo theta phi))
+    (mul_CSNo Complex_i
+      (complex_sin (add_SNo theta phi))) :e complex.
+exact (complex_add_CSNo
+  (complex_cos (add_SNo theta phi))
+  (real_complex
+    (complex_cos (add_SNo theta phi)) hcosSumReal)
+  (mul_CSNo Complex_i
+    (complex_sin (add_SNo theta phi)))
+  (complex_mul_CSNo Complex_i complex_i
+    (complex_sin (add_SNo theta phi))
+    (real_complex
+      (complex_sin (add_SNo theta phi)) hsinSumReal))).
+claim hfieldC : field complex add_CSNo mul_CSNo.
+exact god1_complex_numbers_are_field_direct.
+claim hdivisionC : division_ring complex add_CSNo mul_CSNo.
+exact (god1_field_division_ring
+  complex add_CSNo mul_CSNo hfieldC).
+claim hringC : ring complex add_CSNo mul_CSNo.
+exact (god1_division_ring_ring
+  complex add_CSNo mul_CSNo hdivisionC).
+claim hcommC : commutative_on complex mul_CSNo.
+exact (andER
+  (division_ring complex add_CSNo mul_CSNo)
+  (commutative_on complex mul_CSNo)
+  hfieldC).
+claim hcommRingC : commutative_ring complex add_CSNo mul_CSNo.
+exact (andI
+  (ring complex add_CSNo mul_CSNo)
+  (commutative_on complex mul_CSNo)
+  hringC hcommC).
 claim h_s9_argument_product_reduction :
-  complex_argument z theta -> complex_argument w phi ->
+  mul_CSNo z w
+  = mul_CSNo
+    (mul_CSNo (modulus_CSNo z) (modulus_CSNo w))
+    (mul_CSNo
+      (add_CSNo
+        (complex_cos theta)
+        (mul_CSNo Complex_i (complex_sin theta)))
+      (add_CSNo
+        (complex_cos phi)
+        (mul_CSNo Complex_i (complex_sin phi)))).
+exact (eq_i_tra
+  (mul_CSNo z w)
+  (mul_CSNo
+    (mul_CSNo (modulus_CSNo z)
+      (add_CSNo
+        (complex_cos theta)
+        (mul_CSNo Complex_i (complex_sin theta))))
+    (mul_CSNo (modulus_CSNo w)
+      (add_CSNo
+        (complex_cos phi)
+        (mul_CSNo Complex_i (complex_sin phi)))))
+  (mul_CSNo
+    (mul_CSNo (modulus_CSNo z) (modulus_CSNo w))
+    (mul_CSNo
+      (add_CSNo
+        (complex_cos theta)
+        (mul_CSNo Complex_i (complex_sin theta)))
+      (add_CSNo
+        (complex_cos phi)
+        (mul_CSNo Complex_i (complex_sin phi)))))
+  (god1_binary_operation_congruence mul_CSNo
+    z
+    (mul_CSNo (modulus_CSNo z)
+      (add_CSNo
+        (complex_cos theta)
+        (mul_CSNo Complex_i (complex_sin theta))))
+    w
+    (mul_CSNo (modulus_CSNo w)
+      (add_CSNo
+        (complex_cos phi)
+        (mul_CSNo Complex_i (complex_sin phi))))
+    hrepresentationZ hrepresentationW)
+  (god1_commutative_ring_four_factor_interchange
+    complex add_CSNo mul_CSNo hcommRingC
+    (modulus_CSNo z) hmodZC
+    (add_CSNo
+      (complex_cos theta)
+      (mul_CSNo Complex_i (complex_sin theta))) hunitThetaC
+    (modulus_CSNo w) hmodWC
+    (add_CSNo
+      (complex_cos phi)
+      (mul_CSNo Complex_i (complex_sin phi))) hunitPhiC)).
+claim hmodulusProduct :
+  modulus_CSNo (mul_CSNo z w)
+  = mul_SNo (modulus_CSNo z) (modulus_CSNo w).
+exact (modulus_CSNo_mul_eq_mul z hz w hw).
+claim hfrontFactor :
+  mul_CSNo (modulus_CSNo z) (modulus_CSNo w)
+  = modulus_CSNo (mul_CSNo z w).
+exact (eq_i_tra
+  (mul_CSNo (modulus_CSNo z) (modulus_CSNo w))
+  (mul_SNo (modulus_CSNo z) (modulus_CSNo w))
+  (modulus_CSNo (mul_CSNo z w))
+  (mul_CSNo_mul_SNo
+    (modulus_CSNo z) (modulus_CSNo w)
+    (real_SNo (modulus_CSNo z) hmodZReal)
+    (real_SNo (modulus_CSNo w) hmodWReal))
+  (eq_sym
+    (modulus_CSNo (mul_CSNo z w))
+    (mul_SNo (modulus_CSNo z) (modulus_CSNo w))
+    hmodulusProduct)).
+claim hproductRepresentation :
+  mul_CSNo z w
+  = mul_CSNo (modulus_CSNo (mul_CSNo z w))
+    (add_CSNo
+      (complex_cos (add_SNo theta phi))
+      (mul_CSNo Complex_i
+        (complex_sin (add_SNo theta phi)))).
+exact (eq_i_tra
+  (mul_CSNo z w)
+  (mul_CSNo
+    (mul_CSNo (modulus_CSNo z) (modulus_CSNo w))
+    (mul_CSNo
+      (add_CSNo
+        (complex_cos theta)
+        (mul_CSNo Complex_i (complex_sin theta)))
+      (add_CSNo
+        (complex_cos phi)
+        (mul_CSNo Complex_i (complex_sin phi)))))
+  (mul_CSNo (modulus_CSNo (mul_CSNo z w))
+    (add_CSNo
+      (complex_cos (add_SNo theta phi))
+      (mul_CSNo Complex_i
+        (complex_sin (add_SNo theta phi)))))
+  h_s9_argument_product_reduction
+  (god1_binary_operation_congruence mul_CSNo
+    (mul_CSNo (modulus_CSNo z) (modulus_CSNo w))
+    (modulus_CSNo (mul_CSNo z w))
+    (mul_CSNo
+      (add_CSNo
+        (complex_cos theta)
+        (mul_CSNo Complex_i (complex_sin theta)))
+      (add_CSNo
+        (complex_cos phi)
+        (mul_CSNo Complex_i (complex_sin phi))))
+    (add_CSNo
+      (complex_cos (add_SNo theta phi))
+      (mul_CSNo Complex_i
+        (complex_sin (add_SNo theta phi))))
+    hfrontFactor
+    (hEulerProductLaw theta htheta phi hphi))).
+claim hproductC : mul_CSNo z w :e complex.
+exact (complex_mul_CSNo z hz w hw).
+claim hproductNonzero : mul_CSNo z w <> 0.
+exact (complex_mul_nonzero_of_nonzero z hz w hw hznz hwnz).
+claim hargumentProduct :
   complex_argument (mul_CSNo z w) (add_SNo theta phi).
-admit.
+exact (andI
+  (((mul_CSNo z w :e complex /\ mul_CSNo z w <> 0)
+    /\ add_SNo theta phi :e real))
+  (mul_CSNo z w
+    = mul_CSNo (modulus_CSNo (mul_CSNo z w))
+      (add_CSNo
+        (complex_cos (add_SNo theta phi))
+        (mul_CSNo Complex_i
+          (complex_sin (add_SNo theta phi)))))
+  (andI
+    (mul_CSNo z w :e complex /\ mul_CSNo z w <> 0)
+    (add_SNo theta phi :e real)
+    (andI
+      (mul_CSNo z w :e complex)
+      (mul_CSNo z w <> 0)
+      hproductC hproductNonzero)
+    hsumReal)
+  hproductRepresentation).
+claim hproductCoordinates :
+  CSNo_Re (mul_CSNo z w)
+    = mul_SNo (modulus_CSNo (mul_CSNo z w))
+      (complex_cos (add_SNo theta phi))
+  /\ CSNo_Im (mul_CSNo z w)
+    = mul_SNo (modulus_CSNo (mul_CSNo z w))
+      (complex_sin (add_SNo theta phi)).
+exact (god1_complex_argument_gives_coordinates
+  (mul_CSNo z w) hproductC
+  (add_SNo theta phi) hsumReal
+  hargumentProduct hcosSumReal hsinSumReal).
 //GOD1PRF:174400 But the rules for multiplying complex numbers show that the real part of the lefthand side is equal to
 claim h_s9_argument_product_real_part :
   CSNo_Re (mul_CSNo z w)
     = mul_SNo (modulus_CSNo z) (mul_SNo (modulus_CSNo w)
       (complex_cos (add_SNo theta phi))).
-admit.
+exact (eq_i_tra
+  (CSNo_Re (mul_CSNo z w))
+  (mul_SNo (modulus_CSNo (mul_CSNo z w))
+    (complex_cos (add_SNo theta phi)))
+  (mul_SNo (modulus_CSNo z)
+    (mul_SNo (modulus_CSNo w)
+      (complex_cos (add_SNo theta phi))))
+  (andEL
+    (CSNo_Re (mul_CSNo z w)
+      = mul_SNo (modulus_CSNo (mul_CSNo z w))
+        (complex_cos (add_SNo theta phi)))
+    (CSNo_Im (mul_CSNo z w)
+      = mul_SNo (modulus_CSNo (mul_CSNo z w))
+        (complex_sin (add_SNo theta phi)))
+    hproductCoordinates)
+  (eq_i_tra
+    (mul_SNo (modulus_CSNo (mul_CSNo z w))
+      (complex_cos (add_SNo theta phi)))
+    (mul_SNo
+      (mul_SNo (modulus_CSNo z) (modulus_CSNo w))
+      (complex_cos (add_SNo theta phi)))
+    (mul_SNo (modulus_CSNo z)
+      (mul_SNo (modulus_CSNo w)
+        (complex_cos (add_SNo theta phi))))
+    (f_eq_i
+      (fun q => mul_SNo q (complex_cos (add_SNo theta phi)))
+      (modulus_CSNo (mul_CSNo z w))
+      (mul_SNo (modulus_CSNo z) (modulus_CSNo w))
+      hmodulusProduct)
+    (eq_sym
+      (mul_SNo (modulus_CSNo z)
+        (mul_SNo (modulus_CSNo w)
+          (complex_cos (add_SNo theta phi))))
+      (mul_SNo
+        (mul_SNo (modulus_CSNo z) (modulus_CSNo w))
+        (complex_cos (add_SNo theta phi)))
+      (mul_SNo_assoc
+        (modulus_CSNo z) (modulus_CSNo w)
+        (complex_cos (add_SNo theta phi))
+        (real_SNo (modulus_CSNo z) hmodZReal)
+        (real_SNo (modulus_CSNo w) hmodWReal)
+        (real_SNo
+          (complex_cos (add_SNo theta phi)) hcosSumReal))))).
 //GOD1PRF:174627 and the imaginary part is equal to
 claim h_s9_argument_product_imaginary_part :
   CSNo_Im (mul_CSNo z w)
     = mul_SNo (modulus_CSNo z) (mul_SNo (modulus_CSNo w)
       (complex_sin (add_SNo theta phi))).
-admit.
+exact (eq_i_tra
+  (CSNo_Im (mul_CSNo z w))
+  (mul_SNo (modulus_CSNo (mul_CSNo z w))
+    (complex_sin (add_SNo theta phi)))
+  (mul_SNo (modulus_CSNo z)
+    (mul_SNo (modulus_CSNo w)
+      (complex_sin (add_SNo theta phi))))
+  (andER
+    (CSNo_Re (mul_CSNo z w)
+      = mul_SNo (modulus_CSNo (mul_CSNo z w))
+        (complex_cos (add_SNo theta phi)))
+    (CSNo_Im (mul_CSNo z w)
+      = mul_SNo (modulus_CSNo (mul_CSNo z w))
+        (complex_sin (add_SNo theta phi)))
+    hproductCoordinates)
+  (eq_i_tra
+    (mul_SNo (modulus_CSNo (mul_CSNo z w))
+      (complex_sin (add_SNo theta phi)))
+    (mul_SNo
+      (mul_SNo (modulus_CSNo z) (modulus_CSNo w))
+      (complex_sin (add_SNo theta phi)))
+    (mul_SNo (modulus_CSNo z)
+      (mul_SNo (modulus_CSNo w)
+        (complex_sin (add_SNo theta phi))))
+    (f_eq_i
+      (fun q => mul_SNo q (complex_sin (add_SNo theta phi)))
+      (modulus_CSNo (mul_CSNo z w))
+      (mul_SNo (modulus_CSNo z) (modulus_CSNo w))
+      hmodulusProduct)
+    (eq_sym
+      (mul_SNo (modulus_CSNo z)
+        (mul_SNo (modulus_CSNo w)
+          (complex_sin (add_SNo theta phi))))
+      (mul_SNo
+        (mul_SNo (modulus_CSNo z) (modulus_CSNo w))
+        (complex_sin (add_SNo theta phi)))
+      (mul_SNo_assoc
+        (modulus_CSNo z) (modulus_CSNo w)
+        (complex_sin (add_SNo theta phi))
+        (real_SNo (modulus_CSNo z) hmodZReal)
+        (real_SNo (modulus_CSNo w) hmodWReal)
+        (real_SNo
+          (complex_sin (add_SNo theta phi)) hsinSumReal))))).
 //GOD1PRF:174788 Hence (19) is proved.
 claim h_s9_argument_product_conclusion :
   complex_argument (mul_CSNo z w) (add_SNo theta phi).
-admit.
+exact hargumentProduct.
+Admitted.
+
+Theorem god1_natural_number_is_real :
+  forall n :e omega, n :e real.
+let n.
+assume hn.
+exact (SNoS_omega_real n
+  (Subq_int_SNoS_omega n
+    (Subq_omega_int n hn))).
+Qed.
+
+Theorem god1_de_moivre_zero :
+  forall theta :e real,
+    exp_CSNo_nat
+      (add_CSNo
+        (complex_cos theta)
+        (mul_CSNo Complex_i (complex_sin theta)))
+      0
+    = add_CSNo
+      (complex_cos (mul_SNo 0 theta))
+      (mul_CSNo Complex_i
+        (complex_sin (mul_SNo 0 theta))).
+let theta.
+assume htheta.
+claim hzeroAngle : mul_SNo 0 theta = 0.
+exact (mul_SNo_zeroL theta (real_SNo theta htheta)).
+claim hiZero : mul_CSNo Complex_i 0 = 0.
+exact (mul_CSNo_0R Complex_i
+  (complex_CSNo Complex_i complex_i)).
+claim hEulerZero :
+  add_CSNo
+    (complex_cos 0)
+    (mul_CSNo Complex_i (complex_sin 0))
+  = 1.
+exact (eq_i_tra
+  (add_CSNo
+    (complex_cos 0)
+    (mul_CSNo Complex_i (complex_sin 0)))
+  (add_CSNo 1 (mul_CSNo Complex_i 0))
+  1
+  (god1_binary_operation_congruence add_CSNo
+    (complex_cos 0) 1
+    (mul_CSNo Complex_i (complex_sin 0))
+    (mul_CSNo Complex_i 0)
+    complex_cos_0
+    (f_eq_i (mul_CSNo Complex_i)
+      (complex_sin 0) 0 complex_sin_0))
+  (eq_i_tra
+    (add_CSNo 1 (mul_CSNo Complex_i 0))
+    (add_CSNo 1 0)
+    1
+    (f_eq_i (add_CSNo 1)
+      (mul_CSNo Complex_i 0) 0 hiZero)
+    (add_CSNo_0R 1 (complex_CSNo 1 complex_1)))).
+claim hScaledEulerZero :
+  add_CSNo
+    (complex_cos (mul_SNo 0 theta))
+    (mul_CSNo Complex_i
+      (complex_sin (mul_SNo 0 theta)))
+  = 1.
+exact (eq_i_tra
+  (add_CSNo
+    (complex_cos (mul_SNo 0 theta))
+    (mul_CSNo Complex_i
+      (complex_sin (mul_SNo 0 theta))))
+  (add_CSNo
+    (complex_cos 0)
+    (mul_CSNo Complex_i (complex_sin 0)))
+  1
+  (f_eq_i
+    (fun alpha =>
+      add_CSNo
+        (complex_cos alpha)
+        (mul_CSNo Complex_i (complex_sin alpha)))
+    (mul_SNo 0 theta) 0 hzeroAngle)
+  hEulerZero).
+exact (eq_i_tra
+  (exp_CSNo_nat
+    (add_CSNo
+      (complex_cos theta)
+      (mul_CSNo Complex_i (complex_sin theta)))
+    0)
+  1
+  (add_CSNo
+    (complex_cos (mul_SNo 0 theta))
+    (mul_CSNo Complex_i
+      (complex_sin (mul_SNo 0 theta))))
+  (exp_CSNo_nat_0
+    (add_CSNo
+      (complex_cos theta)
+      (mul_CSNo Complex_i (complex_sin theta))))
+  (eq_sym
+    (add_CSNo
+      (complex_cos (mul_SNo 0 theta))
+      (mul_CSNo Complex_i
+        (complex_sin (mul_SNo 0 theta))))
+    1 hScaledEulerZero)).
+Qed.
+
+Theorem god1_de_moivre_induction_step :
+  forall theta :e real, forall n :e omega,
+    exp_CSNo_nat
+      (add_CSNo
+        (complex_cos theta)
+        (mul_CSNo Complex_i (complex_sin theta)))
+      n
+    = add_CSNo
+      (complex_cos (mul_SNo n theta))
+      (mul_CSNo Complex_i
+        (complex_sin (mul_SNo n theta)))
+    ->
+    exp_CSNo_nat
+      (add_CSNo
+        (complex_cos theta)
+        (mul_CSNo Complex_i (complex_sin theta)))
+      (ordsucc n)
+    = add_CSNo
+      (complex_cos (mul_SNo (ordsucc n) theta))
+      (mul_CSNo Complex_i
+        (complex_sin (mul_SNo (ordsucc n) theta))).
+let theta.
+assume htheta.
+let n.
+assume hn hinduction.
+claim hnReal : n :e real.
+exact (god1_natural_number_is_real n hn).
+claim hnThetaReal : mul_SNo n theta :e real.
+exact (real_mul_SNo n hnReal theta htheta).
+claim hEulerProductLaw :
+  forall alpha beta :e real,
+    mul_CSNo
+      (add_CSNo
+        (complex_cos alpha)
+        (mul_CSNo Complex_i (complex_sin alpha)))
+      (add_CSNo
+        (complex_cos beta)
+        (mul_CSNo Complex_i (complex_sin beta)))
+    = add_CSNo
+      (complex_cos (add_SNo alpha beta))
+      (mul_CSNo Complex_i
+        (complex_sin (add_SNo alpha beta))).
+exact (andER
+  (forall alpha :e real,
+    complex_cos alpha :e real
+    /\ complex_sin alpha :e real)
+  (forall alpha beta :e real,
+    mul_CSNo
+      (add_CSNo
+        (complex_cos alpha)
+        (mul_CSNo Complex_i (complex_sin alpha)))
+      (add_CSNo
+        (complex_cos beta)
+        (mul_CSNo Complex_i (complex_sin beta)))
+    = add_CSNo
+      (complex_cos (add_SNo alpha beta))
+      (mul_CSNo Complex_i
+        (complex_sin (add_SNo alpha beta))))
+  god1_real_angle_euler_laws).
+claim hsuccessorProduct :
+  mul_SNo (ordsucc n) theta
+  = add_SNo theta (mul_SNo n theta).
+exact (eq_i_tra
+  (mul_SNo (ordsucc n) theta)
+  (mul_SNo (add_SNo 1 n) theta)
+  (add_SNo theta (mul_SNo n theta))
+  (f_eq_i (fun q => mul_SNo q theta)
+    (ordsucc n) (add_SNo 1 n)
+    (ordinal_ordsucc_SNo_eq n
+      (nat_p_ordinal n (omega_nat_p n hn))))
+  (eq_i_tra
+    (mul_SNo (add_SNo 1 n) theta)
+    (add_SNo (mul_SNo 1 theta) (mul_SNo n theta))
+    (add_SNo theta (mul_SNo n theta))
+    (mul_SNo_distrR 1 n theta
+      SNo_1 (nat_p_SNo n (omega_nat_p n hn))
+      (real_SNo theta htheta))
+    (f_eq_i
+      (fun q => add_SNo q (mul_SNo n theta))
+      (mul_SNo 1 theta) theta
+      (mul_SNo_oneL theta (real_SNo theta htheta))))).
+claim hangleSuccessor :
+  add_SNo theta (mul_SNo n theta)
+  = mul_SNo (ordsucc n) theta.
+exact (eq_sym
+  (mul_SNo (ordsucc n) theta)
+  (add_SNo theta (mul_SNo n theta))
+  hsuccessorProduct).
+claim hEulerSuccessorSubstitution :
+  add_CSNo
+    (complex_cos (add_SNo theta (mul_SNo n theta)))
+    (mul_CSNo Complex_i
+      (complex_sin (add_SNo theta (mul_SNo n theta))))
+  = add_CSNo
+    (complex_cos (mul_SNo (ordsucc n) theta))
+    (mul_CSNo Complex_i
+      (complex_sin (mul_SNo (ordsucc n) theta))).
+exact (f_eq_i
+  (fun alpha =>
+    add_CSNo
+      (complex_cos alpha)
+      (mul_CSNo Complex_i (complex_sin alpha)))
+  (add_SNo theta (mul_SNo n theta))
+  (mul_SNo (ordsucc n) theta)
+  hangleSuccessor).
+exact (eq_i_tra
+  (exp_CSNo_nat
+    (add_CSNo
+      (complex_cos theta)
+      (mul_CSNo Complex_i (complex_sin theta)))
+    (ordsucc n))
+  (mul_CSNo
+    (add_CSNo
+      (complex_cos theta)
+      (mul_CSNo Complex_i (complex_sin theta)))
+    (exp_CSNo_nat
+      (add_CSNo
+        (complex_cos theta)
+        (mul_CSNo Complex_i (complex_sin theta)))
+      n))
+  (add_CSNo
+    (complex_cos (mul_SNo (ordsucc n) theta))
+    (mul_CSNo Complex_i
+      (complex_sin (mul_SNo (ordsucc n) theta))))
+  (exp_CSNo_nat_S
+    (add_CSNo
+      (complex_cos theta)
+      (mul_CSNo Complex_i (complex_sin theta)))
+    n (omega_nat_p n hn))
+  (eq_i_tra
+    (mul_CSNo
+      (add_CSNo
+        (complex_cos theta)
+        (mul_CSNo Complex_i (complex_sin theta)))
+      (exp_CSNo_nat
+        (add_CSNo
+          (complex_cos theta)
+          (mul_CSNo Complex_i (complex_sin theta)))
+        n))
+    (mul_CSNo
+      (add_CSNo
+        (complex_cos theta)
+        (mul_CSNo Complex_i (complex_sin theta)))
+      (add_CSNo
+        (complex_cos (mul_SNo n theta))
+        (mul_CSNo Complex_i
+          (complex_sin (mul_SNo n theta)))))
+    (add_CSNo
+      (complex_cos (mul_SNo (ordsucc n) theta))
+      (mul_CSNo Complex_i
+        (complex_sin (mul_SNo (ordsucc n) theta))))
+    (f_eq_i
+      (mul_CSNo
+        (add_CSNo
+          (complex_cos theta)
+          (mul_CSNo Complex_i (complex_sin theta))))
+      (exp_CSNo_nat
+        (add_CSNo
+          (complex_cos theta)
+          (mul_CSNo Complex_i (complex_sin theta)))
+        n)
+      (add_CSNo
+        (complex_cos (mul_SNo n theta))
+        (mul_CSNo Complex_i
+          (complex_sin (mul_SNo n theta))))
+      hinduction)
+    (eq_i_tra
+      (mul_CSNo
+        (add_CSNo
+          (complex_cos theta)
+          (mul_CSNo Complex_i (complex_sin theta)))
+        (add_CSNo
+          (complex_cos (mul_SNo n theta))
+          (mul_CSNo Complex_i
+            (complex_sin (mul_SNo n theta)))))
+      (add_CSNo
+        (complex_cos (add_SNo theta (mul_SNo n theta)))
+        (mul_CSNo Complex_i
+          (complex_sin (add_SNo theta (mul_SNo n theta)))))
+      (add_CSNo
+        (complex_cos (mul_SNo (ordsucc n) theta))
+        (mul_CSNo Complex_i
+          (complex_sin (mul_SNo (ordsucc n) theta))))
+      (hEulerProductLaw theta htheta
+        (mul_SNo n theta) hnThetaReal)
+      hEulerSuccessorSubstitution))).
 Admitted.
 
 Theorem god1_de_moivre :
@@ -78004,7 +79292,25 @@ claim h_s9_demoivre_product_formula :
         (mul_CSNo Complex_i (complex_sin theta))) m
     = add_CSNo (complex_cos (mul_SNo m theta))
       (mul_CSNo Complex_i (complex_sin (mul_SNo m theta))).
-admit.
+exact (fun m hm =>
+  nat_ind
+    (fun k =>
+      exp_CSNo_nat
+        (add_CSNo
+          (complex_cos theta)
+          (mul_CSNo Complex_i (complex_sin theta)))
+        k
+      = add_CSNo
+        (complex_cos (mul_SNo k theta))
+        (mul_CSNo Complex_i
+          (complex_sin (mul_SNo k theta))))
+    (god1_de_moivre_zero theta htheta)
+    (fun k hk hinduction =>
+      god1_de_moivre_induction_step
+        theta htheta
+        k (nat_p_omega k hk)
+        hinduction)
+    m (omega_nat_p m hm)).
 //GOD1PRF:175086 In particular, taking all the $\theta_{p}$ to be equal to the same angle $\theta$, we have
 claim h_s9_demoivre_equal_angles :
   exp_CSNo_nat
@@ -78012,7 +79318,7 @@ claim h_s9_demoivre_equal_angles :
       (mul_CSNo Complex_i (complex_sin theta))) n
   = add_CSNo (complex_cos (mul_SNo n theta))
     (mul_CSNo Complex_i (complex_sin (mul_SNo n theta))).
-admit.
+exact (h_s9_demoivre_product_formula n hn).
 //GOD1PRF:175286 which is known as De Moivre's theorem.
 claim h_s9_demoivre_conclusion :
   exp_CSNo_nat
@@ -78020,7 +79326,7 @@ claim h_s9_demoivre_conclusion :
       (mul_CSNo Complex_i (complex_sin theta))) n
   = add_CSNo (complex_cos (mul_SNo n theta))
     (mul_CSNo Complex_i (complex_sin (mul_SNo n theta))).
-admit.
+exact h_s9_demoivre_equal_angles.
 Admitted.
 
 (** § 10. Modules and vector spaces. **)
