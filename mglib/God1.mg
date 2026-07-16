@@ -49882,6 +49882,1588 @@ exact (god1_int_mod_quotient_group p hp).
 exact h_s7_mod_group_conclusion.
 Qed.
 
+(** Additive-integer infrastructure used in the proof of Theorem 10. **)
+Theorem god1_integer_additive_group : group int add_SNo.
+claim hlaw : law_of_composition int add_SNo.
+let x.
+assume hx.
+let y.
+assume hy.
+exact (int_add_SNo x hx y hy).
+claim hassoc : associative_on int add_SNo.
+let x.
+assume hx.
+let y.
+assume hy.
+let z.
+assume hz.
+exact (add_SNo_assoc x y z
+  (int_SNo x hx) (int_SNo y hy) (int_SNo z hz)).
+claim hzero : 0 :e int.
+exact (Subq_omega_int 0 (nat_p_omega 0 nat_0)).
+claim hneutral : neutral_element int add_SNo 0.
+exact (andI
+  (0 :e int)
+  (forall x :e int,
+    add_SNo x 0 = x /\ add_SNo 0 x = x)
+  hzero
+  (fun x hx => andI
+    (add_SNo x 0 = x) (add_SNo 0 x = x)
+    (add_SNo_0R x (int_SNo x hx))
+    (add_SNo_0L x (int_SNo x hx)))).
+claim hreflect : forall x :e int,
+  exists y :e int, reflection int add_SNo 0 x y.
+let x.
+assume hx.
+apply (ex_intro
+  (fun y => y :e int /\ reflection int add_SNo 0 x y)
+  (minus_SNo x)).
+exact (andI
+  (minus_SNo x :e int)
+  (reflection int add_SNo 0 x (minus_SNo x))
+  (int_minus_SNo x hx)
+  (andI
+    (minus_SNo x :e int
+      /\ add_SNo (minus_SNo x) x = 0)
+    (add_SNo x (minus_SNo x) = 0)
+    (andI
+      (minus_SNo x :e int)
+      (add_SNo (minus_SNo x) x = 0)
+      (int_minus_SNo x hx)
+      (add_SNo_minus_SNo_linv x (int_SNo x hx)))
+    (add_SNo_minus_SNo_rinv x (int_SNo x hx)))).
+exact (andI
+  (law_of_composition int add_SNo
+    /\ associative_on int add_SNo)
+  (exists e :e int,
+    neutral_element int add_SNo e
+    /\ forall x :e int,
+      exists y :e int, reflection int add_SNo e x y)
+  (andI
+    (law_of_composition int add_SNo)
+    (associative_on int add_SNo) hlaw hassoc)
+  (ex_intro
+    (fun e => e :e int /\
+      (neutral_element int add_SNo e
+      /\ forall x :e int,
+        exists y :e int, reflection int add_SNo e x y))
+    0
+    (andI
+      (0 :e int)
+      (neutral_element int add_SNo 0
+        /\ forall x :e int,
+          exists y :e int, reflection int add_SNo 0 x y)
+      hzero
+      (andI
+        (neutral_element int add_SNo 0)
+        (forall x :e int,
+          exists y :e int, reflection int add_SNo 0 x y)
+        hneutral hreflect)))).
+Qed.
+
+Theorem god1_integer_additive_identity :
+  group_identity int add_SNo = 0.
+exact (god1_s6_theorem1_neutral_element_unique
+  int add_SNo
+  (god1_group_law_of_composition
+    int add_SNo god1_integer_additive_group)
+  (group_identity int add_SNo) 0
+  (god1_group_identity_specification
+    int add_SNo god1_integer_additive_group)
+  (andI
+    (0 :e int)
+    (forall x :e int,
+      add_SNo x 0 = x /\ add_SNo 0 x = x)
+    (Subq_omega_int 0 (nat_p_omega 0 nat_0))
+    (fun x hx => andI
+      (add_SNo x 0 = x) (add_SNo 0 x = x)
+      (add_SNo_0R x (int_SNo x hx))
+      (add_SNo_0L x (int_SNo x hx))))).
+Qed.
+
+Theorem god1_integer_additive_inverse :
+  forall x :e int, group_inverse int add_SNo x = minus_SNo x.
+let x.
+assume hx.
+apply (god1_s6_left_and_right_reflections_equal
+  int add_SNo 0 x
+  (group_inverse int add_SNo x) (minus_SNo x)).
+- exact (god1_group_associative
+    int add_SNo god1_integer_additive_group).
+- exact (andI
+    (0 :e int)
+    (forall z :e int,
+      add_SNo z 0 = z /\ add_SNo 0 z = z)
+    (Subq_omega_int 0 (nat_p_omega 0 nat_0))
+    (fun z hz => andI
+      (add_SNo z 0 = z) (add_SNo 0 z = z)
+      (add_SNo_0R z (int_SNo z hz))
+      (add_SNo_0L z (int_SNo z hz)))).
+- exact hx.
+- exact (andI
+    (group_inverse int add_SNo x :e int)
+    (add_SNo (group_inverse int add_SNo x) x = 0)
+    (god1_group_inverse_in int add_SNo
+      god1_integer_additive_group x hx)
+    (eq_i_tra
+      (add_SNo (group_inverse int add_SNo x) x)
+      (group_identity int add_SNo) 0
+      (andER
+        (group_inverse int add_SNo x :e int)
+        (add_SNo (group_inverse int add_SNo x) x
+          = group_identity int add_SNo)
+        (andEL
+          (group_inverse int add_SNo x :e int
+            /\ add_SNo (group_inverse int add_SNo x) x
+              = group_identity int add_SNo)
+          (add_SNo x (group_inverse int add_SNo x)
+            = group_identity int add_SNo)
+          (god1_group_inverse_specification int add_SNo
+            god1_integer_additive_group x hx)))
+      god1_integer_additive_identity)).
+- exact (andI
+    (minus_SNo x :e int)
+    (add_SNo x (minus_SNo x) = 0)
+    (int_minus_SNo x hx)
+    (add_SNo_minus_SNo_rinv x (int_SNo x hx))).
+Qed.
+
+Theorem god1_integer_subgroup_contains_natural_multiples :
+  forall I, subgroup int add_SNo I ->
+  forall p :e I, forall n, nat_p n -> mul_SNo p n :e I.
+let I.
+assume hI.
+let p.
+assume hp.
+claim hpint : p :e int.
+exact (god1_subgroup_subset int add_SNo I hI p hp).
+let n.
+assume hn.
+apply (nat_ind
+  (fun k => mul_SNo p k :e I)
+  (mem_eq_substR I 0 (mul_SNo p 0)
+    (eq_sym (mul_SNo p 0) 0
+      (mul_SNo_zeroR p (int_SNo p hpint)))
+    (mem_eq_substR I (group_identity int add_SNo) 0
+      god1_integer_additive_identity
+      (god1_subgroup_contains_identity int add_SNo I hI)))
+  (fun k hk hind =>
+    mem_eq_substR I
+      (add_SNo p (mul_SNo p k))
+      (mul_SNo p (ordsucc k))
+      (eq_sym
+        (mul_SNo p (ordsucc k))
+        (add_SNo p (mul_SNo p k))
+        (eq_i_tra
+          (mul_SNo p (ordsucc k))
+          (mul_SNo p (add_SNo 1 k))
+          (add_SNo p (mul_SNo p k))
+          (f_eq_i (fun z => mul_SNo p z)
+            (ordsucc k) (add_SNo 1 k)
+            (ordinal_ordsucc_SNo_eq k
+              (nat_p_ordinal k hk)))
+          (eq_i_tra
+            (mul_SNo p (add_SNo 1 k))
+            (add_SNo (mul_SNo p 1) (mul_SNo p k))
+            (add_SNo p (mul_SNo p k))
+            (mul_SNo_distrL p 1 k
+              (int_SNo p hpint) SNo_1 (nat_p_SNo k hk))
+            (f_eq_i (fun z => add_SNo z (mul_SNo p k))
+              (mul_SNo p 1) p
+              (mul_SNo_oneR p (int_SNo p hpint))))))
+      (god1_subgroup_product_closed int add_SNo I hI
+        p hp (mul_SNo p k) hind))
+  n hn).
+Qed.
+
+Theorem god1_integer_subgroup_contains_integer_multiples :
+  forall I, subgroup int add_SNo I ->
+  forall p :e I, forall k :e int, mul_SNo p k :e I.
+let I.
+assume hI.
+let p.
+assume hp.
+claim hpint : p :e int.
+exact (god1_subgroup_subset int add_SNo I hI p hp).
+let k.
+assume hk.
+apply (int_SNo_cases
+  (fun z => mul_SNo p z :e I)
+  (fun n hn =>
+    god1_integer_subgroup_contains_natural_multiples
+      I hI p hp n (omega_nat_p n hn))
+  (fun n hn =>
+    mem_eq_substR I
+      (group_inverse int add_SNo (mul_SNo p n))
+      (mul_SNo p (minus_SNo n))
+      (eq_i_tra
+        (group_inverse int add_SNo (mul_SNo p n))
+        (minus_SNo (mul_SNo p n))
+        (mul_SNo p (minus_SNo n))
+        (god1_integer_additive_inverse
+          (mul_SNo p n)
+          (int_mul_SNo p hpint n (Subq_omega_int n hn)))
+        (eq_sym
+          (mul_SNo p (minus_SNo n))
+          (minus_SNo (mul_SNo p n))
+          (mul_SNo_minus_distrR p n
+            (int_SNo p hpint) (omega_SNo n hn))))
+      (god1_subgroup_inverse_closed int add_SNo I hI
+        (mul_SNo p n)
+        (god1_integer_subgroup_contains_natural_multiples
+          I hI p hp n (omega_nat_p n hn))))
+  k hk).
+Qed.
+
+Theorem god1_nontrivial_integer_subgroup_has_positive_natural :
+  forall I, subgroup int add_SNo I ->
+  forall z :e I, z <> 0 ->
+  exists n, ordinal n /\ (n :e omega /\ (n <> 0 /\ n :e I)).
+let I.
+assume hI.
+let z.
+assume hz hz0.
+claim hzint : z :e int.
+exact (god1_subgroup_subset int add_SNo I hI z hz).
+apply (int_3_cases z hzint
+  (exists n,
+    ordinal n /\ (n :e omega /\ (n <> 0 /\ n :e I)))).
+- let m.
+  assume hm hzm.
+  claim hmomega : ordsucc m :e omega.
+  exact (nat_p_omega (ordsucc m)
+    (nat_ordsucc m (omega_nat_p m hm))).
+  claim hinvz : group_inverse int add_SNo z :e I.
+  exact (god1_subgroup_inverse_closed int add_SNo I hI z hz).
+  claim hsuccI : ordsucc m :e I.
+  exact (mem_eq_substR I
+    (group_inverse int add_SNo z) (ordsucc m)
+    (eq_i_tra
+      (group_inverse int add_SNo z)
+      (minus_SNo z) (ordsucc m)
+      (god1_integer_additive_inverse z hzint)
+      (eq_i_tra
+        (minus_SNo z)
+        (minus_SNo (minus_SNo (ordsucc m)))
+        (ordsucc m)
+        (f_eq_i minus_SNo z (minus_SNo (ordsucc m)) hzm)
+        (minus_SNo_invol (ordsucc m)
+          (nat_p_SNo (ordsucc m)
+            (nat_ordsucc m (omega_nat_p m hm))))))
+    hinvz).
+  apply (ex_intro
+    (fun n => ordinal n /\
+      (n :e omega /\ (n <> 0 /\ n :e I)))
+    (ordsucc m)).
+  exact (andI
+    (ordinal (ordsucc m))
+    (ordsucc m :e omega /\ (ordsucc m <> 0 /\ ordsucc m :e I))
+    (nat_p_ordinal (ordsucc m)
+      (nat_ordsucc m (omega_nat_p m hm)))
+    (andI
+      (ordsucc m :e omega)
+      (ordsucc m <> 0 /\ ordsucc m :e I)
+      hmomega
+      (andI (ordsucc m <> 0) (ordsucc m :e I)
+        (neq_ordsucc_0 m) hsuccI))).
+- assume hzEq.
+  exact (FalseE (hz0 hzEq)
+    (exists n,
+      ordinal n /\ (n :e omega /\ (n <> 0 /\ n :e I)))).
+- let m.
+  assume hm hzm.
+  claim hmomega : ordsucc m :e omega.
+  exact (nat_p_omega (ordsucc m)
+    (nat_ordsucc m (omega_nat_p m hm))).
+  claim hsuccI : ordsucc m :e I.
+  exact (mem_eq_substR I z (ordsucc m) hzm hz).
+  apply (ex_intro
+    (fun n => ordinal n /\
+      (n :e omega /\ (n <> 0 /\ n :e I)))
+    (ordsucc m)).
+  exact (andI
+    (ordinal (ordsucc m))
+    (ordsucc m :e omega /\ (ordsucc m <> 0 /\ ordsucc m :e I))
+    (nat_p_ordinal (ordsucc m)
+      (nat_ordsucc m (omega_nat_p m hm)))
+    (andI
+      (ordsucc m :e omega)
+      (ordsucc m <> 0 /\ ordsucc m :e I)
+      hmomega
+      (andI (ordsucc m <> 0) (ordsucc m :e I)
+        (neq_ordsucc_0 m) hsuccI))).
+Qed.
+
+(** This is the subgroup-of-integers result used in §7, Example 8. **)
+Theorem god1_subgroup_of_integers_is_multiple_set :
+  forall I, subgroup int add_SNo I ->
+  exists p :e omega, I = {mul_SNo p k|k :e int}.
+let I.
+assume hI.
+apply (orE
+  (exists z :e I, z <> 0)
+  (~exists z :e I, z <> 0)
+  (xm (exists z :e I, z <> 0))
+  (exists p :e omega, I = {mul_SNo p k|k :e int})).
+- assume hnontrivial.
+  apply (exandE_i
+    (fun z => z :e I) (fun z => z <> 0) hnontrivial).
+  let z.
+  assume hz hz0.
+  claim hpositive : exists n,
+    ordinal n /\ (n :e omega /\ (n <> 0 /\ n :e I)).
+  exact (god1_nontrivial_integer_subgroup_has_positive_natural
+    I hI z hz hz0).
+  claim hleast : exists p,
+    ordinal p
+    /\ (p :e omega /\ (p <> 0 /\ p :e I))
+    /\ forall a :e p,
+      ~(a :e omega /\ (a <> 0 /\ a :e I)).
+  exact (least_ordinal_ex
+    (fun p => p :e omega /\ (p <> 0 /\ p :e I)) hpositive).
+  apply (exandE_i
+    (fun p => ordinal p
+      /\ (p :e omega /\ (p <> 0 /\ p :e I)))
+    (fun p => forall a :e p,
+      ~(a :e omega /\ (a <> 0 /\ a :e I)))
+    hleast).
+  let p.
+  assume hpdata hminimal.
+  claim hp : p :e omega.
+  exact (andEL
+    (p :e omega) (p <> 0 /\ p :e I)
+    (andER (ordinal p)
+      (p :e omega /\ (p <> 0 /\ p :e I)) hpdata)).
+  claim hp0 : p <> 0.
+  exact (andEL (p <> 0) (p :e I)
+    (andER
+      (p :e omega) (p <> 0 /\ p :e I)
+      (andER (ordinal p)
+        (p :e omega /\ (p <> 0 /\ p :e I)) hpdata))).
+  claim hpI : p :e I.
+  exact (andER (p <> 0) (p :e I)
+    (andER
+      (p :e omega) (p <> 0 /\ p :e I)
+      (andER (ordinal p)
+        (p :e omega /\ (p <> 0 /\ p :e I)) hpdata))).
+  apply (ex_intro
+    (fun n => n :e omega /\ I = {mul_SNo n k|k :e int}) p).
+  apply (andI
+    (p :e omega) (I = {mul_SNo p k|k :e int}) hp).
+  apply set_ext.
+  - let w.
+    assume hw.
+    claim hwint : w :e int.
+    exact (god1_subgroup_subset int add_SNo I hI w hw).
+    claim hpnonzero : p :e omega :\: {0}.
+    apply (setminusI omega {0} p hp).
+    assume hpzero.
+    exact (hp0 (SingE 0 p hpzero)).
+    apply (exandE_i
+      (fun q => q :e int)
+      (fun q => exists r :e p,
+        w = add_SNo (mul_SNo q p) r)
+      (quotient_remainder_int p hpnonzero w hwint)).
+    let q.
+    assume hq hqrem.
+    apply (exandE_i
+      (fun r => r :e p)
+      (fun r => w = add_SNo (mul_SNo q p) r)
+      hqrem).
+    let r.
+    assume hr hwr.
+    claim hqpint : mul_SNo q p :e int.
+    exact (int_mul_SNo q hq p (Subq_omega_int p hp)).
+    claim hpqI : mul_SNo p q :e I.
+    exact (god1_integer_subgroup_contains_integer_multiples
+      I hI p hpI q hq).
+    claim hqpI : mul_SNo q p :e I.
+    exact (mem_eq_substR I (mul_SNo p q) (mul_SNo q p)
+      (mul_SNo_com p q (omega_SNo p hp) (int_SNo q hq)) hpqI).
+    claim hdiff :
+      add_SNo w (group_inverse int add_SNo (mul_SNo q p)) :e I.
+    exact (god1_subgroup_difference_closed int add_SNo I hI
+      w hw (mul_SNo q p) hqpI).
+    claim hsub : add_SNo w (minus_SNo (mul_SNo q p)) :e I.
+    exact (mem_eq_substR I
+      (add_SNo w (group_inverse int add_SNo (mul_SNo q p)))
+      (add_SNo w (minus_SNo (mul_SNo q p)))
+      (f_eq_i (fun t => add_SNo w t)
+        (group_inverse int add_SNo (mul_SNo q p))
+        (minus_SNo (mul_SNo q p))
+        (god1_integer_additive_inverse (mul_SNo q p) hqpint))
+      hdiff).
+    claim hrI : r :e I.
+    exact (mem_eq_substL I
+      (add_SNo w (minus_SNo (mul_SNo q p))) r
+      (eq_i_tra r
+        (add_SNo (minus_SNo (mul_SNo q p)) w)
+        (add_SNo w (minus_SNo (mul_SNo q p)))
+        (eq_sym
+          (add_SNo (minus_SNo (mul_SNo q p)) w) r
+          (eq_i_tra
+            (add_SNo (minus_SNo (mul_SNo q p)) w)
+            (add_SNo (minus_SNo (mul_SNo q p))
+              (add_SNo (mul_SNo q p) r)) r
+            (f_eq_i
+          (fun t => add_SNo (minus_SNo (mul_SNo q p)) t)
+              w (add_SNo (mul_SNo q p) r) hwr)
+            (add_SNo_minus_L2 (mul_SNo q p) r
+              (int_SNo (mul_SNo q p) hqpint)
+              (nat_p_SNo r
+                (omega_nat_p r (omega_TransSet p hp r hr))))))
+        (add_SNo_com
+          (minus_SNo (mul_SNo q p)) w
+          (SNo_minus_SNo (mul_SNo q p)
+            (int_SNo (mul_SNo q p) hqpint))
+          (int_SNo w hwint)))
+      hsub).
+    claim hrzero : r = 0.
+    apply dneg.
+    assume hr0.
+    claim hromega : r :e omega.
+    exact (omega_TransSet p hp r hr).
+    exact ((hminimal r hr)
+      (andI
+        (r :e omega) (r <> 0 /\ r :e I) hromega
+        (andI (r <> 0) (r :e I) hr0 hrI))).
+    claim hwpq : w = mul_SNo p q.
+    exact (eq_i_tra w
+      (add_SNo (mul_SNo q p) r) (mul_SNo p q)
+      hwr
+      (eq_i_tra
+        (add_SNo (mul_SNo q p) r)
+        (add_SNo (mul_SNo q p) 0)
+        (mul_SNo p q)
+        (f_eq_i (fun t => add_SNo (mul_SNo q p) t)
+          r 0 hrzero)
+        (eq_i_tra
+          (add_SNo (mul_SNo q p) 0)
+          (mul_SNo q p) (mul_SNo p q)
+          (add_SNo_0R (mul_SNo q p)
+            (int_SNo (mul_SNo q p) hqpint))
+          (mul_SNo_com q p
+            (int_SNo q hq) (omega_SNo p hp))))).
+    exact (mem_eq_substR {mul_SNo p k|k :e int}
+      (mul_SNo p q) w (eq_sym w (mul_SNo p q) hwpq)
+      (ReplI int (fun k => mul_SNo p k) q hq)).
+  - let w.
+    assume hw.
+    apply (ReplE_impred int (fun k => mul_SNo p k) w hw
+      (w :e I)).
+    let k.
+    assume hk hwk.
+    exact (mem_eq_substL I (mul_SNo p k) w hwk
+      (god1_integer_subgroup_contains_integer_multiples
+        I hI p hpI k hk)).
+- assume htrivial.
+  apply (ex_intro
+    (fun p => p :e omega /\ I = {mul_SNo p k|k :e int}) 0).
+  apply (andI
+    (0 :e omega) (I = {mul_SNo 0 k|k :e int})
+    (nat_p_omega 0 nat_0)).
+  apply set_ext.
+  - let w.
+    assume hw.
+    claim hw0 : w = 0.
+    apply dneg.
+    assume hw0.
+    exact (htrivial
+      (ex_intro (fun z => z :e I /\ z <> 0) w
+        (andI (w :e I) (w <> 0) hw hw0))).
+    exact (mem_eq_substR {mul_SNo 0 k|k :e int}
+      (mul_SNo 0 0) w
+      (eq_sym w (mul_SNo 0 0)
+        (eq_i_tra w 0 (mul_SNo 0 0)
+          hw0 (eq_sym (mul_SNo 0 0) 0
+            (mul_SNo_zeroL 0 SNo_0))))
+      (ReplI int (fun k => mul_SNo 0 k)
+        0 (Subq_omega_int 0 (nat_p_omega 0 nat_0)))).
+  - let w.
+    assume hw.
+    apply (ReplE_impred int (fun k => mul_SNo 0 k) w hw
+      (w :e I)).
+    let k.
+    assume hk hwk.
+    apply (mem_eq_substL I 0 w).
+    - apply (eq_i_tra w (mul_SNo 0 k) 0).
+      - exact hwk.
+      - exact (mul_SNo_zeroL k (int_SNo k hk)).
+    - exact (mem_eq_substR I (group_identity int add_SNo) 0
+        god1_integer_additive_identity
+        (god1_subgroup_contains_identity int add_SNo I hI)).
+Qed.
+
+Theorem god1_natural_in_own_integer_multiple_set :
+  forall p :e omega, p :e {mul_SNo p k|k :e int}.
+let p.
+assume hp.
+exact (mem_eq_substR {mul_SNo p k|k :e int}
+  (mul_SNo p 1) p
+  (mul_SNo_oneR p (omega_SNo p hp))
+  (ReplI int (fun k => mul_SNo p k)
+    1 (Subq_omega_int 1 (nat_p_omega 1 nat_1)))).
+Qed.
+
+Theorem god1_integer_multiple_membership_gives_divisibility :
+  forall p :e omega, forall z :e int,
+    z :e {mul_SNo p k|k :e int} -> divides_int p z.
+let p.
+assume hp.
+let z.
+assume hz hmultiple.
+apply (ReplE_impred int (fun k => mul_SNo p k)
+  z hmultiple (divides_int p z)).
+let k.
+assume hk hzk.
+exact (andI
+  (p :e int /\ z :e int)
+  (exists l :e int, mul_SNo p l = z)
+  (andI (p :e int) (z :e int)
+    (Subq_omega_int p hp) hz)
+  (ex_intro
+    (fun l => l :e int /\ mul_SNo p l = z) k
+    (andI (k :e int) (mul_SNo p k = z)
+      hk (eq_sym z (mul_SNo p k) hzk)))).
+Qed.
+
+Theorem god1_zero_divides_integer_only_zero :
+  forall z :e int, divides_int 0 z -> z = 0.
+let z.
+assume hz hdiv.
+apply (exandE_i
+  (fun k => k :e int) (fun k => mul_SNo 0 k = z)
+  (andER
+    (0 :e int /\ z :e int)
+    (exists k :e int, mul_SNo 0 k = z) hdiv)).
+let k.
+assume hk hkz.
+exact (eq_sym 0 z
+  (eq_i_tra 0 (mul_SNo 0 k) z
+    (eq_sym (mul_SNo 0 k) 0
+      (mul_SNo_zeroL k (int_SNo k hk))) hkz)).
+Qed.
+
+Theorem god1_natural_zero_or_positive :
+  forall p :e omega, p = 0 \/ 0 :e p.
+let p.
+assume hp.
+apply (orE
+  (p = 0)
+  (exists n, nat_p n /\ p = ordsucc n)
+  (nat_inv p (omega_nat_p p hp))
+  (p = 0 \/ 0 :e p)).
+- assume hp0.
+  exact (orIL (p = 0) (0 :e p) hp0).
+- assume hsucc.
+  apply (exandE_i
+    (fun n => nat_p n) (fun n => p = ordsucc n) hsucc).
+  let n.
+  assume hn hpn.
+  exact (orIR (p = 0) (0 :e p)
+    (mem_eq_set_subst (ordsucc n) p 0
+      (eq_sym p (ordsucc n) hpn)
+      (nat_0_in_ordsucc n hn))).
+Qed.
+
+Theorem god1_natural_nonzero_is_positive :
+  forall n :e omega, n <> 0 -> 0 < n.
+let n.
+assume hn hn0.
+apply (orE (n = 0) (0 :e n)
+  (god1_natural_zero_or_positive n hn) (0 < n)).
+- assume hzero.
+  exact (FalseE (hn0 hzero) (0 < n)).
+- assume hpos.
+  exact (ordinal_In_SNoLt n
+    (nat_p_ordinal n (omega_nat_p n hn)) 0 hpos).
+Qed.
+
+Theorem god1_integer_multiple_set_generator_unique :
+  forall p q :e omega,
+    {mul_SNo p k|k :e int} = {mul_SNo q k|k :e int} ->
+    p = q.
+let p.
+assume hp.
+let q.
+assume hq hsets.
+apply (orE (p = 0) (0 :e p)
+  (god1_natural_zero_or_positive p hp) (p = q)).
+- assume hpzero.
+  claim hqInP : q :e {mul_SNo p k|k :e int}.
+  exact (mem_eq_set_subst
+    {mul_SNo q k|k :e int} {mul_SNo p k|k :e int} q
+    (eq_sym {mul_SNo p k|k :e int}
+      {mul_SNo q k|k :e int} hsets)
+    (god1_natural_in_own_integer_multiple_set q hq)).
+  claim hzeroDivQ : divides_int 0 q.
+  exact (god1_integer_multiple_membership_gives_divisibility
+    0 (nat_p_omega 0 nat_0) q (Subq_omega_int q hq)
+    (mem_eq_set_subst
+      {mul_SNo p k|k :e int} {mul_SNo 0 k|k :e int} q
+      (f_eq_i (fun r => {mul_SNo r k|k :e int}) p 0 hpzero)
+      hqInP)).
+  exact (eq_i_tra p 0 q hpzero
+    (eq_sym q 0
+      (god1_zero_divides_integer_only_zero
+        q (Subq_omega_int q hq) hzeroDivQ))).
+- assume hppositive.
+  apply (orE (q = 0) (0 :e q)
+    (god1_natural_zero_or_positive q hq) (p = q)).
+  - assume hqzero.
+    claim hpInQ : p :e {mul_SNo q k|k :e int}.
+    exact (mem_eq_set_subst
+      {mul_SNo p k|k :e int} {mul_SNo q k|k :e int} p
+      hsets (god1_natural_in_own_integer_multiple_set p hp)).
+    claim hzeroDivP : divides_int 0 p.
+    exact (god1_integer_multiple_membership_gives_divisibility
+      0 (nat_p_omega 0 nat_0) p (Subq_omega_int p hp)
+      (mem_eq_set_subst
+        {mul_SNo q k|k :e int} {mul_SNo 0 k|k :e int} p
+        (f_eq_i (fun r => {mul_SNo r k|k :e int}) q 0 hqzero)
+        hpInQ)).
+    claim hpne : p <> 0.
+    assume hp0.
+    exact (In_irref 0
+      (mem_eq_set_subst p 0 0 hp0 hppositive)).
+    exact (FalseE
+      (hpne (god1_zero_divides_integer_only_zero
+        p (Subq_omega_int p hp) hzeroDivP))
+      (p = q)).
+  - assume hqpositive.
+    claim hqInP : q :e {mul_SNo p k|k :e int}.
+    exact (mem_eq_set_subst
+      {mul_SNo q k|k :e int} {mul_SNo p k|k :e int} q
+      (eq_sym {mul_SNo p k|k :e int}
+        {mul_SNo q k|k :e int} hsets)
+      (god1_natural_in_own_integer_multiple_set q hq)).
+    claim hpInQ : p :e {mul_SNo q k|k :e int}.
+    exact (mem_eq_set_subst
+      {mul_SNo p k|k :e int} {mul_SNo q k|k :e int} p
+      hsets (god1_natural_in_own_integer_multiple_set p hp)).
+    claim hpdivq : divides_int p q.
+    exact (god1_integer_multiple_membership_gives_divisibility
+      p hp q (Subq_omega_int q hq) hqInP).
+    claim hqdivp : divides_int q p.
+    exact (god1_integer_multiple_membership_gives_divisibility
+      q hq p (Subq_omega_int p hp) hpInQ).
+    exact (SNoLe_antisym p q
+      (omega_SNo p hp) (omega_SNo q hq)
+      (divides_int_pos_Le p q hpdivq
+        (ordinal_In_SNoLt q
+          (nat_p_ordinal q (omega_nat_p q hq)) 0 hqpositive))
+      (divides_int_pos_Le q p hqdivp
+        (ordinal_In_SNoLt p
+          (nat_p_ordinal p (omega_nat_p p hp)) 0 hppositive))).
+Qed.
+
+Theorem god1_subgroups_of_integers_classification_unique :
+  forall I, subgroup int add_SNo I ->
+    exists p :e omega,
+      I = {mul_SNo p k|k :e int}
+      /\ forall q :e omega,
+        I = {mul_SNo q k|k :e int} -> q = p.
+let I.
+assume hI.
+apply (exandE_i
+  (fun p => p :e omega)
+  (fun p => I = {mul_SNo p k|k :e int})
+  (god1_subgroup_of_integers_is_multiple_set I hI)).
+let p.
+assume hp hIp.
+apply (ex_intro
+  (fun r => r :e omega /\
+    (I = {mul_SNo r k|k :e int}
+    /\ forall q :e omega,
+      I = {mul_SNo q k|k :e int} -> q = r)) p).
+exact (andI
+  (p :e omega)
+  (I = {mul_SNo p k|k :e int}
+    /\ forall q :e omega,
+      I = {mul_SNo q k|k :e int} -> q = p)
+  hp
+  (andI
+    (I = {mul_SNo p k|k :e int})
+    (forall q :e omega,
+      I = {mul_SNo q k|k :e int} -> q = p)
+    hIp
+    (fun q hq hIq =>
+      eq_sym p q
+        (god1_integer_multiple_set_generator_unique
+          p hp q hq
+          (eq_i_tra
+            {mul_SNo p k|k :e int} I
+            {mul_SNo q k|k :e int}
+            (eq_sym I {mul_SNo p k|k :e int} hIp) hIq))))).
+Qed.
+
+Theorem god1_integer_power_map_homomorphism :
+  forall G, forall mul:set -> set -> set, forall x :e G,
+    group G mul ->
+    group_homomorphism int add_SNo G mul
+      (fun n => group_int_power G mul x n).
+let G mul x.
+assume hx hG.
+claim hmaps : forall n :e int,
+  group_int_power G mul x n :e G.
+exact (god1_group_int_power_in G mul x hG hx).
+claim hadd : forall m n :e int,
+  group_int_power G mul x (add_SNo m n)
+    = mul (group_int_power G mul x m)
+      (group_int_power G mul x n).
+let m.
+assume hm.
+let n.
+assume hn.
+apply eq_sym.
+exact (god1_group_int_power_add G mul x hG hx m hm n hn).
+exact (andI
+  ((group int add_SNo /\ group G mul)
+    /\ forall n :e int, group_int_power G mul x n :e G)
+  (forall m n :e int,
+    group_int_power G mul x (add_SNo m n)
+      = mul (group_int_power G mul x m)
+        (group_int_power G mul x n))
+  (andI
+    (group int add_SNo /\ group G mul)
+    (forall n :e int, group_int_power G mul x n :e G)
+    (andI (group int add_SNo) (group G mul)
+      god1_integer_additive_group hG)
+    hmaps)
+  hadd).
+Qed.
+
+Theorem god1_generator_powers_fill_group :
+  forall G, forall mul:set -> set -> set, forall x :e G,
+    group G mul ->
+    (forall y :e G, exists n :e int,
+      y = group_int_power G mul x n) ->
+    cyclic_subgroup G mul x = G.
+let G mul x.
+assume hx hG hgen.
+apply set_ext.
+- let y.
+  assume hy.
+  apply (ReplE_impred int
+    (fun n => group_int_power G mul x n) y hy (y :e G)).
+  let n.
+  assume hn hyn.
+  exact (mem_eq_substL G
+    (group_int_power G mul x n) y hyn
+    (god1_group_int_power_in G mul x hG hx n hn)).
+- let y.
+  assume hy.
+  apply (exandE_i
+    (fun n => n :e int)
+    (fun n => y = group_int_power G mul x n)
+    (hgen y hy)).
+  let n.
+  assume hn hyn.
+  exact (mem_eq_substR (cyclic_subgroup G mul x)
+    (group_int_power G mul x n) y
+    (eq_sym y (group_int_power G mul x n) hyn)
+    (ReplI int (fun k => group_int_power G mul x k) n hn)).
+Qed.
+
+Theorem god1_power_map_kernel_is_multiple_set :
+  forall G, forall mul:set -> set -> set, forall x :e G,
+    group G mul -> exists p :e omega,
+      group_homomorphism_kernel int add_SNo G mul
+        (fun n => group_int_power G mul x n)
+      = {mul_SNo p k|k :e int}.
+let G mul x.
+assume hx hG.
+claim hf : group_homomorphism int add_SNo G mul
+  (fun n => group_int_power G mul x n).
+exact (god1_integer_power_map_homomorphism G mul x hx hG).
+exact (god1_subgroup_of_integers_is_multiple_set
+  (group_homomorphism_kernel int add_SNo G mul
+    (fun n => group_int_power G mul x n))
+  (god1_group_homomorphism_kernel_subgroup
+    int add_SNo G mul
+    (fun n => group_int_power G mul x n) hf)).
+Qed.
+
+Theorem god1_surjection_image_is_codomain :
+  forall X Y, forall f:set -> set,
+    surj X Y f -> {f x|x :e X} = Y.
+let X Y f.
+assume hf.
+apply set_ext.
+- let y.
+  assume hy.
+  apply (ReplE_impred X f y hy (y :e Y)).
+  let x.
+  assume hx hyx.
+  exact (mem_eq_substL Y (f x) y hyx
+    ((andEL
+      (forall u :e X, f u :e Y)
+      (forall z :e Y, exists u :e X, f u = z) hf) x hx)).
+- let y.
+  assume hy.
+  apply (exandE_i
+    (fun x => x :e X) (fun x => f x = y)
+    ((andER
+      (forall u :e X, f u :e Y)
+      (forall z :e Y, exists u :e X, f u = z) hf) y hy)).
+  let x.
+  assume hx hxy.
+  exact (mem_eq_substR {f u|u :e X} (f x) y hxy
+    (ReplI X f x hx)).
+Qed.
+
+Theorem god1_surj_codomain_eq_subst :
+  forall X Y Z, forall f:set -> set,
+    Y = Z -> surj X Y f -> surj X Z f.
+let X Y Z f.
+assume hYZ hf.
+exact (andI
+  (forall x :e X, f x :e Z)
+  (forall z :e Z, exists x :e X, f x = z)
+  (fun x hx =>
+    mem_eq_set_subst Y Z (f x) hYZ
+      ((andEL
+        (forall u :e X, f u :e Y)
+        (forall y :e Y, exists u :e X, f u = y) hf) x hx))
+  (fun z hz =>
+    (andER
+      (forall u :e X, f u :e Y)
+      (forall y :e Y, exists u :e X, f u = y) hf) z
+      (mem_eq_set_subst Z Y z
+        (eq_sym Y Z hYZ) hz))).
+Qed.
+
+Theorem god1_positive_periodic_generator_makes_group_finite :
+  forall G, forall mul:set -> set -> set, forall x :e G,
+    group G mul ->
+    (forall y :e G, exists n :e int,
+      y = group_int_power G mul x n) ->
+    forall p :e omega, 0 :e p ->
+    group_int_power G mul x p = group_identity G mul ->
+    finite G.
+let G mul x.
+assume hx hG hgen.
+let p.
+assume hp hp0 hperiodInt.
+claim hpne : p <> 0.
+assume hpzero.
+exact (In_irref 0 (mem_eq_set_subst p 0 0 hpzero hp0)).
+claim hperiodNat :
+  group_nat_power G mul x p = group_identity G mul.
+exact (eq_i_tra
+  (group_nat_power G mul x p)
+  (group_int_power G mul x p)
+  (group_identity G mul)
+  (eq_sym
+    (group_int_power G mul x p)
+    (group_nat_power G mul x p)
+    (god1_group_int_power_nat G mul x p
+      (omega_nat_p p hp)))
+  hperiodInt).
+claim hcyclic : cyclic_subgroup G mul x = G.
+exact (god1_generator_powers_fill_group G mul x hx hG hgen).
+claim hsurj : surj p G
+  (fun a => group_nat_power G mul x a).
+exact (god1_surj_codomain_eq_subst
+  p (cyclic_subgroup G mul x) G
+  (fun a => group_nat_power G mul x a)
+  hcyclic
+  (god1_group_period_surjects_onto_cyclic_subgroup
+    G mul x hG hx p hp hpne hperiodNat)).
+claim himage :
+  {group_nat_power G mul x a|a :e p} = G.
+exact (god1_surjection_image_is_codomain p G
+  (fun a => group_nat_power G mul x a) hsurj).
+claim hfiniteImage : finite
+  {group_nat_power G mul x a|a :e p}.
+exact (Repl_finite (fun a => group_nat_power G mul x a)
+  p (nat_finite p (omega_nat_p p hp))).
+apply (exandE_i
+  (fun n => n :e omega)
+  (fun n => equip {group_nat_power G mul x a|a :e p} n)
+  hfiniteImage).
+let n.
+assume hn heImage.
+exact (ex_intro
+  (fun m => m :e omega /\ equip G m) n
+  (andI (n :e omega) (equip G n) hn
+    (god1_equip_domain_eq_subst
+      {group_nat_power G mul x a|a :e p} G n
+      himage heImage))).
+Qed.
+
+Theorem god1_int_mod_quotient_identity :
+  forall p :e omega,
+    group_identity (int_mod_quotient p) (int_mod_addition p)
+      = int_mod_class p 0.
+let p.
+assume hp.
+exact (god1_s6_theorem1_neutral_element_unique
+  (int_mod_quotient p) (int_mod_addition p)
+  (god1_group_law_of_composition
+    (int_mod_quotient p) (int_mod_addition p)
+    (god1_int_mod_quotient_group p hp))
+  (group_identity (int_mod_quotient p) (int_mod_addition p))
+  (int_mod_class p 0)
+  (god1_group_identity_specification
+    (int_mod_quotient p) (int_mod_addition p)
+    (god1_int_mod_quotient_group p hp))
+  (god1_int_mod_zero_neutral p hp)).
+Qed.
+
+Theorem god1_canonical_int_mod_homomorphism :
+  forall p :e omega,
+    group_homomorphism int add_SNo
+      (int_mod_quotient p) (int_mod_addition p)
+      (fun n => int_mod_class p n).
+let p.
+assume hp.
+claim hmaps : forall n :e int,
+  int_mod_class p n :e int_mod_quotient p.
+exact (god1_int_mod_class_in_quotient p hp).
+claim hadd : forall m n :e int,
+  int_mod_class p (add_SNo m n)
+    = int_mod_addition p (int_mod_class p m) (int_mod_class p n).
+let m.
+assume hm.
+let n.
+assume hn.
+apply eq_sym.
+exact (god1_int_mod_addition_on_classes p hp m hm n hn).
+exact (andI
+  ((group int add_SNo
+      /\ group (int_mod_quotient p) (int_mod_addition p))
+    /\ forall n :e int,
+      int_mod_class p n :e int_mod_quotient p)
+  (forall m n :e int,
+    int_mod_class p (add_SNo m n)
+      = int_mod_addition p
+        (int_mod_class p m) (int_mod_class p n))
+  (andI
+    (group int add_SNo
+      /\ group (int_mod_quotient p) (int_mod_addition p))
+    (forall n :e int,
+      int_mod_class p n :e int_mod_quotient p)
+    (andI
+      (group int add_SNo)
+      (group (int_mod_quotient p) (int_mod_addition p))
+      god1_integer_additive_group
+      (god1_int_mod_quotient_group p hp))
+    hmaps)
+  hadd).
+Qed.
+
+Theorem god1_canonical_int_mod_surjective :
+  forall p :e omega,
+    surj int (int_mod_quotient p)
+      (fun n => int_mod_class p n).
+let p.
+assume hp.
+exact (andI
+  (forall n :e int, int_mod_class p n :e int_mod_quotient p)
+  (forall A :e int_mod_quotient p,
+    exists n :e int, int_mod_class p n = A)
+  (god1_int_mod_class_in_quotient p hp)
+  (fun A hA =>
+    ex_intro
+      (fun n => n :e int /\ int_mod_class p n = A)
+      (int_mod_representative p A)
+      (andI
+        (int_mod_representative p A :e int)
+        (int_mod_class p (int_mod_representative p A) = A)
+        (andEL
+          (int_mod_representative p A :e int)
+          (A = int_mod_class p (int_mod_representative p A))
+          (god1_int_mod_representative_data p hp A hA))
+        (eq_sym A (int_mod_class p (int_mod_representative p A))
+          (andER
+            (int_mod_representative p A :e int)
+            (A = int_mod_class p (int_mod_representative p A))
+            (god1_int_mod_representative_data p hp A hA)))))).
+Qed.
+
+Theorem god1_canonical_int_mod_kernel :
+  forall p :e omega,
+    group_homomorphism_kernel int add_SNo
+      (int_mod_quotient p) (int_mod_addition p)
+      (fun n => int_mod_class p n)
+    = {mul_SNo p k|k :e int}.
+let p.
+assume hp.
+apply set_ext.
+- let n.
+  assume hnker.
+  claim hn : n :e int.
+  exact (SepE1 int
+    (fun z => int_mod_class p z
+      = group_identity (int_mod_quotient p) (int_mod_addition p))
+    n hnker).
+  claim hnidentity : int_mod_class p n
+    = group_identity (int_mod_quotient p) (int_mod_addition p).
+  exact (SepE2 int
+    (fun z => int_mod_class p z
+      = group_identity (int_mod_quotient p) (int_mod_addition p))
+    n hnker).
+  claim hclass : int_mod_class p 0 = int_mod_class p n.
+  exact (eq_sym
+    (int_mod_class p n) (int_mod_class p 0)
+    (eq_i_tra
+      (int_mod_class p n)
+      (group_identity (int_mod_quotient p) (int_mod_addition p))
+      (int_mod_class p 0)
+      hnidentity (god1_int_mod_quotient_identity p hp))).
+  apply (exandE_i
+    (fun k => k :e int)
+    (fun k => n = add_SNo 0 (mul_SNo p k))
+    (god1_int_mod_class_equal_gives_shift p hp
+      0 (Subq_omega_int 0 (nat_p_omega 0 nat_0))
+      n hn hclass)).
+  let k.
+  assume hk hnk.
+  exact (mem_eq_substR {mul_SNo p z|z :e int}
+    (mul_SNo p k) n
+    (eq_sym n (mul_SNo p k)
+      (eq_i_tra n (add_SNo 0 (mul_SNo p k))
+        (mul_SNo p k) hnk
+        (add_SNo_0L (mul_SNo p k)
+          (int_SNo (mul_SNo p k)
+            (int_mul_SNo p (Subq_omega_int p hp) k hk)))))
+    (ReplI int (fun z => mul_SNo p z) k hk)).
+- let n.
+  assume hnmultiple.
+  apply (ReplE_impred int (fun k => mul_SNo p k)
+    n hnmultiple
+    (n :e group_homomorphism_kernel int add_SNo
+      (int_mod_quotient p) (int_mod_addition p)
+      (fun z => int_mod_class p z))).
+  let k.
+  assume hk hnk.
+  claim hpkint : mul_SNo p k :e int.
+  exact (int_mul_SNo p (Subq_omega_int p hp) k hk).
+  claim hn : n :e int.
+  exact (mem_eq_substL int (mul_SNo p k) n hnk hpkint).
+  exact (SepI int
+    (fun z => int_mod_class p z
+      = group_identity (int_mod_quotient p) (int_mod_addition p))
+    n hn
+    (eq_i_tra
+      (int_mod_class p n)
+      (int_mod_class p (mul_SNo p k))
+      (group_identity (int_mod_quotient p) (int_mod_addition p))
+      (f_eq_i (fun z => int_mod_class p z)
+        n (mul_SNo p k) hnk)
+      (eq_i_tra
+        (int_mod_class p (mul_SNo p k))
+        (int_mod_class p 0)
+        (group_identity (int_mod_quotient p) (int_mod_addition p))
+        (god1_int_mod_class_eq_of_shift p hp
+          0 (Subq_omega_int 0 (nat_p_omega 0 nat_0))
+          (mul_SNo p k) hpkint k hk
+          (eq_sym
+            (add_SNo 0 (mul_SNo p k)) (mul_SNo p k)
+            (add_SNo_0L (mul_SNo p k) (int_SNo (mul_SNo p k) hpkint))))
+        (eq_sym
+          (group_identity (int_mod_quotient p) (int_mod_addition p))
+          (int_mod_class p 0)
+          (god1_int_mod_quotient_identity p hp))))).
+Qed.
+
+Theorem god1_canonical_int_mod_map_full :
+  forall p :e omega,
+    group_homomorphism int add_SNo
+      (int_mod_quotient p) (int_mod_addition p)
+      (fun n => int_mod_class p n)
+    /\ surj int (int_mod_quotient p)
+      (fun n => int_mod_class p n)
+    /\ group_homomorphism_kernel int add_SNo
+      (int_mod_quotient p) (int_mod_addition p)
+      (fun n => int_mod_class p n)
+      = {mul_SNo p k|k :e int}.
+let p.
+assume hp.
+exact (andI
+  (group_homomorphism int add_SNo
+      (int_mod_quotient p) (int_mod_addition p)
+      (fun n => int_mod_class p n)
+    /\ surj int (int_mod_quotient p)
+      (fun n => int_mod_class p n))
+  (group_homomorphism_kernel int add_SNo
+      (int_mod_quotient p) (int_mod_addition p)
+      (fun n => int_mod_class p n)
+    = {mul_SNo p k|k :e int})
+  (andI
+    (group_homomorphism int add_SNo
+      (int_mod_quotient p) (int_mod_addition p)
+      (fun n => int_mod_class p n))
+    (surj int (int_mod_quotient p)
+      (fun n => int_mod_class p n))
+    (god1_canonical_int_mod_homomorphism p hp)
+    (god1_canonical_int_mod_surjective p hp))
+  (god1_canonical_int_mod_kernel p hp)).
+Qed.
+
+Theorem god1_zero_integer_multiples_singleton :
+  {mul_SNo 0 k|k :e int} = {0}.
+apply set_ext.
+- let z.
+  assume hz.
+  apply (ReplE_impred int (fun k => mul_SNo 0 k) z hz
+    (z :e {0})).
+  let k.
+  assume hk hzk.
+  exact (mem_eq_substR {0} 0 z
+    (eq_sym z 0
+      (eq_i_tra z (mul_SNo 0 k) 0 hzk
+        (mul_SNo_zeroL k (int_SNo k hk))))
+    (SingI 0)).
+- let z.
+  assume hz.
+  claim hz0 : z = 0.
+  exact (SingE 0 z hz).
+  exact (mem_eq_substR {mul_SNo 0 k|k :e int}
+    (mul_SNo 0 0) z
+    (eq_i_tra
+      (mul_SNo 0 0) 0 z
+      (mul_SNo_zeroL 0 SNo_0)
+      (eq_sym z 0 hz0))
+    (ReplI int (fun k => mul_SNo 0 k)
+      0 (Subq_omega_int 0 (nat_p_omega 0 nat_0)))).
+Qed.
+
+Theorem god1_power_map_quotient_isomorphism :
+  forall G, forall mul:set -> set -> set, forall x :e G,
+    group G mul ->
+    (forall y :e G, exists n :e int,
+      y = group_int_power G mul x n) ->
+    forall p :e omega,
+    group_homomorphism_kernel int add_SNo G mul
+      (fun n => group_int_power G mul x n)
+      = {mul_SNo p k|k :e int} ->
+    isomorphic_groups
+      (int_mod_quotient p) (int_mod_addition p) G mul.
+let G mul x.
+assume hx hG hgen.
+let p.
+assume hp hkernel.
+claim hf : group_homomorphism int add_SNo G mul
+  (fun n => group_int_power G mul x n).
+exact (god1_integer_power_map_homomorphism G mul x hx hG).
+claim hg : group_homomorphism int add_SNo
+  (int_mod_quotient p) (int_mod_addition p)
+  (fun n => int_mod_class p n).
+exact (god1_canonical_int_mod_homomorphism p hp).
+claim hgsurj : surj int (int_mod_quotient p)
+  (fun n => int_mod_class p n).
+exact (god1_canonical_int_mod_surjective p hp).
+claim hfsurj : surj int G
+  (fun n => group_int_power G mul x n).
+exact (god1_cyclic_power_map_surjective G mul x hG hx
+  (god1_generator_powers_fill_group G mul x hx hG hgen)).
+claim hgkernel :
+  group_homomorphism_kernel int add_SNo
+    (int_mod_quotient p) (int_mod_addition p)
+    (fun n => int_mod_class p n)
+  = {mul_SNo p k|k :e int}.
+exact (god1_canonical_int_mod_kernel p hp).
+claim hkernels :
+  group_homomorphism_kernel int add_SNo
+    (int_mod_quotient p) (int_mod_addition p)
+    (fun n => int_mod_class p n)
+  = group_homomorphism_kernel int add_SNo G mul
+    (fun n => group_int_power G mul x n).
+exact (eq_i_tra
+  (group_homomorphism_kernel int add_SNo
+    (int_mod_quotient p) (int_mod_addition p)
+    (fun n => int_mod_class p n))
+  {mul_SNo p k|k :e int}
+  (group_homomorphism_kernel int add_SNo G mul
+    (fun n => group_int_power G mul x n))
+  hgkernel
+  (eq_sym
+    (group_homomorphism_kernel int add_SNo G mul
+      (fun n => group_int_power G mul x n))
+    {mul_SNo p k|k :e int} hkernel)).
+claim hinc :
+  group_homomorphism_kernel int add_SNo
+    (int_mod_quotient p) (int_mod_addition p)
+    (fun n => int_mod_class p n)
+  c= group_homomorphism_kernel int add_SNo G mul
+    (fun n => group_int_power G mul x n).
+let z.
+assume hz.
+exact (mem_eq_set_subst
+  (group_homomorphism_kernel int add_SNo
+    (int_mod_quotient p) (int_mod_addition p)
+    (fun n => int_mod_class p n))
+  (group_homomorphism_kernel int add_SNo G mul
+    (fun n => group_int_power G mul x n)) z hkernels hz).
+claim hfactorExists : exists f':set -> set,
+  group_homomorphism
+    (int_mod_quotient p) (int_mod_addition p) G mul f'
+  /\ forall n :e int,
+    group_int_power G mul x n = f' (int_mod_class p n).
+exact (iffER
+  (exists f':set -> set,
+    group_homomorphism
+      (int_mod_quotient p) (int_mod_addition p) G mul f'
+    /\ forall n :e int,
+      group_int_power G mul x n = f' (int_mod_class p n))
+  (group_homomorphism_kernel int add_SNo
+      (int_mod_quotient p) (int_mod_addition p)
+      (fun n => int_mod_class p n)
+    c= group_homomorphism_kernel int add_SNo G mul
+      (fun n => group_int_power G mul x n))
+  (god1_factorization_exists_iff_kernel_inclusion
+    int add_SNo
+    (int_mod_quotient p) (int_mod_addition p)
+    G mul
+    (fun n => int_mod_class p n)
+    (fun n => group_int_power G mul x n)
+    hg hf hgsurj)
+  hinc).
+apply hfactorExists.
+let f'.
+assume hf'data.
+claim hf'hom : group_homomorphism
+  (int_mod_quotient p) (int_mod_addition p) G mul f'.
+exact (andEL
+  (group_homomorphism
+    (int_mod_quotient p) (int_mod_addition p) G mul f')
+  (forall n :e int,
+    group_int_power G mul x n = f' (int_mod_class p n))
+  hf'data).
+claim hfactor : forall n :e int,
+  group_int_power G mul x n = f' (int_mod_class p n).
+exact (andER
+  (group_homomorphism
+    (int_mod_quotient p) (int_mod_addition p) G mul f')
+  (forall n :e int,
+    group_int_power G mul x n = f' (int_mod_class p n))
+  hf'data).
+claim hinj : inj (int_mod_quotient p) G f'.
+exact (iffER
+  (inj (int_mod_quotient p) G f')
+  (group_homomorphism_kernel int add_SNo
+      (int_mod_quotient p) (int_mod_addition p)
+      (fun n => int_mod_class p n)
+    = group_homomorphism_kernel int add_SNo G mul
+      (fun n => group_int_power G mul x n))
+  (god1_factor_injective_iff_kernels_equal
+    int add_SNo
+    (int_mod_quotient p) (int_mod_addition p)
+    G mul
+    (fun n => int_mod_class p n)
+    (fun n => group_int_power G mul x n) f'
+    hg hf hgsurj hf'hom hfactor hinc)
+  hkernels).
+claim hsurj : surj (int_mod_quotient p) G f'.
+exact (iffER
+  (surj (int_mod_quotient p) G f')
+  (surj int G (fun n => group_int_power G mul x n))
+  (god1_factor_surjective_iff_original_surjective
+    int add_SNo
+    (int_mod_quotient p) (int_mod_addition p)
+    G mul
+    (fun n => int_mod_class p n)
+    (fun n => group_int_power G mul x n) f'
+    hg hf hgsurj hfactor)
+  hfsurj).
+claim hbij : bij (int_mod_quotient p) G f'.
+exact (andI
+  ((forall A :e int_mod_quotient p, f' A :e G)
+    /\ forall A B :e int_mod_quotient p,
+      f' A = f' B -> A = B)
+  (forall y :e G, exists A :e int_mod_quotient p, f' A = y)
+  (andI
+    (forall A :e int_mod_quotient p, f' A :e G)
+    (forall A B :e int_mod_quotient p,
+      f' A = f' B -> A = B)
+    (andEL
+      (forall A :e int_mod_quotient p, f' A :e G)
+      (forall A B :e int_mod_quotient p,
+        f' A = f' B -> A = B) hinj)
+    (andER
+      (forall A :e int_mod_quotient p, f' A :e G)
+      (forall A B :e int_mod_quotient p,
+        f' A = f' B -> A = B) hinj))
+  (andER
+    (forall A :e int_mod_quotient p, f' A :e G)
+    (forall y :e G, exists A :e int_mod_quotient p, f' A = y)
+    hsurj)).
+apply (ex_intro_setfun
+  (fun u => group_isomorphism
+    (int_mod_quotient p) (int_mod_addition p) G mul u) f').
+exact (andI
+  (group_homomorphism
+    (int_mod_quotient p) (int_mod_addition p) G mul f')
+  (bij (int_mod_quotient p) G f') hf'hom hbij).
+Qed.
+
+Theorem god1_power_map_trivial_kernel_isomorphism :
+  forall G, forall mul:set -> set -> set, forall x :e G,
+    group G mul ->
+    (forall y :e G, exists n :e int,
+      y = group_int_power G mul x n) ->
+    group_homomorphism_kernel int add_SNo G mul
+      (fun n => group_int_power G mul x n) = {0} ->
+    isomorphic_groups G mul int add_SNo.
+let G mul x.
+assume hx hG hgen hkernel.
+claim hf : group_homomorphism int add_SNo G mul
+  (fun n => group_int_power G mul x n).
+exact (god1_integer_power_map_homomorphism G mul x hx hG).
+claim hsurj : surj int G
+  (fun n => group_int_power G mul x n).
+exact (god1_cyclic_power_map_surjective G mul x hG hx
+  (god1_generator_powers_fill_group G mul x hx hG hgen)).
+claim hidentitySingleton : {group_identity int add_SNo} = {0}.
+exact (f_eq_i (fun z => {z})
+  (group_identity int add_SNo) 0 god1_integer_additive_identity).
+claim hkernelIdentity :
+  group_homomorphism_kernel int add_SNo G mul
+    (fun n => group_int_power G mul x n)
+  = {group_identity int add_SNo}.
+exact (eq_i_tra
+  (group_homomorphism_kernel int add_SNo G mul
+    (fun n => group_int_power G mul x n))
+  {0} {group_identity int add_SNo}
+  hkernel (eq_sym {group_identity int add_SNo} {0}
+    hidentitySingleton)).
+claim hinj : inj int G (fun n => group_int_power G mul x n).
+exact (iffER
+  (inj int G (fun n => group_int_power G mul x n))
+  (group_homomorphism_kernel int add_SNo G mul
+      (fun n => group_int_power G mul x n)
+    = {group_identity int add_SNo})
+  (god1_s7_theorem8_injective_iff_trivial_kernel
+    int add_SNo G mul
+    (fun n => group_int_power G mul x n) hf)
+  hkernelIdentity).
+claim hbij : bij int G (fun n => group_int_power G mul x n).
+exact (andI
+  ((forall n :e int, group_int_power G mul x n :e G)
+    /\ forall m n :e int,
+      group_int_power G mul x m = group_int_power G mul x n -> m = n)
+  (forall y :e G, exists n :e int,
+    group_int_power G mul x n = y)
+  (andI
+    (forall n :e int, group_int_power G mul x n :e G)
+    (forall m n :e int,
+      group_int_power G mul x m = group_int_power G mul x n -> m = n)
+    (andEL
+      (forall n :e int, group_int_power G mul x n :e G)
+      (forall m n :e int,
+        group_int_power G mul x m = group_int_power G mul x n -> m = n)
+      hinj)
+    (andER
+      (forall n :e int, group_int_power G mul x n :e G)
+      (forall m n :e int,
+        group_int_power G mul x m = group_int_power G mul x n -> m = n)
+      hinj))
+  (andER
+    (forall n :e int, group_int_power G mul x n :e G)
+    (forall y :e G, exists n :e int,
+      group_int_power G mul x n = y)
+    hsurj)).
+claim hIntG : isomorphic_groups int add_SNo G mul.
+apply (ex_intro_setfun
+  (fun f => group_isomorphism int add_SNo G mul f)
+  (fun n => group_int_power G mul x n)).
+exact (andI
+  (group_homomorphism int add_SNo G mul
+    (fun n => group_int_power G mul x n))
+  (bij int G (fun n => group_int_power G mul x n)) hf hbij).
+exact (god1_group_isomorphism_symmetric
+  int add_SNo G mul hIntG).
+Qed.
+
+Theorem god1_integers_infinite : infinite int.
+exact (atleastp_omega_infinite int
+  (Subq_atleastp omega int Subq_omega_int)).
+Qed.
+
+Theorem god1_finite_generator_kernel_cardinality :
+  forall G, forall mul:set -> set -> set, forall x :e G,
+    group G mul ->
+    (forall y :e G, exists m :e int,
+      y = group_int_power G mul x m) ->
+    forall n :e omega, equip G n ->
+    forall p :e omega, 0 :e p ->
+    group_homomorphism_kernel int add_SNo G mul
+      (fun m => group_int_power G mul x m)
+      = {mul_SNo p k|k :e int} ->
+    n = p.
+let G mul x.
+assume hx hG hgen.
+let n.
+assume hn heGn.
+let p.
+assume hp hp0 hkernel.
+claim hpne : p <> 0.
+assume hpzero.
+exact (In_irref 0 (mem_eq_set_subst p 0 0 hpzero hp0)).
+claim hpinKernel : p :e
+  group_homomorphism_kernel int add_SNo G mul
+    (fun m => group_int_power G mul x m).
+apply (mem_eq_set_subst
+  {mul_SNo p k|k :e int}
+  (group_homomorphism_kernel int add_SNo G mul
+    (fun m => group_int_power G mul x m)) p
+  (eq_sym
+    (group_homomorphism_kernel int add_SNo G mul
+      (fun m => group_int_power G mul x m))
+    {mul_SNo p k|k :e int} hkernel)).
+exact (mem_eq_substR {mul_SNo p k|k :e int}
+  (mul_SNo p 1) p
+  (mul_SNo_oneR p (omega_SNo p hp))
+  (ReplI int (fun k => mul_SNo p k)
+    1 (Subq_omega_int 1 (nat_p_omega 1 nat_1)))).
+claim hpperiod : group_int_power G mul x p = group_identity G mul.
+exact (SepE2 int
+  (fun m => group_int_power G mul x m = group_identity G mul)
+  p hpinKernel).
+claim hcyclic : cyclic_subgroup G mul x = G.
+exact (god1_generator_powers_fill_group G mul x hx hG hgen).
+claim hpperiodNat :
+  group_nat_power G mul x p = group_identity G mul.
+exact (eq_i_tra
+  (group_nat_power G mul x p)
+  (group_int_power G mul x p)
+  (group_identity G mul)
+  (eq_sym
+    (group_int_power G mul x p)
+    (group_nat_power G mul x p)
+    (god1_group_int_power_nat G mul x p (omega_nat_p p hp)))
+  hpperiod).
+claim hpsurj : surj p G
+  (fun a => group_nat_power G mul x a).
+exact (god1_surj_codomain_eq_subst
+  p (cyclic_subgroup G mul x) G
+  (fun a => group_nat_power G mul x a) hcyclic
+  (god1_group_period_surjects_onto_cyclic_subgroup
+    G mul x hG hx p hp hpne hpperiodNat)).
+claim hatleast_np : atleastp n p.
+exact (atleastp_tra n G p
+  (equip_atleastp n G (equip_sym G n heGn))
+  (god1_surjection_gives_reverse_atleastp p G
+    (fun a => group_nat_power G mul x a) hpsurj)).
+claim hnperiodNat :
+  group_nat_power G mul x n = group_identity G mul.
+exact (god1_s7_theorem5_finite_group_power_is_identity
+  G mul n hn hG heGn x hx).
+claim hnperiodInt :
+  group_int_power G mul x n = group_identity G mul.
+exact (eq_i_tra
+  (group_int_power G mul x n)
+  (group_nat_power G mul x n)
+  (group_identity G mul)
+  (god1_group_int_power_nat G mul x n (omega_nat_p n hn))
+  hnperiodNat).
+claim hninKernel : n :e
+  group_homomorphism_kernel int add_SNo G mul
+    (fun m => group_int_power G mul x m).
+exact (SepI int
+  (fun m => group_int_power G mul x m = group_identity G mul)
+  n (Subq_omega_int n hn) hnperiodInt).
+claim hninMultiples : n :e {mul_SNo p k|k :e int}.
+exact (mem_eq_set_subst
+  (group_homomorphism_kernel int add_SNo G mul
+    (fun m => group_int_power G mul x m))
+  {mul_SNo p k|k :e int} n hkernel hninKernel).
+claim hdiv : divides_int p n.
+apply (ReplE_impred int (fun k => mul_SNo p k)
+  n hninMultiples (divides_int p n)).
+let k.
+assume hk hnk.
+exact (andI
+  (p :e int /\ n :e int)
+  (exists l :e int, mul_SNo p l = n)
+  (andI (p :e int) (n :e int)
+    (Subq_omega_int p hp) (Subq_omega_int n hn))
+  (ex_intro
+    (fun l => l :e int /\ mul_SNo p l = n) k
+    (andI (k :e int) (mul_SNo p k = n)
+      hk (eq_sym n (mul_SNo p k) hnk)))).
+claim hnne : n <> 0.
+assume hnzero.
+claim hGempty : G = 0.
+exact (equip_0_Empty G
+  (god1_equip_codomain_eq_subst G n 0 hnzero heGn)).
+exact (EmptyE (group_identity G mul)
+  (mem_eq_set_subst G 0 (group_identity G mul) hGempty
+    (god1_group_identity_in G mul hG))).
+claim hnpositive : 0 < n.
+exact (god1_natural_nonzero_is_positive n hn hnne).
+claim hple : p <= n.
+exact (divides_int_pos_Le p n hdiv hnpositive).
+claim hpn : p c= n.
+exact (omega_SNoLe_Subq p hp n hn hple).
+claim hatleast_pn : atleastp p n.
+exact (Subq_atleastp p n hpn).
+claim henp : equip n p.
+exact (atleastp_antisym_equip n p hatleast_np hatleast_pn).
+exact (god1_nat_equip_eq n p
+  (omega_nat_p n hn) (omega_nat_p p hp) henp).
+Qed.
+
+Theorem god1_power_kernel_generator_is_period :
+  forall G, forall mul:set -> set -> set, forall x :e G,
+  forall p :e omega,
+    group_homomorphism_kernel int add_SNo G mul
+      (fun n => group_int_power G mul x n)
+      = {mul_SNo p k|k :e int} ->
+    group_int_power G mul x p = group_identity G mul.
+let G mul x.
+assume hx.
+let p.
+assume hp hkernel.
+claim hpmultiple : p :e {mul_SNo p k|k :e int}.
+exact (mem_eq_substR {mul_SNo p k|k :e int}
+  (mul_SNo p 1) p
+  (mul_SNo_oneR p (omega_SNo p hp))
+  (ReplI int (fun k => mul_SNo p k)
+    1 (Subq_omega_int 1 (nat_p_omega 1 nat_1)))).
+claim hpker : p :e
+  group_homomorphism_kernel int add_SNo G mul
+    (fun n => group_int_power G mul x n).
+exact (mem_eq_set_subst
+  {mul_SNo p k|k :e int}
+  (group_homomorphism_kernel int add_SNo G mul
+    (fun n => group_int_power G mul x n)) p
+  (eq_sym
+    (group_homomorphism_kernel int add_SNo G mul
+      (fun n => group_int_power G mul x n))
+    {mul_SNo p k|k :e int} hkernel)
+  hpmultiple).
+exact (SepE2 int
+  (fun n => group_int_power G mul x n = group_identity G mul)
+  p hpker).
+Qed.
+
+Theorem god1_isomorphic_to_integers_is_infinite :
+  forall G, forall mul:set -> set -> set,
+    isomorphic_groups G mul int add_SNo -> infinite G.
+let G mul.
+assume hiso hfiniteG.
+apply hiso.
+let f.
+assume hf.
+claim hbij : bij G int f.
+exact (god1_group_isomorphism_bijective
+  G mul int add_SNo f hf).
+claim heGint : equip G int.
+exact (ex_intro_setfun (fun u => bij G int u) f hbij).
+apply (exandE_i
+  (fun n => n :e omega) (fun n => equip G n) hfiniteG).
+let n.
+assume hn heGn.
+exact (god1_integers_infinite
+  (ex_intro
+    (fun m => m :e omega /\ equip int m) n
+    (andI (n :e omega) (equip int n) hn
+      (equip_tra int G n (equip_sym G int heGint) heGn)))).
+Qed.
+
 Theorem god1_s7_theorem10_classification_of_cyclic_groups :
   (forall G, forall mul:set -> set -> set,
     cyclic_group G mul -> infinite G ->
@@ -49894,153 +51476,403 @@ Theorem god1_s7_theorem10_classification_of_cyclic_groups :
         G mul (int_mod_quotient p) (int_mod_addition p)).
 apply andI.
 //GOD1PRF:73166 Let G be a cyclic group, $x$ a generator of G .
-claim h_s7_t10_choose_generator :
-  forall G, forall mul:set -> set -> set,
-    cyclic_group G mul ->
-    exists x :e G, forall y :e G, exists n :e int,
+- let G mul.
+  assume hcyclic hinfinite.
+  claim hG : group G mul.
+  exact (andEL
+    (group G mul)
+    (exists x :e G, forall y :e G, exists n :e int,
+      y = group_int_power G mul x n) hcyclic).
+  claim hgenerator : exists x :e G,
+    forall y :e G, exists n :e int,
       y = group_int_power G mul x n.
-admit.
+  exact (andER
+    (group G mul)
+    (exists x :e G, forall y :e G, exists n :e int,
+      y = group_int_power G mul x n) hcyclic).
+  apply (exandE_i
+    (fun x => x :e G)
+    (fun x => forall y :e G, exists n :e int,
+      y = group_int_power G mul x n)
+    hgenerator).
+  let x.
+  assume hx hgen.
 //GOD1PRF:73214 Then every element of G is a power of $x$; in other words, the homomorphism $f: \mathbf{Z} \rightarrow \mathrm{G}$ defined by
-claim h_s7_t10_power_homomorphism :
-  forall G, forall mul:set -> set -> set,
-  forall x :e G,
-    group G mul ->
-    group_homomorphism int add_SNo G mul
-      (fun n => group_int_power G mul x n).
-admit.
+  claim hf : group_homomorphism int add_SNo G mul
+    (fun n => group_int_power G mul x n).
+  exact (god1_integer_power_map_homomorphism G mul x hx hG).
 //GOD1PRF:73359 is surjective.
-claim h_s7_t10_power_map_surjective :
-  forall G, forall mul:set -> set -> set,
-  forall x :e G,
-    (forall y :e G, exists n :e int,
-      y = group_int_power G mul x n) ->
-    surj int G (fun n => group_int_power G mul x n).
-admit.
+  claim hsurj : surj int G
+    (fun n => group_int_power G mul x n).
+  exact (god1_cyclic_power_map_surjective G mul x hG hx
+    (god1_generator_powers_fill_group G mul x hx hG hgen)).
 //GOD1PRF:73376 Let I denote the kernel of $f$; I is a subgroup of $\mathbf{Z}$, and therefore there exists a unique integer $p \geqslant 0$ such that
-claim h_s7_t10_kernel_is_pZ :
-  forall G, forall mul:set -> set -> set,
-  forall x :e G,
-    group G mul -> exists p :e omega,
-      group_homomorphism_kernel
-        int add_SNo G mul
-        (fun n => group_int_power G mul x n)
+  claim hkernelExists : exists p :e omega,
+    group_homomorphism_kernel int add_SNo G mul
+      (fun n => group_int_power G mul x n)
       = {mul_SNo p k|k :e int}.
-admit.
+  exact (god1_power_map_kernel_is_multiple_set G mul x hx hG).
+  apply (exandE_i
+    (fun p => p :e omega)
+    (fun p => group_homomorphism_kernel int add_SNo G mul
+      (fun n => group_int_power G mul x n)
+      = {mul_SNo p k|k :e int})
+    hkernelExists).
+  let p.
+  assume hp hkernel.
 //GOD1PRF:73561 There are two cases to consider : $p=0$, and $p>0$.
-claim h_s7_t10_kernel_generator_cases :
-  forall p :e omega, p = 0 \/ 0 :e p.
-admit.
+  apply (orE (p = 0) (0 :e p)
+    (god1_natural_zero_or_positive p hp)
+    (isomorphic_groups G mul int add_SNo)).
 //GOD1PRF:73615 If $p=0$, then by Theorem $8 f$ is injective, hence bijective, and is therefore an isomorphism of the additive group $\mathbf{Z}$ onto $\mathbf{G}$.
-claim h_s7_t10_theorem8_call :
-  forall G, forall mulG:set -> set -> set,
-  forall H, forall mulH:set -> set -> set,
-  forall f:set -> set,
-    group_homomorphism G mulG H mulH f ->
-    (inj G H f <->
-      group_homomorphism_kernel G mulG H mulH f
-        = {group_identity G mulG}).
-apply god1_s7_theorem8_injective_iff_trivial_kernel.
-claim h_s7_t10_zero_kernel_isomorphism :
-  forall G, forall mul:set -> set -> set,
-  forall f:set -> set,
-    group_homomorphism int add_SNo G mul f ->
-    surj int G f ->
-    group_homomorphism_kernel int add_SNo G mul f = {0} ->
-    group_isomorphism int add_SNo G mul f.
-admit.
+  - assume hpzero.
+    claim hmultipleZero :
+      {mul_SNo p k|k :e int} = {mul_SNo 0 k|k :e int}.
+    exact (f_eq_i
+      (fun q => {mul_SNo q k|k :e int}) p 0 hpzero).
+    claim hkernelZero :
+      group_homomorphism_kernel int add_SNo G mul
+        (fun n => group_int_power G mul x n) = {0}.
+    exact (eq_i_tra
+      (group_homomorphism_kernel int add_SNo G mul
+        (fun n => group_int_power G mul x n))
+      {mul_SNo p k|k :e int} {0}
+      hkernel
+      (eq_i_tra
+        {mul_SNo p k|k :e int}
+        {mul_SNo 0 k|k :e int} {0}
+        hmultipleZero god1_zero_integer_multiples_singleton)).
+    exact (god1_power_map_trivial_kernel_isomorphism
+      G mul x hx hG hgen hkernelZero).
+  - assume hppositive.
+    claim hpperiod :
+      group_int_power G mul x p = group_identity G mul.
+    exact (god1_power_kernel_generator_is_period
+      G mul x hx p hp hkernel).
+    claim hfiniteG : finite G.
+    exact (god1_positive_periodic_generator_makes_group_finite
+      G mul x hx hG hgen p hp hppositive hpperiod).
+    exact (FalseE (hinfinite hfiniteG)
+      (isomorphic_groups G mul int add_SNo)).
 //GOD1PRF:73765 If $p>0$, consider the additive group $\mathbf{Z} / p \mathbf{Z}$ (Example 11) and the canonical mapping $g$ of $\mathbf{Z}$ onto $\mathbf{Z} / p \mathbf{Z}$; this is a surjective homomorphism with kernel equal to $p \mathbf{Z}$, so that $\operatorname{Ker}(g)=\operatorname{Ker}(f)$.
-claim h_s7_t10_example11_call :
-  forall p :e omega,
-    group (int_mod_quotient p) (int_mod_addition p).
-apply god1_integers_modulo_p_form_additive_group.
-claim h_s7_t10_canonical_quotient_map :
-  forall p :e omega,
-    0 :e p -> exists g:set -> set,
-      group_homomorphism int add_SNo
-        (int_mod_quotient p) (int_mod_addition p) g
-      /\ surj int (int_mod_quotient p) g
-      /\ group_homomorphism_kernel
-        int add_SNo (int_mod_quotient p) (int_mod_addition p) g
-        = {mul_SNo p k|k :e int}.
-admit.
+- let G mul.
+  assume hcyclic hfiniteG.
+  claim hG : group G mul.
+  exact (andEL
+    (group G mul)
+    (exists x :e G, forall y :e G, exists n :e int,
+      y = group_int_power G mul x n) hcyclic).
+  claim hgenerator : exists x :e G,
+    forall y :e G, exists n :e int,
+      y = group_int_power G mul x n.
+  exact (andER
+    (group G mul)
+    (exists x :e G, forall y :e G, exists n :e int,
+      y = group_int_power G mul x n) hcyclic).
+  apply (exandE_i
+    (fun x => x :e G)
+    (fun x => forall y :e G, exists n :e int,
+      y = group_int_power G mul x n)
+    hgenerator).
+  let x.
+  assume hx hgen.
+  apply (exandE_i
+    (fun n => n :e omega) (fun n => equip G n) hfiniteG).
+  let n.
+  assume hn heGn.
+  claim hkernelExists : exists p :e omega,
+    group_homomorphism_kernel int add_SNo G mul
+      (fun m => group_int_power G mul x m)
+      = {mul_SNo p k|k :e int}.
+  exact (god1_power_map_kernel_is_multiple_set G mul x hx hG).
+  apply (exandE_i
+    (fun p => p :e omega)
+    (fun p => group_homomorphism_kernel int add_SNo G mul
+      (fun m => group_int_power G mul x m)
+      = {mul_SNo p k|k :e int})
+    hkernelExists).
+  let p.
+  assume hp hkernel.
+  apply (orE (p = 0) (0 :e p)
+    (god1_natural_zero_or_positive p hp)
+    (exists q :e omega,
+      equip G q /\ isomorphic_groups
+        G mul (int_mod_quotient q) (int_mod_addition q))).
+  - assume hpzero.
+    claim hmultipleZero :
+      {mul_SNo p k|k :e int} = {mul_SNo 0 k|k :e int}.
+    exact (f_eq_i
+      (fun q => {mul_SNo q k|k :e int}) p 0 hpzero).
+    claim hkernelZero :
+      group_homomorphism_kernel int add_SNo G mul
+        (fun m => group_int_power G mul x m) = {0}.
+    exact (eq_i_tra
+      (group_homomorphism_kernel int add_SNo G mul
+        (fun m => group_int_power G mul x m))
+      {mul_SNo p k|k :e int} {0}
+      hkernel
+      (eq_i_tra
+        {mul_SNo p k|k :e int}
+        {mul_SNo 0 k|k :e int} {0}
+        hmultipleZero god1_zero_integer_multiples_singleton)).
+    claim hisoInt : isomorphic_groups G mul int add_SNo.
+    exact (god1_power_map_trivial_kernel_isomorphism
+      G mul x hx hG hgen hkernelZero).
+    exact (FalseE
+      ((god1_isomorphic_to_integers_is_infinite
+        G mul hisoInt) hfiniteG)
+      (exists q :e omega,
+        equip G q /\ isomorphic_groups
+          G mul (int_mod_quotient q) (int_mod_addition q))).
+  - assume hppositive.
+    claim hquotientG : isomorphic_groups
+      (int_mod_quotient p) (int_mod_addition p) G mul.
+    exact (god1_power_map_quotient_isomorphism
+      G mul x hx hG hgen p hp hkernel).
 //GOD1PRF:74050 Hence, by Theorem 9, there exists a unique homomorphism
-claim h_s7_t10_theorem9_call :
-  forall G, forall mulG:set -> set -> set,
-  forall H, forall mulH:set -> set -> set,
-  forall M, forall mulM:set -> set -> set,
-  forall p f:set -> set,
-    group_homomorphism G mulG H mulH p ->
-    group_homomorphism G mulG M mulM f ->
-    surj G H p ->
-    ((exists f':set -> set,
-        group_homomorphism H mulH M mulM f'
-        /\ forall x :e G, f x = f' (p x))
-      <-> group_homomorphism_kernel G mulG H mulH p
-        c= group_homomorphism_kernel G mulG M mulM f)
-    /\ (group_homomorphism_kernel G mulG H mulH p
-      c= group_homomorphism_kernel G mulG M mulM f ->
-      exists f':set -> set,
-        group_homomorphism H mulH M mulM f'
-        /\ (forall x :e G, f x = f' (p x))
-        /\ (forall h:set -> set,
-          group_homomorphism H mulH M mulM h ->
-          (forall x :e G, f x = h (p x)) ->
-          forall u :e H, h u = f' u)
-        /\ (inj H M f' <->
-          group_homomorphism_kernel G mulG H mulH p
-            = group_homomorphism_kernel G mulG M mulM f)
-        /\ (surj H M f' <-> surj G M f)).
-apply god1_s7_theorem9_factorization_of_group_homomorphism.
-claim h_s7_t10_factor_homomorphism_exists :
-  forall G, forall mul:set -> set -> set,
-  forall p :e omega,
-    exists f':set -> set,
-      group_homomorphism
-        (int_mod_quotient p) (int_mod_addition p) G mul f'.
-admit.
+    claim hGquotient : isomorphic_groups
+      G mul (int_mod_quotient p) (int_mod_addition p).
+    exact (god1_group_isomorphism_symmetric
+      (int_mod_quotient p) (int_mod_addition p) G mul hquotientG).
 //GOD1PRF:74175 such that $f=f^{\prime} \circ g$.
-claim h_s7_t10_factor_commutes :
-  forall G, forall mul:set -> set -> set,
-  forall p :e omega, forall f g f':set -> set,
-    forall z :e int, f z = f' (g z).
-admit.
+    claim hnp : n = p.
+    exact (god1_finite_generator_kernel_cardinality
+      G mul x hx hG hgen n hn heGn p hp hppositive hkernel).
 //GOD1PRF:74630 Since $f$ is surjective, so is $f^{\prime}$; since $\operatorname{Ker}(f)=\operatorname{Ker}(g), f^{\prime}$ is injective ; hence $f^{\prime}$ is bijective and therefore G is isomorphic to the additive group $\mathbf{Z} / p \mathbf{Z}$ of integers modulo $p$.
-claim h_s7_t10_positive_case_isomorphism :
-  forall G, forall mul:set -> set -> set,
-    cyclic_group G mul -> finite G ->
-    exists p :e omega,
-      equip G p
-      /\ isomorphic_groups
-        G mul (int_mod_quotient p) (int_mod_addition p).
-admit.
+    claim heGp : equip G p.
+    exact (god1_equip_codomain_eq_subst G n p hnp heGn).
 //GOD1PRF:74890 In particular, $G$ has the same number of elements as this group, i.e., G has $p$ elements.
-claim h_s7_t10_positive_case_cardinality :
-  forall G, forall mul:set -> set -> set,
-  forall p :e omega,
-    isomorphic_groups
-      G mul (int_mod_quotient p) (int_mod_addition p) ->
-    equip G p.
-admit.
+    apply (ex_intro
+      (fun q => q :e omega /\
+        (equip G q /\ isomorphic_groups
+          G mul (int_mod_quotient q) (int_mod_addition q))) p).
+    exact (andI
+      (p :e omega)
+      (equip G p /\ isomorphic_groups
+        G mul (int_mod_quotient p) (int_mod_addition p))
+      hp
+      (andI
+        (equip G p)
+        (isomorphic_groups
+          G mul (int_mod_quotient p) (int_mod_addition p))
+        heGp hGquotient)).
 //GOD1PRF:74982 We have therefore proved
-claim h_s7_t10_classification_conclusion :
+//GOD1PRF:75245 It follows that two cyclic groups are isomorphic if and only if they have the same number (finite or infinite) of elements.
+Qed.
+
+Theorem god1_equip_preserves_finiteness :
+  forall X Y, equip X Y -> finite X -> finite Y.
+let X Y.
+assume hXY hfiniteX.
+apply (exandE_i
+  (fun n => n :e omega) (fun n => equip X n) hfiniteX).
+let n.
+assume hn heXn.
+exact (ex_intro
+  (fun m => m :e omega /\ equip Y m) n
+  (andI (n :e omega) (equip Y n) hn
+    (equip_tra Y X n (equip_sym X Y hXY) heXn))).
+Qed.
+
+Theorem god1_infinite_cyclic_group_classification :
+  forall G, forall mul:set -> set -> set,
+    cyclic_group G mul -> infinite G ->
+    isomorphic_groups G mul int add_SNo.
+exact (andEL
   (forall G, forall mul:set -> set -> set,
     cyclic_group G mul -> infinite G ->
     isomorphic_groups G mul int add_SNo)
-  /\ (forall G, forall mul:set -> set -> set,
+  (forall G, forall mul:set -> set -> set,
     cyclic_group G mul -> finite G ->
     exists p :e omega,
-      equip G p
-      /\ isomorphic_groups
-        G mul (int_mod_quotient p) (int_mod_addition p)).
-admit.
-//GOD1PRF:75245 It follows that two cyclic groups are isomorphic if and only if they have the same number (finite or infinite) of elements.
-claim h_s7_t10_cardinality_classifies_cyclic_groups :
+      equip G p /\ isomorphic_groups
+        G mul (int_mod_quotient p) (int_mod_addition p))
+  god1_s7_theorem10_classification_of_cyclic_groups).
+Qed.
+
+Theorem god1_finite_cyclic_group_classification :
+  forall G, forall mul:set -> set -> set,
+    cyclic_group G mul -> finite G ->
+    exists p :e omega,
+      equip G p /\ isomorphic_groups
+        G mul (int_mod_quotient p) (int_mod_addition p).
+exact (andER
+  (forall G, forall mul:set -> set -> set,
+    cyclic_group G mul -> infinite G ->
+    isomorphic_groups G mul int add_SNo)
+  (forall G, forall mul:set -> set -> set,
+    cyclic_group G mul -> finite G ->
+    exists p :e omega,
+      equip G p /\ isomorphic_groups
+        G mul (int_mod_quotient p) (int_mod_addition p))
+  god1_s7_theorem10_classification_of_cyclic_groups).
+Qed.
+
+Theorem god1_finite_cyclic_group_at_its_cardinality :
+  forall G, forall mul:set -> set -> set,
+    cyclic_group G mul -> forall n :e omega, equip G n ->
+    isomorphic_groups
+      G mul (int_mod_quotient n) (int_mod_addition n).
+let G mul.
+assume hcyclic.
+let n.
+assume hn heGn.
+claim hfiniteG : finite G.
+exact (ex_intro
+  (fun m => m :e omega /\ equip G m) n
+  (andI (n :e omega) (equip G n) hn heGn)).
+claim hG : group G mul.
+exact (andEL
+  (group G mul)
+  (exists x :e G, forall y :e G, exists m :e int,
+    y = group_int_power G mul x m) hcyclic).
+claim hgenerator : exists x :e G,
+  forall y :e G, exists m :e int,
+    y = group_int_power G mul x m.
+exact (andER
+  (group G mul)
+  (exists x :e G, forall y :e G, exists m :e int,
+    y = group_int_power G mul x m) hcyclic).
+apply (exandE_i
+  (fun x => x :e G)
+  (fun x => forall y :e G, exists m :e int,
+    y = group_int_power G mul x m)
+  hgenerator).
+let x.
+assume hx hgen.
+claim hkernelExists : exists p :e omega,
+  group_homomorphism_kernel int add_SNo G mul
+    (fun m => group_int_power G mul x m)
+    = {mul_SNo p k|k :e int}.
+exact (god1_power_map_kernel_is_multiple_set G mul x hx hG).
+apply (exandE_i
+  (fun p => p :e omega)
+  (fun p => group_homomorphism_kernel int add_SNo G mul
+    (fun m => group_int_power G mul x m)
+    = {mul_SNo p k|k :e int})
+  hkernelExists).
+let p.
+assume hp hkernel.
+apply (orE (p = 0) (0 :e p)
+  (god1_natural_zero_or_positive p hp)
+  (isomorphic_groups
+    G mul (int_mod_quotient n) (int_mod_addition n))).
+- assume hpzero.
+  claim hkernelZero :
+    group_homomorphism_kernel int add_SNo G mul
+      (fun m => group_int_power G mul x m) = {0}.
+  exact (eq_i_tra
+    (group_homomorphism_kernel int add_SNo G mul
+      (fun m => group_int_power G mul x m))
+    {mul_SNo p k|k :e int} {0}
+    hkernel
+    (eq_i_tra
+      {mul_SNo p k|k :e int}
+      {mul_SNo 0 k|k :e int} {0}
+      (f_eq_i (fun q => {mul_SNo q k|k :e int}) p 0 hpzero)
+      god1_zero_integer_multiples_singleton)).
+  claim hisoInt : isomorphic_groups G mul int add_SNo.
+  exact (god1_power_map_trivial_kernel_isomorphism
+    G mul x hx hG hgen hkernelZero).
+  exact (FalseE
+    ((god1_isomorphic_to_integers_is_infinite
+      G mul hisoInt) hfiniteG)
+    (isomorphic_groups
+      G mul (int_mod_quotient n) (int_mod_addition n))).
+- assume hppositive.
+  claim hnp : n = p.
+  exact (god1_finite_generator_kernel_cardinality
+    G mul x hx hG hgen n hn heGn p hp hppositive hkernel).
+  claim hmultiples :
+    {mul_SNo p k|k :e int} = {mul_SNo n k|k :e int}.
+  exact (f_eq_i (fun q => {mul_SNo q k|k :e int})
+    p n (eq_sym n p hnp)).
+  claim hkernelN :
+    group_homomorphism_kernel int add_SNo G mul
+      (fun m => group_int_power G mul x m)
+    = {mul_SNo n k|k :e int}.
+  exact (eq_i_tra
+    (group_homomorphism_kernel int add_SNo G mul
+      (fun m => group_int_power G mul x m))
+    {mul_SNo p k|k :e int} {mul_SNo n k|k :e int}
+    hkernel hmultiples).
+  exact (god1_group_isomorphism_symmetric
+    (int_mod_quotient n) (int_mod_addition n) G mul
+    (god1_power_map_quotient_isomorphism
+      G mul x hx hG hgen n hn hkernelN)).
+Qed.
+
+Theorem god1_cyclic_groups_isomorphic_iff_equip :
   forall G, forall mulG:set -> set -> set,
   forall H, forall mulH:set -> set -> set,
     cyclic_group G mulG -> cyclic_group H mulH ->
-    equip G H -> isomorphic_groups G mulG H mulH.
-admit.
-Admitted.
+    (isomorphic_groups G mulG H mulH <-> equip G H).
+let G mulG H mulH.
+assume hGcyclic hHcyclic.
+apply iffI.
+- assume hiso.
+  apply hiso.
+  let f.
+  assume hf.
+  exact (ex_intro_setfun (fun u => bij G H u) f
+    (god1_group_isomorphism_bijective G mulG H mulH f hf)).
+- assume heGH.
+  apply (orE (finite G) (infinite G) (xm (finite G))
+    (isomorphic_groups G mulG H mulH)).
+  - assume hfiniteG.
+    claim hfiniteH : finite H.
+    exact (god1_equip_preserves_finiteness G H heGH hfiniteG).
+    claim hGdata : exists p :e omega,
+      equip G p /\ isomorphic_groups
+        G mulG (int_mod_quotient p) (int_mod_addition p).
+    exact (god1_finite_cyclic_group_classification
+      G mulG hGcyclic hfiniteG).
+    apply (exandE_i
+      (fun p => p :e omega)
+      (fun p => equip G p /\ isomorphic_groups
+        G mulG (int_mod_quotient p) (int_mod_addition p))
+      hGdata).
+    let p.
+    assume hp hpdata.
+    claim heGp : equip G p.
+    exact (andEL
+      (equip G p)
+      (isomorphic_groups
+        G mulG (int_mod_quotient p) (int_mod_addition p)) hpdata).
+    claim hGQp : isomorphic_groups
+      G mulG (int_mod_quotient p) (int_mod_addition p).
+    exact (andER
+      (equip G p)
+      (isomorphic_groups
+        G mulG (int_mod_quotient p) (int_mod_addition p)) hpdata).
+    claim heHp : equip H p.
+    exact (equip_tra H G p (equip_sym G H heGH) heGp).
+    claim hHQp : isomorphic_groups
+      H mulH (int_mod_quotient p) (int_mod_addition p).
+    exact (god1_finite_cyclic_group_at_its_cardinality
+      H mulH hHcyclic p hp heHp).
+    exact (god1_group_isomorphism_transitive
+      G mulG (int_mod_quotient p) (int_mod_addition p) H mulH
+      hGQp
+      (god1_group_isomorphism_symmetric
+        H mulH (int_mod_quotient p) (int_mod_addition p) hHQp)).
+  - assume hinfiniteG.
+    claim hinfiniteH : infinite H.
+    assume hfiniteH.
+    exact (hinfiniteG
+      (god1_equip_preserves_finiteness
+        H G (equip_sym G H heGH) hfiniteH)).
+    claim hGint : isomorphic_groups G mulG int add_SNo.
+    exact (god1_infinite_cyclic_group_classification
+      G mulG hGcyclic hinfiniteG).
+    claim hHint : isomorphic_groups H mulH int add_SNo.
+    exact (god1_infinite_cyclic_group_classification
+      H mulH hHcyclic hinfiniteH).
+    exact (god1_group_isomorphism_transitive
+      G mulG int add_SNo H mulH hGint
+      (god1_group_isomorphism_symmetric
+        H mulH int add_SNo hHint)).
+Qed.
 
 //GOD1:75370 group_element_order : "#4 is the order of #3 in the group #1" | $\operatorname{ord}_{#1}(#3)=#4$
 Definition group_element_order :
@@ -67008,7 +68840,10 @@ Theorem god1_s7_example8_subgroups_of_integers_interface :
       I = {mul_SNo p z|z :e int}
       /\ forall q :e omega,
         I = {mul_SNo q z|z :e int} -> q = p.
-Admitted.
+let I.
+assume hI.
+exact (god1_subgroups_of_integers_classification_unique I hI).
+Qed.
 
 Theorem god1_field_characteristic_zero_or_prime_and_scalar_criterion :
   forall K, forall add mul:set -> set -> set,
