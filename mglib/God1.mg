@@ -81343,6 +81343,75 @@ exact (andI
 exact h_s10_induced_module_conclusion.
 Qed.
 
+Theorem god1_submodule_ambient_module :
+  forall K, forall addK mulK:set -> set -> set,
+  forall M, forall addM smul:set -> set -> set, forall N,
+    submodule K addK mulK M addM smul N ->
+    left_module K addK mulK M addM smul.
+let K addK mulK M addM smul N.
+assume hN.
+exact (andEL
+  (left_module K addK mulK M addM smul)
+  (N c= M)
+  (andEL
+    (left_module K addK mulK M addM smul /\ N c= M)
+    (subgroup M addM N)
+    (andEL
+      ((left_module K addK mulK M addM smul /\ N c= M)
+        /\ subgroup M addM N)
+      (forall scalar :e K, forall x :e N, smul scalar x :e N)
+      hN))).
+Qed.
+
+Theorem god1_submodule_subset :
+  forall K, forall addK mulK:set -> set -> set,
+  forall M, forall addM smul:set -> set -> set, forall N,
+    submodule K addK mulK M addM smul N -> N c= M.
+let K addK mulK M addM smul N.
+assume hN.
+exact (andER
+  (left_module K addK mulK M addM smul)
+  (N c= M)
+  (andEL
+    (left_module K addK mulK M addM smul /\ N c= M)
+    (subgroup M addM N)
+    (andEL
+      ((left_module K addK mulK M addM smul /\ N c= M)
+        /\ subgroup M addM N)
+      (forall scalar :e K, forall x :e N, smul scalar x :e N)
+      hN))).
+Qed.
+
+Theorem god1_submodule_additive_subgroup :
+  forall K, forall addK mulK:set -> set -> set,
+  forall M, forall addM smul:set -> set -> set, forall N,
+    submodule K addK mulK M addM smul N -> subgroup M addM N.
+let K addK mulK M addM smul N.
+assume hN.
+exact (andER
+  (left_module K addK mulK M addM smul /\ N c= M)
+  (subgroup M addM N)
+  (andEL
+    ((left_module K addK mulK M addM smul /\ N c= M)
+      /\ subgroup M addM N)
+    (forall scalar :e K, forall x :e N, smul scalar x :e N)
+    hN)).
+Qed.
+
+Theorem god1_submodule_scalar_closed :
+  forall K, forall addK mulK:set -> set -> set,
+  forall M, forall addM smul:set -> set -> set, forall N,
+    submodule K addK mulK M addM smul N ->
+    forall scalar :e K, forall x :e N, smul scalar x :e N.
+let K addK mulK M addM smul N.
+assume hN.
+exact (andER
+  ((left_module K addK mulK M addM smul /\ N c= M)
+    /\ subgroup M addM N)
+  (forall scalar :e K, forall x :e N, smul scalar x :e N)
+  hN).
+Qed.
+
 //GOD1:208638 module_family_intersection : "the intersection in #3 of the family #2 indexed by #1" | $\bigcap_{i\in #1}#2_i$
 Definition module_family_intersection :
   set -> (set -> set) -> set -> set :=
@@ -81367,17 +81436,140 @@ Theorem god1_s10_theorem1_intersection_and_directed_union_submodules :
         (module_family_union I N)).
 let K addK mulK M addM smul I N.
 assume hM hN.
-apply andI.
+claim hringAndAdditive :
+  ring K addK mulK /\ abelian_group M addM.
+exact (god1_left_module_ring_and_additive_component
+  K addK mulK M addM smul hM).
+claim habelianM : abelian_group M addM.
+exact (andER (ring K addK mulK) (abelian_group M addM)
+  hringAndAdditive).
+claim hgroupM : group M addM.
+exact (andEL (group M addM) (commutative_on M addM) habelianM).
+claim hscalarCore :
+  (forall scalar :e K, forall x :e M, smul scalar x :e M)
+  /\ (forall scalar mu :e K, forall x :e M,
+    smul scalar (smul mu x) = smul (mulK scalar mu) x).
+exact (god1_left_module_scalar_core_component
+  K addK mulK M addM smul hM).
+claim hscalarClosureM :
+  forall scalar :e K, forall x :e M, smul scalar x :e M.
+exact (andEL
+  (forall scalar :e K, forall x :e M, smul scalar x :e M)
+  (forall scalar mu :e K, forall x :e M,
+    smul scalar (smul mu x) = smul (mulK scalar mu) x)
+  hscalarCore).
+claim hSubgroups : forall i :e I, subgroup M addM (N i).
+let i.
+assume hi.
+exact (god1_submodule_additive_subgroup
+  K addK mulK M addM smul (N i) (hN i hi)).
 //GOD1PRF:209106 Then the intersection of the $\mathrm{M}_{i}$ is also a submodule of L .
 claim h_s10_t1_intersection :
   submodule K addK mulK M addM smul (module_family_intersection I N M).
-admit.
+claim hIntersectionSubset : module_family_intersection I N M c= M.
+exact (Sep_Subq M (fun x => forall i :e I, x :e N i)).
+claim hIntersectionSubgroup :
+  subgroup M addM (module_family_intersection I N M).
+exact (god1_group_family_intersection_is_subgroup
+  M addM I N hgroupM hSubgroups).
+claim hIntersectionScalarClosed :
+  forall scalar :e K,
+  forall x :e module_family_intersection I N M,
+    smul scalar x :e module_family_intersection I N M.
+let scalar.
+assume hscalar.
+let x.
+assume hx.
+claim hxM : x :e M.
+exact (SepE1 M (fun q => forall i :e I, q :e N i) x hx).
+exact (SepI M
+  (fun q => forall i :e I, q :e N i)
+  (smul scalar x)
+  (hscalarClosureM scalar hscalar x hxM)
+  (fun i hi =>
+    god1_submodule_scalar_closed
+      K addK mulK M addM smul (N i) (hN i hi)
+      scalar hscalar x
+      ((SepE2 M (fun q => forall j :e I, q :e N j) x hx) i hi))).
+exact (andI
+  (((left_module K addK mulK M addM smul
+    /\ module_family_intersection I N M c= M)
+    /\ subgroup M addM (module_family_intersection I N M)))
+  (forall scalar :e K,
+    forall x :e module_family_intersection I N M,
+      smul scalar x :e module_family_intersection I N M)
+  (andI
+    (left_module K addK mulK M addM smul
+      /\ module_family_intersection I N M c= M)
+    (subgroup M addM (module_family_intersection I N M))
+    (andI
+      (left_module K addK mulK M addM smul)
+      (module_family_intersection I N M c= M)
+      hM hIntersectionSubset)
+    hIntersectionSubgroup)
+  hIntersectionScalarClosed).
 //GOD1PRF:209179 For the union of the $\mathrm{M}_{i}$ to be a submodule of L it is sufficient that, for each pair of indices $i, j \in \mathrm{I}$, there exist an index $k \in \mathrm{I}$ such that
 claim h_s10_t1_directed_union :
   ((exists i, i :e I) /\ (forall i j :e I, exists k :e I,
     N i c= N k /\ N j c= N k)) ->
   submodule K addK mulK M addM smul (module_family_union I N).
-admit.
+assume hDirectedData.
+claim hIndexNonempty : exists i, i :e I.
+exact (andEL
+  (exists i, i :e I)
+  (forall i j :e I, exists k :e I,
+    N i c= N k /\ N j c= N k)
+  hDirectedData).
+claim hDirected :
+  forall i j :e I, exists k :e I,
+    N i c= N k /\ N j c= N k.
+exact (andER
+  (exists i, i :e I)
+  (forall i j :e I, exists k :e I,
+    N i c= N k /\ N j c= N k)
+  hDirectedData).
+claim hUnionSubset : module_family_union I N c= M.
+let x.
+assume hx.
+apply (famunionE_impred I N x hx (x :e M)).
+let i.
+assume hi hxi.
+exact ((god1_submodule_subset
+  K addK mulK M addM smul (N i) (hN i hi)) x hxi).
+claim hUnionSubgroup : subgroup M addM (module_family_union I N).
+exact (god1_directed_group_family_union_is_subgroup
+  M addM I N hgroupM hSubgroups hIndexNonempty hDirected).
+claim hUnionScalarClosed :
+  forall scalar :e K, forall x :e module_family_union I N,
+    smul scalar x :e module_family_union I N.
+let scalar.
+assume hscalar.
+let x.
+assume hx.
+apply (famunionE_impred I N x hx
+  (smul scalar x :e module_family_union I N)).
+let i.
+assume hi hxi.
+exact (famunionI I N i (smul scalar x) hi
+  (god1_submodule_scalar_closed
+    K addK mulK M addM smul (N i) (hN i hi)
+    scalar hscalar x hxi)).
+exact (andI
+  (((left_module K addK mulK M addM smul
+    /\ module_family_union I N c= M)
+    /\ subgroup M addM (module_family_union I N)))
+  (forall scalar :e K, forall x :e module_family_union I N,
+    smul scalar x :e module_family_union I N)
+  (andI
+    (left_module K addK mulK M addM smul
+      /\ module_family_union I N c= M)
+    (subgroup M addM (module_family_union I N))
+    (andI
+      (left_module K addK mulK M addM smul)
+      (module_family_union I N c= M)
+      hM hUnionSubset)
+    hUnionSubgroup)
+  hUnionScalarClosed).
 //GOD1PRF:209471 The proof is exactly the same as that of Theorem 1, § 7, and therefore we shall leave the details to the reader.
 claim h_s10_t1_s7_theorem1_call :
   forall G, forall op:set -> set -> set, forall J, forall H:set -> set,
@@ -81386,7 +81578,15 @@ claim h_s10_t1_s7_theorem1_call :
     /\ (((exists i, i :e J) /\ (forall i j :e J, exists k :e J,
       H i c= H k /\ H j c= H k)) -> subgroup G op (group_family_union J H)).
 apply god1_s7_theorem1_intersection_and_directed_union_subgroups.
-Admitted.
+exact (andI
+  (submodule K addK mulK M addM smul
+    (module_family_intersection I N M))
+  (((exists i, i :e I)
+    /\ (forall i j :e I, exists k :e I,
+      N i c= N k /\ N j c= N k)) ->
+    submodule K addK mulK M addM smul (module_family_union I N))
+  h_s10_t1_intersection h_s10_t1_directed_union).
+Qed.
 
 //GOD1:209821 opposite_ring_multiplication : "multiplication in the opposite ring of #1" | $x*y=yx$
 Definition opposite_ring_multiplication :
@@ -81400,14 +81600,468 @@ let K add mul.
 assume hK.
 //GOD1PRF:211000 It is easily seen that the set $K^{0}(=\mathrm{K}!)$, together with the two operations just defined, is a ring: for example, the formula
 claim h_s10_opposite_ring_goal : ring K add (opposite_ring_multiplication mul).
-admit.
+claim h_s10_opposite_additive : abelian_group K add.
+exact (god1_ring_additive_abelian_group K add mul hK).
+claim h_s10_opposite_law :
+  law_of_composition K (opposite_ring_multiplication mul).
+let x.
+assume hx.
+let y.
+assume hy.
+exact (god1_ring_multiplicative_law K add mul hK y hy x hx).
+claim h_s10_opposite_associative :
+  associative_on K (opposite_ring_multiplication mul).
+let x.
+assume hx.
+let y.
+assume hy.
+let z.
+assume hz.
+exact (god1_ring_multiplicative_associative_reverse
+  K add mul hK z hz y hy x hx).
+claim h_s10_opposite_identity :
+  exists one :e K,
+    neutral_element K (opposite_ring_multiplication mul) one.
+apply (exandE_i
+  (fun one => one :e K)
+  (fun one => neutral_element K mul one)
+  (god1_ring_multiplicative_identity_exists K add mul hK)).
+let one.
+assume hone hneutral.
+witness one.
+exact (andI
+  (one :e K)
+  (neutral_element K (opposite_ring_multiplication mul) one)
+  hone
+  (andI
+    (one :e K)
+    (forall x :e K,
+      opposite_ring_multiplication mul x one = x
+      /\ opposite_ring_multiplication mul one x = x)
+    hone
+    (fun x hx => andI
+      (opposite_ring_multiplication mul x one = x)
+      (opposite_ring_multiplication mul one x = x)
+      (andER (mul x one = x) (mul one x = x)
+        ((andER
+          (one :e K)
+          (forall u :e K, mul u one = u /\ mul one u = u)
+          hneutral) x hx))
+      (andEL (mul x one = x) (mul one x = x)
+        ((andER
+          (one :e K)
+          (forall u :e K, mul u one = u /\ mul one u = u)
+          hneutral) x hx))))).
+claim h_s10_opposite_both_distributive : forall x y z :e K,
+  opposite_ring_multiplication mul x (add y z)
+    = add (opposite_ring_multiplication mul x y)
+      (opposite_ring_multiplication mul x z)
+  /\ opposite_ring_multiplication mul (add x y) z
+    = add (opposite_ring_multiplication mul x z)
+      (opposite_ring_multiplication mul y z).
+let x.
+assume hx.
+let y.
+assume hy.
+let z.
+assume hz.
+claim h_s10_opposite_left_distributive :
+  opposite_ring_multiplication mul x (add y z)
+    = add (opposite_ring_multiplication mul x y)
+      (opposite_ring_multiplication mul x z).
+exact (andER
+  (mul y (add z x) = add (mul y z) (mul y x))
+  (mul (add y z) x = add (mul y x) (mul z x))
+  (god1_ring_distributive_laws K add mul hK y hy z hz x hx)).
+claim h_s10_opposite_right_distributive :
+  opposite_ring_multiplication mul (add x y) z
+    = add (opposite_ring_multiplication mul x z)
+      (opposite_ring_multiplication mul y z).
+exact (andEL
+  (mul z (add x y) = add (mul z x) (mul z y))
+  (mul (add z x) y = add (mul z y) (mul x y))
+  (god1_ring_distributive_laws K add mul hK z hz x hx y hy)).
+exact (andI
+  (opposite_ring_multiplication mul x (add y z)
+    = add (opposite_ring_multiplication mul x y)
+      (opposite_ring_multiplication mul x z))
+  (opposite_ring_multiplication mul (add x y) z
+    = add (opposite_ring_multiplication mul x z)
+      (opposite_ring_multiplication mul y z))
+  h_s10_opposite_left_distributive
+  h_s10_opposite_right_distributive).
+exact (andI
+  (((abelian_group K add
+      /\ law_of_composition K (opposite_ring_multiplication mul))
+    /\ associative_on K (opposite_ring_multiplication mul))
+    /\ exists one :e K,
+      neutral_element K (opposite_ring_multiplication mul) one)
+  (forall x y z :e K,
+    opposite_ring_multiplication mul x (add y z)
+      = add (opposite_ring_multiplication mul x y)
+        (opposite_ring_multiplication mul x z)
+    /\ opposite_ring_multiplication mul (add x y) z
+      = add (opposite_ring_multiplication mul x z)
+        (opposite_ring_multiplication mul y z))
+  (andI
+    ((abelian_group K add
+        /\ law_of_composition K (opposite_ring_multiplication mul))
+      /\ associative_on K (opposite_ring_multiplication mul))
+    (exists one :e K,
+      neutral_element K (opposite_ring_multiplication mul) one)
+    (andI
+      (abelian_group K add
+        /\ law_of_composition K (opposite_ring_multiplication mul))
+      (associative_on K (opposite_ring_multiplication mul))
+      (andI
+        (abelian_group K add)
+        (law_of_composition K (opposite_ring_multiplication mul))
+        h_s10_opposite_additive h_s10_opposite_law)
+      h_s10_opposite_associative)
+    h_s10_opposite_identity)
+  h_s10_opposite_both_distributive).
 //GOD1PRF:211167 reduces to the relation $z(x+y)=z x+z y$ in the ring K .\\
 claim h_s10_opposite_distributive : forall x y z :e K,
   opposite_ring_multiplication mul (add x y) z =
   add (opposite_ring_multiplication mul x z)
     (opposite_ring_multiplication mul y z).
-admit.
-Admitted.
+exact (fun x hx y hy z hz => andER
+  (opposite_ring_multiplication mul x (add y z)
+    = add (opposite_ring_multiplication mul x y)
+      (opposite_ring_multiplication mul x z))
+  (opposite_ring_multiplication mul (add x y) z
+    = add (opposite_ring_multiplication mul x z)
+      (opposite_ring_multiplication mul y z))
+  (god1_ring_distributive_laws
+    K add (opposite_ring_multiplication mul)
+    h_s10_opposite_ring_goal x hx y hy z hz)).
+exact h_s10_opposite_ring_goal.
+Qed.
+
+Theorem god1_opposite_ring_one :
+  forall K, forall add mul:set -> set -> set,
+    ring K add mul ->
+    ring_one K (opposite_ring_multiplication mul) = ring_one K mul.
+let K add mul.
+assume hK.
+claim hneutral : neutral_element K mul (ring_one K mul).
+exact (god1_ring_multiplicative_identity_specification K add mul hK).
+claim hopneutral :
+  neutral_element K (opposite_ring_multiplication mul) (ring_one K mul).
+exact (andI
+  (ring_one K mul :e K)
+  (forall x :e K,
+    opposite_ring_multiplication mul x (ring_one K mul) = x
+    /\ opposite_ring_multiplication mul (ring_one K mul) x = x)
+  (andEL
+    (ring_one K mul :e K)
+    (forall x :e K,
+      mul x (ring_one K mul) = x /\ mul (ring_one K mul) x = x)
+    hneutral)
+  (fun x hx => andI
+    (opposite_ring_multiplication mul x (ring_one K mul) = x)
+    (opposite_ring_multiplication mul (ring_one K mul) x = x)
+    (andER (mul x (ring_one K mul) = x)
+      (mul (ring_one K mul) x = x)
+      ((andER
+        (ring_one K mul :e K)
+        (forall u :e K,
+          mul u (ring_one K mul) = u
+          /\ mul (ring_one K mul) u = u)
+        hneutral) x hx))
+    (andEL (mul x (ring_one K mul) = x)
+      (mul (ring_one K mul) x = x)
+      ((andER
+        (ring_one K mul :e K)
+        (forall u :e K,
+          mul u (ring_one K mul) = u
+          /\ mul (ring_one K mul) u = u)
+        hneutral) x hx)))).
+claim hopring : ring K add (opposite_ring_multiplication mul).
+exact (god1_opposite_ring_is_ring K add mul hK).
+exact (god1_s6_theorem1_neutral_element_unique
+  K (opposite_ring_multiplication mul)
+  (god1_ring_multiplicative_law
+    K add (opposite_ring_multiplication mul) hopring)
+  (ring_one K (opposite_ring_multiplication mul))
+  (ring_one K mul)
+  (god1_ring_multiplicative_identity_specification
+    K add (opposite_ring_multiplication mul) hopring)
+  hopneutral).
+Qed.
+
+Theorem god1_right_modules_are_left_modules_over_opposite_ring_core :
+  forall K, forall addK mulK:set -> set -> set,
+  forall M, forall addM smulR:set -> set -> set,
+    right_module K addK mulK M addM smulR ->
+    ((((ring K addK (opposite_ring_multiplication mulK)
+        /\ abelian_group M addM)
+      /\ (forall scalar :e K, forall x :e M, smulR x scalar :e M))
+      /\ (forall scalar mu :e K, forall x :e M,
+        smulR (smulR x mu) scalar = smulR x (mulK mu scalar)))
+      /\ (forall x :e M,
+        smulR x (ring_one K (opposite_ring_multiplication mulK)) = x))
+      /\ (forall scalar mu :e K, forall x :e M,
+        smulR x (addK scalar mu)
+          = addM (smulR x scalar) (smulR x mu))
+    /\ (forall scalar :e K, forall x y :e M,
+      smulR (addM x y) scalar
+        = addM (smulR x scalar) (smulR y scalar)).
+let K addK mulK M addM smulR.
+assume hM.
+claim h_s10_right_prefix_scalar_add :
+  (((((ring K addK mulK /\ abelian_group M addM)
+    /\ (forall x :e M, forall scalar :e K,
+      smulR x scalar :e M))
+    /\ (forall x :e M, forall scalar mu :e K,
+      smulR (smulR x scalar) mu = smulR x (mulK scalar mu)))
+    /\ (forall x :e M, smulR x (ring_one K mulK) = x))
+    /\ (forall x :e M, forall scalar mu :e K,
+      smulR x (addK scalar mu)
+        = addM (smulR x scalar) (smulR x mu))).
+exact (andEL
+  (((((ring K addK mulK /\ abelian_group M addM)
+    /\ (forall x :e M, forall scalar :e K,
+      smulR x scalar :e M))
+    /\ (forall x :e M, forall scalar mu :e K,
+      smulR (smulR x scalar) mu = smulR x (mulK scalar mu)))
+    /\ (forall x :e M, smulR x (ring_one K mulK) = x))
+    /\ (forall x :e M, forall scalar mu :e K,
+      smulR x (addK scalar mu)
+        = addM (smulR x scalar) (smulR x mu)))
+  (forall x y :e M, forall scalar :e K,
+    smulR (addM x y) scalar
+      = addM (smulR x scalar) (smulR y scalar))
+  hM).
+claim h_s10_right_vector_add :
+  forall x y :e M, forall scalar :e K,
+    smulR (addM x y) scalar
+      = addM (smulR x scalar) (smulR y scalar).
+exact (andER
+  (((((ring K addK mulK /\ abelian_group M addM)
+    /\ (forall x :e M, forall scalar :e K,
+      smulR x scalar :e M))
+    /\ (forall x :e M, forall scalar mu :e K,
+      smulR (smulR x scalar) mu = smulR x (mulK scalar mu)))
+    /\ (forall x :e M, smulR x (ring_one K mulK) = x))
+    /\ (forall x :e M, forall scalar mu :e K,
+      smulR x (addK scalar mu)
+        = addM (smulR x scalar) (smulR x mu)))
+  (forall x y :e M, forall scalar :e K,
+    smulR (addM x y) scalar
+      = addM (smulR x scalar) (smulR y scalar))
+  hM).
+claim h_s10_right_prefix_one :
+  ((((ring K addK mulK /\ abelian_group M addM)
+    /\ (forall x :e M, forall scalar :e K,
+      smulR x scalar :e M))
+    /\ (forall x :e M, forall scalar mu :e K,
+      smulR (smulR x scalar) mu = smulR x (mulK scalar mu)))
+    /\ (forall x :e M, smulR x (ring_one K mulK) = x)).
+exact (andEL
+  ((((ring K addK mulK /\ abelian_group M addM)
+    /\ (forall x :e M, forall scalar :e K,
+      smulR x scalar :e M))
+    /\ (forall x :e M, forall scalar mu :e K,
+      smulR (smulR x scalar) mu = smulR x (mulK scalar mu)))
+    /\ (forall x :e M, smulR x (ring_one K mulK) = x))
+  (forall x :e M, forall scalar mu :e K,
+    smulR x (addK scalar mu)
+      = addM (smulR x scalar) (smulR x mu))
+  h_s10_right_prefix_scalar_add).
+claim h_s10_right_scalar_add :
+  forall x :e M, forall scalar mu :e K,
+    smulR x (addK scalar mu)
+      = addM (smulR x scalar) (smulR x mu).
+exact (andER
+  ((((ring K addK mulK /\ abelian_group M addM)
+    /\ (forall x :e M, forall scalar :e K,
+      smulR x scalar :e M))
+    /\ (forall x :e M, forall scalar mu :e K,
+      smulR (smulR x scalar) mu = smulR x (mulK scalar mu)))
+    /\ (forall x :e M, smulR x (ring_one K mulK) = x))
+  (forall x :e M, forall scalar mu :e K,
+    smulR x (addK scalar mu)
+      = addM (smulR x scalar) (smulR x mu))
+  h_s10_right_prefix_scalar_add).
+claim h_s10_right_prefix_associative :
+  (((ring K addK mulK /\ abelian_group M addM)
+    /\ (forall x :e M, forall scalar :e K,
+      smulR x scalar :e M))
+    /\ (forall x :e M, forall scalar mu :e K,
+      smulR (smulR x scalar) mu = smulR x (mulK scalar mu))).
+exact (andEL
+  (((ring K addK mulK /\ abelian_group M addM)
+    /\ (forall x :e M, forall scalar :e K,
+      smulR x scalar :e M))
+    /\ (forall x :e M, forall scalar mu :e K,
+      smulR (smulR x scalar) mu = smulR x (mulK scalar mu)))
+  (forall x :e M, smulR x (ring_one K mulK) = x)
+  h_s10_right_prefix_one).
+claim h_s10_right_one :
+  forall x :e M, smulR x (ring_one K mulK) = x.
+exact (andER
+  (((ring K addK mulK /\ abelian_group M addM)
+    /\ (forall x :e M, forall scalar :e K,
+      smulR x scalar :e M))
+    /\ (forall x :e M, forall scalar mu :e K,
+      smulR (smulR x scalar) mu = smulR x (mulK scalar mu)))
+  (forall x :e M, smulR x (ring_one K mulK) = x)
+  h_s10_right_prefix_one).
+claim h_s10_right_prefix_closure :
+  (ring K addK mulK /\ abelian_group M addM)
+  /\ (forall x :e M, forall scalar :e K,
+    smulR x scalar :e M).
+exact (andEL
+  ((ring K addK mulK /\ abelian_group M addM)
+    /\ (forall x :e M, forall scalar :e K,
+      smulR x scalar :e M))
+  (forall x :e M, forall scalar mu :e K,
+    smulR (smulR x scalar) mu = smulR x (mulK scalar mu))
+  h_s10_right_prefix_associative).
+claim h_s10_right_associative :
+  forall x :e M, forall scalar mu :e K,
+    smulR (smulR x scalar) mu = smulR x (mulK scalar mu).
+exact (andER
+  ((ring K addK mulK /\ abelian_group M addM)
+    /\ (forall x :e M, forall scalar :e K,
+      smulR x scalar :e M))
+  (forall x :e M, forall scalar mu :e K,
+    smulR (smulR x scalar) mu = smulR x (mulK scalar mu))
+  h_s10_right_prefix_associative).
+claim h_s10_right_ring_and_additive :
+  ring K addK mulK /\ abelian_group M addM.
+exact (andEL
+  (ring K addK mulK /\ abelian_group M addM)
+  (forall x :e M, forall scalar :e K,
+    smulR x scalar :e M)
+  h_s10_right_prefix_closure).
+claim h_s10_right_closure :
+  forall x :e M, forall scalar :e K, smulR x scalar :e M.
+exact (andER
+  (ring K addK mulK /\ abelian_group M addM)
+  (forall x :e M, forall scalar :e K,
+    smulR x scalar :e M)
+  h_s10_right_prefix_closure).
+claim h_s10_right_ring : ring K addK mulK.
+exact (andEL
+  (ring K addK mulK) (abelian_group M addM)
+  h_s10_right_ring_and_additive).
+claim h_s10_right_additive : abelian_group M addM.
+exact (andER
+  (ring K addK mulK) (abelian_group M addM)
+  h_s10_right_ring_and_additive).
+claim h_s10_left_opposite_ring :
+  ring K addK (opposite_ring_multiplication mulK).
+exact (god1_opposite_ring_is_ring K addK mulK h_s10_right_ring).
+claim h_s10_left_closure :
+  forall scalar :e K, forall x :e M, smulR x scalar :e M.
+exact (fun scalar hscalar x hx =>
+  h_s10_right_closure x hx scalar hscalar).
+claim h_s10_left_associative :
+  forall scalar mu :e K, forall x :e M,
+    smulR (smulR x mu) scalar = smulR x (mulK mu scalar).
+exact (fun scalar hscalar mu hmu x hx =>
+  h_s10_right_associative x hx mu hmu scalar hscalar).
+claim h_s10_opposite_one_eq :
+  ring_one K (opposite_ring_multiplication mulK) = ring_one K mulK.
+exact (god1_opposite_ring_one K addK mulK h_s10_right_ring).
+claim h_s10_left_one : forall x :e M,
+  smulR x (ring_one K (opposite_ring_multiplication mulK)) = x.
+let x.
+assume hx.
+exact (eq_i_tra
+  (smulR x (ring_one K (opposite_ring_multiplication mulK)))
+  (smulR x (ring_one K mulK)) x
+  (f_eq_i (fun scalar:set => smulR x scalar)
+    (ring_one K (opposite_ring_multiplication mulK))
+    (ring_one K mulK) h_s10_opposite_one_eq)
+  (h_s10_right_one x hx)).
+claim h_s10_left_scalar_add :
+  forall scalar mu :e K, forall x :e M,
+    smulR x (addK scalar mu)
+      = addM (smulR x scalar) (smulR x mu).
+exact (fun scalar hscalar mu hmu x hx =>
+  h_s10_right_scalar_add x hx scalar hscalar mu hmu).
+claim h_s10_left_vector_add :
+  forall scalar :e K, forall x y :e M,
+    smulR (addM x y) scalar
+      = addM (smulR x scalar) (smulR y scalar).
+exact (fun scalar hscalar x hx y hy =>
+  h_s10_right_vector_add x hx y hy scalar hscalar).
+claim h_s10_left_prefix_ring_additive :
+  ring K addK (opposite_ring_multiplication mulK)
+  /\ abelian_group M addM.
+exact (andI
+  (ring K addK (opposite_ring_multiplication mulK))
+  (abelian_group M addM)
+  h_s10_left_opposite_ring h_s10_right_additive).
+claim h_s10_left_prefix_closure :
+  (ring K addK (opposite_ring_multiplication mulK)
+    /\ abelian_group M addM)
+  /\ (forall scalar :e K, forall x :e M, smulR x scalar :e M).
+exact (andI
+  (ring K addK (opposite_ring_multiplication mulK)
+    /\ abelian_group M addM)
+  (forall scalar :e K, forall x :e M, smulR x scalar :e M)
+  h_s10_left_prefix_ring_additive h_s10_left_closure).
+claim h_s10_left_prefix_associative :
+  ((ring K addK (opposite_ring_multiplication mulK)
+      /\ abelian_group M addM)
+    /\ (forall scalar :e K, forall x :e M, smulR x scalar :e M))
+  /\ (forall scalar mu :e K, forall x :e M,
+    smulR (smulR x mu) scalar = smulR x (mulK mu scalar)).
+exact (andI
+  ((ring K addK (opposite_ring_multiplication mulK)
+      /\ abelian_group M addM)
+    /\ (forall scalar :e K, forall x :e M, smulR x scalar :e M))
+  (forall scalar mu :e K, forall x :e M,
+    smulR (smulR x mu) scalar = smulR x (mulK mu scalar))
+  h_s10_left_prefix_closure h_s10_left_associative).
+claim h_s10_left_prefix_one :
+  (((ring K addK (opposite_ring_multiplication mulK)
+      /\ abelian_group M addM)
+    /\ (forall scalar :e K, forall x :e M, smulR x scalar :e M))
+    /\ (forall scalar mu :e K, forall x :e M,
+      smulR (smulR x mu) scalar = smulR x (mulK mu scalar)))
+  /\ (forall x :e M,
+    smulR x (ring_one K (opposite_ring_multiplication mulK)) = x).
+exact (andI
+  (((ring K addK (opposite_ring_multiplication mulK)
+      /\ abelian_group M addM)
+    /\ (forall scalar :e K, forall x :e M, smulR x scalar :e M))
+    /\ (forall scalar mu :e K, forall x :e M,
+      smulR (smulR x mu) scalar = smulR x (mulK mu scalar)))
+  (forall x :e M,
+    smulR x (ring_one K (opposite_ring_multiplication mulK)) = x)
+  h_s10_left_prefix_associative h_s10_left_one).
+claim h_s10_left_prefix_scalar_add :
+  ((((ring K addK (opposite_ring_multiplication mulK)
+      /\ abelian_group M addM)
+    /\ (forall scalar :e K, forall x :e M, smulR x scalar :e M))
+    /\ (forall scalar mu :e K, forall x :e M,
+      smulR (smulR x mu) scalar = smulR x (mulK mu scalar)))
+    /\ (forall x :e M,
+      smulR x (ring_one K (opposite_ring_multiplication mulK)) = x))
+  /\ (forall scalar mu :e K, forall x :e M,
+    smulR x (addK scalar mu)
+      = addM (smulR x scalar) (smulR x mu)).
+exact (andI
+  ((((ring K addK (opposite_ring_multiplication mulK)
+      /\ abelian_group M addM)
+    /\ (forall scalar :e K, forall x :e M, smulR x scalar :e M))
+    /\ (forall scalar mu :e K, forall x :e M,
+      smulR (smulR x mu) scalar = smulR x (mulK mu scalar)))
+    /\ (forall x :e M,
+      smulR x (ring_one K (opposite_ring_multiplication mulK)) = x))
+  (forall scalar mu :e K, forall x :e M,
+    smulR x (addK scalar mu)
+      = addM (smulR x scalar) (smulR x mu))
+  h_s10_left_prefix_one h_s10_left_scalar_add).
+apply andI.
+- exact h_s10_left_prefix_scalar_add.
+- exact h_s10_left_vector_add.
+Qed.
 
 Theorem god1_right_modules_are_left_modules_over_opposite_ring :
   forall K, forall addK mulK:set -> set -> set,
@@ -81422,21 +82076,35 @@ assume hM.
 claim h_s10_right_to_left_goal :
   left_module K addK (opposite_ring_multiplication mulK)
     M addM (fun a x => smulR x a).
-admit.
+exact (god1_right_modules_are_left_modules_over_opposite_ring_core
+  K addK mulK M addM smulR hM).
 //GOD1PRF:211800 For
 claim h_s10_right_to_left_associativity : forall a b :e K, forall x :e M,
   smulR (smulR x b) a = smulR x (mulK b a).
-admit.
+exact (fun a ha b hb x hx => andER
+  (forall scalar :e K, forall y :e M,
+    smulR y scalar :e M)
+  (forall scalar mu :e K, forall y :e M,
+    smulR (smulR y mu) scalar = smulR y (mulK mu scalar))
+  (god1_left_module_scalar_core_component
+    K addK (opposite_ring_multiplication mulK)
+    M addM (fun c:set => fun z:set => smulR z c)
+    h_s10_right_to_left_goal)
+  a ha b hb x hx).
 //GOD1PRF:212105 and finally
 claim h_s10_right_to_left_distributivity : forall a :e K, forall x y :e M,
   smulR (addM x y) a = addM (smulR x a) (smulR y a).
-admit.
+exact (god1_left_module_vector_add_component
+  K addK (opposite_ring_multiplication mulK)
+  M addM (fun c:set => fun z:set => smulR z c)
+  h_s10_right_to_left_goal).
 //GOD1PRF:212137 which proves our assertion.\\
 claim h_s10_right_to_left_conclusion :
   left_module K addK (opposite_ring_multiplication mulK)
     M addM (fun a x => smulR x a).
-admit.
-Admitted.
+exact h_s10_right_to_left_goal.
+exact h_s10_right_to_left_conclusion.
+Qed.
 
 (** § 11. Linear relations in a module. **)
 
