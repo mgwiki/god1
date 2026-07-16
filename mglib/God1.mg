@@ -56663,11 +56663,546 @@ exact (god1_int_mod_commutative_ring_core p hp).
 exact h_s8_mod_commutative_ring_conclusion.
 Qed.
 
+(** Finite self-injections, used to discharge the finite-domain interface. **)
+Theorem god1_injection_restricts_across_fixed_adjoin :
+  forall X y, y /:e X -> forall f:set -> set,
+    inj (X :\/: {y}) (X :\/: {y}) f -> f y = y -> inj X X f.
+let X y.
+assume hyX.
+let f.
+assume hf hfy.
+claim hyY : y :e X :\/: {y}.
+exact (binunionI2 X {y} y (SingI y)).
+apply (andI
+  (forall x :e X, f x :e X)
+  (forall x z :e X, f x = f z -> x = z)).
+- let x.
+  assume hx.
+  claim hfxY : f x :e X :\/: {y}.
+  exact ((andEL
+    (forall u :e X :\/: {y}, f u :e X :\/: {y})
+    (forall u v :e X :\/: {y}, f u = f v -> u = v) hf)
+    x (binunionI1 X {y} x hx)).
+  apply (binunionE' X {y} (f x) (f x :e X)).
+  - exact (fun hfx => hfx).
+  - assume hfxsing.
+    claim hxy : x = y.
+    exact ((andER
+      (forall u :e X :\/: {y}, f u :e X :\/: {y})
+      (forall u v :e X :\/: {y}, f u = f v -> u = v) hf)
+      x (binunionI1 X {y} x hx) y hyY
+      (eq_i_tra (f x) y (f y)
+        (SingE y (f x) hfxsing) (eq_sym (f y) y hfy))).
+    exact (FalseE (hyX (mem_eq_substR X x y hxy hx)) (f x :e X)).
+  - exact hfxY.
+- let x.
+  assume hx.
+  let z.
+  assume hz hxz.
+  exact ((andER
+    (forall u :e X :\/: {y}, f u :e X :\/: {y})
+    (forall u v :e X :\/: {y}, f u = f v -> u = v) hf)
+    x (binunionI1 X {y} x hx)
+    z (binunionI1 X {y} z hz) hxz).
+Qed.
+
+Theorem god1_surjection_extends_across_fixed_adjoin :
+  forall X y, y /:e X -> forall f:set -> set,
+    inj (X :\/: {y}) (X :\/: {y}) f ->
+    surj X X f -> f y = y -> surj (X :\/: {y}) (X :\/: {y}) f.
+let X y.
+assume hyX.
+let f.
+assume hfinj hsurj hfy.
+claim hyY : y :e X :\/: {y}.
+exact (binunionI2 X {y} y (SingI y)).
+apply (andI
+  (forall x :e X :\/: {y}, f x :e X :\/: {y})
+  (forall w :e X :\/: {y}, exists x :e X :\/: {y}, f x = w)).
+- exact (andEL
+    (forall x :e X :\/: {y}, f x :e X :\/: {y})
+    (forall x z :e X :\/: {y}, f x = f z -> x = z) hfinj).
+- let w.
+  assume hw.
+  apply (binunionE' X {y} w
+    (exists x :e X :\/: {y}, f x = w)).
+  - assume hwX.
+    apply (exandE_i (fun x => x :e X) (fun x => f x = w)
+      ((andER
+        (forall x :e X, f x :e X)
+        (forall v :e X, exists x :e X, f x = v) hsurj) w hwX)).
+    let x.
+    assume hx hfx.
+    witness x.
+    exact (andI
+      (x :e X :\/: {y}) (f x = w)
+      (binunionI1 X {y} x hx) hfx).
+  - assume hwsing.
+    witness y.
+    exact (andI
+      (y :e X :\/: {y}) (f y = w) hyY
+      (eq_i_tra (f y) y w hfy
+        (eq_sym w y (SingE y w hwsing)))).
+  - exact hw.
+Qed.
+
+Theorem god1_swap_postcomposition_surjective_transfer :
+  forall X a b, a :e X -> b :e X -> forall f:set -> set,
+    (forall x :e X, f x :e X) ->
+    surj X X (fun x => permutation_swap X a b (f x)) ->
+    surj X X f.
+let X a b.
+assume ha hb.
+let f.
+assume hf hsurj.
+apply (andI
+  (forall x :e X, f x :e X)
+  (forall w :e X, exists x :e X, f x = w)).
+- exact hf.
+- let w.
+  assume hw.
+  claim hsw : permutation_swap X a b w :e X.
+  exact (god1_permutation_swap_values_in X a b ha hb w hw).
+  apply (exandE_i
+    (fun x => x :e X)
+    (fun x => permutation_swap X a b (f x)
+      = permutation_swap X a b w)
+    ((andER
+      (forall x :e X, permutation_swap X a b (f x) :e X)
+      (forall v :e X, exists x :e X,
+        permutation_swap X a b (f x) = v)
+      hsurj) (permutation_swap X a b w) hsw)).
+  let x.
+  assume hx hxeq.
+  witness x.
+  exact (andI
+    (x :e X) (f x = w) hx
+    (eq_i_tra (f x)
+      (permutation_swap X a b (permutation_swap X a b (f x))) w
+      (eq_sym
+        (permutation_swap X a b (permutation_swap X a b (f x)))
+        (f x)
+        (god1_permutation_swap_involutive X a b ha hb
+          (f x) (hf x hx)))
+      (eq_i_tra
+        (permutation_swap X a b (permutation_swap X a b (f x)))
+        (permutation_swap X a b (permutation_swap X a b w)) w
+        (f_eq_i (fun u => permutation_swap X a b u)
+          (permutation_swap X a b (f x))
+          (permutation_swap X a b w) hxeq)
+        (god1_permutation_swap_involutive X a b ha hb w hw)))).
+Qed.
+
+Theorem god1_empty_self_injection_surjective :
+  forall f:set -> set, inj 0 0 f -> surj 0 0 f.
+let f.
+assume hf.
+apply (andI
+  (forall x :e 0, f x :e 0)
+  (forall w :e 0, exists x :e 0, f x = w)).
+- let x.
+  assume hx.
+  exact (FalseE (EmptyE x hx) (f x :e 0)).
+- let w.
+  assume hw.
+  exact (FalseE (EmptyE w hw)
+    (exists x :e 0, f x = w)).
+Qed.
+
+Theorem god1_finite_self_injection_adjoin_step :
+  forall X y, finite X -> y /:e X ->
+    (forall f:set -> set, inj X X f -> surj X X f) ->
+    forall f:set -> set,
+      inj (X :\/: {y}) (X :\/: {y}) f ->
+      surj (X :\/: {y}) (X :\/: {y}) f.
+let X y.
+assume hfin hyX hIH.
+let f.
+assume hf.
+claim hyY : y :e X :\/: {y}.
+exact (binunionI2 X {y} y (SingI y)).
+claim hfyY : f y :e X :\/: {y}.
+exact ((andEL
+  (forall x :e X :\/: {y}, f x :e X :\/: {y})
+  (forall x z :e X :\/: {y}, f x = f z -> x = z) hf) y hyY).
+claim hginj : inj (X :\/: {y}) (X :\/: {y})
+  (fun z:set => permutation_swap (X :\/: {y}) y (f y) (f z)).
+exact (andI
+  (forall z :e X :\/: {y},
+    permutation_swap (X :\/: {y}) y (f y) (f z) :e X :\/: {y})
+  (forall u v :e X :\/: {y},
+    permutation_swap (X :\/: {y}) y (f y) (f u)
+      = permutation_swap (X :\/: {y}) y (f y) (f v) -> u = v)
+  (fun z hz =>
+    god1_permutation_swap_values_in (X :\/: {y}) y (f y)
+      hyY hfyY (f z)
+      ((andEL
+        (forall u :e X :\/: {y}, f u :e X :\/: {y})
+        (forall u v :e X :\/: {y}, f u = f v -> u = v) hf) z hz))
+  (fun u hu v hv huv =>
+    (andER
+      (forall r :e X :\/: {y}, f r :e X :\/: {y})
+      (forall r s :e X :\/: {y}, f r = f s -> r = s) hf)
+      u hu v hv
+      (god1_permutation_swap_injective (X :\/: {y}) y (f y)
+        hyY hfyY
+        (f u)
+        ((andEL
+          (forall r :e X :\/: {y}, f r :e X :\/: {y})
+          (forall r s :e X :\/: {y}, f r = f s -> r = s) hf) u hu)
+        (f v)
+        ((andEL
+          (forall r :e X :\/: {y}, f r :e X :\/: {y})
+          (forall r s :e X :\/: {y}, f r = f s -> r = s) hf) v hv)
+        huv))).
+claim hgy :
+  (fun z:set => permutation_swap (X :\/: {y}) y (f y) (f z)) y = y.
+exact (god1_permutation_swap_at_right
+  (X :\/: {y}) y (f y) hyY hfyY).
+claim hginjX : inj X X
+  (fun z:set => permutation_swap (X :\/: {y}) y (f y) (f z)).
+exact (god1_injection_restricts_across_fixed_adjoin X y hyX
+  (fun z:set => permutation_swap (X :\/: {y}) y (f y) (f z)) hginj hgy).
+claim hgsurjX : surj X X
+  (fun z:set => permutation_swap (X :\/: {y}) y (f y) (f z)).
+exact (hIH
+  (fun z:set => permutation_swap (X :\/: {y}) y (f y) (f z)) hginjX).
+claim hgsurjY : surj (X :\/: {y}) (X :\/: {y})
+  (fun z:set => permutation_swap (X :\/: {y}) y (f y) (f z)).
+exact (god1_surjection_extends_across_fixed_adjoin X y hyX
+  (fun z:set => permutation_swap (X :\/: {y}) y (f y) (f z))
+  hginj hgsurjX hgy).
+exact (god1_swap_postcomposition_surjective_transfer
+  (X :\/: {y}) y (f y) hyY hfyY f
+  (andEL
+    (forall z :e X :\/: {y}, f z :e X :\/: {y})
+    (forall z w :e X :\/: {y}, f z = f w -> z = w) hf)
+  hgsurjY).
+Qed.
+
+Theorem god1_finite_self_injection_surjective_core :
+  forall X, finite X -> forall f:set -> set, inj X X f -> surj X X f.
+let X.
+assume hfin.
+exact (finite_ind
+  (fun Y => forall f:set -> set, inj Y Y f -> surj Y Y f)
+  (god1_empty_self_injection_surjective)
+  (god1_finite_self_injection_adjoin_step)
+  X hfin).
+Qed.
+
+Theorem god1_integral_domain_commutative_ring :
+  forall K, forall add mul:set -> set -> set,
+    integral_domain K add mul -> commutative_ring K add mul.
+let K add mul.
+assume hK.
+exact (andEL
+  (commutative_ring K add mul)
+  (ring_one K mul <> ring_zero K add)
+  (andEL
+    (commutative_ring K add mul
+      /\ ring_one K mul <> ring_zero K add)
+    (forall u v :e K,
+      mul u v = ring_zero K add ->
+      u = ring_zero K add \/ v = ring_zero K add)
+    hK)).
+Qed.
+
+Theorem god1_integral_domain_one_ne_zero :
+  forall K, forall add mul:set -> set -> set,
+    integral_domain K add mul -> ring_one K mul <> ring_zero K add.
+let K add mul.
+assume hK.
+exact (andER
+  (commutative_ring K add mul)
+  (ring_one K mul <> ring_zero K add)
+  (andEL
+    (commutative_ring K add mul
+      /\ ring_one K mul <> ring_zero K add)
+    (forall u v :e K,
+      mul u v = ring_zero K add ->
+      u = ring_zero K add \/ v = ring_zero K add)
+    hK)).
+Qed.
+
+Theorem god1_integral_domain_zero_product :
+  forall K, forall add mul:set -> set -> set,
+    integral_domain K add mul -> forall u v :e K,
+      mul u v = ring_zero K add ->
+      u = ring_zero K add \/ v = ring_zero K add.
+let K add mul.
+assume hK.
+exact (andER
+  (commutative_ring K add mul
+    /\ ring_one K mul <> ring_zero K add)
+  (forall u v :e K,
+    mul u v = ring_zero K add ->
+    u = ring_zero K add \/ v = ring_zero K add)
+  hK).
+Qed.
+
+Theorem god1_commutative_ring_multiply_negation_right :
+  forall K, forall add mul:set -> set -> set,
+    commutative_ring K add mul -> forall x y :e K,
+      mul x (ring_negation K add y)
+        = ring_negation K add (mul x y).
+let K add mul.
+assume hK.
+let x.
+assume hx.
+let y.
+assume hy.
+claim hring : ring K add mul.
+exact (andEL (ring K add mul) (commutative_on K mul) hK).
+claim hcomm : commutative_on K mul.
+exact (andER (ring K add mul) (commutative_on K mul) hK).
+claim hG : group K add.
+exact (god1_ring_additive_group K add mul hring).
+claim hone : ring_one K mul :e K.
+exact (andEL
+  (ring_one K mul :e K)
+  (forall u :e K,
+    mul u (ring_one K mul) = u /\ mul (ring_one K mul) u = u)
+  (god1_ring_multiplicative_identity_specification K add mul hring)).
+claim hminusone : ring_negation K add (ring_one K mul) :e K.
+exact (god1_group_inverse_in K add hG (ring_one K mul) hone).
+claim hnegy : ring_negation K add y :e K.
+exact (god1_group_inverse_in K add hG y hy).
+claim hya : mul y x :e K.
+exact (god1_ring_multiplicative_law K add mul hring y hy x hx).
+apply (eq_i_tra
+  (mul x (ring_negation K add y))
+  (mul (ring_negation K add y) x)
+  (ring_negation K add (mul x y))).
+- exact (hcomm x hx (ring_negation K add y) hnegy).
+- apply (eq_i_tra
+    (mul (ring_negation K add y) x)
+    (mul (mul (ring_negation K add (ring_one K mul)) y) x)
+    (ring_negation K add (mul x y))).
+  - exact (f_eq_i (fun u => mul u x)
+      (ring_negation K add y)
+      (mul (ring_negation K add (ring_one K mul)) y)
+      (eq_sym
+        (mul (ring_negation K add (ring_one K mul)) y)
+        (ring_negation K add y)
+        (god1_ring_minus_one_multiplication_left K add mul hring y hy))).
+  - apply (eq_i_tra
+      (mul (mul (ring_negation K add (ring_one K mul)) y) x)
+      (mul (ring_negation K add (ring_one K mul)) (mul y x))
+      (ring_negation K add (mul x y))).
+    - exact (eq_sym
+        (mul (ring_negation K add (ring_one K mul)) (mul y x))
+        (mul (mul (ring_negation K add (ring_one K mul)) y) x)
+        (god1_ring_multiplicative_associative K add mul hring
+          (ring_negation K add (ring_one K mul)) hminusone
+          y hy x hx)).
+    - apply (eq_i_tra
+        (mul (ring_negation K add (ring_one K mul)) (mul y x))
+        (ring_negation K add (mul y x))
+        (ring_negation K add (mul x y))).
+      - exact (god1_ring_minus_one_multiplication_left K add mul hring
+          (mul y x) hya).
+      - exact (f_eq_i (fun u => ring_negation K add u)
+          (mul y x) (mul x y) (hcomm y hy x hx)).
+Qed.
+
+Theorem god1_commutative_ring_equal_products_difference_zero :
+  forall K, forall add mul:set -> set -> set,
+    commutative_ring K add mul -> forall a x y :e K,
+      mul a x = mul a y ->
+      mul a (add x (ring_negation K add y)) = ring_zero K add.
+let K add mul.
+assume hK.
+let a.
+assume ha.
+let x.
+assume hx.
+let y.
+assume hy haxy.
+claim hring : ring K add mul.
+exact (andEL (ring K add mul) (commutative_on K mul) hK).
+claim hG : group K add.
+exact (god1_ring_additive_group K add mul hring).
+claim hnegy : ring_negation K add y :e K.
+exact (god1_group_inverse_in K add hG y hy).
+apply (eq_i_tra
+  (mul a (add x (ring_negation K add y)))
+  (add (mul a x) (mul a (ring_negation K add y)))
+  (ring_zero K add)).
+- exact (andEL
+    (mul a (add x (ring_negation K add y))
+      = add (mul a x) (mul a (ring_negation K add y)))
+    (mul (add a x) (ring_negation K add y)
+      = add (mul a (ring_negation K add y))
+        (mul x (ring_negation K add y)))
+    (god1_ring_distributive_laws K add mul hring
+      a ha x hx (ring_negation K add y) hnegy)).
+- apply (eq_i_tra
+    (add (mul a x) (mul a (ring_negation K add y)))
+    (add (mul a y) (ring_negation K add (mul a y)))
+    (ring_zero K add)).
+  - exact (god1_binary_operation_congruence add
+      (mul a x) (mul a y)
+      (mul a (ring_negation K add y))
+      (ring_negation K add (mul a y))
+      haxy
+      (god1_commutative_ring_multiply_negation_right
+        K add mul hK a ha y hy)).
+  - exact (andER
+      (ring_negation K add (mul a y) :e K
+        /\ add (ring_negation K add (mul a y)) (mul a y)
+          = ring_zero K add)
+      (add (mul a y) (ring_negation K add (mul a y))
+        = ring_zero K add)
+      (god1_group_inverse_specification K add hG
+        (mul a y)
+        (god1_ring_multiplicative_law K add mul hring a ha y hy))).
+Qed.
+
+Theorem god1_integral_domain_left_cancel :
+  forall K, forall add mul:set -> set -> set,
+    integral_domain K add mul -> forall a :e K,
+      a <> ring_zero K add -> forall x y :e K,
+        mul a x = mul a y -> x = y.
+let K add mul.
+assume hK.
+let a.
+assume ha hane.
+let x.
+assume hx.
+let y.
+assume hy haxy.
+claim hcommring : commutative_ring K add mul.
+exact (god1_integral_domain_commutative_ring K add mul hK).
+claim hring : ring K add mul.
+exact (andEL (ring K add mul) (commutative_on K mul) hcommring).
+claim hG : group K add.
+exact (god1_ring_additive_group K add mul hring).
+claim hnegy : ring_negation K add y :e K.
+exact (god1_group_inverse_in K add hG y hy).
+claim hdiff : add x (ring_negation K add y) :e K.
+exact (god1_group_law_of_composition K add hG
+  x hx (ring_negation K add y) hnegy).
+apply (iffER
+  (x = y)
+  (add x (ring_negation K add y) = ring_zero K add)
+  (god1_group_equal_iff_difference_identity K add hG x hx y hy)).
+apply (orE
+  (a = ring_zero K add)
+  (add x (ring_negation K add y) = ring_zero K add)
+  (god1_integral_domain_zero_product K add mul hK
+    a ha (add x (ring_negation K add y)) hdiff
+    (god1_commutative_ring_equal_products_difference_zero
+      K add mul hcommring a ha x hx y hy haxy))
+  (add x (ring_negation K add y) = ring_zero K add)).
+- assume hazero.
+  exact (FalseE (hane hazero)
+    (add x (ring_negation K add y) = ring_zero K add)).
+- exact (fun h => h).
+Qed.
+
+Theorem god1_integral_domain_left_multiplication_injective :
+  forall K, forall add mul:set -> set -> set,
+    integral_domain K add mul -> forall a :e K,
+      a <> ring_zero K add -> inj K K (fun x => mul a x).
+let K add mul.
+assume hK.
+let a.
+assume ha hane.
+claim hcommring : commutative_ring K add mul.
+exact (god1_integral_domain_commutative_ring K add mul hK).
+claim hring : ring K add mul.
+exact (andEL (ring K add mul) (commutative_on K mul) hcommring).
+apply (andI
+  (forall x :e K, mul a x :e K)
+  (forall x y :e K, mul a x = mul a y -> x = y)).
+- exact (god1_ring_multiplicative_law K add mul hring a ha).
+- exact (god1_integral_domain_left_cancel K add mul hK a ha hane).
+Qed.
+
+Theorem god1_finite_integral_domain_nonzero_unit :
+  forall K, forall add mul:set -> set -> set,
+    finite K -> integral_domain K add mul -> forall a :e K,
+      a <> ring_zero K add -> ring_unit K add mul a.
+let K add mul.
+assume hfin hK.
+let a.
+assume ha hane.
+claim hcommring : commutative_ring K add mul.
+exact (god1_integral_domain_commutative_ring K add mul hK).
+claim hring : ring K add mul.
+exact (andEL (ring K add mul) (commutative_on K mul) hcommring).
+claim hcomm : commutative_on K mul.
+exact (andER (ring K add mul) (commutative_on K mul) hcommring).
+claim hinj : inj K K (fun x => mul a x).
+exact (god1_integral_domain_left_multiplication_injective
+  K add mul hK a ha hane).
+claim hsurj : surj K K (fun x => mul a x).
+exact (god1_finite_self_injection_surjective_core K hfin
+  (fun x => mul a x) hinj).
+claim hone : ring_one K mul :e K.
+exact (andEL
+  (ring_one K mul :e K)
+  (forall x :e K,
+    mul x (ring_one K mul) = x /\ mul (ring_one K mul) x = x)
+  (god1_ring_multiplicative_identity_specification K add mul hring)).
+apply (exandE_i (fun x => x :e K)
+  (fun x => mul a x = ring_one K mul)
+  ((andER
+    (forall x :e K, mul a x :e K)
+    (forall w :e K, exists x :e K, mul a x = w)
+    hsurj) (ring_one K mul) hone)).
+let x.
+assume hx hax.
+apply (andI
+  (a :e K)
+  (exists y :e K,
+    mul y a = ring_one K mul /\ mul a y = ring_one K mul)).
+- exact ha.
+- witness x.
+  exact (andI
+    (x :e K)
+    (mul x a = ring_one K mul /\ mul a x = ring_one K mul)
+    hx
+    (andI
+      (mul x a = ring_one K mul)
+      (mul a x = ring_one K mul)
+      (eq_i_tra (mul x a) (mul a x) (ring_one K mul)
+        (hcomm x hx a ha) hax)
+      hax)).
+Qed.
+
+Theorem god1_finite_integral_domain_field_core :
+  forall K, forall add mul:set -> set -> set,
+    finite K -> integral_domain K add mul -> field K add mul.
+let K add mul.
+assume hfin hK.
+claim hcommring : commutative_ring K add mul.
+exact (god1_integral_domain_commutative_ring K add mul hK).
+claim hring : ring K add mul.
+exact (andEL (ring K add mul) (commutative_on K mul) hcommring).
+claim hcomm : commutative_on K mul.
+exact (andER (ring K add mul) (commutative_on K mul) hcommring).
+claim hdivision : division_ring K add mul.
+exact (andI
+  (ring K add mul /\ ring_one K mul <> ring_zero K add)
+  (forall x :e K,
+    x <> ring_zero K add -> ring_unit K add mul x)
+  (andI
+    (ring K add mul) (ring_one K mul <> ring_zero K add)
+    hring (god1_integral_domain_one_ne_zero K add mul hK))
+  (god1_finite_integral_domain_nonzero_unit K add mul hfin hK)).
+exact (andI
+  (division_ring K add mul) (commutative_on K mul)
+  hdivision hcomm).
+Qed.
+
 (** Formal interface for the more general finite-domain result used below. **)
 Theorem god1_s8_finite_integral_domain_field_interface :
   forall K, forall add mul:set -> set -> set,
     finite K -> integral_domain K add mul -> field K add mul.
-Admitted.
+exact god1_finite_integral_domain_field_core.
+Qed.
 
 Theorem god1_s8_theorem1_integers_mod_p_domain_field_prime :
   forall p :e omega,
