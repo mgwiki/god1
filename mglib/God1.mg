@@ -34495,6 +34495,14 @@ Theorem god1_s6_theorem1_neutral_element_unique :
       neutral_element X op e1 ->
       neutral_element X op e2 ->
       e1 = e2.
+let X op.
+assume hop.
+let e1 e2.
+assume he1 he2.
+//GOD1PRF:8596 Suppose that $e^{\prime}, e^{\prime \prime}$ are neutral elements.
+//GOD1PRF:8663 Then the formula $e^{\prime} \perp x=x$ applied to $x=e^{\prime \prime}$ gives $e^{\prime} \perp e^{\prime \prime}=e^{\prime \prime}$; and the formula $x \perp e^{\prime \prime}=x$ applied to $x=e^{\prime}$ gives $e^{\prime} \perp e^{\prime \prime} =e^{\prime}$.
+apply (eq_i_tra e1 (op e1 e2) e2).
+//GOD1PRF:8926 Hence $e^{\prime}=e^{\prime \prime}$.
 Admitted.
 
 Theorem god1_s6_theorem2_reflection_characterization :
@@ -34514,6 +34522,16 @@ Theorem god1_s6_theorem2_reflection_characterization :
         /\ (forall v :e X, reflection X op e x v -> v = u)
         /\ (forall v :e X, left_reflection X op e x v -> v = u)
         /\ (forall v :e X, right_reflection X op e x v -> v = u)).
+let X op e x.
+assume hop hassoc he hx.
+apply andI.
+- apply iffI.
+//GOD1PRF:14362 Let $x^{\prime}$ be a left reflection and $x^{\prime \prime}$ a right reflection of $x$.
+//GOD1PRF:14513 Using associativity, it follows that
+//GOD1PRF:14745 Hence every right reflection of $x$ is equal to every left reflection of $x$, and therefore $x$ has only one left reflection and only one right reflection, and the two are equal.
+//GOD1PRF:14924 If $x^{\prime}$ denotes their common value, we have
+//GOD1PRF:15024 so that $x$ is reflexible and $x^{\prime}$ is the reflection of $x$ (necessarily unique, because a reflection of $x$ is a fortiori a left reflection and a right reflection of $x$, and must therefore be equal to $x^{\prime}$ ).
+//GOD1PRF:15253 Q.E.D.
 Admitted.
 
 Theorem god1_s6_theorem3_reflections_and_products :
@@ -34529,6 +34547,12 @@ Theorem god1_s6_theorem3_reflections_and_products :
       reflection X op e y ry ->
       reflexible X op e (op x y)
       /\ reflection X op e (op x y) (op ry rx)).
+let X op e.
+assume hop hassoc he.
+apply andI.
+//GOD1PRF:15889 The first part of the theorem follows immediately from the relations
+//GOD1PRF:16006 For the second part, we calculate
+//GOD1PRF:16409 This shows that $x \perp y$ is reflexible and that $y^{\prime} \perp x^{\prime}$ is its reflection.
 Admitted.
 
 Theorem god1_s6_theorem4_equation_with_reflexible_left_factor :
@@ -34543,6 +34567,18 @@ Theorem god1_s6_theorem4_equation_with_reflexible_left_factor :
           op a x = b
           /\ x = op ar b
           /\ (forall y :e X, op a y = b -> y = x).
+let X op e.
+assume hop hassoc he.
+let a.
+assume ha.
+let ar.
+assume harX href.
+let b.
+assume hb.
+//GOD1PRF:17285 For the relation $a \perp x=b$ implies
+//GOD1PRF:17380 i.e.,
+//GOD1PRF:17465 conversely, from $x=a^{\prime} \perp b$ it follows that
+witness (op ar b).
 Admitted.
 
 (** § 7. Groups. **)
@@ -34576,6 +34612,11 @@ Theorem god1_group_identity_and_inverse_specifications :
     neutral_element G mul (group_identity G mul)
     /\ forall x :e G,
       reflection G mul (group_identity G mul) x (group_inverse G mul x).
+let G mul.
+assume hG.
+//GOD1PRF:18611 b) there exists an element $e \in \mathrm{G}$ such that $x e=e x=x$ for all $x \in \mathrm{G}$ (existence of a neutral element);
+//GOD1PRF:18742 c) for each $x \in \mathrm{G}$, there exists an element $x^{-1} \in \mathrm{G}$ such that $x^{-1} x=x x^{-1}=e$ (existence of an inverse for each element of G ).
+apply andI.
 Admitted.
 
 //GOD1:26816 indexed_group_product_operation : "componentwise multiplication on the product of the family of groups #2 indexed by #1" | $(x_i)(y_i)=(x_i y_i)_{i\in #1}$
@@ -34591,6 +34632,16 @@ Theorem god1_indexed_direct_product_is_group :
     group
       (Pi_ i :e I, G i)
       (indexed_group_product_operation I mul).
+let I G mul.
+assume hgroups.
+//GOD1PRF:27181 Then the pair consisting of the set $\mathbf{G}$ and this law of composition is a group.
+//GOD1PRF:27272 To prove associativity, consider three elements
+//GOD1PRF:27805 Thus the associative law on G follows from the associativity of the laws of composition on the factors $\mathrm{G}_{1}, \ldots, \mathrm{G}_{n}$.
+//GOD1PRF:27951 To show that G has a neutral element, consider the element
+//GOD1PRF:28155 A trivial calculation shows immediately that $e$ is a neutral element for the law of composition on G.
+//GOD1PRF:28258 Finally, if
+//GOD1PRF:28314 is any element of G , it is immediate that $x$ has an inverse given by the formula
+//GOD1PRF:28458 Thus the product set $\mathrm{G}_{1} \times \ldots \times \mathrm{G}_{n}$, together with the law of composition defined above, is a group.
 Admitted.
 
 //GOD1:29275 group_direct_power : "the direct power of #1 indexed by #3" | $#1^{#3}$
@@ -34612,11 +34663,31 @@ Theorem god1_subgroup_characterization :
       group_identity G mul :e H
       /\ (forall x y :e H, mul x y :e H)
       /\ (forall x :e H, group_inverse G mul x :e H)).
+let G mul H.
+assume hG hHG.
+apply iffI.
+//GOD1PRF:31594 Let H be a subgroup of a group G .
+//GOD1PRF:31629 Since H is not empty, it contains at least one element $a$.
+//GOD1PRF:31689 From the relations $a \in \mathrm{H}$ and $a \in \mathrm{H}$ it follows therefore that H contains
+//GOD1PRF:31808 in other words, a subgroup H of G always contains the neutral element of G .
+//GOD1PRF:31885 Next, if H contains an element $x$, then since it contains $e$ and $x$ it also contains
+//GOD1PRF:31997 and therefore the relation $x \in H$ implies the relation $x^{-1} \in H$.
+//GOD1PRF:32073 Let $x, y$ be any elements of H .
+//GOD1PRF:32107 Since H contains $x$ and $y^{-1}$ (by what has just been proved), H must contain
+//GOD1PRF:32228 and therefore the relations $x \in \mathrm{H}$ and $y \in \mathrm{H}$ imply the relation $x y \in \mathrm{H}$.
+//GOD1PRF:32341 Conversely, let H be a subset of G which has the following three properties:
+//GOD1PRF:32620 Then H is a subgroup of G .
+//GOD1PRF:32648 For H is not empty, by $b$ ); and if $x, y$ are any two elements of H , then H contains $x$ and $y^{-1}$, by $c$ ), and hence also $x y^{-1}$, by a).
+//GOD1PRF:32798 Hence the conditions a), b), c) above characterize subgroups ; in practice they are often used in place of the original definition.
 Admitted.
 
 Theorem god1_subgroup_induced_group :
   forall G, forall mul:set -> set -> set, forall H,
     subgroup G mul H -> group H mul.
+let G mul H.
+assume hH.
+//GOD1PRF:33511 The set H , endowed with this law of composition, is a group.
+//GOD1PRF:33573 For since the law of composition is associative on G , a fortiori it is associative on H ; since H contains the neutral element $e$ of G , the law of composition on H clearly has $e$ as neutral element; and every $x \in H$ has an inverse in $H$, by condition $c$ ).
 Admitted.
 
 //GOD1:39560 group_nat_power : "the natural-number power #4 of #3 in the group #1" | $#3^{#4}$
@@ -34648,6 +34719,10 @@ Theorem god1_group_integer_power_laws :
     /\ (forall p q :e int,
       group_int_power G mul (group_int_power G mul x p) q
       = group_int_power G mul x (mul_SNo p q)).
+let G mul x.
+assume hx hG.
+//GOD1PRF:40125 By means of the associativity of multiplication in G , the following rules of calculation are easily verified :
+apply andI.
 Admitted.
 
 //GOD1:40617 cyclic_subgroup : "the subgroup of #1 generated by #3" | $\langle #3\rangle$
@@ -34658,6 +34733,9 @@ Definition cyclic_subgroup :
 Theorem god1_powers_form_cyclic_subgroup :
   forall G, forall mul:set -> set -> set, forall x :e G,
     group G mul -> subgroup G mul (cyclic_subgroup G mul x).
+let G mul x.
+assume hx hG.
+//GOD1PRF:40343 It follows that the set of elements $x^{p}$ (for fixed $x \in \mathrm{G}$ and variable $p \in \mathrm{Z}$ ) is a subgroup of G : for clearly it is not empty, and if it contains elements $u=x^{p}, v=x^{q}$, the formula $u v^{-1} =x^{p-q}$ shows that it contains $u v^{-1}$.
 Admitted.
 
 //GOD1:41978 cyclic_group : "#1 with multiplication #2 is a cyclic group" | $(#1,#2)\text{ is cyclic}$
@@ -34687,6 +34765,17 @@ Theorem god1_s7_theorem1_intersection_and_directed_union_subgroups :
       /\ (forall i j :e I, exists k :e I,
         H i c= H k /\ H j c= H k)) ->
       subgroup G mul (group_family_union I H)).
+let G mul I H.
+assume hG hH.
+apply andI.
+//GOD1PRF:42954 Let $M$ be the intersection of the $H_{i}$.
+//GOD1PRF:42998 $M$ is not empty, because the neutral element of G belongs to all the $\mathrm{H}_{i}$ and therefore to M ; if M contains two elements $x, y$, then these two elements belong to each $\mathrm{H}_{i}$ and therefore so does $x y^{-1}$.
+//GOD1PRF:43231 Hence $x y^{-1}$ belongs to M , and therefore M is a subgroup of G .
+//GOD1PRF:43301 Now let U be the union of the $\mathrm{H}_{i}$.
+//GOD1PRF:43349 Clearly U is not empty.
+//GOD1PRF:43373 Let $x, y$ be two elements of U , then there exist indices $i, j \in \mathrm{I}$ such that $x \in \mathrm{H}_{i}$ and $y \in \mathrm{H}_{j}$.
+//GOD1PRF:43515 By the hypothesis of the theorem, there exists an index $k \in \mathrm{I}$ such that $\mathrm{H}_{k}$ contains both $x$ and $y$, and therefore also contains $x y^{-1}$.
+//GOD1PRF:43684 Hence $x y^{-1}$ belongs to U , and U is a subgroup of G .
 Admitted.
 
 //GOD1:43744 subgroup_generated_by : "the subgroup of #1 generated by #3" | $\langle #3\rangle_{#1}$
@@ -34705,6 +34794,12 @@ Theorem god1_generated_subgroup_is_smallest :
     /\ (forall H :e Power G,
       subgroup G mul H -> B c= H ->
       subgroup_generated_by G mul B c= H).
+let G mul B.
+assume hG hBG.
+//GOD1PRF:43744 Let B be a subset of a group G .
+//GOD1PRF:43777 There exist subgroups of G which contain B (for example, G itself); the intersection of all these subgroups is again a subgroup, by Theorem 1 ; this subgroup contains B and is contained in every subgroup of G containing B.
+//GOD1PRF:44000 Hence this subgroup is the "smallest" of all the subgroups of G which contain B , and is called the subgroup of G generated by B .
+apply andI.
 Admitted.
 
 //GOD1:45063 group_word_product : "the product of the first #5 terms of #4 in the group #1" | $\prod_{i<#5}#4_i$
@@ -34726,6 +34821,24 @@ Theorem god1_s7_theorem2_generated_subgroup_words :
             f i :e G
             /\ (f i :e B \/ group_inverse G mul (f i) :e B))
           /\ x = group_word_product G mul f p).
+let G mul B.
+assume hG hBG.
+let x.
+assume hx.
+apply iffI.
+//GOD1PRF:45406 To prove Theorem 2, consider the set H of all $x \in \mathrm{G}$ which satisfy the conditions of the theorem.
+//GOD1PRF:45516 We have to show that H is a subgroup, that H contains B , and that H is contained in every subgroup which contains B .
+//GOD1PRF:45636 The last of these assertions is obvious: if a subgroup contains B then clearly it contains the elements $x_{i}$ in the statement of the theorem, hence it contains the element $x$.
+//GOD1PRF:45817 That H contains B is equally obvious, for an element $x \in \mathrm{~B}$ satisfies conditions $a$ ) and $b$ ), as we see by taking $p=1$ and $x_{1}=x$.
+//GOD1PRF:45970 It remains to prove that H is a subgroup.
+//GOD1PRF:46012 First of all, H contains the neutral element of G, by Remark 3 above.
+//GOD1PRF:46082 Let $x, y$ be two elements of H; then we have say
+//GOD1PRF:46448 Hence
+//GOD1PRF:46606 Thus $x y^{-1}$ is of the form
+//GOD1PRF:46675 where
+//GOD1PRF:46811 and consequently $x y^{-1} \in \mathrm{H}$.
+//GOD1PRF:46855 Hence H is a subgroup of G .
+//GOD1PRF:46886 Q.E.D.
 Admitted.
 
 //GOD1:46894 generating_set : "#3 is a set of generators of the group #1" | $\langle #3\rangle=#1$
@@ -34752,6 +34865,10 @@ Definition permutation_composition : set -> set -> set -> set :=
 Theorem god1_permutations_form_group :
   forall X,
     group (permutation_group X) (permutation_composition X).
+let X.
+//GOD1PRF:22384 If $f, g$ are permutations of X, then so is their composition $f \circ g$ (§ 2, Theorem 6); hence the formula $(f, g) \rightarrow f \circ g$ defines a law of composition on the set $\mathrm{S}(\mathrm{X})$.
+//GOD1PRF:22592 This law of composition is associative (§ 2, Theorem 2); it admits a neutral element, namely the identity mapping $j_{\mathrm{X}}$ (which is sometimes called the identity permutation in this context); and if $f$ is a permutation of X , then so is the inverse mapping $\bar{f}^{-1}$ by virtue of §2, Theorem 5, and clearly $\bar{f}^{-1}$ is the inverse of $f$ with respect to the law of composition under discussion.
+//GOD1PRF:23011 Hence the pair consisting of the set $\mathrm{S}(\mathrm{X})$ and the law of composition $(f, g) \rightarrow f \circ g$ on this set, is a group, called the group of permutations of the set X.
 Admitted.
 
 //GOD1:49782 adjacent_transposition : "#2 is an adjacent transposition of the finite ordinal #1" | $#2=(i\ i+1)$
@@ -34776,6 +34893,24 @@ Theorem god1_s7_theorem3_symmetric_group_generated_by_transpositions :
       (permutation_group n)
       (permutation_composition n)
       (adjacent_transpositions n).
+let n.
+assume hn.
+//GOD1PRF:50092 We shall prove, by induction on $n$, that every permutation $s \in \mathbf{S}_{n}$ is a product of transpositions.
+//GOD1PRF:50207 The case $n=1$ is trivial because the group $\mathrm{S}_{n}$ then consists of just one element.
+//GOD1PRF:50304 Consider then a permutation $s \in \mathfrak{S}_{n}$, and put $s(n)=i$.
+//GOD1PRF:50376 If $t_{j}$ denotes the transposition which interchanges $j$ and $j+1$, it is clear that the permutation
+//GOD1PRF:50531 satisfies $u(n)=n$, and we have
+//GOD1PRF:50665 by virtue of the fact that
+//GOD1PRF:50709 for every transposition $t$.
+//GOD1PRF:50738 Hence, to show that $s$ is a product of transpositions, it is enough to show that $u$ is such a product.
+//GOD1PRF:50843 But since $u(n)=n, u$ permutes the elements $1,2, \ldots, n-1$ of $I_{n}$; in other words, $u$ "induces" on $I_{n-1}$ a permutation $u^{\prime} \in \mathfrak{S}_{n-1}$.
+//GOD1PRF:51012 By the inductive hypothesis, $u^{\prime}$ can be written in the form
+//GOD1PRF:51131 where $v_{1}, \ldots, v_{q}$ are transpositions in the group $\mathfrak{S}_{n-1}$.
+//GOD1PRF:51214 So let us define permutations $w_{1}, \ldots, w_{q}$ of $I_{n}$ by the rule
+//GOD1PRF:51403 since $u$ and $u^{\prime}$ agree on $\mathrm{I}_{n-1}$ and since $u(n)=n$, it is clear that
+//GOD1PRF:51538 But since the $v_{j}$ are transpositions of $\mathrm{I}_{n-1}$, obviously the $w_{j}$ are transpositions of $\mathrm{I}_{n}$.
+//GOD1PRF:51664 Hence $u$ is a product of transpositions in the group $\mathfrak{S}_{n}$, and therefore so is $s$.
+//GOD1PRF:51763 Q.E.D.
 Admitted.
 
 //GOD1:53380 left_coset : "the left coset of #3 represented by #4 in #1" | $#4#3$
@@ -34816,12 +34951,26 @@ Theorem god1_left_coset_relation_is_equivalence :
       left_coset_relation G mul H x y ->
       left_coset_relation G mul H y z ->
       left_coset_relation G mul H x z).
+let G mul H.
+assume hH.
+apply andI.
+//GOD1PRF:51973 First of all, the relation $\mathrm{R}\{x, x\}$ is always true, because it signifies that H contains the identity element
+//GOD1PRF:52114 Next, to show that $\mathbf{R}\{x, y\}$ implies $\mathbf{R}\{y, x\}$, we observe that, by the definition of a subgroup, the relation
+//GOD1PRF:52279 implies $\left(x^{-1} y\right)^{-1} \in \mathrm{H}$, i.e., $y^{-1} x \in \mathrm{H}$.
+//GOD1PRF:52365 Finally, the relations $\mathrm{R}\{x, y\}$ and $\mathrm{R}\{y, z\}$, i.e., the relations
+//GOD1PRF:52525 imply the relation $\left(x^{-1} y\right)\left(y^{-1} z\right) \in \mathrm{H}$, i.e., $x^{-1} z \in \mathrm{H}$, which is the relation $\mathrm{R}\{x, z\}$.
+//GOD1PRF:52684 Hence the relation $\mathrm{R}\{x, y\}$ is an equivalence relation on the set G .
 Admitted.
 
 Theorem god1_left_cosets_equipotent_to_subgroup :
   forall G, forall mul:set -> set -> set, forall H,
     subgroup G mul H ->
     forall x :e G, equip H (left_coset G mul H x).
+let G mul H.
+assume hH.
+let x.
+assume hx.
+//GOD1PRF:55039 For every left coset $x \mathrm{H}$ there exists a bijection of H onto $x \mathrm{H}$, namely the mapping $z \rightarrow x z$ : this is surjective by the definition of $x \mathrm{H}$, and injective because each $x \in \mathrm{G}$ is invertible, so that Theorem 4 of § 6 applies.
 Admitted.
 
 Theorem god1_s7_theorem4_lagrange_cardinality_formula :
@@ -34832,6 +34981,16 @@ Theorem god1_s7_theorem4_lagrange_cardinality_formula :
       equip (left_coset_quotient G mul H) q ->
       equip H r ->
       n = mul_nat q r.
+let G mul H.
+assume hG hH hfin.
+let n.
+assume hn.
+let q.
+assume hq.
+let r.
+assume hr heG heQ heH.
+//GOD1PRF:55319 In particular, if G is a finite group, so that H is also finite, then we see that each left coset $x \mathrm{H}$ contains the same number of elements as H .
+//GOD1PRF:55476 Now the cosets $x \mathrm{H}$ form a partition of the set G ; hence (§ 5, Theorem 7) the number of elements in G is equal to the number of elements in H multiplied by the number of distinct left cosets $x \mathrm{H}$.
 Admitted.
 
 Theorem god1_left_and_right_coset_indices_equal :
@@ -34840,6 +34999,9 @@ Theorem god1_left_and_right_coset_indices_equal :
     equip
       (left_coset_quotient G mul H)
       (right_coset_quotient G mul H).
+let G mul H.
+assume hH.
+//GOD1PRF:56194 It is easy to show that $(\mathrm{G}: \mathrm{H})$ is also equal to the number of distinct right cosets Hx of H in G .
 Admitted.
 
 Theorem god1_s7_theorem5_finite_group_power_is_identity :
@@ -34847,11 +35009,41 @@ Theorem god1_s7_theorem5_finite_group_power_is_identity :
     group G mul -> equip G n ->
     forall x :e G,
       group_nat_power G mul x n = group_identity G mul.
+let G mul n.
+assume hn hG hequip.
+let x.
+assume hx.
+//GOD1PRF:56559 Let H be the subgroup of G generated by $x$, and let $r=\operatorname{Card}(\mathrm{H})$.
+//GOD1PRF:56649 Since $n$ is a multiple of $r$, it is enough to prove that $x^{r}=e$.
+//GOD1PRF:56719 In other words, it is enough to prove Theorem 5 in the case where G is generated by $x$.
+//GOD1PRF:56809 So let G be generated by an element $x$, and consider the mapping $f: \mathbf{Z} \rightarrow \mathrm{G}$ defined by
+//GOD1PRF:56944 by hypothesis, $f$ is surjective.
+//GOD1PRF:56978 The formulae for calculating with powers (Example 9) show that we have the relations
+//GOD1PRF:57190 from these relations it follows immediately that the $q \in \mathbf{Z}$ such that $f(q)=e$ form a subgroup of $\mathbf{Z}$, which is therefore of the form $s \mathbf{Z}$ where $s$ is a well-determined positive integer.
+//GOD1PRF:57410 Furthermore, the relation $f\left(q^{\prime}\right)=f\left(q^{\prime \prime}\right)$ is equivalent to
+//GOD1PRF:57584 and from the formulae above this in turn is equivalent to $f\left(q^{\prime}-q^{\prime \prime}\right)=e$, i.e., to
+//GOD1PRF:57812 Since $f$ is surjective, it follows that the number of elements of $\mathbf{G}$ is equal to the number of classes modulo $s$ in $\mathbf{Z}$; in other words, the order of $\mathbf{G}$ is $s$, and since $x^{s}=e$ the proof is complete.
+//GOD1PRF:58049 Q.E.D.
 Admitted.
 
 Theorem god1_s7_permutation_group_order :
   forall X, forall n :e omega,
     equip X n -> equip (permutation_group X) (factorial n).
+let X n.
+assume hn hequip.
+//GOD1PRF:58547 The theorem is clearly true when $n=1$, and we shall prove it by induction on $n$; in other words, we shall show that if it is true for the integer $n-1$, then it is true for the integer $n$.
+//GOD1PRF:58740 To do this, fix an element $a$ in X , and let
+//GOD1PRF:58822 be the set obtained by removing the element $a$ from X ; the set Y has $n-1$ elements, and therefore (by the inductive hypothesis) the theorem applies to Y .
+//GOD1PRF:58981 On the other hand the group $\mathrm{S}(\mathrm{Y})$ may be considered as a subgroup of $\mathrm{S}(\mathrm{X})$, for each permutation $s$ of the set Y we may associate the permutation $\bar{s}$ of X given by
+//GOD1PRF:59298 In this way $\mathbf{S}(\mathbf{Y})$ is identified with the subgroup of $\mathbf{S}(\mathbf{X})$ consisting of those permutations of X which have a as a fixed point.
+//GOD1PRF:59465 By the inductive hypothesis, the group $\mathfrak{S}(\mathrm{Y})$ has $(n-1)$ ! elements; hence to show that $\mathfrak{S}(\mathrm{X})$ has $n!$ elements it is enough (by Theorem 4) to show that the index of $S(Y)$ in $S(X)$ is equal to $n$.
+//GOD1PRF:59708 Let $f: \mathrm{S}(\mathrm{X}) \rightarrow \mathrm{X}$ be the mapping defined by
+//GOD1PRF:59864 If $s, t$ are permutations of X , the relation $f(s)=f(t)$ therefore means that
+//GOD1PRF:59993 which in turn means that
+//GOD1PRF:60065 i.e., that $s$ and $t$ belong to the same left coset of $\mathfrak{S}(\mathrm{Y})$ in $\mathfrak{S}(\mathrm{X})$.
+//GOD1PRF:60179 By Theorem 2 of §4 it follows therefore that the number of left cosets of $\mathrm{S}(\mathrm{Y})$ in $\mathrm{S}(\mathrm{X})$ is equal to the number of elements in the image of $\mathrm{S}(\mathrm{X})$ under $f$, i.e., to the number of elements $x \in \mathrm{X}$ for which there exists a permutation $s$ of X such that $x=s(a)$.
+//GOD1PRF:60511 But it is clear that every $x \in \mathrm{X}$ is of the form $x=s(a)$ for a suitably chosen permutation $s$; hence the number of left cosets (i.e., the index of $\mathfrak{S}(\mathrm{Y})$ in $\mathfrak{S}(\mathrm{X}))$ is equal to $n$.
+//GOD1PRF:60749 Q.E.D.
 Admitted.
 
 //GOD1:60785 group_homomorphism : "#7 is a homomorphism from the group #1 to the group #3" | $#7:#1\to #3$
@@ -34874,6 +35066,11 @@ Theorem god1_group_homomorphism_preserves_identity_and_inverse :
     f (group_identity G mulG) = group_identity H mulH
     /\ forall x :e G,
       f (group_inverse G mulG x) = group_inverse H mulH (f x).
+let G mulG H mulH f.
+assume hf.
+//GOD1PRF:60962 Putting $y=e$, we obtain $f(x)=f(x) f(e)$, and therefore
+//GOD1PRF:61036 Next, taking $y=x^{-1}$, we obtain $e=f(x) f\left(x^{-1}\right)$, so that
+apply andI.
 Admitted.
 
 Theorem god1_s7_theorem6_composite_and_inverse_homomorphisms :
@@ -34886,6 +35083,16 @@ Theorem god1_s7_theorem6_composite_and_inverse_homomorphisms :
     group_homomorphism M mulM P mulP (fun x => g (f x))
     /\ (bij M N f ->
       group_homomorphism N mulN M mulM (inv M f)).
+let M mulM N mulN P mulP f g.
+assume hf hg.
+apply andI.
+//GOD1PRF:63143 If $x, y \in \mathrm{M}$, then
+//GOD1PRF:63245 which proves the first part of the theorem.
+//GOD1PRF:63291 To prove the second part, in other words that
+//GOD1PRF:63377 for all $u, v \in \mathrm{~N}$, it is sufficient (since $f$ is bijective, and therefore injective) to establish that the images under $f$ of the two sides of this relation are equal, i.e., that
+//GOD1PRF:63641 But the left-hand side is equal to $u v$, by the definition of the inverse mapping $f^{-1}$; and since $f$ is a homomorphism, the right-hand side is equal to
+//GOD1PRF:63858 which is equal to $u v$.
+//GOD1PRF:63885 Q.E.D.
 Admitted.
 
 //GOD1:63893 group_isomorphism : "#7 is an isomorphism from the group #1 onto the group #3" | $#7:#1\xrightarrow{\sim}#3$
@@ -34916,6 +35123,9 @@ Theorem god1_group_isomorphism_is_equivalence :
       isomorphic_groups G mulG H mulH ->
       isomorphic_groups H mulH K mulK ->
       isomorphic_groups G mulG K mulK).
+apply andI.
+//GOD1PRF:64271 is an equivalence relation.
+//GOD1PRF:64299 For $G$ and $G$ are isomorphic, $G$ being any group, because the identity mapping is an isomorphism of $G$ onto $G$; next, if there exists an isomorphism $f$ of G onto H , then there exists an isomorphism of H onto G , namely $f^{-1}$; and finally, if there exists an isomorphism $f$ of a group M onto a group N , and an isomorphism $g$ of N onto a third group P , then there exists an isomorphism of M onto P-namely $g \circ f$, which is a homomorphism by Theorem 6, and is bijective because $f$ and $g$ are bijective.
 Admitted.
 
 //GOD1:64820 group_automorphism : "#4 is an automorphism of the group #1" | $#4\in\operatorname{Aut}(#1)$
@@ -34963,6 +35173,13 @@ Theorem god1_s7_theorem7_images_and_preimages_of_subgroups :
     /\ (forall B,
       subgroup H mulH B ->
       subgroup G mulG (group_preimage_of_subset G B f)).
+let G mulG H mulH f.
+assume hf.
+apply andI.
+//GOD1PRF:67072 Let $\mathrm{G}^{\prime}$ be a subgroup of G and let $\mathrm{H}^{\prime}=f\left(\mathrm{G}^{\prime}\right)$ be its image.
+//GOD1PRF:67195 If $u, v \in \mathrm{H}^{\prime}$, then there exist $x, y \in \mathrm{G}$ such that $u=f(x), v=f(y)$, and we calculate
+//GOD1PRF:67397 Since $x y^{-1} \in \mathrm{G}^{\prime}$, it follows that $u v^{-1} \in \mathrm{H}^{\prime}$, and therefore $\mathrm{H}^{\prime}$ is a subgroup of H .
+//GOD1PRF:67548 This proves the first statement of the theorem; the proof of the second is analogous, and we leave the details to the reader.
 Admitted.
 
 //GOD1:68903 normal_subgroup : "#3 is a normal subgroup of the group #1" | $#3\trianglelefteq #1$
@@ -34980,6 +35197,10 @@ Theorem god1_kernel_is_normal_subgroup :
     group_homomorphism G mulG H mulH f ->
     normal_subgroup G mulG
       (group_homomorphism_kernel G mulG H mulH f).
+let G mulG H mulH f.
+assume hf.
+//GOD1PRF:68629 If $x \in \mathrm{~N}, a \in \mathrm{G}$ we have
+//GOD1PRF:69103 Thus the kernel of a homomorphism is a normal subgroup.
 Admitted.
 
 Theorem god1_s7_theorem8_injective_iff_trivial_kernel :
@@ -34990,6 +35211,15 @@ Theorem god1_s7_theorem8_injective_iff_trivial_kernel :
     (inj G H f <->
       group_homomorphism_kernel G mulG H mulH f
       = {group_identity G mulG}).
+let G mulG H mulH f.
+assume hf.
+apply iffI.
+//GOD1PRF:69673 Since $f(e)=e$, the relation $f(x)=e$ is equivalent to $f(x)=f(e)$.
+//GOD1PRF:69741 If $f$ is injective, this implies that $x=e$, and therefore $\operatorname{Ker}(f)=\{e\}$.
+//GOD1PRF:69832 Conversely, suppose that $\operatorname{Ker}(f)=\{e\}$.
+//GOD1PRF:69888 If $f(x)=f(y)$, then
+//GOD1PRF:69935 or, since $f$ is a homomorphism, $f\left(x y^{-1}\right)=e$, i.e.
+//GOD1PRF:70046 Since $\operatorname{Ker}(f)=\{e\}$ it follows that $x y^{-1}=e$, so that $x=y$ and hence $f$ is injective.
 Admitted.
 
 Theorem god1_s7_theorem9_factorization_of_group_homomorphism :
@@ -35019,6 +35249,28 @@ Theorem god1_s7_theorem9_factorization_of_group_homomorphism :
           group_homomorphism_kernel G mulG H mulH p
           = group_homomorphism_kernel G mulG M mulM f)
         /\ (surj H M f' <-> surj G M f)).
+let G mulG H mulH M mulM p f.
+assume hp hf hsurj.
+apply andI.
+//GOD1PRF:70787 A criterion for the existence of a mapping $f^{\prime}: \mathrm{H} \rightarrow \mathrm{M}$ such that $f=f^{\prime} \circ p$ is provided by Theorem 1 of § 2; it is that the relation $p(x)=p(y)$ implies the relation $f(x)=f(y)$.
+//GOD1PRF:71015 Now, since $p$ is a homomorphism, the relation $p(x)=p(y)$ is equivalent to
+//GOD1PRF:71140 or in other words
+//GOD1PRF:71203 and likewise the relation $f(x)=f(y)$ is equivalent to
+//GOD1PRF:71301 Taking $y=e$ we see that the relation $x \in \operatorname{Ker}(p)$ must imply the relation $x \in \operatorname{Ker}(f)$, that is to say $\operatorname{Ker}(p) \subset \operatorname{Ker}(f)$; and this condition is obviously sufficient as well as necessary.
+//GOD1PRF:71560 Hence, condition $b$ ) is equivalent to the existence of a mapping $f^{\prime}$ such that $f=f^{\prime} \circ p$.
+//GOD1PRF:71674 Now $f^{\prime}$ is necessarily a homomorphism.
+//GOD1PRF:71722 To see this, let $u, v \in \mathrm{H}$; since $p$ is surjective we may write $u=p(x), v=p(y)$ where $x, y$ are elements of G; and then we have
+//GOD1PRF:72045 Thus the equivalence of $a$ ) and $b$ ) is proved.
+//GOD1PRF:72098 The uniqueness of $f^{\prime}$ is clear, because ( $p$ being surjective) the relation
+//GOD1PRF:72238 implies $f_{1}^{\prime}=f_{2}^{\prime}$.
+//GOD1PRF:72279 It is equally clear that
+//GOD1PRF:72375 and therefore that $f^{\prime}$ is surjective if and only if $f$ is surjective.
+//GOD1PRF:72457 Finally, consider the kernel of $f^{\prime}$.
+//GOD1PRF:72503 It consists of the $u \in \mathrm{H}$ such that $f^{\prime}(u)=e$; putting $u=p(x)$, this relation becomes $f(x)=e$, i.e., $x \in \operatorname{Ker}(f)$.
+//GOD1PRF:72657 Therefore we have
+//GOD1PRF:72750 For $f^{\prime}$ to be injective it is therefore necessary and sufficient (Theorem 8) that $p[\operatorname{Ker}(f)]=e$, i.e., that $\operatorname{Ker}(f) \subset \operatorname{Ker}(p)$.
+//GOD1PRF:72937 But $\operatorname{Ker}(p) \subset \operatorname{Ker}(f)$ by hypothesis, and therefore $f^{\prime}$ is injective if and only if $\operatorname{Ker}(f)=\operatorname{Ker}(p)$.
+//GOD1PRF:73114 Q.E.D.
 Admitted.
 
 //GOD1:54276 int_mod_class : "the congruence class of #2 modulo #1" | $#2+#1\mathbb Z$
@@ -35046,6 +35298,9 @@ Definition int_mod_addition : set -> set -> set -> set :=
 Theorem god1_integers_modulo_p_form_additive_group :
   forall p :e omega,
     group (int_mod_quotient p) (int_mod_addition p).
+let p.
+assume hp.
+//GOD1PRF:54788 It can easily be shown that (cf. §8, section 3) the set $\mathbf{Z} / p \mathbf{Z}$, endowed with this law of composition, is a group (the additive group of integers modulo p).
 Admitted.
 
 Theorem god1_s7_theorem10_classification_of_cyclic_groups :
@@ -35058,6 +35313,20 @@ Theorem god1_s7_theorem10_classification_of_cyclic_groups :
       equip G p
       /\ isomorphic_groups
         G mul (int_mod_quotient p) (int_mod_addition p)).
+apply andI.
+//GOD1PRF:73166 Let G be a cyclic group, $x$ a generator of G .
+//GOD1PRF:73214 Then every element of G is a power of $x$; in other words, the homomorphism $f: \mathbf{Z} \rightarrow \mathrm{G}$ defined by
+//GOD1PRF:73359 is surjective.
+//GOD1PRF:73376 Let I denote the kernel of $f$; I is a subgroup of $\mathbf{Z}$, and therefore there exists a unique integer $p \geqslant 0$ such that
+//GOD1PRF:73561 There are two cases to consider : $p=0$, and $p>0$.
+//GOD1PRF:73615 If $p=0$, then by Theorem $8 f$ is injective, hence bijective, and is therefore an isomorphism of the additive group $\mathbf{Z}$ onto $\mathbf{G}$.
+//GOD1PRF:73765 If $p>0$, consider the additive group $\mathbf{Z} / p \mathbf{Z}$ (Example 11) and the canonical mapping $g$ of $\mathbf{Z}$ onto $\mathbf{Z} / p \mathbf{Z}$; this is a surjective homomorphism with kernel equal to $p \mathbf{Z}$, so that $\operatorname{Ker}(g)=\operatorname{Ker}(f)$.
+//GOD1PRF:74050 Hence, by Theorem 9, there exists a unique homomorphism
+//GOD1PRF:74175 such that $f=f^{\prime} \circ g$.
+//GOD1PRF:74630 Since $f$ is surjective, so is $f^{\prime}$; since $\operatorname{Ker}(f)=\operatorname{Ker}(g), f^{\prime}$ is injective ; hence $f^{\prime}$ is bijective and therefore G is isomorphic to the additive group $\mathbf{Z} / p \mathbf{Z}$ of integers modulo $p$.
+//GOD1PRF:74890 In particular, $G$ has the same number of elements as this group, i.e., G has $p$ elements.
+//GOD1PRF:74982 We have therefore proved
+//GOD1PRF:75245 It follows that two cyclic groups are isomorphic if and only if they have the same number (finite or infinite) of elements.
 Admitted.
 
 //GOD1:75370 group_element_order : "#4 is the order of #3 in the group #1" | $\operatorname{ord}_{#1}(#3)=#4$
@@ -35080,6 +35349,11 @@ Theorem god1_finite_element_order_characterization :
       /\ (forall p :e n,
         p <> 0 ->
         group_nat_power G mul x p <> group_identity G mul)).
+let G mul x.
+assume hx hG.
+apply andI.
+//GOD1PRF:75505 Since H is the image of $\mathbb{Z}$ under the homomorphism $n \rightarrow x^{n}$, it follows that $x$ is of finite order if and only if there exists a non-zero integer $p$ such that
+//GOD1PRF:75706 and then the order of $x$ is the smallest positive integer $p$ which satisfies this relation.
 Admitted.
 
 //GOD1:75842 group_action : "the group #1 acts on #3 by #4" | $#1\curvearrowright #3$
@@ -35115,6 +35389,12 @@ Theorem god1_action_maps_are_permutations_and_form_homomorphism :
       G mul
       (permutation_group X) (permutation_composition X)
       (fun s => fun x :e X => act s x).
+let G mul X act.
+assume hact.
+apply andI.
+//GOD1PRF:78818 If a group $G$ operates on a set $X$, then for every $s \in G$ the mapping
+//GOD1PRF:78980 is bijective, because $s^{-1} \cdot(s \cdot x)=\left(s^{-1} s\right) \cdot x=e \cdot x=x$.
+//GOD1PRF:79071 Hence the conditions at the beginning of this section are equivalent to the statement that the mapping $s \rightarrow \bar{s}$ is a homomorphism of the group G onto a group of transformations of the set X .
 Admitted.
 
 Theorem god1_action_stabilizer_is_subgroup :
@@ -35123,6 +35403,11 @@ Theorem god1_action_stabilizer_is_subgroup :
     group_action G mul X act ->
     forall x :e X,
       subgroup G mul (action_stabilizer G mul X act x).
+let G mul X act.
+assume hact.
+let x.
+assume hx.
+//GOD1PRF:79319 For each $x \in \mathrm{X}$, the elements $s \in \mathrm{G}$ such that $s . x=x$ clearly form a subgroup of G ; this subgroup is called the stabilizer of $x$ in G .
 Admitted.
 
 (** § 8. Rings and fields. **)
