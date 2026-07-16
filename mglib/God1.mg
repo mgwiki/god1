@@ -53137,6 +53137,667 @@ Definition mapping_ring_multiplication :
   set -> (set -> set -> set) -> set -> set -> set :=
   fun X mul f g => fun x :e X => mul (f x) (g x).
 
+Theorem god1_mapping_ring_addition_eval :
+  forall X, forall add:set -> set -> set, forall f g,
+    forall z :e X,
+      mapping_ring_addition X add f g z = add (f z) (g z).
+let X add f g z.
+assume hz.
+exact (beta X (fun u => add (f u) (g u)) z hz).
+Qed.
+
+Theorem god1_mapping_ring_multiplication_eval :
+  forall X, forall mul:set -> set -> set, forall f g,
+    forall z :e X,
+      mapping_ring_multiplication X mul f g z = mul (f z) (g z).
+let X mul f g z.
+assume hz.
+exact (beta X (fun u => mul (f u) (g u)) z hz).
+Qed.
+
+Theorem god1_mapping_ring_additive_group :
+  forall X K, forall add mul:set -> set -> set,
+    ring K add mul ->
+    group (K :^: X) (mapping_ring_addition X add).
+let X K add mul.
+assume hK.
+apply (god1_indexed_direct_product_is_group
+  X (fun z => K) (fun z => add)).
+let z.
+assume hz.
+exact (god1_ring_additive_group K add mul hK).
+Qed.
+
+Theorem god1_mapping_ring_addition_commutative :
+  forall X K, forall add mul:set -> set -> set,
+    ring K add mul ->
+    commutative_on (K :^: X) (mapping_ring_addition X add).
+let X K add mul.
+assume hK.
+claim hAG : group K add.
+exact (god1_ring_additive_group K add mul hK).
+claim hcomm : commutative_on K add.
+exact (andER
+  (group K add) (commutative_on K add)
+  (god1_ring_additive_abelian_group K add mul hK)).
+claim hlaw : law_of_composition
+  (K :^: X) (mapping_ring_addition X add).
+exact (god1_group_law_of_composition
+  (K :^: X) (mapping_ring_addition X add)
+  (god1_mapping_ring_additive_group X K add mul hK)).
+let f.
+assume hf.
+let g.
+assume hg.
+apply (Pi_ext X (fun z => K)
+  (mapping_ring_addition X add f g) (hlaw f hf g hg)
+  (mapping_ring_addition X add g f) (hlaw g hg f hf)).
+let z.
+assume hz.
+apply (eq_i_tra
+  (mapping_ring_addition X add f g z)
+  (add (f z) (g z))
+  (mapping_ring_addition X add g f z)).
+- exact (beta X (fun u => add (f u) (g u)) z hz).
+- apply (eq_i_tra
+    (add (f z) (g z)) (add (g z) (f z))
+    (mapping_ring_addition X add g f z)).
+  - exact (hcomm (f z) (ap_Pi X (fun u => K) f z hf hz)
+      (g z) (ap_Pi X (fun u => K) g z hg hz)).
+  - exact (eq_sym
+      (mapping_ring_addition X add g f z)
+      (add (g z) (f z))
+      (beta X (fun u => add (g u) (f u)) z hz)).
+Qed.
+
+Theorem god1_mapping_ring_additive_abelian_group :
+  forall X K, forall add mul:set -> set -> set,
+    ring K add mul ->
+    abelian_group (K :^: X) (mapping_ring_addition X add).
+let X K add mul.
+assume hK.
+exact (andI
+  (group (K :^: X) (mapping_ring_addition X add))
+  (commutative_on (K :^: X) (mapping_ring_addition X add))
+  (god1_mapping_ring_additive_group X K add mul hK)
+  (god1_mapping_ring_addition_commutative X K add mul hK)).
+Qed.
+
+Theorem god1_mapping_ring_multiplicative_law :
+  forall X K, forall add mul:set -> set -> set,
+    ring K add mul ->
+    law_of_composition (K :^: X) (mapping_ring_multiplication X mul).
+let X K add mul.
+assume hK.
+claim hM : law_of_composition K mul.
+exact (god1_ring_multiplicative_law K add mul hK).
+let f.
+assume hf.
+let g.
+assume hg.
+claim hfun :
+  (fun z :e X => mul (f z) (g z)) :e (Pi_ z :e X, K).
+apply (lam_Pi X (fun z => K)
+  (fun z => mul (f z) (g z))).
+let z.
+assume hz.
+exact (hM
+  (f z) (ap_Pi X (fun u => K) f z hf hz)
+  (g z) (ap_Pi X (fun u => K) g z hg hz)).
+exact hfun.
+Qed.
+
+Theorem god1_mapping_ring_multiplication_associative :
+  forall X K, forall add mul:set -> set -> set,
+    ring K add mul ->
+    associative_on (K :^: X) (mapping_ring_multiplication X mul).
+let X K add mul.
+assume hK.
+claim hM : law_of_composition
+  (K :^: X) (mapping_ring_multiplication X mul).
+exact (god1_mapping_ring_multiplicative_law X K add mul hK).
+claim hassoc : associative_on K mul.
+exact (andER
+  (abelian_group K add /\ law_of_composition K mul)
+  (associative_on K mul)
+  (andEL
+    ((abelian_group K add /\ law_of_composition K mul)
+      /\ associative_on K mul)
+    (exists one :e K, neutral_element K mul one)
+    (andEL
+      (((abelian_group K add /\ law_of_composition K mul)
+        /\ associative_on K mul)
+        /\ exists one :e K, neutral_element K mul one)
+      (forall x y z :e K,
+        mul x (add y z) = add (mul x y) (mul x z)
+        /\ mul (add x y) z = add (mul x z) (mul y z))
+      hK))).
+let f.
+assume hf.
+let g.
+assume hg.
+let h.
+assume hh.
+apply eq_sym.
+apply (Pi_ext X (fun z => K)
+  (mapping_ring_multiplication X mul
+    (mapping_ring_multiplication X mul f g) h)
+  (hM (mapping_ring_multiplication X mul f g)
+    (hM f hf g hg) h hh)
+  (mapping_ring_multiplication X mul f
+    (mapping_ring_multiplication X mul g h))
+  (hM f hf (mapping_ring_multiplication X mul g h)
+    (hM g hg h hh))).
+let z.
+assume hz.
+apply (eq_i_tra
+  (mapping_ring_multiplication X mul
+    (mapping_ring_multiplication X mul f g) h z)
+  (mul (mapping_ring_multiplication X mul f g z) (h z))
+  (mapping_ring_multiplication X mul f
+    (mapping_ring_multiplication X mul g h) z)).
+- exact (beta X
+    (fun u => mul (mapping_ring_multiplication X mul f g u) (h u))
+    z hz).
+- apply (eq_i_tra
+    (mul (mapping_ring_multiplication X mul f g z) (h z))
+    (mul (mul (f z) (g z)) (h z))
+    (mapping_ring_multiplication X mul f
+      (mapping_ring_multiplication X mul g h) z)).
+  - exact (f_eq_i (fun u => mul u (h z))
+      (mapping_ring_multiplication X mul f g z)
+      (mul (f z) (g z))
+      (beta X (fun u => mul (f u) (g u)) z hz)).
+  - apply (eq_i_tra
+      (mul (mul (f z) (g z)) (h z))
+      (mul (f z) (mul (g z) (h z)))
+      (mapping_ring_multiplication X mul f
+        (mapping_ring_multiplication X mul g h) z)).
+    - exact (eq_sym
+        (mul (f z) (mul (g z) (h z)))
+        (mul (mul (f z) (g z)) (h z))
+        (hassoc
+          (f z) (ap_Pi X (fun u => K) f z hf hz)
+          (g z) (ap_Pi X (fun u => K) g z hg hz)
+          (h z) (ap_Pi X (fun u => K) h z hh hz))).
+    - apply (eq_i_tra
+        (mul (f z) (mul (g z) (h z)))
+        (mul (f z) (mapping_ring_multiplication X mul g h z))
+        (mapping_ring_multiplication X mul f
+          (mapping_ring_multiplication X mul g h) z)).
+      - exact (f_eq_i (fun u => mul (f z) u)
+          (mul (g z) (h z))
+          (mapping_ring_multiplication X mul g h z)
+          (eq_sym
+            (mapping_ring_multiplication X mul g h z)
+            (mul (g z) (h z))
+            (beta X (fun u => mul (g u) (h u)) z hz))).
+      - exact (eq_sym
+          (mapping_ring_multiplication X mul f
+            (mapping_ring_multiplication X mul g h) z)
+          (mul (f z) (mapping_ring_multiplication X mul g h z))
+          (beta X
+            (fun u => mul (f u)
+              (mapping_ring_multiplication X mul g h u))
+            z hz)).
+Qed.
+
+Theorem god1_mapping_ring_multiplicative_identity :
+  forall X K, forall add mul:set -> set -> set,
+    ring K add mul ->
+    neutral_element (K :^: X) (mapping_ring_multiplication X mul)
+      (fun z :e X => ring_one K mul).
+let X K add mul.
+assume hK.
+claim hM : law_of_composition
+  (K :^: X) (mapping_ring_multiplication X mul).
+exact (god1_mapping_ring_multiplicative_law X K add mul hK).
+claim honeutral : neutral_element K mul (ring_one K mul).
+exact (god1_ring_multiplicative_identity_specification K add mul hK).
+claim hone : ring_one K mul :e K.
+exact (andEL
+  (ring_one K mul :e K)
+  (forall u :e K,
+    mul u (ring_one K mul) = u /\ mul (ring_one K mul) u = u)
+  honeutral).
+claim honefun :
+  (fun z :e X => ring_one K mul) :e (Pi_ z :e X, K).
+apply (lam_Pi X (fun z => K) (fun z => ring_one K mul)).
+let z.
+assume hz.
+exact hone.
+apply (andI
+  ((fun z :e X => ring_one K mul) :e (K :^: X))
+  (forall f :e (K :^: X),
+    mapping_ring_multiplication X mul f
+      (fun z :e X => ring_one K mul) = f
+    /\ mapping_ring_multiplication X mul
+      (fun z :e X => ring_one K mul) f = f)).
+- exact honefun.
+- let f.
+  assume hf.
+  apply andI.
+  - apply (Pi_ext X (fun z => K)
+      (mapping_ring_multiplication X mul f
+        (fun u :e X => ring_one K mul))
+      (hM f hf (fun u :e X => ring_one K mul) honefun)
+      f hf).
+    let z.
+    assume hz.
+    apply (eq_i_tra
+      (mapping_ring_multiplication X mul f
+        (fun u :e X => ring_one K mul) z)
+      (mul (f z) ((fun u :e X => ring_one K mul) z))
+      (f z)).
+    - exact (beta X
+        (fun u => mul (f u) ((fun v :e X => ring_one K mul) u))
+        z hz).
+    - apply (eq_i_tra
+        (mul (f z) ((fun u :e X => ring_one K mul) z))
+        (mul (f z) (ring_one K mul)) (f z)).
+      - exact (f_eq_i (fun u => mul (f z) u)
+          ((fun u :e X => ring_one K mul) z) (ring_one K mul)
+          (beta X (fun u => ring_one K mul) z hz)).
+      - exact (andEL
+          (mul (f z) (ring_one K mul) = f z)
+          (mul (ring_one K mul) (f z) = f z)
+          ((andER
+            (ring_one K mul :e K)
+            (forall u :e K,
+              mul u (ring_one K mul) = u
+              /\ mul (ring_one K mul) u = u)
+            honeutral)
+            (f z) (ap_Pi X (fun u => K) f z hf hz))).
+  - apply (Pi_ext X (fun z => K)
+      (mapping_ring_multiplication X mul
+        (fun u :e X => ring_one K mul) f)
+      (hM (fun u :e X => ring_one K mul) honefun f hf)
+      f hf).
+    let z.
+    assume hz.
+    apply (eq_i_tra
+      (mapping_ring_multiplication X mul
+        (fun u :e X => ring_one K mul) f z)
+      (mul ((fun u :e X => ring_one K mul) z) (f z))
+      (f z)).
+    - exact (beta X
+        (fun u => mul ((fun v :e X => ring_one K mul) u) (f u))
+        z hz).
+    - apply (eq_i_tra
+        (mul ((fun u :e X => ring_one K mul) z) (f z))
+        (mul (ring_one K mul) (f z)) (f z)).
+      - exact (f_eq_i (fun u => mul u (f z))
+          ((fun u :e X => ring_one K mul) z) (ring_one K mul)
+          (beta X (fun u => ring_one K mul) z hz)).
+      - exact (andER
+          (mul (f z) (ring_one K mul) = f z)
+          (mul (ring_one K mul) (f z) = f z)
+          ((andER
+            (ring_one K mul :e K)
+            (forall u :e K,
+              mul u (ring_one K mul) = u
+              /\ mul (ring_one K mul) u = u)
+            honeutral)
+            (f z) (ap_Pi X (fun u => K) f z hf hz))).
+Qed.
+
+Theorem god1_mapping_ring_multiplication_commutative :
+  forall X K, forall add mul:set -> set -> set,
+    commutative_ring K add mul ->
+    commutative_on (K :^: X) (mapping_ring_multiplication X mul).
+let X K add mul.
+assume hK.
+claim hring : ring K add mul.
+exact (andEL (ring K add mul) (commutative_on K mul) hK).
+claim hcomm : commutative_on K mul.
+exact (andER (ring K add mul) (commutative_on K mul) hK).
+claim hM : law_of_composition
+  (K :^: X) (mapping_ring_multiplication X mul).
+exact (god1_mapping_ring_multiplicative_law X K add mul hring).
+let f.
+assume hf.
+let g.
+assume hg.
+apply (Pi_ext X (fun z => K)
+  (mapping_ring_multiplication X mul f g) (hM f hf g hg)
+  (mapping_ring_multiplication X mul g f) (hM g hg f hf)).
+let z.
+assume hz.
+apply (eq_i_tra
+  (mapping_ring_multiplication X mul f g z)
+  (mul (f z) (g z))
+  (mapping_ring_multiplication X mul g f z)).
+- exact (god1_mapping_ring_multiplication_eval X mul f g z hz).
+- apply (eq_i_tra
+    (mul (f z) (g z)) (mul (g z) (f z))
+    (mapping_ring_multiplication X mul g f z)).
+  - exact (hcomm
+      (f z) (ap_Pi X (fun u => K) f z hf hz)
+      (g z) (ap_Pi X (fun u => K) g z hg hz)).
+  - exact (eq_sym
+      (mapping_ring_multiplication X mul g f z)
+      (mul (g z) (f z))
+      (god1_mapping_ring_multiplication_eval X mul g f z hz)).
+Qed.
+
+Theorem god1_mapping_ring_left_distributive_eval :
+  forall X K, forall add mul:set -> set -> set,
+  forall f g h :e (K :^: X), forall z :e X,
+    ring K add mul ->
+    mapping_ring_multiplication X mul f
+      (mapping_ring_addition X add g h) z
+    = mapping_ring_addition X add
+      (mapping_ring_multiplication X mul f g)
+      (mapping_ring_multiplication X mul f h) z.
+let X K add mul.
+let f.
+assume hf.
+let g.
+assume hg.
+let h.
+assume hh.
+let z.
+assume hz hK.
+apply (eq_i_tra
+  (mapping_ring_multiplication X mul f
+    (mapping_ring_addition X add g h) z)
+  (mul (f z) (mapping_ring_addition X add g h z))
+  (mapping_ring_addition X add
+    (mapping_ring_multiplication X mul f g)
+    (mapping_ring_multiplication X mul f h) z)).
+- exact (god1_mapping_ring_multiplication_eval X mul f
+    (mapping_ring_addition X add g h) z hz).
+- apply (eq_i_tra
+    (mul (f z) (mapping_ring_addition X add g h z))
+    (mul (f z) (add (g z) (h z)))
+    (mapping_ring_addition X add
+      (mapping_ring_multiplication X mul f g)
+      (mapping_ring_multiplication X mul f h) z)).
+  - exact (f_eq_i (fun u => mul (f z) u)
+      (mapping_ring_addition X add g h z)
+      (add (g z) (h z))
+      (god1_mapping_ring_addition_eval X add g h z hz)).
+  - apply (eq_i_tra
+      (mul (f z) (add (g z) (h z)))
+      (add (mul (f z) (g z)) (mul (f z) (h z)))
+      (mapping_ring_addition X add
+        (mapping_ring_multiplication X mul f g)
+        (mapping_ring_multiplication X mul f h) z)).
+    - exact (andEL
+        (mul (f z) (add (g z) (h z))
+          = add (mul (f z) (g z)) (mul (f z) (h z)))
+        (mul (add (f z) (g z)) (h z)
+          = add (mul (f z) (h z)) (mul (g z) (h z)))
+        (god1_ring_distributive_laws K add mul hK
+          (f z) (ap_Pi X (fun u => K) f z hf hz)
+          (g z) (ap_Pi X (fun u => K) g z hg hz)
+          (h z) (ap_Pi X (fun u => K) h z hh hz))).
+    - apply (eq_i_tra
+        (add (mul (f z) (g z)) (mul (f z) (h z)))
+        (add (mapping_ring_multiplication X mul f g z)
+          (mul (f z) (h z)))
+        (mapping_ring_addition X add
+          (mapping_ring_multiplication X mul f g)
+          (mapping_ring_multiplication X mul f h) z)).
+      - exact (f_eq_i (fun u => add u (mul (f z) (h z)))
+          (mul (f z) (g z))
+          (mapping_ring_multiplication X mul f g z)
+          (eq_sym
+            (mapping_ring_multiplication X mul f g z)
+            (mul (f z) (g z))
+            (god1_mapping_ring_multiplication_eval X mul f g z hz))).
+      - apply (eq_i_tra
+          (add (mapping_ring_multiplication X mul f g z)
+            (mul (f z) (h z)))
+          (add (mapping_ring_multiplication X mul f g z)
+            (mapping_ring_multiplication X mul f h z))
+          (mapping_ring_addition X add
+            (mapping_ring_multiplication X mul f g)
+            (mapping_ring_multiplication X mul f h) z)).
+        - exact (f_eq_i
+            (fun u => add (mapping_ring_multiplication X mul f g z) u)
+            (mul (f z) (h z))
+            (mapping_ring_multiplication X mul f h z)
+            (eq_sym
+              (mapping_ring_multiplication X mul f h z)
+              (mul (f z) (h z))
+              (god1_mapping_ring_multiplication_eval X mul f h z hz))).
+        - exact (eq_sym
+            (mapping_ring_addition X add
+              (mapping_ring_multiplication X mul f g)
+              (mapping_ring_multiplication X mul f h) z)
+            (add (mapping_ring_multiplication X mul f g z)
+              (mapping_ring_multiplication X mul f h z))
+            (god1_mapping_ring_addition_eval X add
+              (mapping_ring_multiplication X mul f g)
+              (mapping_ring_multiplication X mul f h) z hz)).
+Qed.
+
+Theorem god1_mapping_ring_right_distributive_eval :
+  forall X K, forall add mul:set -> set -> set,
+  forall f g h :e (K :^: X), forall z :e X,
+    ring K add mul ->
+    mapping_ring_multiplication X mul
+      (mapping_ring_addition X add f g) h z
+    = mapping_ring_addition X add
+      (mapping_ring_multiplication X mul f h)
+      (mapping_ring_multiplication X mul g h) z.
+let X K add mul.
+let f.
+assume hf.
+let g.
+assume hg.
+let h.
+assume hh.
+let z.
+assume hz hK.
+apply (eq_i_tra
+  (mapping_ring_multiplication X mul
+    (mapping_ring_addition X add f g) h z)
+  (mul (mapping_ring_addition X add f g z) (h z))
+  (mapping_ring_addition X add
+    (mapping_ring_multiplication X mul f h)
+    (mapping_ring_multiplication X mul g h) z)).
+- exact (god1_mapping_ring_multiplication_eval X mul
+    (mapping_ring_addition X add f g) h z hz).
+- apply (eq_i_tra
+    (mul (mapping_ring_addition X add f g z) (h z))
+    (mul (add (f z) (g z)) (h z))
+    (mapping_ring_addition X add
+      (mapping_ring_multiplication X mul f h)
+      (mapping_ring_multiplication X mul g h) z)).
+  - exact (f_eq_i (fun u => mul u (h z))
+      (mapping_ring_addition X add f g z)
+      (add (f z) (g z))
+      (god1_mapping_ring_addition_eval X add f g z hz)).
+  - apply (eq_i_tra
+      (mul (add (f z) (g z)) (h z))
+      (add (mul (f z) (h z)) (mul (g z) (h z)))
+      (mapping_ring_addition X add
+        (mapping_ring_multiplication X mul f h)
+        (mapping_ring_multiplication X mul g h) z)).
+    - exact (andER
+        (mul (f z) (add (g z) (h z))
+          = add (mul (f z) (g z)) (mul (f z) (h z)))
+        (mul (add (f z) (g z)) (h z)
+          = add (mul (f z) (h z)) (mul (g z) (h z)))
+        (god1_ring_distributive_laws K add mul hK
+          (f z) (ap_Pi X (fun u => K) f z hf hz)
+          (g z) (ap_Pi X (fun u => K) g z hg hz)
+          (h z) (ap_Pi X (fun u => K) h z hh hz))).
+    - apply (eq_i_tra
+        (add (mul (f z) (h z)) (mul (g z) (h z)))
+        (add (mapping_ring_multiplication X mul f h z)
+          (mul (g z) (h z)))
+        (mapping_ring_addition X add
+          (mapping_ring_multiplication X mul f h)
+          (mapping_ring_multiplication X mul g h) z)).
+      - exact (f_eq_i (fun u => add u (mul (g z) (h z)))
+          (mul (f z) (h z))
+          (mapping_ring_multiplication X mul f h z)
+          (eq_sym
+            (mapping_ring_multiplication X mul f h z)
+            (mul (f z) (h z))
+            (god1_mapping_ring_multiplication_eval X mul f h z hz))).
+      - apply (eq_i_tra
+          (add (mapping_ring_multiplication X mul f h z)
+            (mul (g z) (h z)))
+          (add (mapping_ring_multiplication X mul f h z)
+            (mapping_ring_multiplication X mul g h z))
+          (mapping_ring_addition X add
+            (mapping_ring_multiplication X mul f h)
+            (mapping_ring_multiplication X mul g h) z)).
+        - exact (f_eq_i
+            (fun u => add (mapping_ring_multiplication X mul f h z) u)
+            (mul (g z) (h z))
+            (mapping_ring_multiplication X mul g h z)
+            (eq_sym
+              (mapping_ring_multiplication X mul g h z)
+              (mul (g z) (h z))
+              (god1_mapping_ring_multiplication_eval X mul g h z hz))).
+        - exact (eq_sym
+            (mapping_ring_addition X add
+              (mapping_ring_multiplication X mul f h)
+              (mapping_ring_multiplication X mul g h) z)
+            (add (mapping_ring_multiplication X mul f h z)
+              (mapping_ring_multiplication X mul g h z))
+            (god1_mapping_ring_addition_eval X add
+              (mapping_ring_multiplication X mul f h)
+              (mapping_ring_multiplication X mul g h) z hz)).
+Qed.
+
+Theorem god1_mapping_ring_distributive_laws :
+  forall X K, forall add mul:set -> set -> set,
+    ring K add mul -> forall f g h :e (K :^: X),
+      mapping_ring_multiplication X mul f
+        (mapping_ring_addition X add g h)
+      = mapping_ring_addition X add
+        (mapping_ring_multiplication X mul f g)
+        (mapping_ring_multiplication X mul f h)
+      /\ mapping_ring_multiplication X mul
+        (mapping_ring_addition X add f g) h
+      = mapping_ring_addition X add
+        (mapping_ring_multiplication X mul f h)
+        (mapping_ring_multiplication X mul g h).
+let X K add mul.
+assume hK.
+claim hA : law_of_composition
+  (K :^: X) (mapping_ring_addition X add).
+exact (god1_group_law_of_composition
+  (K :^: X) (mapping_ring_addition X add)
+  (god1_mapping_ring_additive_group X K add mul hK)).
+claim hM : law_of_composition
+  (K :^: X) (mapping_ring_multiplication X mul).
+exact (god1_mapping_ring_multiplicative_law X K add mul hK).
+let f.
+assume hf.
+let g.
+assume hg.
+let h.
+assume hh.
+apply andI.
+- apply (Pi_ext X (fun z => K)
+    (mapping_ring_multiplication X mul f
+      (mapping_ring_addition X add g h))
+    (hM f hf (mapping_ring_addition X add g h) (hA g hg h hh))
+    (mapping_ring_addition X add
+      (mapping_ring_multiplication X mul f g)
+      (mapping_ring_multiplication X mul f h))
+    (hA
+      (mapping_ring_multiplication X mul f g) (hM f hf g hg)
+      (mapping_ring_multiplication X mul f h) (hM f hf h hh))).
+  let z.
+  assume hz.
+  exact (god1_mapping_ring_left_distributive_eval
+    X K add mul f hf g hg h hh z hz hK).
+- apply (Pi_ext X (fun z => K)
+    (mapping_ring_multiplication X mul
+      (mapping_ring_addition X add f g) h)
+    (hM (mapping_ring_addition X add f g) (hA f hf g hg) h hh)
+    (mapping_ring_addition X add
+      (mapping_ring_multiplication X mul f h)
+      (mapping_ring_multiplication X mul g h))
+    (hA
+      (mapping_ring_multiplication X mul f h) (hM f hf h hh)
+      (mapping_ring_multiplication X mul g h) (hM g hg h hh))).
+  let z.
+  assume hz.
+  exact (god1_mapping_ring_right_distributive_eval
+    X K add mul f hf g hg h hh z hz hK).
+Qed.
+
+Theorem god1_mapping_ring_ring :
+  forall X K, forall add mul:set -> set -> set,
+    ring K add mul ->
+    ring (K :^: X)
+      (mapping_ring_addition X add)
+      (mapping_ring_multiplication X mul).
+let X K add mul.
+assume hK.
+claim honeutral :
+  neutral_element (K :^: X) (mapping_ring_multiplication X mul)
+    (fun z :e X => ring_one K mul).
+exact (god1_mapping_ring_multiplicative_identity X K add mul hK).
+apply (andI
+  ((((abelian_group (K :^: X) (mapping_ring_addition X add)
+      /\ law_of_composition (K :^: X)
+        (mapping_ring_multiplication X mul))
+      /\ associative_on (K :^: X)
+        (mapping_ring_multiplication X mul))
+      /\ exists one :e (K :^: X),
+        neutral_element (K :^: X)
+          (mapping_ring_multiplication X mul) one))
+  (forall f g h :e (K :^: X),
+    mapping_ring_multiplication X mul f
+      (mapping_ring_addition X add g h)
+      = mapping_ring_addition X add
+        (mapping_ring_multiplication X mul f g)
+        (mapping_ring_multiplication X mul f h)
+    /\ mapping_ring_multiplication X mul
+      (mapping_ring_addition X add f g) h
+      = mapping_ring_addition X add
+        (mapping_ring_multiplication X mul f h)
+        (mapping_ring_multiplication X mul g h))).
+- apply andI.
+  - apply andI.
+    - apply andI.
+      - exact (god1_mapping_ring_additive_abelian_group
+          X K add mul hK).
+      - exact (god1_mapping_ring_multiplicative_law X K add mul hK).
+    - exact (god1_mapping_ring_multiplication_associative
+        X K add mul hK).
+  - witness (fun z :e X => ring_one K mul).
+    apply andI.
+    - exact (andEL
+        ((fun z :e X => ring_one K mul) :e (K :^: X))
+        (forall f :e (K :^: X),
+          mapping_ring_multiplication X mul f
+            (fun z :e X => ring_one K mul) = f
+          /\ mapping_ring_multiplication X mul
+            (fun z :e X => ring_one K mul) f = f)
+        honeutral).
+    - exact honeutral.
+- exact (god1_mapping_ring_distributive_laws X K add mul hK).
+Qed.
+
+Theorem god1_mapping_ring_commutative_ring :
+  forall X K, forall add mul:set -> set -> set,
+    commutative_ring K add mul ->
+    commutative_ring (K :^: X)
+      (mapping_ring_addition X add)
+      (mapping_ring_multiplication X mul).
+let X K add mul.
+assume hK.
+exact (andI
+  (ring (K :^: X)
+    (mapping_ring_addition X add)
+    (mapping_ring_multiplication X mul))
+  (commutative_on (K :^: X) (mapping_ring_multiplication X mul))
+  (god1_mapping_ring_ring X K add mul
+    (andEL (ring K add mul) (commutative_on K mul) hK))
+  (god1_mapping_ring_multiplication_commutative X K add mul hK)).
+Qed.
+
 Theorem god1_mapping_ring_is_ring :
   forall X K, forall add mul:set -> set -> set,
     ring K add mul ->
@@ -53151,12 +53812,17 @@ Theorem god1_mapping_ring_is_ring :
         (mapping_ring_multiplication X mul)).
 let X K add mul.
 assume hK.
-apply andI.
 //GOD1PRF:102450 The set A , together with the two laws of composition
 claim h_s8_mapping_ring_operations_closed :
   law_of_composition (K :^: X) (mapping_ring_addition X add)
   /\ law_of_composition (K :^: X) (mapping_ring_multiplication X mul).
-admit.
+exact (andI
+  (law_of_composition (K :^: X) (mapping_ring_addition X add))
+  (law_of_composition (K :^: X) (mapping_ring_multiplication X mul))
+  (god1_group_law_of_composition
+    (K :^: X) (mapping_ring_addition X add)
+    (god1_mapping_ring_additive_group X K add mul hK))
+  (god1_mapping_ring_multiplicative_law X K add mul hK)).
 //GOD1PRF:102583 just defined, is a ring (which is commutative if and only if K is commutative).
 claim h_s8_mapping_ring_goal :
   ring
@@ -53168,7 +53834,16 @@ claim h_s8_mapping_ring_goal :
       (K :^: X)
       (mapping_ring_addition X add)
       (mapping_ring_multiplication X mul)).
-admit.
+exact (andI
+  (ring (K :^: X)
+    (mapping_ring_addition X add)
+    (mapping_ring_multiplication X mul))
+  (commutative_ring K add mul ->
+    commutative_ring (K :^: X)
+      (mapping_ring_addition X add)
+      (mapping_ring_multiplication X mul))
+  (god1_mapping_ring_ring X K add mul hK)
+  (god1_mapping_ring_commutative_ring X K add mul)).
 //GOD1PRF:102736 To prove this we must show that the two sides of this equation, which are mappings of X into K , take the same value at each element $x$ of $X$.
 claim h_s8_mapping_ring_pointwise_extensionality :
   forall f g h :e (K :^: X),
@@ -53183,13 +53858,47 @@ claim h_s8_mapping_ring_pointwise_extensionality :
     = mapping_ring_addition X add
       (mapping_ring_multiplication X mul f g)
       (mapping_ring_multiplication X mul f h).
-admit.
+let f.
+assume hf.
+let g.
+assume hg.
+let h.
+assume hh hpointwise.
+exact (andEL
+  (mapping_ring_multiplication X mul f
+    (mapping_ring_addition X add g h)
+    = mapping_ring_addition X add
+      (mapping_ring_multiplication X mul f g)
+      (mapping_ring_multiplication X mul f h))
+  (mapping_ring_multiplication X mul
+    (mapping_ring_addition X add f g) h
+    = mapping_ring_addition X add
+      (mapping_ring_multiplication X mul f h)
+      (mapping_ring_multiplication X mul g h))
+  (god1_mapping_ring_distributive_laws
+    X K add mul hK f hf g hg h hh)).
 //GOD1PRF:102881 The value of the left-hand side at $x$ is $f(x)(g(x)+h(x))$, and the value of the right-hand side is $f(x) g(x)+f(x) h(x)$.
 claim h_s8_mapping_ring_pointwise_values :
   forall f g h :e (K :^: X), forall z :e X,
     mul (f z) (add (g z) (h z))
       = add (mul (f z) (g z)) (mul (f z) (h z)).
-admit.
+let f.
+assume hf.
+let g.
+assume hg.
+let h.
+assume hh.
+let z.
+assume hz.
+exact (andEL
+  (mul (f z) (add (g z) (h z))
+    = add (mul (f z) (g z)) (mul (f z) (h z)))
+  (mul (add (f z) (g z)) (h z)
+    = add (mul (f z) (h z)) (mul (g z) (h z)))
+  (god1_ring_distributive_laws K add mul hK
+    (f z) (ap_Pi X (fun u => K) f z hf hz)
+    (g z) (ap_Pi X (fun u => K) g z hg hz)
+    (h z) (ap_Pi X (fun u => K) h z hh hz))).
 //GOD1PRF:103005 Hence the distributive law is true in A because it is true in K.
 claim h_s8_mapping_ring_distributive :
   forall f g h :e (K :^: X),
@@ -53198,8 +53907,27 @@ claim h_s8_mapping_ring_distributive :
     = mapping_ring_addition X add
       (mapping_ring_multiplication X mul f g)
       (mapping_ring_multiplication X mul f h).
-admit.
-Admitted.
+let f.
+assume hf.
+let g.
+assume hg.
+let h.
+assume hh.
+exact (andEL
+  (mapping_ring_multiplication X mul f
+    (mapping_ring_addition X add g h)
+    = mapping_ring_addition X add
+      (mapping_ring_multiplication X mul f g)
+      (mapping_ring_multiplication X mul f h))
+  (mapping_ring_multiplication X mul
+    (mapping_ring_addition X add f g) h
+    = mapping_ring_addition X add
+      (mapping_ring_multiplication X mul f h)
+      (mapping_ring_multiplication X mul g h))
+  (god1_mapping_ring_distributive_laws
+    X K add mul hK f hf g hg h hh)).
+exact h_s8_mapping_ring_goal.
+Qed.
 
 //GOD1:104124 subring : "#4 is a subring of the ring #1" | $#4\subseteq #1\text{ is a subring}$
 Definition subring :
