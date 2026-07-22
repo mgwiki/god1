@@ -207,7 +207,8 @@ def main() -> int:
     doc = html.fromstring(data, parser=parser)
 
     # Optional: fix bogus attribute "classname" -> merge into "class"
-    for el in doc.xpath(".//*[@classname]"):
+    for el in doc.iterfind(".//*[@classname]"):
+    # for el in doc.xpath(".//*[@classname]"):
         cn = el.get("classname")
         if cn:
             el.set("class", merge_classes(el.get("class"), cn))
