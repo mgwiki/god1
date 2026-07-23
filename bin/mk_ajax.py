@@ -214,7 +214,13 @@ def main() -> int:
             el.set("class", merge_classes(el.get("class"), cn))
         del el.attrib["classname"]
 
-    proofs = doc.xpath(".//div[contains(concat(' ', normalize-space(@class), ' '), ' proof ')][@id]")
+    #proofs = doc.xpath(".//div[contains(concat(' ', normalize-space(@class), ' '), ' proof ')][@id]")
+    proofs = (
+        el
+        for el in doc.iter("div")
+        if "id" in el.attrib
+        and "proof" in (el.get("class") or "").split()
+    )
     used_names: dict[str, int] = {}
 
     extracted = 0
